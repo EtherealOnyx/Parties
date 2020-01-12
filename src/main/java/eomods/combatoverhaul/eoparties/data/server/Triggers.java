@@ -148,25 +148,9 @@ class Triggers {
                     NetworkDirection.PLAY_TO_CLIENT);
     }
 
-    static void removePlayerInfo(UUID player) {
-        Trackers.remove(player);
-
-    }
-
     private static void markOffline(UUID player, HashSet<UUID> party) {
         for (UUID toSend : party)
             updateOnline(toSend, player, false);
-    }
-
-    static void removeClientInfo(UUID toRemove, HashSet<UUID> clientTrackers) {
-        for (UUID client : clientTrackers)
-            removeClientInfo(toRemove, client);
-    }
-
-    static void removeClientInfo(UUID toRemove, UUID clientTracker) {
-        if (isOnline(clientTracker))
-            Handler.network.sendTo(new ClientPacketData(7, toRemove), getNet(clientTracker),
-                    NetworkDirection.PLAY_TO_CLIENT);
     }
 
     static void moveAllToServer(UUID player) {
@@ -196,5 +180,32 @@ class Triggers {
                 return partyMember;
         }
         return null;
+    }
+
+    public static void removeMemberFromParty(UUID droppingPlayer, HashSet<UUID> party) {
+        for (UUID partyMember : party) {
+            removeMemberFromParty(droppingPlayer, partyMember);
+        }
+    }
+
+    static void removeMemberFromParty(UUID droppingPlayer, UUID partyMember) {
+        Trackers.removeMemberFromParty(droppingPlayer, partyMember);
+        if (isOnline(partyMember))
+            Handler.network.sendTo(new ClientPacketData(6, droppingPlayer), getNet(partyMember),
+                    NetworkDirection.PLAY_TO_CLIENT);
+
+    }
+
+    static void removeParty(UUID droppingPlayer) {
+        Trackers.removeParty(droppingPlayer);
+        if (isOnline(droppingPlayer))
+            Handler.network.sendTo(new ClientPacketData(6), getNet(droppingPlayer),
+                    NetworkDirection.PLAY_TO_CLIENT);
+    }
+
+    public static void removeClientTracker(UUID toRemove, UUID clientTracker) {
+        if (isOnline(clientTracker))
+            Handler.network.sendTo(new ClientPacketData(7, toRemove), getNet(clientTracker),
+                    NetworkDirection.PLAY_TO_CLIENT);
     }
 }

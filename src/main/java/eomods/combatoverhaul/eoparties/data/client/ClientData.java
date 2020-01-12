@@ -97,21 +97,24 @@ public class ClientData {
             inactiveTracks.remove(pet);
             activeTracks.remove(pet);
         }
+        partyMembers.remove(partyMember);
     }
 
-    public static void removePartyMember() {
+    public static void dropParty() {
         AnimHandler.dropParty();
-        for (Map.Entry<UUID, RenderPartyMember> partyMember : partyMembers.entrySet()) {
+        Iterator iter = partyMembers.entrySet().iterator();
+        Map.Entry<UUID, RenderPartyMember> partyMember;
+        while (iter.hasNext()) {
+            partyMember = (Map.Entry<UUID, RenderPartyMember>) iter.next();
             if (!isSelf(partyMember.getKey())) {
-                partyMembers.remove(partyMember.getKey());
-                activeTracks.remove(partyMember.getKey());
-                inactiveTracks.remove(partyMember.getKey());
                 for (UUID pet : partyMember.getValue().getPetList()) {
                     inactiveTracks.remove(pet);
                     activeTracks.remove(pet);
                 }
+                activeTracks.remove(partyMember.getKey());
+                inactiveTracks.remove(partyMember.getKey());
+                iter.remove();
             }
-
         }
         partyLeader = EMPTY;
     }

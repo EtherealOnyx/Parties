@@ -39,13 +39,19 @@ public class PartyEvent {
         System.out.println("Pleaseeeee");
         if (!event.getWorld().isRemote)
             if (event.getTarget() instanceof PlayerEntity) {
-                if (Events.addPlayerToParty(event.getPlayer().getUniqueID(),
-                        event.getTarget().getUniqueID()))
-                    System.out.println("Party creation success.");
-                else
-                    System.out.println("Party creation failed!");
-
+                if (event.getPlayer().getHeldItemMainhand().getItem() == Items.DIAMOND) {
+                    if (Events.addPlayerToParty(event.getPlayer().getUniqueID(),
+                            event.getTarget().getUniqueID()))
+                        System.out.println("Party creation success.");
+                    else
+                        System.out.println("Party creation failed!");
+                } else if (event.getPlayer().getHeldItemMainhand().getItem() == Items.DIAMOND_SWORD) {
+                    //Events.kickPartyMember(event.getTarget().getUniqueID());
+                }
             }
+        if (event.getPlayer().getHeldItemMainhand().getItem() == Items.EMERALD) {
+            Events.dropParty(event.getPlayer().getUniqueID());
+        }
     }
     @SubscribeEvent
     public void interactEntity(PlayerInteractEvent.RightClickItem event) {
@@ -102,6 +108,10 @@ public class PartyEvent {
     @SubscribeEvent()
     public void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
         Events.onPlayerLeave(event.getPlayer().getUniqueID());
+    }
+
+    public void onPlayerDrop(ServerPlayerEntity player) {
+
     }
 
     @OnlyIn(Dist.CLIENT)

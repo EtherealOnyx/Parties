@@ -19,50 +19,16 @@ public class Trackers {
             moveTracker(toTrack, clientTrackers.get(toTrack));
         }
     }
-    static void removeTracker(UUID toTrack, UUID clientTracker) {
-        clientTrackers.get(toTrack).remove(clientTracker);
-        Triggers.removeClientInfo(toTrack, clientTracker);
-
-    }
 
     private static void moveTracker(UUID toTrack, HashSet<UUID> trackers) {
         for (UUID tracker : trackers) {
             Events.moveToServer(toTrack, tracker);
-            Triggers.removeClientInfo(toTrack, tracker);
+            Triggers.removeClientTracker(toTrack, tracker);
         }
     }
 
     static HashSet<UUID> getTrackers(UUID player) {
         return trackers.getOrDefault(player, EMPTY);
-    }
-
-    static void remove(UUID player) {
-        //Remove all people tracking player.
-        trackers.remove(player);
-        clientTrackers.remove(player);
-        for (Map.Entry<UUID, HashSet<UUID>> toTrackers : trackers.entrySet()) {
-            //Found a player tracker.
-            if (toTrackers.getValue().contains(player)) {
-                //Remove player from entry.
-                trackers.get(toTrackers.getKey()).remove(player);
-                //If entry is now empty
-                if (trackers.get(toTrackers.getKey()).size() == 0)
-                    //Completely remove the tracker.
-                    trackers.remove(toTrackers.getKey());
-            }
-        }
-
-        for (Map.Entry<UUID, HashSet<UUID>> toTrackers : clientTrackers.entrySet()) {
-            //Found a player tracker.
-            if (toTrackers.getValue().contains(player)) {
-                //Remove player from entry.
-                clientTrackers.get(toTrackers.getKey()).remove(player);
-                //If entry is now empty
-                if (clientTrackers.get(toTrackers.getKey()).size() == 0)
-                    //Completely remove the tracker.
-                    clientTrackers.remove(toTrackers.getKey());
-            }
-        }
     }
 
     static void moveToClient(UUID playerTracker, UUID toTrack) {
@@ -159,4 +125,90 @@ public class Trackers {
         }
     }
 
+    static void removeOnlyPlayerAll(UUID playerToRemove) {
+        //Remove all people tracking player.
+        removeAllTrackers(playerToRemove);
+        //Remove player from all trackers;
+        removeFromAllTrackers(playerToRemove);
+    }
+
+    private static void removeFromAllTrackers(UUID playerToRemove) {
+        removeFromClientTrackers(playerToRemove);
+        removeFromServerTrackers(playerToRemove);
+    }
+
+    private static void removeFromServerTrackers(UUID playerToRemove) {
+        for (Map.Entry<UUID, HashSet<UUID>> toTrack : trackers.entrySet())
+            if (toTrack.getValue().contains(playerToRemove))
+                removeTrackerServer(toTrack.getKey(), playerToRemove);
+    }
+
+    private static void removeFromClientTrackers(UUID playerToRemove) {
+        for (Map.Entry<UUID, HashSet<UUID>> toTrack : clientTrackers.entrySet())
+            if (toTrack.getValue().contains(playerToRemove))
+                removeTrackerClient(toTrack.getKey(), playerToRemove);
+    }
+
+    static void removeTracker(UUID toTrack, UUID tracker) {
+        removeTrackerClient(toTrack, tracker);
+        removeTrackerServer(toTrack, tracker);
+    }
+
+    static void removeTrackerClient(UUID toTrack, UUID tracker) {
+        clientTrackers.getOrDefault(toTrack, EMPTY).remove(tracker);
+        if (clientTrackers.get(toTrack).size() == 0)
+            clientTrackers.remove(toTrack);
+    }
+
+    static void removeTrackerServer(UUID toTrack, UUID tracker) {
+        trackers.getOrDefault(toTrack, EMPTY).remove(toTrack);
+        if (trackers.get(toTrack).size() == 0)
+            trackers.remove(toTrack);
+
+    }
+
+    static void removeAllTrackers(UUID toTrack) {
+        trackers.remove(toTrack);
+        clientTrackers.remove(toTrack);
+    }
+
+    static void removeParty(UUID droppingPlayer) {
+        //Remove all people tracking player.
+        removeAllTrackers(droppingPlayer);
+        //Remove all trackers from player's pets except self.
+        removeAllPetTrackers(droppingPlayer);
+    }
+
+    private static void removeAllPetTrackers(UUID droppingPlayer) {
+        for (UUID pet : getSubParty(droppingPlayer)) {
+            removeAllTrackersExcept(pet, droppingPlayer);
+        }
+    }
+
+    private static void removeAllTrackersExcept(UUID toTrack, UUID except) {
+        HashSet<UUID> set = new HashSet<>();
+        set.add(except);
+        if (clientTrackers.get(toTrack).contains(except))
+            clientTrackers.put(toTrack, set);
+        else
+            clientTrackers.remove(except);
+        if (trackers.get(toTrack).contains(except))
+            trackers.put(toTrack, set);
+        else
+            trackers.remove(except);
+    }
+
+    public static void removeMemberFromParty(UUID droppingPlayer, UUID partyMember) {
+        //droppingPlayer already has no trackers. droppingPlayer's pets also have no trackers (aside from owner).
+
+        //Remove droppingPlayer from partyMember's trackers.
+        removeTracker(partyMember, droppingPlayer);
+        //Remove droppingPlayer from partyMember's pets.
+        removePetTracker(getSubParty(partyMember), droppingPlayer);
+    }
+
+    static void removePetTracker(HashSet<UUID> pets, UUID tracker) {
+        for (UUID pet : pets)
+            removeTracker(pet, tracker);
+    }
 }

@@ -7,8 +7,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 import static eomods.combatoverhaul.eoparties.data.server.ServerData.*;
-import static eomods.combatoverhaul.eoparties.data.server.Util.EMPTY;
-import static eomods.combatoverhaul.eoparties.data.server.Util.getParty;
+import static eomods.combatoverhaul.eoparties.data.server.Util.*;
 
 //Events cover anything that is called whenever a certain event happens - like when the player needs to join a party,
 // when they go offline, etc.
@@ -111,13 +110,17 @@ public class Events {
     public static void onPlayerLeave(UUID player) {
         //Mark player as offline, send packet to other trackers indicating player is offline.
         Triggers.markOffline(player);
+        checkLeader(player);
+        //Remove player from all trackers. They don't need to be tracked while offline (they can't).
+        Trackers.removeOnlyPlayerAll(player);
+    }
+
+    public static void checkLeader(UUID player) {
         if (partyLeaders.contains(player)) {
             System.out.println("Party member was leader...giving lead to next best person...");
             if (Triggers.nextLeader(getParty(player)))
                 partyLeaders.remove(player);
         }
-        //Remove player from all trackers. They don't need to be tracked while offline (they can't).
-        Triggers.removePlayerInfo(player);
     }
 
     public static void moveAllToServer(UUID player) {
@@ -144,5 +147,29 @@ public class Events {
                 return true;
         }
         return false;
+    }
+
+
+    public static boolean dropParty(UUID droppingPlayer) {
+        return dropParty(droppingPlayer, getParty(droppingPlayer));
+    }
+
+    public static boolean dropParty(UUID droppingPlayer, HashSet<UUID> party) {
+        if (party.size() == 0)
+            return false;
+        party.remove(droppingPlayer);
+        Triggers.removeParty(droppingPlayer);
+        if (party.size() == 1) {
+            Triggers.removeParty(party.iterator().next());
+            partyLeaders.remove(droppingPlayer);
+            partyLeaders.remove(party.iterator().next());
+            parties.remove(party);
+            party.clear();
+            return true;
+        }
+        checkLeader(droppingPlayer);
+        Triggers.removeMemberFromParty(droppingPlayer, party);
+        //Check leaders...
+        return true;
     }
 }

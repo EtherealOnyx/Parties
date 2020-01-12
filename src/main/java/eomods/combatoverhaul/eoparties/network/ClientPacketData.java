@@ -85,7 +85,7 @@ public class ClientPacketData {
             //#6 - Sends a UUID to the client, to tell it that the specified UUID is no longer in the party.
             case 6:
                 if (list.size() == 0)
-                    ClientData.removePartyMember();
+                    ClientData.dropParty();
                 else
                     ClientData.removePartyMember(list.get(0));
                 break;
