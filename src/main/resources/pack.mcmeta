@@ -1,0 +1,6 @@
+{
+    "pack": {
+        "description": "eo_parties resources",
+        "pack_format": 4,
+        "_comment": "Required for 1.13+"}
+}

@@ -1,0 +1,149 @@
+package eomods.combatoverhaul.eoparties.data.server;
+
+import eomods.combatoverhaul.eoparties.lib.Reference;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayerMP;
+
+import java.util.HashSet;
+import java.util.UUID;
+
+import static eomods.combatoverhaul.eoparties.data.server.ServerData.*;
+import static eomods.combatoverhaul.eoparties.data.server.Util.*;
+
+//Events cover anything that is called whenever a certain event happens - like when the player needs to join a party,
+// when they go offline, etc.
+public class Events {
+    //This attempts to add a player to a party. There's only two players here - the requester and requested.
+
+    private static int getIndex(UUID partyMember) {
+        for (int i = 0; i < parties.size(); i++) {
+            if (parties.get(i).contains(partyMember)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+    public static boolean addPlayerToParty(UUID inviter, UUID invited) {
+        boolean inviterInParty = false;
+        boolean invitedInParty = false;
+        int index = -1;
+        for (int i = 0; i < parties.size(); i++) {
+            if (parties.get(i).contains(inviter)) {
+                inviterInParty = true;
+                index = i;
+            }
+            if (parties.get(i).contains(invited)) {
+                invitedInParty = true;
+                index = i;
+            }
+        }
+        if (inviterInParty) {
+            if (invitedInParty)
+                return false;
+            //Party List in index belongs to inviter.
+            return addPlayerToParty(invited, index);
+        } else {
+            if (invitedInParty) {
+                //Party list on index belongs to invited.
+                return addPlayerToParty(invited, index);
+            } else {
+                //No player has a party.
+                createNewParty(inviter, invited);
+                return true;
+            }
+        }
+    }
+    private static void createNewParty(UUID inviter, UUID invited) {
+        //Store party.
+        HashSet<UUID> freshParty = new HashSet<>();
+        freshParty.add(inviter);
+        parties.add(freshParty);
+        //Add a party leader.
+        partyLeaders.add(inviter);
+        //Tells the clients of their party leader.
+        Triggers.updateLeader(inviter);
+        addPlayerToParty(invited, parties.size()-1);
+    }
+
+    private static boolean addPlayerToParty(UUID invited, int index) {
+        if (parties.get(index).size() > Reference.MAX_PARTY_SIZE - 1)
+            return false;
+        //Add player to party.
+        parties.get(index).add(invited);
+
+        //Update information for player.
+        updatePartyInfo(invited, index, true);
+        return true;
+    }
+
+    private static void updatePartyInfo(UUID invited, int index, boolean isNew) {
+        //Send player all UUIDs of their existing party members, including self.
+        Triggers.updatePartyMember(invited, parties.get(index), isNew);
+
+        //Update player trackers.
+        if (isNew)
+            Trackers.addNewTracker(invited, parties.get(index));
+        else
+            //Try to add new trackers...?
+            Trackers.attemptAddNewTracker(invited, parties.get(index));
+
+
+        //Send partyMember and joiner name information.
+        Triggers.updateNameForced(invited, isNew);
+
+        //Send player leader information.
+        Triggers.sendLeader(invited, parties.get(index));
+
+        //Send all online information.
+        Triggers.updateOnline(invited, parties.get(index));
+
+    }
+
+    public static void onPlayerJoin(EntityPlayerMP player) {
+        Triggers.markOnline(player);
+        int index = getIndex(player.getUniqueID());
+        if (index != -1) {
+            updatePartyInfo(player.getUniqueID(), index, false);
+        }
+    }
+
+    public static void onPlayerLeave(UUID player) {
+        //Mark player as offline
+        Triggers.markOffline(player);
+        if (partyLeaders.contains(player)) {
+            System.out.println("Party member was leader...giving lead to next best person...");
+            if (Triggers.nextLeader(getParty(player)))
+                partyLeaders.remove(player);
+        }
+        //Send a packet to all other online players indicating that this player is now offline.
+        //Remove player from all trackers. They don't need to be tracked while offline (they can't).
+        Triggers.removePlayerInfo(player);
+    }
+
+    public static void moveAllToServer(UUID player) {
+        //This checks if that player has any trackers, and then tells the trackers to move them to server side tracking.
+        Trackers.moveToServer(player);
+        Trackers.moveSelfToServer(player);
+        //This tells the player to move all client trackers to server trackers.
+        Triggers.moveAllToServer(player);
+
+    }
+
+    public static void moveToClient(UUID playerTracker, UUID toTrack) {
+        Trackers.moveToClient(playerTracker, toTrack);
+    }
+
+    public static void moveToServer(UUID playerTracker, UUID toTrack) {
+        Trackers.moveToServer(playerTracker, toTrack);
+    }
+
+    public static boolean validatePartyMember(UUID requestingPlayer, UUID toTrack) {
+        for (UUID partyMember : getParty(requestingPlayer)) {
+            //Checks if toTrack is a party member, or one of party member's pets.
+            if (partyMember.equals(toTrack) || subParties.getOrDefault(partyMember, EMPTY).contains(toTrack))
+                return true;
+        }
+        return false;
+    }
+}
