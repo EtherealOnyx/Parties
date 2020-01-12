@@ -1,10 +1,13 @@
 package eomods.combatoverhaul.eoparties.data.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.UUID;
 
+@OnlyIn(Dist.CLIENT)
 class AnimHandler {
     static void addPetToParty(UUID partyMember, UUID... pets) {
         //Tell the UI to add pet below partyMember.
@@ -67,7 +70,7 @@ class AnimHandler {
     }
 
     static void send(String message) {
-        Minecraft.getMinecraft().player.sendMessage(new TextComponentString(message));
+        Minecraft.getInstance().player.sendMessage(new StringTextComponent(message));
     }
 
     static String getName(UUID id) {

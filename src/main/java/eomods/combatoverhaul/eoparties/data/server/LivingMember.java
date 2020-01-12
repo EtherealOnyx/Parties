@@ -1,25 +1,25 @@
 package eomods.combatoverhaul.eoparties.data.server;
 
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class LivingMember {
-    private EntityPlayerMP player;
+    private PlayerEntity player;
     private String name;
 
-    public LivingMember(EntityPlayerMP entity) {
+    public LivingMember(PlayerEntity entity) {
         this.player = entity;
-        this.name = entity.getName();
+        this.name = entity.getName().getFormattedText();
     }
 
     public String getName() {
         return this.name;
     }
 
-    public EntityPlayerMP getPlayer() {
+    public PlayerEntity getPlayer() {
         return player;
     }
 
-    public void setPlayer(EntityPlayerMP entity) {
+    public void setPlayer(PlayerEntity entity) {
         player = entity;
     }
 }

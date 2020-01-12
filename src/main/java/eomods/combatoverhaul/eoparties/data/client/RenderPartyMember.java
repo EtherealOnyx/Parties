@@ -1,9 +1,11 @@
 package eomods.combatoverhaul.eoparties.data.client;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.*;
 
+@OnlyIn(Dist.CLIENT)
 public class RenderPartyMember {
     private String name;
     private boolean isOnline;

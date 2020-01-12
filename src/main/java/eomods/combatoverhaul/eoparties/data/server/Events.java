@@ -1,14 +1,14 @@
 package eomods.combatoverhaul.eoparties.data.server;
 
-import eomods.combatoverhaul.eoparties.lib.Reference;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
+import eomods.combatoverhaul.eoparties.config.Config;
+import net.minecraft.entity.player.ServerPlayerEntity;
 
 import java.util.HashSet;
 import java.util.UUID;
 
 import static eomods.combatoverhaul.eoparties.data.server.ServerData.*;
-import static eomods.combatoverhaul.eoparties.data.server.Util.*;
+import static eomods.combatoverhaul.eoparties.data.server.Util.EMPTY;
+import static eomods.combatoverhaul.eoparties.data.server.Util.getParty;
 
 //Events cover anything that is called whenever a certain event happens - like when the player needs to join a party,
 // when they go offline, etc.
@@ -67,7 +67,7 @@ public class Events {
     }
 
     private static boolean addPlayerToParty(UUID invited, int index) {
-        if (parties.get(index).size() > Reference.MAX_PARTY_SIZE - 1)
+        if (parties.get(index).size() > Config.MAX_PARTY_SIZE - 1)
             return false;
         //Add player to party.
         parties.get(index).add(invited);
@@ -100,7 +100,7 @@ public class Events {
 
     }
 
-    public static void onPlayerJoin(EntityPlayerMP player) {
+    public static void onPlayerJoin(ServerPlayerEntity player) {
         Triggers.markOnline(player);
         int index = getIndex(player.getUniqueID());
         if (index != -1) {

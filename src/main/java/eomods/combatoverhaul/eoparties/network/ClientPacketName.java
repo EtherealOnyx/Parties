@@ -1,36 +1,30 @@
 package eomods.combatoverhaul.eoparties.network;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import eomods.combatoverhaul.eoparties.data.client.ClientData;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
-public class PacketName implements IMessage {
+public class ClientPacketName {
     private UUID id;
     private String name;
 
-    public PacketName(UUID id, String name) {
+    public ClientPacketName(UUID id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public PacketName() {
-        id = null;
-        name = null;
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf) {
+    void encode(PacketBuffer buf) {
         buf.writeLong(id.getMostSignificantBits());
         buf.writeLong(id.getLeastSignificantBits());
         for (int letter : name.toCharArray()) {
             buf.writeChar(letter);
         }
-
     }
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
+    ClientPacketName(PacketBuffer buf) {
         id = new UUID(buf.readLong(), buf.readLong());
         StringBuilder builder = new StringBuilder();
         while (true) {
@@ -44,11 +38,7 @@ public class PacketName implements IMessage {
         name = builder.toString();
     }
 
-    String getName() {
-        return name;
-    }
-
-    UUID getId() {
-        return id;
+    void handle(Supplier<NetworkEvent.Context> context) {
+        ClientData.changeName(id, name);
     }
 }

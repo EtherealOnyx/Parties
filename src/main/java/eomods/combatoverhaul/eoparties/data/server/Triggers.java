@@ -1,11 +1,15 @@
 package eomods.combatoverhaul.eoparties.data.server;
 
-import eomods.combatoverhaul.eoparties.network.COPSHandler;
-import eomods.combatoverhaul.eoparties.network.PacketData;
-import eomods.combatoverhaul.eoparties.network.PacketName;
-import net.minecraft.entity.player.EntityPlayerMP;
+import eomods.combatoverhaul.eoparties.network.ClientPacketData;
+import eomods.combatoverhaul.eoparties.network.ClientPacketName;
+import eomods.combatoverhaul.eoparties.network.Handler;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraftforge.fml.network.NetworkDirection;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 import static eomods.combatoverhaul.eoparties.data.server.ServerData.*;
 import static eomods.combatoverhaul.eoparties.data.server.Trackers.getTrackers;
@@ -26,17 +30,18 @@ class Triggers {
     private static void updateName(UUID entityTracked, UUID tracker) {
         if (isOnline(tracker)) {
             System.out.println("Sending name update: " + entityTracked + " | To: " + tracker);
-            COPSHandler.INSTANCE.sendTo(new PacketName(entityTracked, getName(entityTracked)), getPlayer(tracker));
+            Handler.network.sendTo(new ClientPacketName(entityTracked, getName(entityTracked)),
+                    getNet(tracker), NetworkDirection.PLAY_TO_CLIENT);
         }
     }
 
-    static void markOnline(EntityPlayerMP playerMP) {
+    static void markOnline(ServerPlayerEntity playerMP) {
         if (!livingMembers.containsKey(playerMP.getUniqueID())) {
             livingMembers.put(playerMP.getUniqueID(), new LivingMember(playerMP));
         } else {
             livingMembers.get(playerMP.getUniqueID()).setPlayer(playerMP);
         }
-        COPSHandler.INSTANCE.sendTo(new PacketData(8), playerMP);
+        Handler.network.sendTo(new ClientPacketData(8), getNet(playerMP), NetworkDirection.PLAY_TO_CLIENT);
     }
 
     static void markOffline(UUID player) {
@@ -82,8 +87,8 @@ class Triggers {
     static void updatePartyMember(UUID toSend, ArrayList<UUID> party) {
 
         if (isOnline(toSend))
-            COPSHandler.INSTANCE.sendTo(new PacketData(2, party),
-                    getPlayer(toSend));
+            Handler.network.sendTo(new ClientPacketData(2, party),
+                    getNet(toSend), NetworkDirection.PLAY_TO_CLIENT);
 
         //Send pets to toSend.
         for (UUID partyMember : party)
@@ -94,14 +99,14 @@ class Triggers {
     static void updatePartyMember(UUID toSend, HashSet<UUID> pets, UUID partyMember) {
         if (pets.size() > 0)
             if (isOnline(toSend))
-                COPSHandler.INSTANCE.sendTo(new PacketData(3, listWithSelf(partyMember, pets)),
-                    getPlayer(toSend));
+                Handler.network.sendTo(new ClientPacketData(3, listWithSelf(partyMember, pets)),
+                    getNet(toSend), NetworkDirection.PLAY_TO_CLIENT);
     }
 
     static void updatePartyMember(UUID toSend, UUID partyMember) {
         if (isOnline(toSend)) {
-            COPSHandler.INSTANCE.sendTo(new PacketData(2, partyMember),
-                    getPlayer(toSend));
+            Handler.network.sendTo(new ClientPacketData(2, partyMember),
+                    getNet(toSend), NetworkDirection.PLAY_TO_CLIENT);
         }
     }
 
@@ -113,7 +118,7 @@ class Triggers {
 
     static void updateLeader(UUID toSend) {
         if (isOnline(toSend))
-            COPSHandler.INSTANCE.sendTo(new PacketData(5), getPlayer(toSend));
+            Handler.network.sendTo(new ClientPacketData(5), getNet(toSend), NetworkDirection.PLAY_TO_CLIENT);
     }
 
     static void updateLeader(UUID toSend, UUID newLeader) {
@@ -122,7 +127,7 @@ class Triggers {
                 updateLeader(toSend);
             else
                 //Send leader to connecting client...
-                COPSHandler.INSTANCE.sendTo(new PacketData(5, newLeader), getPlayer(toSend));
+                Handler.network.sendTo(new ClientPacketData(5, newLeader), getNet(toSend), NetworkDirection.PLAY_TO_CLIENT);
         }
     }
 
@@ -138,7 +143,8 @@ class Triggers {
     }
     static void updateOnline(UUID toSend, UUID onlineMember, boolean isOnline) {
         if (isOnline(toSend))
-            COPSHandler.INSTANCE.sendTo(new PacketData(isOnline ? 0 : 1, onlineMember), getPlayer(toSend));
+            Handler.network.sendTo(new ClientPacketData(isOnline ? 0 : 1, onlineMember), getNet(toSend),
+                    NetworkDirection.PLAY_TO_CLIENT);
     }
 
     static void removePlayerInfo(UUID player) {
@@ -162,12 +168,13 @@ class Triggers {
 
     static void removeClientInfo(UUID toRemove, UUID clientTracker) {
         if (isOnline(clientTracker))
-            COPSHandler.INSTANCE.sendTo(new PacketData(7, toRemove), getPlayer(clientTracker));
+            Handler.network.sendTo(new ClientPacketData(7, toRemove), getNet(clientTracker),
+                    NetworkDirection.PLAY_TO_CLIENT);
     }
 
     static void moveAllToServer(UUID player) {
         if (isOnline(player))
-            COPSHandler.INSTANCE.sendTo(new PacketData(7), getPlayer(player));
+            Handler.network.sendTo(new ClientPacketData(7), getNet(player), NetworkDirection.PLAY_TO_CLIENT);
     }
 
     public static boolean nextLeader(HashSet<UUID> party) {

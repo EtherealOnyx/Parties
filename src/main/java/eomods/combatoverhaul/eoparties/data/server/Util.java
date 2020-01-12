@@ -1,8 +1,7 @@
 package eomods.combatoverhaul.eoparties.data.server;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.WorldServer;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.NetworkManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,8 +25,16 @@ public class Util {
         return list;
     }
 
-    static EntityPlayerMP getPlayer(UUID id) {
-        return livingMembers.get(id).getPlayer();
+    static ServerPlayerEntity getPlayer(UUID id) {
+        return (ServerPlayerEntity) livingMembers.get(id).getPlayer();
+    }
+
+    static NetworkManager getNet(UUID id) {
+        return getPlayer(id).connection.netManager;
+    }
+
+    static NetworkManager getNet(ServerPlayerEntity player) {
+        return player.connection.netManager;
     }
 
     static boolean isOnline(UUID id) {

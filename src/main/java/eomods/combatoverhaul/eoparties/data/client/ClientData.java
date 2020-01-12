@@ -1,17 +1,17 @@
 package eomods.combatoverhaul.eoparties.data.client;
 
-import eomods.combatoverhaul.eoparties.network.COPSHandler;
-import eomods.combatoverhaul.eoparties.network.PacketServer;
+import eomods.combatoverhaul.eoparties.network.Handler;
+import eomods.combatoverhaul.eoparties.network.ServerPacketData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ClassInheritanceMultiMap;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.*;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ClientData {
 
     //This stores all the party members in a HashMap.
@@ -77,7 +77,7 @@ public class ClientData {
     }
 
     private static boolean isSelf(UUID id) {
-        return Minecraft.getMinecraft().player.getUniqueID().equals(id);
+        return Minecraft.getInstance().player.getUniqueID().equals(id);
     }
 
     public static void changeLeader(UUID newLeader) {
@@ -87,7 +87,7 @@ public class ClientData {
 
     public static void changeLeader() {
         AnimHandler.changePartyLead(partyLeader);
-        partyLeader = Minecraft.getMinecraft().player.getUniqueID();
+        partyLeader = Minecraft.getInstance().player.getUniqueID();
     }
 
     public static void removePartyMember(UUID partyMember) {
@@ -117,7 +117,7 @@ public class ClientData {
         partyLeader = EMPTY;
     }
 
-    public static void checkTrackerData(EntityLivingBase entity) {
+    public static void checkTrackerData(LivingEntity entity) {
         if (inactiveTracks.contains(entity.getUniqueID())) {
             //Remove from inactive tracks.
             inactiveTracks.remove(entity.getUniqueID());
@@ -126,13 +126,13 @@ public class ClientData {
             activeTracks.add(entity.getUniqueID());
             updateClientInfo(entity.getUniqueID(), entity);
             //Send Packet #0 to server.
-            COPSHandler.INSTANCE.sendToServer(new PacketServer(0, entity.getUniqueID()));
+            Handler.network.sendToServer(new ServerPacketData(0, entity.getUniqueID()));
             AnimHandler.addClientTracker(entity.getUniqueID());
         }
 
     }
 
-    private static void updateClientInfo(UUID entityToUpdate, EntityLivingBase entity) {
+    private static void updateClientInfo(UUID entityToUpdate, LivingEntity entity) {
         if (partyMembers.containsKey(entityToUpdate)) {
             updatePartyMemberInfo(partyMembers.get(entityToUpdate), entity);
             return;
@@ -145,15 +145,15 @@ public class ClientData {
         }
     }
 
-    private static void updatePartyMemberInfo(RenderPartyMember memberRender, EntityLivingBase entity) {
+    private static void updatePartyMemberInfo(RenderPartyMember memberRender, LivingEntity entity) {
         System.out.println("Changing name of partyMember...");
-        memberRender.setName(entity.getName());
+        memberRender.setName(entity.getName().getFormattedText());
         //Set health, etc.
         memberRender.setOnline(true);
     }
 
-    private static void updatePetMemberInfo(RenderPetMember memberRender, EntityLivingBase entity) {
-        memberRender.setName(entity.getName());
+    private static void updatePetMemberInfo(RenderPetMember memberRender, LivingEntity entity) {
+        memberRender.setName(entity.getName().getFormattedText());
     }
 
     public static void checkTrackerData(ClassInheritanceMultiMap<Entity>[] pos) {
@@ -186,7 +186,7 @@ public class ClientData {
         activeTracks.remove(toTransfer);
         AnimHandler.removeClientTracker(toTransfer);
         //Send Packet #1 to server.
-        COPSHandler.INSTANCE.sendToServer(new PacketServer(1, toTransfer));
+        Handler.network.sendToServer(new ServerPacketData(1, toTransfer));
     }
 
     public static void removeTracker(UUID trackerToRemove) {
@@ -220,7 +220,7 @@ public class ClientData {
 
     public static void defaultData() {
         //Delay this a bit more...
-        partyMembers.put(Minecraft.getMinecraft().player.getUniqueID(),
-                new RenderPartyMember(Minecraft.getMinecraft().player.getName()));
+        partyMembers.put(Minecraft.getInstance().player.getUniqueID(),
+                new RenderPartyMember(Minecraft.getInstance().player.getName().getFormattedText()));
     }
 }
