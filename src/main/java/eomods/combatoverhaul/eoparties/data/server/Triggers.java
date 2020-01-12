@@ -48,6 +48,7 @@ class Triggers {
         //Server removes tracker, but keeps name.
         if (livingMembers.containsKey(player))
             livingMembers.get(player).setPlayer(null);
+        markOffline(player, getParty(player));
     }
 
 
@@ -149,16 +150,12 @@ class Triggers {
 
     static void removePlayerInfo(UUID player) {
         Trackers.remove(player);
-        removePlayerInfo(player, getParty(player));
 
     }
 
-    private static void removePlayerInfo(UUID player, HashSet<UUID> party) {
-        for (UUID toSend : party) {
-            if (isOnline(player)) {
-                updateOnline(toSend, player, false);
-            }
-        }
+    private static void markOffline(UUID player, HashSet<UUID> party) {
+        for (UUID toSend : party)
+            updateOnline(toSend, player, false);
     }
 
     static void removeClientInfo(UUID toRemove, HashSet<UUID> clientTrackers) {

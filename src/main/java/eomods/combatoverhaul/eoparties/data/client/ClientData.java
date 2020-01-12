@@ -24,7 +24,7 @@ public class ClientData {
     static HashSet<UUID> activeTracks = new HashSet<>();
 
     //This stores a list of all the UUIDs in which the client isn't able to track.
-    private static HashSet<UUID> inactiveTracks = new HashSet<>();
+    static HashSet<UUID> inactiveTracks = new HashSet<>();
 
 
     public static void changeOnline(UUID id, boolean isOnline) {
@@ -47,7 +47,6 @@ public class ClientData {
             if (!partyMembers.containsKey(id)) {
                 partyMembers.put(id, new RenderPartyMember(id));
                 AnimHandler.addToParty(id);
-                inactiveTracks.add(id);
             }
         }
 
@@ -222,5 +221,10 @@ public class ClientData {
         //Delay this a bit more...
         partyMembers.put(Minecraft.getInstance().player.getUniqueID(),
                 new RenderPartyMember(Minecraft.getInstance().player.getName().getFormattedText()));
+    }
+
+    public static void printTrackers() {
+        System.out.println("Attempting to print trackers...");
+        AnimHandler.printTrackers();
     }
 }

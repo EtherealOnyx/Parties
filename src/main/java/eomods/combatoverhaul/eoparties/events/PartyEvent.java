@@ -36,6 +36,7 @@ public class PartyEvent {
 
     @SubscribeEvent
     public void interactEntity(PlayerInteractEvent.EntityInteractSpecific event) {
+        System.out.println("Pleaseeeee");
         if (!event.getWorld().isRemote)
             if (event.getTarget() instanceof PlayerEntity) {
                 if (Events.addPlayerToParty(event.getPlayer().getUniqueID(),
@@ -47,8 +48,8 @@ public class PartyEvent {
             }
     }
     @SubscribeEvent
-    public void interactEntity(PlayerInteractEvent event) {
-        if (!event.getWorld().isRemote)
+    public void interactEntity(PlayerInteractEvent.RightClickItem event) {
+        if (!event.getWorld().isRemote) {
             if (event.getPlayer().getHeldItemMainhand().getItem() == Items.STICK) {
                 for (UUID toTrack : ServerData.trackers.keySet())
                     System.out.println("Server tracker exists for: " + getName(toTrack));
@@ -62,6 +63,10 @@ public class PartyEvent {
                         //System.out.println("Found Leader: " + Util.getName(partyLeader));
                 }*/
             }
+        }
+        else {
+                ClientData.printTrackers();
+        }
     }
 
 

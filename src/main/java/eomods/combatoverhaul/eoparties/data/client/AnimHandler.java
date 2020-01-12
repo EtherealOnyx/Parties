@@ -7,6 +7,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.UUID;
 
+import static eomods.combatoverhaul.eoparties.data.client.ClientData.activeTracks;
+import static eomods.combatoverhaul.eoparties.data.client.ClientData.inactiveTracks;
+
 @OnlyIn(Dist.CLIENT)
 class AnimHandler {
     static void addPetToParty(UUID partyMember, UUID... pets) {
@@ -88,5 +91,14 @@ class AnimHandler {
 
     static void resetClientTrackers() {
         send("All tracker data has been reset!");
+    }
+    public static void printTrackers() {
+        for (UUID track : inactiveTracks) {
+            System.out.println ("Tracking " + getName(track) + " on the server");
+        }
+        for (UUID track : activeTracks) {
+            System.out.println ("Tracking " + getName(track) + " on the client");
+        }
+
     }
 }

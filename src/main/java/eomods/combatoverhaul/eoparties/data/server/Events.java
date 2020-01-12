@@ -109,14 +109,13 @@ public class Events {
     }
 
     public static void onPlayerLeave(UUID player) {
-        //Mark player as offline
+        //Mark player as offline, send packet to other trackers indicating player is offline.
         Triggers.markOffline(player);
         if (partyLeaders.contains(player)) {
             System.out.println("Party member was leader...giving lead to next best person...");
             if (Triggers.nextLeader(getParty(player)))
                 partyLeaders.remove(player);
         }
-        //Send a packet to all other online players indicating that this player is now offline.
         //Remove player from all trackers. They don't need to be tracked while offline (they can't).
         Triggers.removePlayerInfo(player);
     }
