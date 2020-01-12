@@ -109,27 +109,29 @@ public class Trackers {
     }
 
     public static void attemptAddNewTracker(UUID joiningPlayer, HashSet<UUID> party) {
-        //partyMember was able to track joiningPlayer.
-        if (clientTrackers.containsKey(joiningPlayer))
-            for (UUID partyMember : listWithoutSelf(party, joiningPlayer)) {
-                //For all party members, check if they are tracking player in clientTracker.
-                if (!clientTrackers.get(joiningPlayer).contains(partyMember))
-                    //If party member doesn't have them in clientTrackers, then add them to server tracker.
-                    addNewTracker(joiningPlayer, partyMember);
-            }
+        //Add joiningPlayer to party member's trackers.
+        for (UUID partyMember : listWithoutSelf(party, joiningPlayer)) {
+            //For all party members, check if they are tracking player in clientTracker.
+            if (!clientTrackers.getOrDefault(joiningPlayer, EMPTY).contains(partyMember))
+                //If party member doesn't have them in clientTrackers, then add them to server tracker.
+                addNewTracker(joiningPlayer, partyMember);
+        }
+
         //Add partyMembers to joiningPlayer's trackers.
         addNewTracker(listWithoutSelf(party, joiningPlayer), joiningPlayer);
 
     }
     static void addNewTracker(UUID toTrack, List<UUID> trackers) {
         for (UUID tracker : trackers) {
-            addNewTracker(toTrack, tracker);
+            if (isOnline(toTrack))
+                addNewTracker(toTrack, tracker);
             addNewTracker(getSubParty(toTrack), tracker);
         }
     }
     static void addNewTracker(List<UUID> toTracks, UUID tracker) {
         for (UUID toTrack : toTracks) {
-            addNewTracker(toTrack, tracker);
+            if (isOnline(toTrack))
+                addNewTracker(toTrack, tracker);
             addNewTracker(getSubParty(toTrack), tracker);
         }
     }
