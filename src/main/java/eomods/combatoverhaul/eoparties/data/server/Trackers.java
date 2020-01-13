@@ -156,13 +156,13 @@ public class Trackers {
 
     static void removeTrackerClient(UUID toTrack, UUID tracker) {
         clientTrackers.getOrDefault(toTrack, EMPTY).remove(tracker);
-        if (clientTrackers.get(toTrack).size() == 0)
+        if (clientTrackers.getOrDefault(toTrack, EMPTY).size() == 0)
             clientTrackers.remove(toTrack);
     }
 
     static void removeTrackerServer(UUID toTrack, UUID tracker) {
-        trackers.getOrDefault(toTrack, EMPTY).remove(toTrack);
-        if (trackers.get(toTrack).size() == 0)
+        trackers.getOrDefault(toTrack, EMPTY).remove(tracker);
+        if (trackers.getOrDefault(toTrack, EMPTY).size() == 0)
             trackers.remove(toTrack);
 
     }

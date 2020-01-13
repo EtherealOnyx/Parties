@@ -52,11 +52,6 @@ class AnimHandler {
         send("You are now party leader!");
     }
 
-    static void removePartyMember(UUID partyMember) {
-        //Tell the UI that the party member dropped the party.
-        send(getName(partyMember) + " has left the party...");
-    }
-
     static void dropParty() {
         //Tell the UI that the client dropped the party.
         send("You have left the party!");
@@ -100,5 +95,23 @@ class AnimHandler {
             System.out.println ("Tracking " + getName(track) + " on the client");
         }
 
+    }
+
+    public static void disbandParty() {
+        send("The party has been disbanded...");
+    }
+
+    public static void kickedFromParty() {
+        send("You have been kicked from the party...");
+    }
+
+    public static void removePartyMemberKicked(UUID playerToRemove) {
+        //Tell the UI that the party member dropped the party.
+        send(getName(playerToRemove) + " has been kicked from the party.");
+    }
+
+    public static void removePartyMemberDropped(UUID playerToRemove) {
+        //Tell the UI that the party member dropped the party.
+        send(getName(playerToRemove) + " has left the party.");
     }
 }

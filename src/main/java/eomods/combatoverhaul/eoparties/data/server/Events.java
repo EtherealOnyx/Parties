@@ -117,7 +117,6 @@ public class Events {
 
     public static void checkLeader(UUID player) {
         if (partyLeaders.contains(player)) {
-            System.out.println("Party member was leader...giving lead to next best person...");
             if (Triggers.nextLeader(getParty(player)))
                 partyLeaders.remove(player);
         }
@@ -159,17 +158,38 @@ public class Events {
             return false;
         party.remove(droppingPlayer);
         Triggers.removeParty(droppingPlayer);
+        Triggers.removeMemberFromParty(droppingPlayer, party);
         if (party.size() == 1) {
-            Triggers.removeParty(party.iterator().next());
+            Triggers.disbandParty(party.iterator().next());
             partyLeaders.remove(droppingPlayer);
-            partyLeaders.remove(party.iterator().next());
             parties.remove(party);
             party.clear();
             return true;
         }
-        checkLeader(droppingPlayer);
-        Triggers.removeMemberFromParty(droppingPlayer, party);
         //Check leaders...
+        checkLeader(droppingPlayer);
+        return true;
+    }
+
+    public static boolean kickPartyMember(UUID playerToKick) {
+        return kickPartyMember(playerToKick, getParty(playerToKick));
+    }
+
+    public static boolean kickPartyMember(UUID playerToKick, HashSet<UUID> party) {
+        if (party.size() == 0)
+            return false;
+        party.remove(playerToKick);
+        Triggers.removePartyKicked(playerToKick);
+        Triggers.removeMemberFromPartyKicked(playerToKick, party);
+        if (party.size() == 1) {
+            Triggers.disbandParty(party.iterator().next());
+            partyLeaders.remove(playerToKick);
+            parties.remove(party);
+            party.clear();
+            return true;
+        }
+        //Check leaders...
+        checkLeader(playerToKick);
         return true;
     }
 }

@@ -87,7 +87,7 @@ public class ClientPacketData {
                 if (list.size() == 0)
                     ClientData.dropParty();
                 else
-                    ClientData.removePartyMember(list.get(0));
+                    ClientData.removePartyMemberDropped(list.get(0));
                 break;
             //#7 - Sends a UUID to the client, to tell it to remove the specified UUID from client-side tracking.
             case 7:
@@ -98,6 +98,17 @@ public class ClientPacketData {
                 break;
             case 8:
                 Minecraft.getInstance().deferTask(ClientData::defaultData);
+                break;
+                //Sends a packet to the client, indicating that the player has been kicked from the party.
+            case 9:
+                if (list.size() == 0)
+                    ClientData.dropPartyKicked();
+                else
+                    ClientData.removePartyMemberKicked(list.get(0));
+                break;
+                //Sends a packet to the client, indicating that the party has been disbanded.
+            case 10:
+                ClientData.disbandParty();
                 break;
         }
     }

@@ -36,7 +36,6 @@ public class PartyEvent {
 
     @SubscribeEvent
     public void interactEntity(PlayerInteractEvent.EntityInteractSpecific event) {
-        System.out.println("Pleaseeeee");
         if (!event.getWorld().isRemote)
             if (event.getTarget() instanceof PlayerEntity) {
                 if (event.getPlayer().getHeldItemMainhand().getItem() == Items.DIAMOND) {
@@ -46,7 +45,7 @@ public class PartyEvent {
                     else
                         System.out.println("Party creation failed!");
                 } else if (event.getPlayer().getHeldItemMainhand().getItem() == Items.DIAMOND_SWORD) {
-                    //Events.kickPartyMember(event.getTarget().getUniqueID());
+                    Events.kickPartyMember(event.getTarget().getUniqueID());
                 }
             }
         if (event.getPlayer().getHeldItemMainhand().getItem() == Items.EMERALD) {
@@ -61,13 +60,6 @@ public class PartyEvent {
                     System.out.println("Server tracker exists for: " + getName(toTrack));
                 for (UUID toTrack : ServerData.clientTrackers.keySet())
                     System.out.println("Client tracker exists for: " + getName(toTrack));
-                /*for (Map.Entry<UUID, LivingMember> members : ServerData.livingMembers.entrySet()) {
-                    //if (members.getValue().getPlayer() != null)
-                        //System.out.println("Found Player: " + members.getValue().getPlayer());
-                }
-                for (UUID partyLeader : ServerData.partyLeaders) {
-                        //System.out.println("Found Leader: " + Util.getName(partyLeader));
-                }*/
             }
         }
         else {

@@ -182,9 +182,9 @@ class Triggers {
         return null;
     }
 
-    public static void removeMemberFromParty(UUID droppingPlayer, HashSet<UUID> party) {
+    public static void removeMemberFromParty(UUID playerToRemove, HashSet<UUID> party) {
         for (UUID partyMember : party) {
-            removeMemberFromParty(droppingPlayer, partyMember);
+            removeMemberFromParty(playerToRemove, partyMember);
         }
     }
 
@@ -207,5 +207,34 @@ class Triggers {
         if (isOnline(clientTracker))
             Handler.network.sendTo(new ClientPacketData(7, toRemove), getNet(clientTracker),
                     NetworkDirection.PLAY_TO_CLIENT);
+    }
+
+    public static void disbandParty(UUID partyMember) {
+        partyLeaders.remove(partyMember);
+        System.out.println("Sending message to " + getName(partyMember) + " to disband party...");
+        //Trackers.removeParty(partyMember); At this point, partyMember shouldn't have any other player trackers...
+        if (isOnline(partyMember))
+            Handler.network.sendTo(new ClientPacketData(10), getNet(partyMember),
+                    NetworkDirection.PLAY_TO_CLIENT);
+    }
+
+    public static void removePartyKicked(UUID playerToKick) {
+        Trackers.removeParty(playerToKick);
+        if (isOnline(playerToKick))
+            Handler.network.sendTo(new ClientPacketData(9), getNet(playerToKick),
+                    NetworkDirection.PLAY_TO_CLIENT);
+    }
+
+    public static void removeMemberFromPartyKicked(UUID playerToKick, UUID partyMember) {
+        Trackers.removeMemberFromParty(playerToKick, partyMember);
+        if (isOnline(partyMember))
+            Handler.network.sendTo(new ClientPacketData(9, playerToKick), getNet(partyMember),
+                    NetworkDirection.PLAY_TO_CLIENT);
+    }
+
+    public static void removeMemberFromPartyKicked(UUID playerToRemove, HashSet<UUID> party) {
+        for (UUID partyMember : party) {
+            removeMemberFromPartyKicked(playerToRemove, partyMember);
+        }
     }
 }

@@ -90,7 +90,6 @@ public class ClientData {
     }
 
     public static void removePartyMember(UUID partyMember) {
-        AnimHandler.removePartyMember(partyMember);
         inactiveTracks.remove(partyMember);
         activeTracks.remove(partyMember);
         for (UUID pet : partyMembers.get(partyMember).getPetList()) {
@@ -102,6 +101,10 @@ public class ClientData {
 
     public static void dropParty() {
         AnimHandler.dropParty();
+        removeParty();
+    }
+
+    private static void removeParty() {
         Iterator iter = partyMembers.entrySet().iterator();
         Map.Entry<UUID, RenderPartyMember> partyMember;
         while (iter.hasNext()) {
@@ -229,5 +232,25 @@ public class ClientData {
     public static void printTrackers() {
         System.out.println("Attempting to print trackers...");
         AnimHandler.printTrackers();
+    }
+
+    public static void disbandParty() {
+        AnimHandler.disbandParty();
+        removeParty();
+    }
+
+    public static void removePartyMemberKicked(UUID playerToRemove) {
+        AnimHandler.removePartyMemberKicked(playerToRemove);
+        removePartyMember(playerToRemove);
+    }
+
+    public static void removePartyMemberDropped(UUID playerToRemove) {
+        AnimHandler.removePartyMemberDropped(playerToRemove);
+        removePartyMember(playerToRemove);
+    }
+
+    public static void dropPartyKicked() {
+        AnimHandler.kickedFromParty();
+        removeParty();
     }
 }
