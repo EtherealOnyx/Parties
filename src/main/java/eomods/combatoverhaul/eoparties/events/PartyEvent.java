@@ -71,15 +71,18 @@ public class PartyEvent {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onEntitySpawned(EntityJoinWorldEvent event) {
-        if (event.getWorld().isRemote && event.getEntity() instanceof TameableEntity) {
-            ClientData.checkTrackerData((LivingEntity) event.getEntity());
+        if (event.getWorld().isRemote) {
+            if ((event.getEntity() instanceof PlayerEntity || event.getEntity() instanceof TameableEntity)) {
+                System.out.println("Found entity spawned : " + event.getEntity().getName());
+                ClientData.checkTrackerData((LivingEntity) event.getEntity());
+            }
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onChunkUnload(ChunkEvent.Unload event) {
         if (event.getWorld().isRemote()) {
-            //ClientData.checkTrackerData(event.getChunk());
+            ClientData.checkTrackerData(event.getChunk().getPos());
         }
     }
 

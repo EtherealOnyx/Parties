@@ -211,4 +211,14 @@ public class Trackers {
         for (UUID pet : pets)
             removeTracker(pet, tracker);
     }
+
+    public static void moveAllToServer(UUID entity) {
+        if (clientTrackers.containsKey(entity))
+            if (trackers.containsKey(entity))
+                trackers.get(entity).addAll(clientTrackers.get(entity));
+            else
+                trackers.put(entity, clientTrackers.get(entity));
+            clientTrackers.remove(entity);
+
+    }
 }

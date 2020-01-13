@@ -154,8 +154,10 @@ class Triggers {
     }
 
     static void moveAllToServer(UUID player) {
-        if (isOnline(player))
+        if (isOnline(player)) {
+            Trackers.moveAllToServer(player);
             Handler.network.sendTo(new ClientPacketData(7), getNet(player), NetworkDirection.PLAY_TO_CLIENT);
+        }
     }
 
     public static boolean nextLeader(HashSet<UUID> party) {

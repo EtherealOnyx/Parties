@@ -1,11 +1,11 @@
 package eomods.combatoverhaul.eoparties.data.client;
 
+import eomods.combatoverhaul.eoparties.data.server.Util;
 import eomods.combatoverhaul.eoparties.network.Handler;
 import eomods.combatoverhaul.eoparties.network.ServerPacketData;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.ClassInheritanceMultiMap;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -28,8 +28,11 @@ public class ClientData {
 
 
     public static void changeOnline(UUID id, boolean isOnline) {
-        if (partyMembers.containsKey(id))
+        if (partyMembers.containsKey(id)) {
+            if (partyMembers.get(id).isOnline() == isOnline)
+                return;
             partyMembers.get(id).setOnline(isOnline);
+        }
 
         if (isOnline) {
             inactiveTracks.add(id);
@@ -39,6 +42,20 @@ public class ClientData {
             AnimHandler.registerOffline(id);
             inactiveTracks.remove(id);
             activeTracks.remove(id);
+        }
+    }
+
+    public static void changeOnlineForced(UUID id, boolean isOnline) {
+        if (partyMembers.containsKey(id)) {
+            if (partyMembers.get(id).isOnline() == isOnline)
+                return;
+            partyMembers.get(id).setOnline(isOnline);
+        }
+        if (isOnline) {
+            AnimHandler.registerOnline(id);
+        }
+        else {
+            AnimHandler.registerOffline(id);
         }
     }
 
@@ -128,70 +145,71 @@ public class ClientData {
             inactiveTracks.remove(entity.getUniqueID());
 
             //Add to active tracks.
-            activeTracks.add(entity.getUniqueID());
-            updateClientInfo(entity.getUniqueID(), entity);
-            //Send Packet #0 to server.
-            Handler.network.sendToServer(new ServerPacketData(0, entity.getUniqueID()));
-            AnimHandler.addClientTracker(entity.getUniqueID());
+            moveToClient(entity.getUniqueID(), entity);
+            return;
         }
-
+        //Check if entity is player that was marked offline.
+        if (Util.notMe(entity.getUniqueID()) && partyMembers.containsKey(entity.getUniqueID())) {
+            moveToClient(entity.getUniqueID(), entity);
+        }
     }
 
-    private static void updateClientInfo(UUID entityToUpdate, LivingEntity entity) {
+    public static void checkTrackerData(ChunkPos pos) {
+        for (UUID activeTracking : activeTracks) {
+            if (partyMembers.get(activeTracking).getChunk().equals(pos)) {
+                movePlayerToServer(activeTracking);
+                for (Map.Entry<UUID, RenderMember> pets : partyMembers.get(activeTracking).getPets().entrySet()) {
+                    if (pets.getValue().getChunk().equals(pos))
+                        movePetToServer(activeTracking, pets.getKey());
+                }
+            }
+        }
+    }
+
+    private static void movePlayerToServer(UUID activeTracking) {
+        partyMembers.get(activeTracking).entity = null;
+        moveToServer(activeTracking);
+    }
+    private static void moveToServer(UUID activeTracking) {
+        activeTracks.remove(activeTracking);
+        inactiveTracks.add(activeTracking);
+        AnimHandler.removeClientTracker(activeTracking);
+        //Send Packet #1 to server.
+        Handler.network.sendToServer(new ServerPacketData(1, activeTracking));
+    }
+
+    private static void movePetToServer(UUID owner, UUID activeTracking) {
+        partyMembers.get(owner).getPetMember(activeTracking).entity = null;
+        moveToServer(activeTracking);
+    }
+
+    private static void moveToClient(UUID entityToUpdate, LivingEntity entity) {
+
         if (partyMembers.containsKey(entityToUpdate)) {
             updatePartyMemberInfo(partyMembers.get(entityToUpdate), entity);
             return;
         }
         for (Map.Entry<UUID, RenderPartyMember> partyMember : partyMembers.entrySet()) {
             if (partyMember.getValue().getPetList().contains(entityToUpdate)) {
-                updatePetMemberInfo(partyMember.getValue().getPets().get(entityToUpdate), entity);
+                updateMemberInfo(partyMember.getValue().getPets().get(entityToUpdate), entity);
                 return;
             }
         }
     }
 
     private static void updatePartyMemberInfo(RenderPartyMember memberRender, LivingEntity entity) {
-        System.out.println("Changing name of partyMember...");
+        changeOnlineForced(entity.getUniqueID(), true);
+        updateMemberInfo(memberRender, entity);
+
+    }
+
+    private static void updateMemberInfo(RenderMember memberRender, LivingEntity entity) {
         memberRender.setName(entity.getName().getFormattedText());
-        //Set health, etc.
-        memberRender.setOnline(true);
-    }
-
-    private static void updatePetMemberInfo(RenderPetMember memberRender, LivingEntity entity) {
-        memberRender.setName(entity.getName().getFormattedText());
-    }
-
-    public static void checkTrackerData(ClassInheritanceMultiMap<Entity>[] pos) {
-        Iterator iter;
-        Entity entity;
-        for (ClassInheritanceMultiMap<Entity> subMap : pos) {
-            System.out.println(subMap.size());
-                iter = subMap.iterator();
-                while (iter.hasNext()) {
-                    entity = (Entity) iter.next();
-                    System.out.println("Entity with id: " + entity.getName());
-                    for (UUID id : activeTracks)
-                        if (((Entity) iter.next()).getUniqueID().equals(id))
-                            transferToServer(id);
-                }
-        }
-        /*for (Map.Entry<UUID, EntityLivingBase> entity : activeTracks.entrySet()) {
-            if (entity.getValue().chunkCoordX == pos.x && entity.getValue().chunkCoordZ == pos.z) {
-                inactiveTracks.add(entity.getKey());
-                activeTracks.remove(entity.getKey());
-                AnimHandler.removeClientTracker(entity.getKey());
-                //Send Packet #1 to server.
-                COPSHandler.INSTANCE.sendToServer(new PacketServer(1, entity.getKey()));
-            }
-        }*/
-    }
-
-    private static void transferToServer(UUID toTransfer) {
-        inactiveTracks.add(toTransfer);
-        activeTracks.remove(toTransfer);
-        AnimHandler.removeClientTracker(toTransfer);
-        //Send Packet #1 to server.
-        Handler.network.sendToServer(new ServerPacketData(1, toTransfer));
+        memberRender.entity = entity;
+        activeTracks.add(entity.getUniqueID());
+        inactiveTracks.remove(entity.getUniqueID());
+        Handler.network.sendToServer(new ServerPacketData(0, entity.getUniqueID()));
+        AnimHandler.addClientTracker(entity.getUniqueID());
     }
 
     public static void removeTracker(UUID trackerToRemove) {
@@ -252,5 +270,26 @@ public class ClientData {
     public static void dropPartyKicked() {
         AnimHandler.kickedFromParty();
         removeParty();
+    }
+
+    public static void triggerUpdate(UUID playerToUpdate, int upgradeType) {
+        triggerUpdate(playerToUpdate, null, upgradeType);
+    }
+
+    public static void triggerUpdate(UUID playerOwner, UUID petToUpdate, int upgradeType) {
+        RenderMember member = partyMembers.get(playerOwner);
+        if (petToUpdate != null)
+            member = ((RenderPartyMember) member).getPetMember(petToUpdate);
+        switch(upgradeType) {
+            case 0:
+                //Health
+                triggerUpdate(playerOwner, petToUpdate, upgradeType, member.getAmount(upgradeType));
+        }
+    }
+
+    public static void triggerUpdate(UUID playerOwner, UUID petToUpdate, int upgradeType, float amount) {
+        StatUpdateRenderHelper helper = new StatUpdateRenderHelper(playerOwner, petToUpdate, upgradeType, amount);
+        //Do something with this...
+        //addQueue(helper);
     }
 }

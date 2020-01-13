@@ -122,12 +122,13 @@ public class Events {
         }
     }
 
-    public static void moveAllToServer(UUID player) {
-        //This checks if that player has any trackers, and then tells the trackers to move them to server side tracking.
-        Trackers.moveToServer(player);
-        Trackers.moveSelfToServer(player);
-        //This tells the player to move all client trackers to server trackers.
-        Triggers.moveAllToServer(player);
+    public static void moveAllToServer(UUID playerOrPet) {
+        //This checks if that entity has any trackers, and then tells the trackers to move them to server side tracking.
+        Trackers.moveToServer(playerOrPet);
+        //Ehh?? this one does the same thing as previous statement...except the previous statement does it better..?
+        //Trackers.moveSelfToServer(player);
+        //This tells the player to move all client trackers to server trackers, if they are a player.
+        Triggers.moveAllToServer(playerOrPet);
 
     }
 

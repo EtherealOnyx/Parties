@@ -1,5 +1,6 @@
 package eomods.combatoverhaul.eoparties.data.server;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.NetworkManager;
 
@@ -53,24 +54,28 @@ public class Util {
         return EMPTY;
     }
 
-    public static boolean hasParty(UUID entity) {
+    public static boolean hasParty(UUID playerOrPet) {
         //Check if entity is found in any parties.
         for (HashSet<UUID> parties : parties) {
-            if (parties.contains(entity))
+            if (parties.contains(playerOrPet))
+                //partyMember was a player that belongs to a party.
                 return true;
         }
-        if (subParties.containsKey(entity))
-            return true;
-        for (HashSet<UUID> pets : subParties.values()) {
-            if (pets.contains(entity))
-                return true;
-        }
+
+        if (subParties.containsKey(playerOrPet))
+            for (HashSet<UUID> pets : subParties.values()) {
+                //A pet that is currently claimed by a player exists, so part of subParty.
+                if (pets.contains(playerOrPet))
+                    return true;
+            }
         return false;
-
-
     }
 
     static HashSet<UUID> getSubParty(UUID player) {
         return subParties.getOrDefault(player, EMPTY);
+    }
+
+    public static boolean notMe(UUID uniqueID) {
+        return Minecraft.getInstance().player.getUniqueID() != uniqueID;
     }
 }
