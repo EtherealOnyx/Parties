@@ -89,7 +89,9 @@ public class Events {
 
 
         //Send partyMember and joiner name information.
-        Triggers.updateNameForced(invited, isNew);
+        Triggers.updateNameJoin(invited);
+        if (isNew)
+            Triggers.updateName(invited);
 
         //Send player leader information.
         Triggers.sendLeader(invited, parties.get(index));

@@ -41,7 +41,12 @@ class Triggers {
         } else {
             livingMembers.get(playerMP.getUniqueID()).setPlayer(playerMP);
         }
+        checkName(playerMP);
         Handler.network.sendTo(new ClientPacketData(8), getNet(playerMP), NetworkDirection.PLAY_TO_CLIENT);
+    }
+
+    private static void checkName(ServerPlayerEntity playerMP) {
+        if (livingMembers.get(playerMP.getUniqueID()).getName().equals(playerMP.getName().getFormattedText()));
     }
 
     static void markOffline(UUID player) {
@@ -52,9 +57,7 @@ class Triggers {
     }
 
 
-    static void updateNameForced(UUID invitedPlayer, boolean isNew) {
-        //Sends out invited players' name to the listeners.
-        updateName(invitedPlayer);
+    static void updateNameJoin(UUID invitedPlayer) {
 
         //Send out party members' and pet members' names to invitedPlayer.
         for (UUID partyMember : listWithoutSelf(getParty(invitedPlayer), invitedPlayer)) {
@@ -63,9 +66,10 @@ class Triggers {
                 updateName(pet, invitedPlayer);
         }
 
-        if (!isNew)
-            for (UUID pet : getSubParty(invitedPlayer))
-                updateName(pet, invitedPlayer);
+        //Sends out invited player's pet names to the invited player.
+        for (UUID pet : getSubParty(invitedPlayer))
+            updateName(pet, invitedPlayer);
+
     }
 
     static void updatePartyMember(UUID toSend, HashSet<UUID> party, boolean isNew) {
