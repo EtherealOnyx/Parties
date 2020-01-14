@@ -96,6 +96,8 @@ public class ClientPacketData {
                 else
                     ClientData.removeTracker(list.get(0));
                 break;
+            //#8 - Sends a packet to the client, to tell it to load default data, that's when they store their own
+            // player information in the party list.
             case 8:
                 Minecraft.getInstance().deferTask(ClientData::defaultData);
                 break;
@@ -110,6 +112,10 @@ public class ClientPacketData {
             case 10:
                 ClientData.disbandParty();
                 break;
+            case 11:
+                //Sends a packet to the client, indicating that the client should attempt to update their trackers on
+                // the client side.
+                ClientData.attemptToFindTrackers();
         }
     }
 

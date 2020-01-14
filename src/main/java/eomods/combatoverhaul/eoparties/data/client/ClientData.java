@@ -4,7 +4,10 @@ import eomods.combatoverhaul.eoparties.data.server.Util;
 import eomods.combatoverhaul.eoparties.network.Handler;
 import eomods.combatoverhaul.eoparties.network.ServerPacketData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.TameableEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -149,7 +152,7 @@ public class ClientData {
             return;
         }
         //Check if entity is player that was marked offline.
-        if (Util.notMe(entity.getUniqueID()) && partyMembers.containsKey(entity.getUniqueID())) {
+        if (partyMembers.containsKey(entity.getUniqueID()) && Util.notMe(entity.getUniqueID())) {
             moveToClient(entity.getUniqueID(), entity);
         }
     }
@@ -291,5 +294,14 @@ public class ClientData {
         StatUpdateRenderHelper helper = new StatUpdateRenderHelper(playerOwner, petToUpdate, upgradeType, amount);
         //Do something with this...
         //addQueue(helper);
+    }
+
+    public static void attemptToFindTrackers() {
+        for (Entity e : Minecraft.getInstance().world.getAllEntities()) {
+            if (e instanceof TameableEntity || e instanceof PlayerEntity)
+                checkTrackerData((LivingEntity) e);
+        }
+
+
     }
 }

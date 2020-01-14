@@ -243,4 +243,15 @@ class Triggers {
             removeMemberFromPartyKicked(playerToRemove, partyMember);
         }
     }
+
+    public static void sendClientRefresh(HashSet<UUID> party) {
+        for (UUID partyMember : party) {
+            sendClientRefresh(partyMember);
+        }
+    }
+
+    public static void sendClientRefresh(UUID partyMember) {
+        if (isOnline(partyMember))
+            Handler.network.sendTo(new ClientPacketData(11), getNet(partyMember), NetworkDirection.PLAY_TO_CLIENT);
+    }
 }

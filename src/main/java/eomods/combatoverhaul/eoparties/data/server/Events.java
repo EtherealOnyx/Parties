@@ -76,29 +76,33 @@ public class Events {
         return true;
     }
 
-    private static void updatePartyInfo(UUID invited, int index, boolean isNew) {
+    private static void updatePartyInfo(UUID playerJoiningOrInvited, int index, boolean isNew) {
         //Send player all UUIDs of their existing party members, including self.
-        Triggers.updatePartyMember(invited, parties.get(index), isNew);
+        Triggers.updatePartyMember(playerJoiningOrInvited, parties.get(index), isNew);
 
         //Update player trackers.
         if (isNew)
-            Trackers.addNewTracker(invited, parties.get(index));
+            Trackers.addNewTracker(playerJoiningOrInvited, parties.get(index));
         else
             //Try to add new trackers...?
-            Trackers.attemptAddNewTracker(invited, parties.get(index));
+            Trackers.attemptAddNewTracker(playerJoiningOrInvited, parties.get(index));
 
 
         //Send partyMember and joiner name information.
-        Triggers.updateNameJoin(invited);
+        Triggers.updateNameJoin(playerJoiningOrInvited);
         if (isNew)
-            Triggers.updateName(invited);
+            Triggers.updateName(playerJoiningOrInvited);
 
         //Send player leader information.
-        Triggers.sendLeader(invited, parties.get(index));
+        Triggers.sendLeader(playerJoiningOrInvited, parties.get(index));
 
         //Send all online information.
-        Triggers.updateOnline(invited, parties.get(index));
+        Triggers.updateOnline(playerJoiningOrInvited, parties.get(index));
 
+        if (isNew)
+            Triggers.sendClientRefresh(getParty(playerJoiningOrInvited));
+        else
+            Triggers.sendClientRefresh(playerJoiningOrInvited);
     }
 
     public static void onPlayerJoin(ServerPlayerEntity player) {
