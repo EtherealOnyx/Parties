@@ -4,7 +4,6 @@ package eomods.combatoverhaul.eoparties.events;
 import eomods.combatoverhaul.eoparties.data.client.ClientData;
 import eomods.combatoverhaul.eoparties.data.server.Events;
 import eomods.combatoverhaul.eoparties.data.server.ServerData;
-import eomods.combatoverhaul.eoparties.data.server.Util;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -56,7 +55,7 @@ public class PartyEvent {
                     else
                         System.out.println("Subparty creation failed!");
                 } else if (event.getPlayer().getHeldItemMainhand().getItem() == Items.DIAMOND_SWORD) {
-                    //Events.kickPetMember(event.getTarget().getUniqueID());
+                    Events.kickPetMember(event.getPlayer().getUniqueID(), event.getTarget().getUniqueID());
                 }
             }
             if (event.getPlayer().getHeldItemMainhand().getItem() == Items.EMERALD) {
@@ -100,10 +99,8 @@ public class PartyEvent {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onDimensionChangeEvent(EntityTravelToDimensionEvent event) {
-        if (Util.hasParty(event.getEntity().getUniqueID()) || Util.hasSubParty(event.getEntity().getUniqueID())) {
+        if ((event.getEntity() instanceof PlayerEntity || event.getEntity() instanceof TameableEntity))
             Events.moveAllToServer(event.getEntity().getUniqueID());
-        }
-
     }
 
 

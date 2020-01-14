@@ -88,8 +88,6 @@ public class ClientData {
     public static void removePetMembers(UUID id, List<UUID> pets) {
         if (partyMembers.containsKey(id)) {
             partyMembers.get(id).removePet(pets);
-            if (isSelf(id))
-                partyMembers.remove(id);
         }
         AnimHandler.removePetFromParty(id, pets);
         inactiveTracks.removeAll(pets);

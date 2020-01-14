@@ -141,9 +141,11 @@ public class Events {
     public static void moveAllToServer(UUID playerOrPet) {
         //This checks if that entity has any trackers, and then tells the trackers to move them to server side tracking.
         Trackers.moveToServer(playerOrPet, false);
-        //This tells the player to move all client trackers to server trackers, if they are a player.
-        Trackers.moveAllToServer(playerOrPet);
 
+        //This tells the player to move all client trackers to server trackers, if they are a player.
+        if (Util.hasParty(playerOrPet) || Util.hasSubParty(playerOrPet)) {
+            Trackers.moveAllToServer(playerOrPet);
+        }
     }
 
     public static void moveToClient(UUID playerTracker, UUID toTrack) {
@@ -240,6 +242,26 @@ public class Events {
             Triggers.updateName(pet.getUniqueID());
             Triggers.sendClientRefresh(owner);
         }
+        return true;
+    }
+
+    public static boolean kickPetMember(UUID owner, UUID pet) {
+        if (!subParties.containsKey(owner))
+            return false;
+        if (!subParties.get(owner).contains(pet))
+            return false;
+
+        //Remove every tracker associated with the pet getting removed.
+        Trackers.removeAllTrackers(pet);
+
+        //Remove the pet from the subParty.
+        subParties.get(owner).remove(pet);
+        if (subParties.get(owner).size() == 0)
+            subParties.remove(owner);
+
+        //Tell clients to remove the pet from party.
+        Triggers.removePetFromParty(owner, pet);
+
         return true;
     }
 }

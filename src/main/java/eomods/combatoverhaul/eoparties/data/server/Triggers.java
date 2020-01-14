@@ -279,4 +279,20 @@ class Triggers {
             Handler.network.sendTo(new ClientPacketData(3, listWithSelf(owner, getSubParty(owner))),
                 getNet(owner), NetworkDirection.PLAY_TO_CLIENT);
     }
+
+    public static void removePetFromParty(UUID owner, UUID pet) {
+        removePetFromParty(owner, pet, getParty(owner));
+    }
+
+    private static void removePetFromParty(UUID owner, UUID pet, HashSet<UUID> party) {
+        for (UUID partyMember : party)
+            removePetFromParty(partyMember, owner, pet);
+    }
+
+    private static void removePetFromParty(UUID toSend, UUID petOwner, UUID pet) {
+        if (isOnline(toSend)) {
+            Handler.network.sendTo(new ClientPacketData(4, listWithSelf(petOwner, pet)),
+                    getNet(toSend), NetworkDirection.PLAY_TO_CLIENT);
+        }
+    }
 }
