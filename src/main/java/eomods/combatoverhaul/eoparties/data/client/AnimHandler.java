@@ -5,16 +5,16 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.List;
 import java.util.UUID;
 
-import static eomods.combatoverhaul.eoparties.data.client.ClientData.activeTracks;
-import static eomods.combatoverhaul.eoparties.data.client.ClientData.inactiveTracks;
+import static eomods.combatoverhaul.eoparties.data.client.ClientData.*;
 
 @OnlyIn(Dist.CLIENT)
 class AnimHandler {
-    static void addPetToParty(UUID partyMember, UUID... pets) {
+    static void addPetToParty(UUID partyMember, List<UUID> pets) {
         //Tell the UI to add pet below partyMember.
-        send(getName(partyMember) + " contained " + pets.length + " pets! You are now " +
+        send(getName(partyMember) + " contained " + pets.size() + " pets! You are now " +
                 "tracking them!");
     }
 
@@ -34,9 +34,9 @@ class AnimHandler {
         send(getName(partyMember) + " is now in your party!");
     }
 
-    static void removePetFromParty(UUID id,UUID... pets) {
+    static void removePetFromParty(UUID id, List<UUID> pets) {
         //Tell the UI to remove these pets from below party member.
-        send(getName(id) + " has removed " + pets.length + " pet(s) from the party!");
+        send(getName(id) + " has removed " + pets.size() + " pet(s) from the party!");
     }
 
     static void changePartyLead(UUID oldLeader, UUID newLeader) {
@@ -72,16 +72,31 @@ class AnimHandler {
     }
 
     static String getName(UUID id) {
+        //Check if ID is a player member.
         if (ClientData.partyMembers.get(id) != null) {
             System.out.println(ClientData.partyMembers.get(id).getName());
             if (ClientData.partyMembers.get(id).getName() != null)
                 return "[" + ClientData.partyMembers.get(id).getName() + "]";
+            else
+                return "[????]";
+        }
+        //Check if ID is a pet member.
+        for (RenderPartyMember member : partyMembers.values()) {
+            if (member.getPetMember(id) != null)
+                if (member.getPetMember(id).getName() != null)
+                    return "[" + member.getPetMember(id).getName() + "]";
+                else
+                    return "[????]";
         }
         return "[????]";
     }
 
     static void changeMemberName(UUID id, String name) {
         send(getName(id) +  " --> [" + name + "]");
+    }
+
+    public static void changePetName(UUID owner, UUID pet, String name) {
+        send(getName(owner) + ", " + getName(pet) + " --> [" + name + "]");
     }
 
     static void resetClientTrackers() {

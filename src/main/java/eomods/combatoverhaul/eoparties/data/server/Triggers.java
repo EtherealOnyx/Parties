@@ -37,6 +37,7 @@ class Triggers {
 
     static void markOnline(ServerPlayerEntity playerMP) {
         if (!livingMembers.containsKey(playerMP.getUniqueID())) {
+            System.out.println("Putting player in livingMembers list...");
             livingMembers.put(playerMP.getUniqueID(), new LivingMember(playerMP));
         } else {
             livingMembers.get(playerMP.getUniqueID()).setPlayer(playerMP);
@@ -67,9 +68,13 @@ class Triggers {
         }
 
         //Sends out invited player's pet names to the invited player.
+        updatePetNames(invitedPlayer);
+
+    }
+
+    static void updatePetNames(UUID invitedPlayer) {
         for (UUID pet : getSubParty(invitedPlayer))
             updateName(pet, invitedPlayer);
-
     }
 
     static void updatePartyMember(UUID toSend, HashSet<UUID> party, boolean isNew) {
@@ -98,6 +103,21 @@ class Triggers {
         //Send pets to toSend.
         for (UUID partyMember : party)
             updatePartyMember(toSend, subParties.getOrDefault(partyMember, EMPTY), partyMember);
+
+    }
+
+    static void addPet(UUID pet, HashSet<UUID> party, UUID owner) {
+        for (UUID partyMember : party) {
+            updatePartyMember(partyMember, pet, owner);
+        }
+    }
+
+    static void updatePartyMember(UUID toSend, UUID pet, UUID partyMember) {
+            if (isOnline(toSend)) {
+                Handler.network.sendTo(new ClientPacketData(3, listWithSelf(partyMember, pet)),
+                        getNet(toSend), NetworkDirection.PLAY_TO_CLIENT);
+                System.out.println("Sending pet message...");
+            }
 
     }
 
@@ -159,7 +179,6 @@ class Triggers {
 
     static void moveAllToServer(UUID player) {
         if (isOnline(player)) {
-            Trackers.moveAllToServer(player);
             Handler.network.sendTo(new ClientPacketData(7), getNet(player), NetworkDirection.PLAY_TO_CLIENT);
         }
     }
@@ -253,5 +272,11 @@ class Triggers {
     public static void sendClientRefresh(UUID partyMember) {
         if (isOnline(partyMember))
             Handler.network.sendTo(new ClientPacketData(11), getNet(partyMember), NetworkDirection.PLAY_TO_CLIENT);
+    }
+
+    public static void sendPetInfo(UUID owner) {
+        if (isOnline(owner))
+            Handler.network.sendTo(new ClientPacketData(3, listWithSelf(owner, getSubParty(owner))),
+                getNet(owner), NetworkDirection.PLAY_TO_CLIENT);
     }
 }

@@ -20,6 +20,13 @@ public class Util {
         return list;
     }
 
+    static ArrayList<UUID> listWithSelf(UUID first, UUID entityTrackers) {
+        ArrayList<UUID> list = new ArrayList<>();
+        list.add(first);
+        list.add(entityTrackers);
+        return list;
+    }
+
     static ArrayList<UUID> listWithoutSelf(HashSet<UUID> party, UUID player) {
         ArrayList<UUID> list = new ArrayList<>(party);
         list.remove(player);
@@ -61,13 +68,6 @@ public class Util {
                 //partyMember was a player that belongs to a party.
                 return true;
         }
-
-        if (subParties.containsKey(playerOrPet))
-            for (HashSet<UUID> pets : subParties.values()) {
-                //A pet that is currently claimed by a player exists, so part of subParty.
-                if (pets.contains(playerOrPet))
-                    return true;
-            }
         return false;
     }
 
@@ -77,5 +77,9 @@ public class Util {
 
     public static boolean notMe(UUID uniqueID) {
         return Minecraft.getInstance().player.getUniqueID() != uniqueID;
+    }
+
+    public static boolean hasSubParty(UUID owner) {
+        return subParties.containsKey(owner);
     }
 }

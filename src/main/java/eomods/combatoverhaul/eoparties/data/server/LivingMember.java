@@ -11,6 +11,10 @@ public class LivingMember {
         this.name = entity.getName().getFormattedText();
     }
 
+    public LivingMember(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return this.name;
     }

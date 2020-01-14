@@ -16,7 +16,7 @@ public class ServerData {
     //A set of all party leaders on the server.
     public static HashSet<UUID> partyLeaders = new HashSet<>();
 
-    //A map of all players/entities.
+    //A map of all players/pet entities.
     public static HashMap<UUID, LivingMember> livingMembers = new HashMap<>();
 
     //A map of trackers that need to be sent to clients.

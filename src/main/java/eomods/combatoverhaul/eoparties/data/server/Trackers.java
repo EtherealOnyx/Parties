@@ -11,13 +11,42 @@ public class Trackers {
         return clientTrackers;
     }
 
-    static void moveToServer(UUID toTrack) {
-        if (clientTrackers.containsKey(toTrack)) {
+    static void moveToServer(UUID toTrackOrBeTracked, boolean isTracker) {
+        if (isTracker) {
+            HashSet<UUID> toTracks = new HashSet<>();
+            for (Map.Entry<UUID, HashSet<UUID>> trackers : clientTrackers.entrySet()) {
+                //If the player is listed in something's clientTracker list...
+                if (trackers.getValue().contains(toTrackOrBeTracked)) {
+                    //Add them to our hash set up top
+                    toTracks.add(trackers.getKey());
+                    //Remove them from the clientTracker list.
+                    trackers.getValue().remove(toTrackOrBeTracked);
+                    //If the list is now empty...
+                    if (trackers.getValue().size() == 0)
+                        //Remove the toTrack completely from the clientTrackers.
+                        clientTrackers.remove(trackers.getKey());
+                }
+            }
+            if (toTracks.size() == 0)
+                return;
+            for (UUID toTrack : toTracks) {
+                if (trackers.containsKey(toTrack)) {
+                    trackers.get(toTrack).add(toTrackOrBeTracked);
+                } else {
+                    HashSet<UUID> set = new HashSet<>();
+                    set.add(toTrackOrBeTracked);
+                    trackers.put(toTrack, set);
+                }
+            }
+        } else {
+            if (clientTrackers.containsKey(toTrackOrBeTracked)) {
 
-            //This snip adds the trackers to the server-side trackers.
-            //This also removes them from the client trackers, and sends the clients that information.
-            moveTracker(toTrack, clientTrackers.get(toTrack));
+                //This snip adds the trackers to the server-side trackers.
+                //This also removes them from the client trackers, and sends the clients that information.
+                moveTracker(toTrackOrBeTracked, clientTrackers.get(toTrackOrBeTracked));
+            }
         }
+
     }
 
     private static void moveTracker(UUID toTrack, HashSet<UUID> trackers) {
@@ -63,17 +92,6 @@ public class Trackers {
         }
     }
 
-    public static void moveSelfToServer(UUID player) {
-        if (clientTrackers.containsKey(player)) {
-            if (trackers.containsKey(player))
-                trackers.get(player).addAll(clientTrackers.get(player));
-            else
-                trackers.put(player, clientTrackers.get(player));
-            clientTrackers.remove(player);
-        }
-
-    }
-
     public static void attemptAddNewTracker(UUID joiningPlayer, HashSet<UUID> party) {
         //Add joiningPlayer to party member's trackers.
         for (UUID partyMember : listWithoutSelf(party, joiningPlayer)) {
@@ -87,6 +105,15 @@ public class Trackers {
         addNewTracker(listWithoutSelf(party, joiningPlayer), joiningPlayer);
 
     }
+    public static void addNewPetTracker(UUID pet, HashSet<UUID> party) {
+        HashSet<UUID> onlineMembers = new HashSet<>();
+        for (UUID partyMember : party) {
+            if (isOnline(partyMember))
+                onlineMembers.add(partyMember);
+        }
+        trackers.put(pet, onlineMembers);
+    }
+
     static void addNewTracker(UUID toTrack, List<UUID> trackers) {
         for (UUID tracker : trackers) {
             if (isOnline(toTrack))
@@ -113,7 +140,8 @@ public class Trackers {
         //Add party members and their pets.
         addNewTracker(Util.listWithoutSelf(trackers, toTrack), toTrack);
     }
-    private static void addNewTracker(UUID toTrack, UUID player) {
+
+    static void addNewTracker(UUID toTrack, UUID player) {
         if (isOnline(player)) {
             if (trackers.containsKey(toTrack))
                 trackers.get(toTrack).add(player);
@@ -138,15 +166,27 @@ public class Trackers {
     }
 
     private static void removeFromServerTrackers(UUID playerToRemove) {
-        for (Map.Entry<UUID, HashSet<UUID>> toTrack : trackers.entrySet())
-            if (toTrack.getValue().contains(playerToRemove))
-                removeTrackerServer(toTrack.getKey(), playerToRemove);
+        Iterator iter = trackers.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<UUID, HashSet<UUID>> entry = (Map.Entry<UUID, HashSet<UUID>>) iter.next();
+            if (entry.getValue().contains(playerToRemove)) {
+                entry.getValue().remove(playerToRemove);
+                if (entry.getValue().size() == 0)
+                    iter.remove();
+            }
+        }
     }
 
     private static void removeFromClientTrackers(UUID playerToRemove) {
-        for (Map.Entry<UUID, HashSet<UUID>> toTrack : clientTrackers.entrySet())
-            if (toTrack.getValue().contains(playerToRemove))
-                removeTrackerClient(toTrack.getKey(), playerToRemove);
+        Iterator iter = clientTrackers.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<UUID, HashSet<UUID>> entry = (Map.Entry<UUID, HashSet<UUID>>) iter.next();
+            if (entry.getValue().contains(playerToRemove)) {
+                entry.getValue().remove(playerToRemove);
+                if (entry.getValue().size() == 0)
+                    iter.remove();
+            }
+        }
     }
 
     static void removeTracker(UUID toTrack, UUID tracker) {
@@ -212,13 +252,20 @@ public class Trackers {
             removeTracker(pet, tracker);
     }
 
-    public static void moveAllToServer(UUID entity) {
-        if (clientTrackers.containsKey(entity))
-            if (trackers.containsKey(entity))
-                trackers.get(entity).addAll(clientTrackers.get(entity));
-            else
-                trackers.put(entity, clientTrackers.get(entity));
-            clientTrackers.remove(entity);
+    public static void moveAllToServer(UUID playerOrPet) {
+        Trackers.moveToServer(playerOrPet, true);
+        Triggers.moveAllToServer(playerOrPet);
+    }
+
+    public static void addPetTrackers(UUID owner) {
+        if (getSubParty(owner).size() > 0) {
+            Triggers.sendPetInfo(owner);
+            for (UUID pet : getSubParty(owner)) {
+                addNewTracker(pet, owner);
+            }
+        }
+
+
 
     }
 }

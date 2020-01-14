@@ -72,27 +72,28 @@ public class ClientData {
 
     }
 
-    public static void addPetMembers(UUID id, UUID... pets) {
+    public static void addPetMembers(UUID id, List<UUID> pets) {
         if (partyMembers.containsKey(id))
             partyMembers.get(id).addPet(pets);
         else {
             partyMembers.put(id, new RenderPartyMember(pets));
-            inactiveTracks.add(id);
+            if (!isSelf(id))
+                inactiveTracks.add(id);
         }
-        inactiveTracks.addAll(Arrays.asList(pets));
+        inactiveTracks.addAll(pets);
         AnimHandler.addPetToParty(id, pets);
     }
 
 
-    public static void removePetMembers(UUID id, UUID... pets) {
+    public static void removePetMembers(UUID id, List<UUID> pets) {
         if (partyMembers.containsKey(id)) {
             partyMembers.get(id).removePet(pets);
             if (isSelf(id))
                 partyMembers.remove(id);
         }
         AnimHandler.removePetFromParty(id, pets);
-        inactiveTracks.removeAll(Arrays.asList(pets));
-        activeTracks.removeAll(Arrays.asList(pets));
+        inactiveTracks.removeAll(pets);
+        activeTracks.removeAll(pets);
     }
 
     private static boolean isSelf(UUID id) {
@@ -233,8 +234,16 @@ public class ClientData {
 
     public static void changeName(UUID id, String name) {
         if(partyMembers.containsKey(id)) {
-            partyMembers.get(id).setName(name);
             AnimHandler.changeMemberName(id, name);
+            partyMembers.get(id).setName(name);
+            return;
+        }
+
+        for (Map.Entry<UUID, RenderPartyMember> partyMember : partyMembers.entrySet()) {
+            if (partyMember.getValue().getPetMember(id) != null) {
+                AnimHandler.changePetName(partyMember.getKey(), id, name);
+                partyMember.getValue().getPetMember(id).setName(name);
+            }
         }
     }
 
@@ -245,7 +254,7 @@ public class ClientData {
     }
 
     public static void defaultData() {
-        //Delay this a bit more...
+        //Delay this a bit more...maybe
         partyMembers.put(Minecraft.getInstance().player.getUniqueID(),
                 new RenderPartyMember(Minecraft.getInstance().player.getName().getFormattedText()));
     }

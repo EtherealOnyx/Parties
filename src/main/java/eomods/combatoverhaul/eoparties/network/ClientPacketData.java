@@ -1,7 +1,6 @@
 package eomods.combatoverhaul.eoparties.network;
 
 import eomods.combatoverhaul.eoparties.data.client.ClientData;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -66,14 +65,14 @@ public class ClientPacketData {
             //#3 - Sends a list of UUIDs to the client, where the first one is a player UUID, and the rest are
             // its pets. This one tells the client to add pets.
             case 3:
-                ClientData.addPetMembers(list.get(0), (UUID[])(list.subList(1,
-                        list.size()).toArray()));
+                ClientData.addPetMembers(list.get(0), list.subList(1,
+                        list.size()));
                 break;
             //#4 - Sends a list of UUIDs to the client, where the first one is a player UUID, and the rest are
             // its pets. This one tells the client to remove pets.
             case 4:
-                ClientData.removePetMembers(list.get(0), (UUID[])(list.subList(1,
-                        list.size()).toArray()));
+                ClientData.removePetMembers(list.get(0), list.subList(1,
+                        list.size()));
                 break;
             //#5 - Sends a UUID to the client, to tell it that the specific UUID is now the party leader of the party.
             case 5:
@@ -99,7 +98,7 @@ public class ClientPacketData {
             //#8 - Sends a packet to the client, to tell it to load default data, that's when they store their own
             // player information in the party list.
             case 8:
-                Minecraft.getInstance().deferTask(ClientData::defaultData);
+                ClientData.defaultData();
                 break;
                 //Sends a packet to the client, indicating that the player has been kicked from the party.
             case 9:

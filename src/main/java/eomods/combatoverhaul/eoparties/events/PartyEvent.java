@@ -36,7 +36,7 @@ public class PartyEvent {
 
     @SubscribeEvent
     public void interactEntity(PlayerInteractEvent.EntityInteractSpecific event) {
-        if (!event.getWorld().isRemote)
+        if (!event.getWorld().isRemote) {
             if (event.getTarget() instanceof PlayerEntity) {
                 if (event.getPlayer().getHeldItemMainhand().getItem() == Items.DIAMOND) {
                     if (Events.addPlayerToParty(event.getPlayer().getUniqueID(),
@@ -48,8 +48,20 @@ public class PartyEvent {
                     Events.kickPartyMember(event.getTarget().getUniqueID());
                 }
             }
-        if (event.getPlayer().getHeldItemMainhand().getItem() == Items.EMERALD) {
-            Events.dropParty(event.getPlayer().getUniqueID());
+            if (event.getTarget() instanceof TameableEntity) {
+                if (event.getPlayer().getHeldItemMainhand().getItem() == Items.DIAMOND) {
+                    if (Events.addPetToParty(event.getPlayer().getUniqueID(),
+                            (LivingEntity) event.getTarget()))
+                        System.out.println("Adding pet to a subparty.");
+                    else
+                        System.out.println("Subparty creation failed!");
+                } else if (event.getPlayer().getHeldItemMainhand().getItem() == Items.DIAMOND_SWORD) {
+                    //Events.kickPetMember(event.getTarget().getUniqueID());
+                }
+            }
+            if (event.getPlayer().getHeldItemMainhand().getItem() == Items.EMERALD) {
+                Events.dropParty(event.getPlayer().getUniqueID());
+            }
         }
     }
     @SubscribeEvent
@@ -88,7 +100,7 @@ public class PartyEvent {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onDimensionChangeEvent(EntityTravelToDimensionEvent event) {
-        if (Util.hasParty(event.getEntity().getUniqueID())) {
+        if (Util.hasParty(event.getEntity().getUniqueID()) || Util.hasSubParty(event.getEntity().getUniqueID())) {
             Events.moveAllToServer(event.getEntity().getUniqueID());
         }
 

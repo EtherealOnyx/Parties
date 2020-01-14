@@ -5,6 +5,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,8 +24,17 @@ public class RenderPartyMember extends RenderMember {
         }
     }
 
+    RenderPartyMember(List<UUID> pets) {
+        super();
+        petList = new HashMap<>();
+        for (UUID pet : pets) {
+            petList.put(pet, new RenderMember());
+        }
+    }
+
     RenderPartyMember(String name) {
         super(name);
+        isOnline = true;
     }
 
     public boolean isOnline() {
@@ -41,7 +51,19 @@ public class RenderPartyMember extends RenderMember {
         }
     }
 
+    void addPet(List<UUID> pets) {
+        for (UUID pet : pets) {
+            petList.put(pet, new RenderMember());
+        }
+    }
+
     void removePet(UUID... pets) {
+        for (UUID pet : pets) {
+            petList.remove(pet);
+        }
+    }
+
+    void removePet(List<UUID> pets) {
         for (UUID pet : pets) {
             petList.remove(pet);
         }

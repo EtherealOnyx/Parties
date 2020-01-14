@@ -1,6 +1,7 @@
 package eomods.combatoverhaul.eoparties.data.server;
 
 import eomods.combatoverhaul.eoparties.config.Config;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 
 import java.util.HashSet;
@@ -83,9 +84,12 @@ public class Events {
         //Update player trackers.
         if (isNew)
             Trackers.addNewTracker(playerJoiningOrInvited, parties.get(index));
-        else
+        else {
             //Try to add new trackers...?
             Trackers.attemptAddNewTracker(playerJoiningOrInvited, parties.get(index));
+            Trackers.addPetTrackers(playerJoiningOrInvited);
+        }
+
 
 
         //Send partyMember and joiner name information.
@@ -110,8 +114,14 @@ public class Events {
         int index = getIndex(player.getUniqueID());
         if (index != -1) {
             updatePartyInfo(player.getUniqueID(), index, false);
+        } else {
+            Trackers.addPetTrackers(player.getUniqueID());
+            Triggers.updatePetNames(player.getUniqueID());
+            Triggers.sendClientRefresh(player.getUniqueID());
         }
     }
+
+
 
     public static void onPlayerLeave(UUID player) {
         //Mark player as offline, send packet to other trackers indicating player is offline.
@@ -130,11 +140,9 @@ public class Events {
 
     public static void moveAllToServer(UUID playerOrPet) {
         //This checks if that entity has any trackers, and then tells the trackers to move them to server side tracking.
-        Trackers.moveToServer(playerOrPet);
-        //Ehh?? this one does the same thing as previous statement...except the previous statement does it better..?
-        //Trackers.moveSelfToServer(player);
+        Trackers.moveToServer(playerOrPet, false);
         //This tells the player to move all client trackers to server trackers, if they are a player.
-        Triggers.moveAllToServer(playerOrPet);
+        Trackers.moveAllToServer(playerOrPet);
 
     }
 
@@ -197,6 +205,41 @@ public class Events {
         }
         //Check leaders...
         checkLeader(playerToKick);
+        return true;
+    }
+
+    public static boolean addPetToParty(UUID owner, LivingEntity pet) {
+        HashSet<UUID> party = getSubParty(owner);
+        if (party.size() >= Config.MAX_SUBPARTY_SIZE || party.contains(pet.getUniqueID()))
+            return false;
+        livingMembers.put(pet.getUniqueID(), new LivingMember(pet.getName().getFormattedText()));
+        //Add the subParty member.
+        if (party.size() == 0) {
+            party = new HashSet<>();
+            party.add(pet.getUniqueID());
+            subParties.put(owner, party);
+            System.out.println("Placing " + getName(owner) + " in a new subparty.");
+        } else {
+            subParties.get(owner).add(pet.getUniqueID());
+        }
+        //Add all party members to tracker, if they exist, and send pet info to clients.
+        if (hasParty(owner)) {
+            HashSet<UUID> party2 = getParty(owner);
+            Trackers.addNewPetTracker(pet.getUniqueID(), party2);
+            Triggers.addPet(pet.getUniqueID(), party2, owner);
+
+            //Sends pet name info to all trackers members.
+            Triggers.updateName(pet.getUniqueID());
+            Triggers.sendClientRefresh(party2);
+        }
+        else {
+            Trackers.addNewTracker(pet.getUniqueID(), owner);
+            Triggers.updatePartyMember(owner, pet.getUniqueID(), owner);
+
+            //Sends pet name info to all trackers members.
+            Triggers.updateName(pet.getUniqueID());
+            Triggers.sendClientRefresh(owner);
+        }
         return true;
     }
 }
