@@ -39,7 +39,7 @@ public class ServerPacketData {
             //#1 - Sends a UUID to the server stating that the client requests the server to track it.
             case 1:
                 if (Events.validatePartyMember(context.get().getSender().getUniqueID(), id))
-                    Events.moveToServer(context.get().getSender().getUniqueID(), id);
+                    Events.moveToServer(id, context.get().getSender().getUniqueID());
                 break;
         }
     }

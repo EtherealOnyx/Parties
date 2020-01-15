@@ -3,6 +3,7 @@ package eomods.combatoverhaul.eoparties.data.server;
 import java.util.*;
 
 import static eomods.combatoverhaul.eoparties.data.server.ServerData.*;
+import static eomods.combatoverhaul.eoparties.data.server.ServerData.trackers;
 import static eomods.combatoverhaul.eoparties.data.server.Util.*;
 
 public class Trackers {
@@ -14,17 +15,18 @@ public class Trackers {
     static void moveToServer(UUID toTrackOrBeTracked, boolean isTracker) {
         if (isTracker) {
             HashSet<UUID> toTracks = new HashSet<>();
-            for (Map.Entry<UUID, HashSet<UUID>> trackers : clientTrackers.entrySet()) {
-                //If the player is listed in something's clientTracker list...
-                if (trackers.getValue().contains(toTrackOrBeTracked)) {
+            Iterator iter = clientTrackers.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<UUID, HashSet<UUID>> entry = (Map.Entry<UUID, HashSet<UUID>>) iter.next();
+                if (entry.getValue().contains(toTrackOrBeTracked)) {
                     //Add them to our hash set up top
-                    toTracks.add(trackers.getKey());
+                    toTracks.add(entry.getKey());
                     //Remove them from the clientTracker list.
-                    trackers.getValue().remove(toTrackOrBeTracked);
+                    entry.getValue().remove(toTrackOrBeTracked);
                     //If the list is now empty...
-                    if (trackers.getValue().size() == 0)
+                    if (entry.getValue().size() == 0)
                         //Remove the toTrack completely from the clientTrackers.
-                        clientTrackers.remove(trackers.getKey());
+                        iter.remove();
                 }
             }
             if (toTracks.size() == 0)
@@ -39,21 +41,29 @@ public class Trackers {
                 }
             }
         } else {
-            if (clientTrackers.containsKey(toTrackOrBeTracked)) {
-
-                //This snip adds the trackers to the server-side trackers.
-                //This also removes them from the client trackers, and sends the clients that information.
-                moveTracker(toTrackOrBeTracked, clientTrackers.get(toTrackOrBeTracked));
-            }
+            //This snip adds the trackers to the server-side trackers.
+            //This also removes them from the client trackers, and sends the clients that information.
+            moveAllClientTrackers(toTrackOrBeTracked);
         }
 
     }
 
-    private static void moveTracker(UUID toTrack, HashSet<UUID> trackers) {
-        for (UUID tracker : trackers) {
-            Events.moveToServer(toTrack, tracker);
+    private static void moveAllClientTrackers(UUID toTrack) {
+        if (!clientTrackers.containsKey(toTrack))
+            return;
+        Iterator iter = clientTrackers.get(toTrack).iterator();
+        HashSet<UUID> set = new HashSet<>();
+        while (iter.hasNext()) {
+            UUID tracker = (UUID) iter.next();
+            set.add(tracker);
             Triggers.removeClientTracker(toTrack, tracker);
         }
+        if (trackers.containsKey(toTrack)) {
+            trackers.get(toTrack).addAll(set);
+        } else {
+            trackers.put(toTrack, set);
+        }
+        clientTrackers.remove(toTrack);
     }
 
     static HashSet<UUID> getTrackers(UUID player) {
@@ -77,7 +87,7 @@ public class Trackers {
         }
 
     }
-    static void moveToServer(UUID playerTracker, UUID toTrack) {
+    static void moveToServer(UUID toTrack, UUID playerTracker) {
         if (trackers.containsKey(toTrack))
             trackers.get(toTrack).add(playerTracker);
         else {
@@ -228,14 +238,18 @@ public class Trackers {
     private static void removeAllTrackersExcept(UUID toTrack, UUID except) {
         HashSet<UUID> set = new HashSet<>();
         set.add(except);
-        if (clientTrackers.get(toTrack).contains(except))
-            clientTrackers.put(toTrack, set);
-        else
-            clientTrackers.remove(except);
-        if (trackers.get(toTrack).contains(except))
-            trackers.put(toTrack, set);
-        else
-            trackers.remove(except);
+        if (clientTrackers.containsKey(toTrack)) {
+            if (clientTrackers.get(toTrack).contains(except))
+                clientTrackers.put(toTrack, set);
+            else
+                clientTrackers.remove(except);
+        }
+        if (trackers.containsKey(toTrack)) {
+            if (trackers.get(toTrack).contains(except))
+                trackers.put(toTrack, set);
+            else
+                trackers.remove(except);
+        }
     }
 
     public static void removeMemberFromParty(UUID droppingPlayer, UUID partyMember) {

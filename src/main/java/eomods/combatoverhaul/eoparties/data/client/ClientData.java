@@ -77,8 +77,6 @@ public class ClientData {
             partyMembers.get(id).addPet(pets);
         else {
             partyMembers.put(id, new RenderPartyMember(pets));
-            if (!isSelf(id))
-                inactiveTracks.add(id);
         }
         inactiveTracks.addAll(pets);
         AnimHandler.addPetToParty(id, pets);
@@ -158,11 +156,15 @@ public class ClientData {
 
     public static void checkTrackerData(ChunkPos pos) {
         for (UUID activeTracking : activeTracks) {
-            if (partyMembers.get(activeTracking).getChunk().equals(pos)) {
+
+            if (partyMembers.containsKey(activeTracking) && partyMembers.get(activeTracking).getChunk().equals(pos)) {
                 movePlayerToServer(activeTracking);
-                for (Map.Entry<UUID, RenderMember> pets : partyMembers.get(activeTracking).getPets().entrySet()) {
-                    if (pets.getValue().getChunk().equals(pos))
-                        movePetToServer(activeTracking, pets.getKey());
+                return;
+            }
+            for (Map.Entry<UUID, RenderPartyMember> partyMember : partyMembers.entrySet()) {
+                if (partyMember.getValue().containsPet(activeTracking)
+                        && partyMember.getValue().getPetMember(activeTracking).getChunk().equals(pos)) {
+                    movePetToServer(partyMember.getKey(), activeTracking);
                 }
             }
         }

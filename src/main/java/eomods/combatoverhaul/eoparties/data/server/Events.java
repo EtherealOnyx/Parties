@@ -157,6 +157,8 @@ public class Events {
     }
 
     public static boolean validatePartyMember(UUID requestingPlayer, UUID toTrack) {
+        if (getSubParty(requestingPlayer).contains(toTrack))
+            return true;
         for (UUID partyMember : getParty(requestingPlayer)) {
             //Checks if toTrack is a party member, or one of party member's pets.
             if (partyMember.equals(toTrack) || subParties.getOrDefault(partyMember, EMPTY).contains(toTrack))

@@ -80,6 +80,10 @@ public class RenderPartyMember extends RenderMember {
         return petList.get(pet);
     }
 
+    boolean containsPet(UUID pet) {
+        return petList.containsKey(pet);
+    }
+
     @Override
     int update() {
         //Player-only updates example
