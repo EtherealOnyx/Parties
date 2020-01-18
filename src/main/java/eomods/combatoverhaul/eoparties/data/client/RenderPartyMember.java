@@ -1,5 +1,6 @@
 package eomods.combatoverhaul.eoparties.data.client;
 
+import eomods.combatoverhaul.eoparties.data.E_TYPE;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -14,7 +15,10 @@ public class RenderPartyMember extends RenderMember {
     private boolean isOnline = false;
     private HashMap<UUID, RenderMember> petList = new HashMap<>();
     //Maybe support for future pets that have a foodLevel?
-    private int foodLevel;
+    private int hunger;
+    private int hungerTick;
+    private float saturation;
+    private float saturationTick;
 
     RenderPartyMember(UUID... pets) {
         super();
@@ -87,8 +91,11 @@ public class RenderPartyMember extends RenderMember {
     @Override
     int update() {
         //Player-only updates example
-        if (((PlayerEntity) entity).getFoodStats().getFoodLevel() != foodLevel)
-            return 1;
+
+        if (((PlayerEntity) entity).getFoodStats().getFoodLevel() != hunger)
+            return E_TYPE.HUNGER.value();
+        if (((PlayerEntity) entity).getFoodStats().getSaturationLevel() != saturation)
+            return E_TYPE.SATURATION.value();
         //Checks all other common stats between pet/player, like health.
         return super.update();
     }

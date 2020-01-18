@@ -6,7 +6,15 @@ import net.minecraft.util.math.ChunkPos;
 public class RenderMember {
     private String name;
     LivingEntity entity;
+
+    //xTicks are animation values.
+
+    //Health
+    private int maxHealth;
     private int health;
+    private int healthTick;
+    private int armor;
+
 
     public RenderMember() {
         name = null;

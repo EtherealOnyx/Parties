@@ -1,6 +1,7 @@
 package eomods.combatoverhaul.eoparties.events;
 
 
+import eomods.combatoverhaul.eoparties.config.Config;
 import eomods.combatoverhaul.eoparties.data.client.ClientData;
 import eomods.combatoverhaul.eoparties.data.server.Events;
 import eomods.combatoverhaul.eoparties.data.server.ServerData;
@@ -12,11 +13,10 @@ import net.minecraft.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingHealEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.ChunkEvent;
@@ -138,8 +138,33 @@ public class PartyEvent {
     public void onEntityDeath(LivingDeathEvent event) {
         //TODO: Send the client data all the time.
     }
-    //TODO: Implement a semi-event of when a player leaves a party.
-    //TODO: Implement a semi-event of when a player adds a pet to their party.
-    //TODO: Implement a semi-event of when a player removes a pet from their party.
+
+    @SubscribeEvent
+    public void onEntityArmorChange(LivingEquipmentChangeEvent event) {
+        //TODO: Send the client data of armor.
+    }
+
+    @SubscribeEvent
+    public void onFoodConsumption(LivingEntityUseItemEvent.Finish event) {
+        //TODO: Send the client data of food consumption.
+    }
+
+    @SubscribeEvent
+    public void onPotionAdded(PotionEvent.PotionAddedEvent event) {
+        //TODO : Send client data of potion added.
+    }
+
+    @SubscribeEvent
+    public void onPotionRemoved(PotionEvent.PotionAddedEvent event) {
+        //TODO : Send client data of potion removed.
+    }
+
+    int update = 0;
+    @SubscribeEvent
+    public void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END && update++ >= Config.SERVER_UPDATE_FREQUENCY) {
+            Events.update();
+        }
+    }
 
 }

@@ -266,4 +266,8 @@ public class Events {
 
         return true;
     }
+
+    public static void update() {
+        QueuePacket.dequeue();
+    }
 }
