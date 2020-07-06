@@ -1,8 +1,4 @@
 package eomods.combatoverhaul.eoparties;
-
-import eomods.combatoverhaul.eoparties.events.PartyEvent;
-import eomods.combatoverhaul.eoparties.network.Handler;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -31,8 +27,6 @@ public class Parties {
     }
 
     public void init(final FMLCommonSetupEvent event) {
-        Handler.registerPackets();
-        MinecraftForge.EVENT_BUS.register(PartyEvent.instance);
     }
 
     public void initClient(final FMLClientSetupEvent event) {
