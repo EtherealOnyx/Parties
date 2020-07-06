@@ -1,2 +1,2 @@
 # Parties
-Adds a party system to minecraft!
+Adds a party system to Minecraft!
