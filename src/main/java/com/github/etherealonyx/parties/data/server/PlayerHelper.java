@@ -1,20 +1,21 @@
-package com.github.etherealonyx.parties.data;
+package com.github.etherealonyx.parties.data.server;
 
-import com.github.etherealonyx.parties.data.server.PlayerData;
-import com.github.etherealonyx.parties.data.server.ServerData;
+import com.github.etherealonyx.parties.data.PlayerData;
 import net.minecraft.entity.player.ServerPlayerEntity;
 
 import java.util.UUID;
 
-import static com.github.etherealonyx.parties.data.Util.getMember;
-import static com.github.etherealonyx.parties.data.Util.getParty;
+import static com.github.etherealonyx.parties.data.server.Util.getMember;
+import static com.github.etherealonyx.parties.data.server.Util.getParty;
 
 public class PlayerHelper {
 
     public static void onPlayerJoin(ServerPlayerEntity player) {
+        //Creates PlayerData if necessary. Also marks them online.
         if (!ServerData.players.containsKey(player.getUniqueID())) {
-            ServerData.players.put(player.getUniqueID(), new PlayerData());
+            ServerData.players.put(player.getUniqueID(), new PlayerData(player));
         } else {
+            ServerData.players.get(player.getUniqueID()).assignEntity(player);
             ServerData.players.get(player.getUniqueID()).markOnline();
         }
 
@@ -24,6 +25,9 @@ public class PlayerHelper {
                 !getMember(getParty(player.getUniqueID()).getLeader()).isOnline()) {
             PartyHelper.updateLeader(getParty(player.getUniqueID()), player.getUniqueID());
         }
+
+        //Tells the joining client to refresh their default values.
+        PacketHelper.runDefault(player.getUniqueID());
     }
 
     public static void onPlayerLeave(UUID id) {

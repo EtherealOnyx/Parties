@@ -1,5 +1,6 @@
 package com.github.etherealonyx.parties.data.server;
 
+import com.github.etherealonyx.parties.data.PlayerData;
 import com.github.etherealonyx.parties.data.TrackerData;
 
 import java.util.HashMap;

@@ -1,5 +1,7 @@
 package com.github.etherealonyx.parties.data;
 
+import com.github.etherealonyx.parties.data.client.ClientData;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -13,6 +15,12 @@ public class PartyData {
         this.partyLeader = partyLeader;
         partyMembers = new ArrayList<>();
         addMember(partyLeader);
+    }
+
+    public PartyData() {
+        System.out.println("Creating new party!");
+        partyMembers = new ArrayList<>();
+        partyMembers.add(ClientData.client);
     }
 
     public boolean addMember(UUID partyMember) {

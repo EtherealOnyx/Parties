@@ -1,6 +1,7 @@
-package com.github.etherealonyx.parties.data.server;
+package com.github.etherealonyx.parties.data;
 
-import com.github.etherealonyx.parties.data.PartyData;
+import com.github.etherealonyx.parties.data.server.PacketHelper;
+import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,11 +21,12 @@ public class PlayerData {
     private boolean partyLeader;
     //A boolean that indicates whether or not this player is online.
     private boolean isOnline;
+    private PlayerEntity player;
+
 
 
     //'Default' constructor that stores the playerID this playerData belongs to.
     public PlayerData() {
-        System.out.println("Adding new player!");
         isOnline = true;
         party = null;
     }
@@ -34,13 +36,17 @@ public class PlayerData {
         addPets(pets);
     }
 
-    private boolean addPets(UUID... pets) {
-        //TODO: Tell the client to add the pets as well.
+    public PlayerData(PlayerEntity player) {
+        this.player = player;
+        isOnline = true;
+        party = null;
+    }
+
+    public boolean addPets(UUID... pets) {
         return this.pets.addAll(Arrays.asList(pets));
     }
 
     public boolean assignParty(PartyData party) {
-        //TODO: Tell the client to add the party.
         if (party == null)
             return false;
         else {
@@ -59,7 +65,6 @@ public class PlayerData {
 
     public void clearParty() {
         party = null;
-        //TODO: Tell the client that they are no longer in the party.
         removeLead();
     }
 
@@ -87,5 +92,13 @@ public class PlayerData {
 
     public boolean isOnline() {
         return isOnline;
+    }
+
+    public void assignEntity(PlayerEntity player) {
+        this.player = player;
+    }
+
+    public PlayerEntity getPlayer() {
+        return this.player;
     }
 }

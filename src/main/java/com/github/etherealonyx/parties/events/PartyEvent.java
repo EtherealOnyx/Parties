@@ -1,20 +1,14 @@
 package com.github.etherealonyx.parties.events;
 
-import com.github.etherealonyx.parties.data.PartyHelper;
-import com.github.etherealonyx.parties.data.PlayerHelper;
-import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.TameableEntity;
+import com.github.etherealonyx.parties.data.client.ClientData;
+import com.github.etherealonyx.parties.data.server.PartyHelper;
+import com.github.etherealonyx.parties.data.server.PlayerHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Items;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-
-import java.util.UUID;
 
 public class PartyEvent {
 
@@ -25,6 +19,7 @@ public class PartyEvent {
         if (!event.getWorld().isRemote) {
             if (event.getTarget() instanceof PlayerEntity) {
                 if (event.getPlayer().getHeldItemMainhand().getItem() == Items.DIAMOND) {
+
                     if (PartyHelper.invitePlayer(event.getPlayer().getUniqueID(),
                             event.getTarget().getUniqueID()))
                         System.out.println("Party creation success.");
@@ -50,20 +45,24 @@ public class PartyEvent {
             }*/
         }
     }
-    /*@SubscribeEvent
+
+    @SubscribeEvent
     public void interactEntity(PlayerInteractEvent.RightClickItem event) {
         if (!event.getWorld().isRemote) {
-            if (event.getPlayer().getHeldItemMainhand().getItem() == Items.STICK) {
-                for (UUID toTrack : ServerData.trackers.keySet())
-                    System.out.println("Server tracker exists for: " + getName(toTrack));
-                for (UUID toTrack : ServerData.clientTrackers.keySet())
-                    System.out.println("Client tracker exists for: " + getName(toTrack));
+
+        } else {
+            if (event.getItemStack().getItem().equals(Items.STICK)) {
+                if (ClientData.party != null) {
+                    System.out.println("**** Party ****");
+                    ClientData.party.getMembers().forEach(entry -> System.out.println("Member: " + entry.toString()));
+                    System.out.println("**** Leader ****");
+                    System.out.println(ClientData.party.getLeader());
+                }
             }
         }
-        else {
-            ClientData.printTrackers();
-        }
     }
+
+    /*
 
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

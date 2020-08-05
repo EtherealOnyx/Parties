@@ -15,6 +15,10 @@ public class TrackerData {
     //The entity itself.
     private LivingEntity entity;
 
+    public void changeToServ() {
+        trackerIds.entrySet().forEach(entry -> entry.setValue(false));
+    }
+
 
 
 }

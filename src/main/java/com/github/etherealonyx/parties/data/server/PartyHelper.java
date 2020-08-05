@@ -1,8 +1,10 @@
-package com.github.etherealonyx.parties.data;
+package com.github.etherealonyx.parties.data.server;
+
+import com.github.etherealonyx.parties.data.PartyData;
 
 import java.util.UUID;
 
-import static com.github.etherealonyx.parties.data.Util.*;
+import static com.github.etherealonyx.parties.data.server.Util.*;
 
 public class PartyHelper {
 
@@ -22,18 +24,23 @@ public class PartyHelper {
 
         //This checks if initiator is in a party.
         if (getParty(initiator) == null) {
-            getMember(initiator).makeLeader();
             PartyData data = new PartyData(initiator);
             getMember(initiator).assignParty(data);
         }
+        getMember(initiator).makeLeader();
+        PacketHelper.updateLeader(initiator);
         return addPlayer(futureMember, getParty(initiator));
     }
 
     //This adds the player to the given party.
     public static boolean addPlayer(UUID futureMember, PartyData currentParty) {
-        //This checks if the current player has a party.
         currentParty.addMember(futureMember);
         getMember(futureMember).assignParty(currentParty);
+
+        //Add all members to the party (Also sends the entire party to the futureMember).
+        PacketHelper.addMember(futureMember);
+        //Tell futureMember who is the new leader.
+        PacketHelper.updateLeader(currentParty.getLeader(), futureMember);
         //TODO: Add players to trackers. Also tell client who's online, who's lead, etc etc. Basically all party info.
         return true;
     }
@@ -45,6 +52,7 @@ public class PartyHelper {
             return false;
         }
         //Removes member.
+        PacketHelper.kickPlayer(removedMember);
         return removePlayer(removedMember);
     }
 
@@ -64,6 +72,7 @@ public class PartyHelper {
         if (party.getSize() == 1) {
             System.out.println("Party disbanding!");
             getMember(party.getMembers().get(0)).clearParty();
+            PacketHelper.disbandParty(party);
             //No trackers needed to be removed here because they would've been removed before.
             return true;
         }
@@ -87,6 +96,7 @@ public class PartyHelper {
         party.changeLeader(member);
         //Update leader in player data.
         getMember(member).makeLeader();
+        PacketHelper.updateLeader(member);
     }
 
     static boolean updateLeader(PartyData party) {
