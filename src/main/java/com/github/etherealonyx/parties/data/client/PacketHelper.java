@@ -139,8 +139,7 @@ public class PacketHelper {
     }
 
     public static void dropPartyKicked() {
-        ClientData.party = null;
-        ClientData.players.entrySet().removeIf(entry -> !entry.getKey().equals(ClientData.client));
+        removeParty();
         //TODO: Fix trackers.
         System.out.println("You have been kicked from the party...");
     }
@@ -150,12 +149,20 @@ public class PacketHelper {
         ClientData.players.remove(uuid);
         //TODO: Fix trackers.
         System.out.println("Party member " + uuid + " was kicked from the party.");
+        if (ClientData.party.getMembers().size() <= 1) {
+            disbandParty();
+        }
     }
 
     public static void disbandParty() {
+        removeParty();
+        System.out.println("Party has been disbanded.");
+        //TODO: Fix trackers.
+    }
+
+    private static void removeParty() {
         ClientData.party = null;
         ClientData.players.entrySet().removeIf(entry -> !entry.getKey().equals(ClientData.client));
-        //TODO: Fix trackers.
     }
 
     public static void attemptToFindTrackers() {
