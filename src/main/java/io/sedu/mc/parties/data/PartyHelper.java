@@ -46,12 +46,25 @@ public class PartyHelper {
         }
         //Removes member.
         //PacketHelper.kickPlayer(removedMember);
-        return removePlayerFromParty(removedMember);
+        return removePlayerFromParty(removedMember, true);
     }
 
-    public static boolean removePlayerFromParty(UUID removedMember) {
+    public static boolean removePlayerFromParty(UUID removedMember, boolean wasKicked) {
         //Remove player from the party.
-        getPartyFromMember(removedMember).removeMember(removedMember);
+        getPartyFromMember(removedMember).removeMember(removedMember, wasKicked);
+        return true;
+    }
+
+    public static boolean leaveParty(UUID uuid) {
+        if (getPlayer(uuid).hasParty()) {
+            getPartyFromMember(uuid).removeMember(uuid, false);
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean giveLeader(UUID player) {
+        getPartyFromMember(player).makeLeader(player);
         return true;
     }
 }

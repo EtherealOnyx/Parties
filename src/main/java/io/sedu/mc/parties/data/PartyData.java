@@ -8,7 +8,10 @@ import java.util.UUID;
 public class PartyData {
 
     //Keeps track of all the parties currently on the server. May also be used to track the singular party on client.
-    public static HashMap<UUID, PartyData> partyList = new HashMap<>();
+    public static HashMap<UUID, PartyData> partyList;
+
+    //Client-side party.
+    public static PartyData clientParty;
 
     //The currently selected leader of the party.
     private UUID leader;
@@ -24,19 +27,35 @@ public class PartyData {
         party = new ArrayList<>();
 
         //Generate a new party.
+        if (partyList == null)
+           partyList = new HashMap<>();
+
         partyId = UUID.randomUUID();
         partyList.put(partyId, this);
-        leader = initiator;
+
         addMember(initiator);
+        makeLeader(initiator);
+    }
+
+    public static void addClientMember(UUID uuid) {
+        //This assumes that players are online first.
+        PlayerData p = new PlayerData();
+        p.setId(uuid);
+    }
+
+    public void makeLeader(UUID initiator) {
+        leader = initiator;
     }
 
     public void addMember(UUID futureMember) {
         //No checks necessary here as they have already been done.
         party.add(futureMember);
         Util.getPlayer(futureMember).addParty(partyId);
-        //TODO: Implement Packets (send all party info not just lead)
-        //PacketHelper.updateLeader(initiator);
 
+    }
+
+    public void addMemberClient(UUID futureMember) {
+        clientParty.party.add(futureMember);
     }
 
     public ArrayList<UUID> getMembers() {
@@ -51,7 +70,7 @@ public class PartyData {
 
     }
 
-    public void removeMember(UUID removedMember) {
+    public void removeMember(UUID removedMember, boolean wasKicked) {
         if (!party.remove(removedMember))
             //Some error occured!
             System.out.println("This should never get here");
@@ -62,13 +81,11 @@ public class PartyData {
             System.out.println("Party disbanding!");
             disband();
             return;
-            //PacketHelper.disbandParty(party);
         }
 
         //Update Leader
         if (removedMember.equals(leader)) {
             leader = party.get(0);
-            //PacketHelper.updateLeader(leader, party);
         }
     }
 
@@ -80,5 +97,10 @@ public class PartyData {
             i.remove();
         }
         partyList.remove(partyId);
+    }
+
+
+    public boolean isLeader(UUID playerId) {
+        return leader.equals(playerId);
     }
 }
