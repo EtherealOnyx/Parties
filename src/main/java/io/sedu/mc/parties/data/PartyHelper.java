@@ -20,15 +20,13 @@ public class PartyHelper {
 
         //This checks if initiator is in a party.
         if (!getPlayer(initiator).hasParty()) {
-            PartyData data = new PartyData(initiator);
-            //TODO: Implement Packets
-            //PacketHelper.updateLeader(initiator);
+            new PartyData(initiator);
         }
-        return addPlayer(futureMember, getParty(initiator));
+        return addPlayerToParty(futureMember, getPartyFromMember(initiator));
     }
 
     //This adds the player to the given party.
-    public static boolean addPlayer(UUID futureMember, PartyData currentParty) {
+    public static boolean addPlayerToParty(UUID futureMember, PartyData currentParty) {
         currentParty.addMember(futureMember);
 
         //TODO: Implement Packets.
@@ -40,4 +38,20 @@ public class PartyHelper {
         return true;
     }
 
+    //Kicks player from party.
+    public static boolean kickPlayer(UUID initiator, UUID removedMember) {
+        if (!inSameParty(initiator, removedMember)) {
+            System.out.println("Target is not in your party!");
+            return false;
+        }
+        //Removes member.
+        //PacketHelper.kickPlayer(removedMember);
+        return removePlayerFromParty(removedMember);
+    }
+
+    public static boolean removePlayerFromParty(UUID removedMember) {
+        //Remove player from the party.
+        getPartyFromMember(removedMember).removeMember(removedMember);
+        return true;
+    }
 }

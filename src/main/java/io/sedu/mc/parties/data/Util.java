@@ -8,8 +8,20 @@ public class Util {
         return PlayerData.playerList.get(id);
     }
 
-    public static PartyData getParty(UUID playerId) {
+    public static PartyData getPartyFromMember(UUID playerId) {
         //Can a hashmap handle a null get()? No...
-        return PartyData.partyList.get(PlayerData.playerList.get(playerId).getPartyId());
+        return getPartyFromId(PlayerData.playerList.get(playerId).getPartyId());
     }
+
+    public static boolean inSameParty(UUID member1, UUID member2) {
+        if (getPartyFromMember(member1) == null)
+            return false;
+        return getPartyFromMember(member1).equals(getPartyFromMember(member2));
+    }
+
+    public static PartyData getPartyFromId(UUID partyId) {
+        return PartyData.partyList.get(partyId);
+    }
+
+
 }

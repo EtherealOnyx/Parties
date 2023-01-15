@@ -46,4 +46,8 @@ public class PlayerData {
     public void setOffline() {
         isOnline = false;
     }
+
+    public void removeParty() {
+        party = null;
+    }
 }
