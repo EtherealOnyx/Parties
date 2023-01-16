@@ -31,20 +31,38 @@ public class PartyData {
 
         party.add(initiator);
         Util.getPlayer(initiator).addParty(partyId);
-        updateLeader(initiator);
+        updateLeaderNew(initiator);
+    }
+
+    private void updateLeaderNew(UUID initiator) {
+        leader = initiator;
+        ServerPacketHelper.sendNewLeader(initiator);
     }
 
     public static void addClientMember(UUID uuid) {
-        //This assumes that players are online first.
         PlayerData p = new PlayerData();
         p.setId(uuid);
     }
 
     public void addMember(UUID futureMember) {
         //No checks necessary here as they have already been done.
+        System.out.println("In addMember()...");
         ServerPacketHelper.sendNewMember(futureMember, party);
+        System.out.println("Packet sent successfully...");
+        //Add future member to party's trackers.
+        /*party.forEach(id -> {
+            if (!PlayerData.trackerList.containsKey(id))
+                PlayerData.trackerList.put(id, new HashMap<>());
+            PlayerData.trackerList.get(id).put(futureMember, true);
+            //Add party to future member's trackers.
+            if (!PlayerData.trackerList.containsKey(futureMember))
+                PlayerData.trackerList.put(futureMember, new HashMap<>());
+            PlayerData.trackerList.get(futureMember).put(id, true);
+        });*/
         party.add(futureMember);
+        System.out.println("Added member to party...");
         Util.getPlayer(futureMember).addParty(partyId);
+        System.out.println("Added party id to member...");
 
     }
 
@@ -66,7 +84,12 @@ public class PartyData {
             System.out.println("This should never get here");
         Util.getPlayer(removedMember).removeParty();
         ServerPacketHelper.sendRemoveMember(removedMember, party, wasKicked);
-
+        //Remove previous member from party's trackers.
+        /*party.forEach(id -> {
+            PlayerData.trackerList.get(id).remove(removedMember);
+        });
+        //Remove all trackers from removedMember.
+        PlayerData.trackerList.remove(removedMember);*/
         //Delete party if necessary.
         if (party.size() == 1) {
             System.out.println("Party disbanding!");
@@ -85,7 +108,9 @@ public class PartyData {
         //To avoid concurrent modification....
         Iterator<UUID> i = party.iterator();
         while (i.hasNext()) {
-            Util.getPlayer(i.next()).removeParty();
+            UUID member = i.next();
+            Util.getPlayer(member).removeParty();
+            //PlayerData.trackerList.remove(member);
             i.remove();
         }
         partyList.remove(partyId);

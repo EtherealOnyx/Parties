@@ -66,7 +66,10 @@ public class ClientPacketData {
                 break;
             //#3 - Sends a UUID to the client, to tell it that the specific UUID is now the party leader of the party.
             case 3:
-                ClientPacketHelper.changeLeader(list);
+                if (list.size() == 0)
+                    ClientPacketHelper.setLeader();
+                else
+                    ClientPacketHelper.changeLeader(list);
                 break;
             //#4 - Sends a UUID to the client, to tell it that the specified UUID is no longer in the party.
             case 4:

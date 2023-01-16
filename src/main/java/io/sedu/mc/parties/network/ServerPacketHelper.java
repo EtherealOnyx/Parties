@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.network;
 
+import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.data.Util;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -13,10 +14,12 @@ public class ServerPacketHelper {
 
     public static void sendNewMember(UUID futureMember, ArrayList<UUID> party) {
         //Send each member to future party member.
+        System.out.println("Sending to player #1");
         PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, party), getServerPlayer(futureMember));
 
         //Send future member to each party member.
         party.forEach(id -> {
+            System.out.println("Sending to player loop");
             PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, futureMember), getServerPlayer(id));
             //Tell newly online player that this other member is also online.
             if (isOnline(id))
@@ -24,6 +27,7 @@ public class ServerPacketHelper {
         });
 
         //Send leader to future party member.
+        System.out.println("Sending to player #2");
         PartiesPacketHandler.sendToPlayer(new ClientPacketData(3, getPartyFromMember(party.get(0)).getLeader()),
                                           getServerPlayer(futureMember));
     }
@@ -61,6 +65,9 @@ public class ServerPacketHelper {
                 if (isOnline(id))
                     PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, id), player);
             });
+            //Tell the online party member who the leader is.
+            PartiesPacketHandler.sendToPlayer(
+                    new ClientPacketData(3, getPartyFromMember(player.getUUID()).getLeader()), player);
         }
     }
 
@@ -70,5 +77,20 @@ public class ServerPacketHelper {
                 PartiesPacketHandler.sendToPlayer(new ClientPacketData(1, player), getServerPlayer(id));
             });
         }
+    }
+
+    public static void trackerToClient(UUID tracker, UUID playerToTrack) {
+        System.out.println("Tracker (" + tracker + " is now tracking player (" + playerToTrack +") on client");
+        PlayerData.trackerList.get(tracker).put(playerToTrack, false);
+    }
+
+    public static void trackerToServer(UUID tracker, UUID playerToTrack) {
+        System.out.println("Tracker (" + tracker + " is now getting tracking info of player (" + playerToTrack
+                                   +") from server");
+        PlayerData.trackerList.get(tracker).put(playerToTrack, true);
+    }
+
+    public static void sendNewLeader(UUID initiator) {
+        PartiesPacketHandler.sendToPlayer(new ClientPacketData(3), getServerPlayer(initiator));
     }
 }

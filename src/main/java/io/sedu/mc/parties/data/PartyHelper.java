@@ -18,16 +18,16 @@ public class PartyHelper {
             return false;
         }
 
-        //This checks if initiator is in a party.
+        //This checks if initiator is in a party. Creates one if not.
         if (!getPlayer(initiator).hasParty()) {
             new PartyData(initiator);
-
         }
         return addPlayerToParty(futureMember, getPartyFromMember(initiator));
     }
 
     //This adds the player to the given party.
     public static boolean addPlayerToParty(UUID futureMember, PartyData currentParty) {
+        System.out.println("In addPlayerToParty()...");
         currentParty.addMember(futureMember);
         return true;
     }
