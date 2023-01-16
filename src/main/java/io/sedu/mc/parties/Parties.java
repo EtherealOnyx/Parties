@@ -32,6 +32,8 @@ public class Parties
         IEventBus modbus = FMLJavaModLoadingContext.get().getModEventBus();
         modbus.addListener(ModSetup::init);
         MinecraftForge.EVENT_BUS.register(PartyEvent.class);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> modbus.addListener(ClientSetup::init));
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+            modbus.addListener(ClientSetup::init)
+        );
     }
 }

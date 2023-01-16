@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.events;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.client.ClientPlayerData;
 import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PartyData;
 import io.sedu.mc.parties.data.PartyHelper;
@@ -16,6 +17,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -37,42 +39,46 @@ public class PartyEvent {
 
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        UUID id = event.getPlayer().getUUID();
-        if (getPlayer(id) == null) {
-            PlayerData d = new PlayerData(id);
+        if (!event.getPlayer().level.isClientSide) {
+            UUID id = event.getPlayer().getUUID();
+            if (getPlayer(id) == null) {
+                PlayerData d = new PlayerData(id);
+            }
+            getPlayer(id).setServerPlayer((ServerPlayer) event.getPlayer());//.setOnline();
+            ServerPacketHelper.sendOnline((ServerPlayer) event.getPlayer());
         }
-        getPlayer(id).setServerPlayer((ServerPlayer) event.getPlayer()).setOnline();
-        ServerPacketHelper.sendOnline((ServerPlayer) event.getPlayer());
     }
 
     @SubscribeEvent
     public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
-        getPlayer(event.getPlayer().getUUID()).removeServerPlayer().setOffline();
-        ServerPacketHelper.sendOffline(event.getPlayer().getUUID());
+        if (!event.getPlayer().level.isClientSide) {
+            getPlayer(event.getPlayer().getUUID()).removeServerPlayer();//.setOffline();
+            ServerPacketHelper.sendOffline(event.getPlayer().getUUID());
+        }
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @SubscribeEvent()
-    public void onClientLeave(ClientPlayerNetworkEvent.LoggedOutEvent event) {
+    /*@SubscribeEvent
+    public static void onClientLeave(ClientPlayerNetworkEvent.LoggedOutEvent event) {
         PlayerData.playerList.clear();
-    }
+    }*/
 
-    @SubscribeEvent()
-    public void onEntitySpawned(EntityJoinWorldEvent event) {
+    @SubscribeEvent
+    public static void onEntitySpawned(EntityJoinWorldEvent event) {
         System.out.println("Entity Spawned: " + event.getEntity().getName().getContents());
         if (event.getWorld().isClientSide && event.getEntity() instanceof Player) {
             System.out.println("PLAYER Spawned: " + event.getEntity().getName().getContents());
-            if (PlayerData.playerList.containsKey(event.getEntity().getUUID()))
-                    if (PlayerData.playerList.get(event.getEntity().getUUID()).isTrackedOnServer()) {
+            if (ClientPlayerData.playerList.containsKey(event.getEntity().getUUID()))
+                    if (ClientPlayerData.playerList.get(event.getEntity().getUUID()).isTrackedOnServer()) {
                         ClientPacketHelper.sendTrackerToClient((Player) event.getEntity());
                     }
             else {
-                PlayerData.potentialTracks.put(event.getEntity().getUUID(), (Player) event.getEntity());
+                ClientPlayerData.potentialTracks.put(event.getEntity().getUUID(), (Player) event.getEntity());
             }
         }
     }
 
-    private static int timer = 0;
+
+    /*private static int timer = 0;
     @SubscribeEvent
     public void clientTickEvent(TickEvent.ClientTickEvent event) {
         //Check if our trackers are valid every sec (20 ticks per sec?)...
@@ -93,7 +99,7 @@ public class PartyEvent {
                     PlayerData.potentialTracks.remove(p.getUUID());
             }
         }
-    }
+    }*/
 
 
 

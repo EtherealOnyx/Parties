@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
+import io.sedu.mc.parties.client.ClientPlayerData;
 import io.sedu.mc.parties.network.ClientPacketData.*;
 import io.sedu.mc.parties.network.ServerPacketHelper;
 
@@ -37,11 +38,6 @@ public class PartyData {
     private void updateLeaderNew(UUID initiator) {
         leader = initiator;
         ServerPacketHelper.sendNewLeader(initiator);
-    }
-
-    public static void addClientMember(UUID uuid) {
-        PlayerData p = new PlayerData();
-        p.setId(uuid);
     }
 
     public void addMember(UUID futureMember) {

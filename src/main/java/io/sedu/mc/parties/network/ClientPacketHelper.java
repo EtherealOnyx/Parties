@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.network;
 
+import io.sedu.mc.parties.client.ClientPlayerData;
 import io.sedu.mc.parties.data.PartyData;
 import io.sedu.mc.parties.data.PlayerData;
 import net.minecraft.client.Minecraft;
@@ -11,8 +12,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
 
-import static io.sedu.mc.parties.data.Util.getPlayer;
-import static io.sedu.mc.parties.data.PlayerData.*;
+import static io.sedu.mc.parties.client.ClientPlayerData.*;
+import static io.sedu.mc.parties.data.Util.getClientPlayer;
 
 public class ClientPacketHelper {
 
@@ -28,7 +29,7 @@ public class ClientPacketHelper {
     public static void markOnline(ArrayList<UUID> list) {
         list.forEach(uuid -> {
             try {
-                getPlayer(uuid).setOnline();
+                getClientPlayer(uuid).setOnline();
                 msg(getName(uuid) + " is now online.");
             } catch (NullPointerException e) {
                 error();
@@ -40,7 +41,7 @@ public class ClientPacketHelper {
     public static void markOffline(ArrayList<UUID> list) {
         list.forEach(uuid -> {
             try {
-                getPlayer(uuid).setOffline();
+                getClientPlayer(uuid).setOffline();
                 msg(getName(uuid) + " is now offline.");
             } catch (NullPointerException e) {
                 error();
@@ -51,9 +52,9 @@ public class ClientPacketHelper {
 
     public static void addMembers(ArrayList<UUID> list) {
         try {
-            if (PlayerData.partySize() == 0)
-                PartyData.addClientMember(Minecraft.getInstance().player.getUUID());
-            list.forEach(PartyData::addClientMember);
+            if (partySize() == 0)
+                ClientPlayerData.addClientMember(Minecraft.getInstance().player.getUUID());
+            list.forEach(ClientPlayerData::addClientMember);
         } catch (NullPointerException e) {
             error();
             e.printStackTrace();
@@ -65,7 +66,7 @@ public class ClientPacketHelper {
         while (it.hasNext()) {
             p = (Player) it.next();
             if (playerList.containsKey(p.getUUID())) {
-                playerList.get(p.getUUID()).setClientPlayer(PlayerData.potentialTracks.remove(p.getUUID()));
+                playerList.get(p.getUUID()).setClientPlayer(potentialTracks.remove(p.getUUID()));
                 ClientPacketHelper.sendTrackerToServer(p);
             }
         }

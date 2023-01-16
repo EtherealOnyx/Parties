@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.data;
 
+import io.sedu.mc.parties.client.ClientPlayerData;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.UUID;
@@ -39,6 +40,10 @@ public class Util {
     /*
     Client-Side Functions
      */
+
+    public static ClientPlayerData getClientPlayer(UUID player) {
+        return ClientPlayerData.playerList.get(player);
+    }
 
 
     public static boolean hasParty(UUID player) {
