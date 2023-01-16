@@ -1,5 +1,7 @@
 package io.sedu.mc.parties.data;
 
+import net.minecraft.server.level.ServerPlayer;
+
 import java.util.UUID;
 
 public class Util {
@@ -7,6 +9,9 @@ public class Util {
     /*
     Server-side Functions
      */
+    public static ServerPlayer getServerPlayer(UUID id) {
+        return getPlayer(id).serverPlayer == null? null : getPlayer(id).serverPlayer.get();
+    }
     public static PlayerData getPlayer(UUID id) {
         return PlayerData.playerList.get(id);
     }
@@ -35,15 +40,12 @@ public class Util {
     Client-Side Functions
      */
 
-    public static PlayerData getClientPlayer(UUID id) {
-        for (PlayerData data : PlayerData.clientList)
-           if (data.getId().equals(id))
-               return data;
-        return null;
+
+    public static boolean hasParty(UUID player) {
+        return getPartyFromMember(player) != null;
     }
 
-
-
-
-
+    public static boolean isOnline(UUID id) {
+        return getServerPlayer(id) != null;
+    }
 }

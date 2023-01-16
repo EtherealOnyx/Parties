@@ -1,5 +1,9 @@
 package io.sedu.mc.parties.data;
 
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.server.level.ServerPlayer;
+
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -8,12 +12,17 @@ public class PlayerData {
 
     public static HashMap<UUID, PlayerData> playerList = new HashMap<>();
 
-    public static ArrayList<PlayerData> clientList;
-
     public static UUID leader;
 
-    //The UUID of the player we are tracking.
-    private UUID player;
+
+
+    //Player Entity
+    WeakReference<ServerPlayer> serverPlayer;
+
+    //Client Information
+    private static int globalIndex;
+    private int partyIndex;
+    private String name;
 
     //The UUID of the party that this player belongs to.
     private UUID party;
@@ -22,10 +31,7 @@ public class PlayerData {
     private boolean isOnline;
 
     public PlayerData(UUID id) {
-        player = id;
-        isOnline = true;
         playerList.put(id, this);
-
     }
 
     //Client constructor.
@@ -33,8 +39,16 @@ public class PlayerData {
 
     }
 
-    public UUID getId() {
-        return player;
+    public static void updatePartyIndex(int indexRemoved) {
+        globalIndex--;
+        playerList.values().forEach((playerData) -> {
+            if (playerData.partyIndex > indexRemoved)
+                playerData.partyIndex--;
+        });
+    }
+
+    public static int partySize() {
+        return globalIndex;
     }
 
     public boolean hasParty() {
@@ -65,10 +79,22 @@ public class PlayerData {
     }
 
     public void setId(UUID uuid) {
-        player = uuid;
-        if (clientList == null)
-            clientList = new ArrayList<>();
-        clientList.add(this);
+        partyIndex = globalIndex;
+        globalIndex++;
+        playerList.put(uuid, this);
     }
 
+    public PlayerData setServerPlayer(ServerPlayer player) {
+        serverPlayer = new WeakReference<>(player);
+        return this;
+    }
+
+    public PlayerData removeServerPlayer() {
+        serverPlayer = null;
+        return this;
+    }
+
+    public int getIndex() {
+        return partyIndex;
+    }
 }

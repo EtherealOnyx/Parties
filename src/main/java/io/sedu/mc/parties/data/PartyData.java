@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
+import io.sedu.mc.parties.network.ClientPacketData.*;
+import io.sedu.mc.parties.network.ServerPacketHelper;
+
 public class PartyData {
 
     //Keeps track of all the parties currently on the server. May also be used to track the singular party on client.
-    public static HashMap<UUID, PartyData> partyList;
-
-    //Client-side party.
-    public static PartyData clientParty;
+    public static HashMap<UUID, PartyData> partyList = new HashMap<>();
 
     //The currently selected leader of the party.
     private UUID leader;
@@ -26,15 +26,12 @@ public class PartyData {
     public PartyData(UUID initiator) {
         party = new ArrayList<>();
 
-        //Generate a new party.
-        if (partyList == null)
-           partyList = new HashMap<>();
-
         partyId = UUID.randomUUID();
         partyList.put(partyId, this);
 
-        addMember(initiator);
-        makeLeader(initiator);
+        party.add(initiator);
+        Util.getPlayer(initiator).addParty(partyId);
+        updateLeader(initiator);
     }
 
     public static void addClientMember(UUID uuid) {
@@ -43,19 +40,12 @@ public class PartyData {
         p.setId(uuid);
     }
 
-    public void makeLeader(UUID initiator) {
-        leader = initiator;
-    }
-
     public void addMember(UUID futureMember) {
         //No checks necessary here as they have already been done.
+        ServerPacketHelper.sendNewMember(futureMember, party);
         party.add(futureMember);
         Util.getPlayer(futureMember).addParty(partyId);
 
-    }
-
-    public void addMemberClient(UUID futureMember) {
-        clientParty.party.add(futureMember);
     }
 
     public ArrayList<UUID> getMembers() {
@@ -75,6 +65,7 @@ public class PartyData {
             //Some error occured!
             System.out.println("This should never get here");
         Util.getPlayer(removedMember).removeParty();
+        ServerPacketHelper.sendRemoveMember(removedMember, party, wasKicked);
 
         //Delete party if necessary.
         if (party.size() == 1) {
@@ -85,11 +76,12 @@ public class PartyData {
 
         //Update Leader
         if (removedMember.equals(leader)) {
-            leader = party.get(0);
+            updateLeader(party.get(0));
         }
     }
 
     public void disband() {
+        ServerPacketHelper.disband(party);
         //To avoid concurrent modification....
         Iterator<UUID> i = party.iterator();
         while (i.hasNext()) {
@@ -99,8 +91,17 @@ public class PartyData {
         partyList.remove(partyId);
     }
 
+    public void updateLeader(UUID newLeader) {
+        leader = newLeader;
+        ServerPacketHelper.sendNewLeader(newLeader, party);
+    }
+
 
     public boolean isLeader(UUID playerId) {
         return leader.equals(playerId);
+    }
+
+    public UUID getLeader() {
+        return leader;
     }
 }

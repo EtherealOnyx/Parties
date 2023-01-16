@@ -5,6 +5,8 @@ import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PartyData;
 import io.sedu.mc.parties.data.PartyHelper;
 import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.network.ServerPacketHelper;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
@@ -26,10 +28,16 @@ public class PartyEvent {
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         UUID id = event.getPlayer().getUUID();
         if (getPlayer(id) == null) {
-            new PlayerData(id);
-        } else {
-            //TODO: Send client info if they belong to party.
+            PlayerData d = new PlayerData(id);
         }
+        getPlayer(id).setServerPlayer((ServerPlayer) event.getPlayer()).setOnline();
+        ServerPacketHelper.sendOnline((ServerPlayer) event.getPlayer());
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
+        getPlayer(event.getPlayer().getUUID()).removeServerPlayer().setOffline();
+        ServerPacketHelper.sendOffline(event.getPlayer().getUUID());
     }
 
     @SubscribeEvent

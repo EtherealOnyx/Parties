@@ -21,6 +21,7 @@ public class PartyHelper {
         //This checks if initiator is in a party.
         if (!getPlayer(initiator).hasParty()) {
             new PartyData(initiator);
+
         }
         return addPlayerToParty(futureMember, getPartyFromMember(initiator));
     }
@@ -28,13 +29,6 @@ public class PartyHelper {
     //This adds the player to the given party.
     public static boolean addPlayerToParty(UUID futureMember, PartyData currentParty) {
         currentParty.addMember(futureMember);
-
-        //TODO: Implement Packets.
-        //Add all members to the party (Also sends the entire party to the futureMember).
-        //PacketHelper.addMember(futureMember);
-        //Tell futureMember who is the new leader.
-        //PacketHelper.updateLeader(currentParty.getLeader(), futureMember);
-        //TODO: Add players to trackers. Also tell client who's online, who's lead, etc etc. Basically all party info.
         return true;
     }
 
@@ -64,7 +58,7 @@ public class PartyHelper {
     }
 
     public static boolean giveLeader(UUID player) {
-        getPartyFromMember(player).makeLeader(player);
+        getPartyFromMember(player).updateLeader(player);
         return true;
     }
 }

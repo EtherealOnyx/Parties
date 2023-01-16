@@ -6,11 +6,6 @@ import io.sedu.mc.parties.data.PartyHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.commands.arguments.MessageArgument;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-
-import java.util.UUID;
 
 import static io.sedu.mc.parties.data.Util.isLeader;
 

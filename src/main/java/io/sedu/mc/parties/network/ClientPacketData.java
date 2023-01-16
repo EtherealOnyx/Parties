@@ -24,6 +24,22 @@ public class ClientPacketData {
         }
     }
 
+    public ClientPacketData(int i, ArrayList<UUID> party) {
+        this.type = i;
+        list = party;
+    }
+
+    public ClientPacketData(int i, UUID futureMember) {
+        list = new ArrayList<>();
+        list.add(futureMember);
+        this.type = i;
+    }
+
+    public ClientPacketData(int i) {
+        this.type = i;
+        list = new ArrayList<>();
+    }
+
     void encode(FriendlyByteBuf buf) {
         buf.writeInt(type);
         for (UUID id : list) {
@@ -37,39 +53,42 @@ public class ClientPacketData {
         switch(type) {
             //#0 - Sends a UUID to the client stating that the player is online.
             case 0:
-                PacketHelper.markOnline(list);
+                ClientPacketHelper.markOnline(list);
                 break;
             //#1 - Sends a UUID to the client stating that the player is offline.
             case 1:
-                PacketHelper.markOffline(list);
+                ClientPacketHelper.markOffline(list);
                 break;
             //#2 - Sends a list of UUIDs to the client, where all of them are player UUID's that need to be added to
             // the client's party list.
             case 2:
-                PacketHelper.addMembers(list);
+                ClientPacketHelper.addMembers(list);
                 break;
             //#3 - Sends a UUID to the client, to tell it that the specific UUID is now the party leader of the party.
             case 3:
-                PacketHelper.changeLeader(list);
+                ClientPacketHelper.changeLeader(list);
                 break;
             //#4 - Sends a UUID to the client, to tell it that the specified UUID is no longer in the party.
             case 4:
                 if (list.size() == 0)
-                    PacketHelper.dropParty();
+                    ClientPacketHelper.dropParty();
                 else
-                    PacketHelper.removePartyMemberDropped(list.get(0));
+                    ClientPacketHelper.removePartyMemberDropped(list.get(0));
                 break;
             //#5 Sends a packet to the client, indicating that the player has been kicked from the party.
             case 5:
                 if (list.size() == 0)
-                    PacketHelper.dropPartyKicked();
+                    ClientPacketHelper.dropPartyKicked();
                 else
-                    PacketHelper.removePartyMemberKicked(list.get(0));
+                    ClientPacketHelper.removePartyMemberKicked(list.get(0));
                 break;
             //#6 Sends a packet to the client, indicating that the party has been disbanded.
             case 6:
-                PacketHelper.disbandParty();
+                ClientPacketHelper.disbandParty();
                 break;
         }
+        context.get().setPacketHandled(true);
     }
+
+
 }
