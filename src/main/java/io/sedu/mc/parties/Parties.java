@@ -1,6 +1,7 @@
 package io.sedu.mc.parties;
 
 import io.sedu.mc.parties.commands.PartyCommands;
+import io.sedu.mc.parties.events.ClientEvent;
 import io.sedu.mc.parties.events.PartyEvent;
 import io.sedu.mc.parties.setup.ClientSetup;
 import io.sedu.mc.parties.setup.ModSetup;

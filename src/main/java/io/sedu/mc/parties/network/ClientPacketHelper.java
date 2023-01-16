@@ -127,6 +127,7 @@ public class ClientPacketHelper {
     public static void sendTrackerToServer(Player entity) {
         playerList.get(entity.getUUID()).removeClientPlayer();
         msg("You are no longer tracking " + getName(entity.getUUID()) + " on the client.");
+        PartiesPacketHandler.sendToServer(new ServerPacketData(1, entity.getUUID()));
     }
 
     public static void setLeader() {

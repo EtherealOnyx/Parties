@@ -20,7 +20,7 @@ public class ClientPlayerData {
     private Player clientPlayer;
     //Client-side functionality.
     private boolean isOnline;
-    private Component playerName;
+    private String playerName;
     private boolean trackedOnClient;
     public static UUID leader;
 
@@ -46,21 +46,9 @@ public class ClientPlayerData {
         return globalIndex;
     }
 
-    public static String getName(UUID uuid) {
-        return playerList.get(uuid).getName().getContents();
-    }
-
     public void setId(UUID uuid) {
         partyIndex = globalIndex;
         globalIndex++;
-
-        for (PlayerInfo pi : Minecraft.getInstance().player.connection.getOnlinePlayers()) {
-            if (pi.getProfile().getId().equals(uuid)) {
-                playerName = new TextComponent(pi.getProfile().getName());
-            }
-        }
-
-        playerName = playerName == null ? new TextComponent("???") : playerName;
         trackedOnClient = false;
         playerList.put(uuid, this);
     }
@@ -77,14 +65,14 @@ public class ClientPlayerData {
         return partyIndex;
     }
 
-    public Component getName() {
-        return (clientPlayer != null) ? clientPlayer.getDisplayName() : playerName;
+    public String getName() {
+        return trackedOnClient ? clientPlayer.getDisplayName().getContents() : playerName;
     }
 
     public void setClientPlayer(Player entity) {
         clientPlayer = entity;
         trackedOnClient = true;
-        playerName = entity.getDisplayName();
+        playerName = entity.getDisplayName().getContents();
     }
 
     public void removeClientPlayer() {
@@ -98,5 +86,9 @@ public class ClientPlayerData {
 
     public Player getClientPlayer() {
         return clientPlayer;
+    }
+
+    public static String getName(UUID uuid) {
+        return playerList.get(uuid).getName();
     }
 }

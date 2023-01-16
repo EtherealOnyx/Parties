@@ -46,7 +46,7 @@ public class PartyData {
         ServerPacketHelper.sendNewMember(futureMember, party);
         System.out.println("Packet sent successfully...");
         //Add future member to party's trackers.
-        /*party.forEach(id -> {
+        party.forEach(id -> {
             if (!PlayerData.trackerList.containsKey(id))
                 PlayerData.trackerList.put(id, new HashMap<>());
             PlayerData.trackerList.get(id).put(futureMember, true);
@@ -54,7 +54,7 @@ public class PartyData {
             if (!PlayerData.trackerList.containsKey(futureMember))
                 PlayerData.trackerList.put(futureMember, new HashMap<>());
             PlayerData.trackerList.get(futureMember).put(id, true);
-        });*/
+        });
         party.add(futureMember);
         System.out.println("Added member to party...");
         Util.getPlayer(futureMember).addParty(partyId);
@@ -81,11 +81,11 @@ public class PartyData {
         Util.getPlayer(removedMember).removeParty();
         ServerPacketHelper.sendRemoveMember(removedMember, party, wasKicked);
         //Remove previous member from party's trackers.
-        /*party.forEach(id -> {
+        party.forEach(id -> {
             PlayerData.trackerList.get(id).remove(removedMember);
         });
         //Remove all trackers from removedMember.
-        PlayerData.trackerList.remove(removedMember);*/
+        PlayerData.trackerList.remove(removedMember);
         //Delete party if necessary.
         if (party.size() == 1) {
             System.out.println("Party disbanding!");
@@ -106,7 +106,7 @@ public class PartyData {
         while (i.hasNext()) {
             UUID member = i.next();
             Util.getPlayer(member).removeParty();
-            //PlayerData.trackerList.remove(member);
+            PlayerData.trackerList.remove(member);
             i.remove();
         }
         partyList.remove(partyId);

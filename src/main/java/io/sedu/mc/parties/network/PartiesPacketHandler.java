@@ -30,10 +30,16 @@ public class PartiesPacketHandler {
 
 
         net.messageBuilder(ClientPacketData.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(ClientPacketData::new)
-                .encoder(ClientPacketData::encode)
-                .consumer(ClientPacketData::handle)
-                .add();
+                                  .decoder(ClientPacketData::new)
+                                  .encoder(ClientPacketData::encode)
+                                  .consumer(ClientPacketData::handle)
+                                  .add();
+
+        net.messageBuilder(ServerPacketData.class, id(), NetworkDirection.PLAY_TO_SERVER)
+           .decoder(ServerPacketData::new)
+           .encoder(ServerPacketData::encode)
+           .consumer(ServerPacketData::handle)
+           .add();
     }
 
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
