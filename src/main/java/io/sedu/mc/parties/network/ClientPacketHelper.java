@@ -5,12 +5,11 @@ import io.sedu.mc.parties.data.PartyData;
 import io.sedu.mc.parties.data.PlayerData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.UUID;
+import java.util.*;
 
 import static io.sedu.mc.parties.client.ClientPlayerData.*;
 import static io.sedu.mc.parties.data.Util.getClientPlayer;
@@ -61,15 +60,11 @@ public class ClientPacketHelper {
         }
         msg("You join the party.");
         //Try to see if we can track any of our new members on the client.
-        Iterator it = potentialTracks.values().iterator();
-        Player p;
-        while (it.hasNext()) {
-            p = (Player) it.next();
-            if (playerList.containsKey(p.getUUID())) {
-                playerList.get(p.getUUID()).setClientPlayer(potentialTracks.remove(p.getUUID()));
-                ClientPacketHelper.sendTrackerToServer(p);
+        Minecraft.getInstance().level.players().forEach(player -> {
+            if (ClientPlayerData.playerList.containsKey(player.getUUID())) {
+                ClientPacketHelper.sendTrackerToClient(player);
             }
-        }
+        });
     }
 
 
@@ -88,10 +83,6 @@ public class ClientPacketHelper {
 
     public static void removePartyMemberDropped(UUID uuid) {
         int index = playerList.get(uuid).getIndex();
-        //Move tracker to potential trackers if tracked on client.
-        if (!playerList.get(uuid).isTrackedOnServer()) {
-            potentialTracks.put(uuid, playerList.get(uuid).getClientPlayer());
-        }
         playerList.remove(uuid);
         updatePartyIndex(index);
         msg(getName(uuid) + " left the party.");
@@ -104,10 +95,6 @@ public class ClientPacketHelper {
 
     public static void removePartyMemberKicked(UUID uuid) {
         int index = playerList.get(uuid).getIndex();
-        //Move tracker to potential trackers if tracked on client.
-        if (!playerList.get(uuid).isTrackedOnServer()) {
-            potentialTracks.put(uuid, playerList.get(uuid).getClientPlayer());
-        }
         playerList.remove(uuid);
         updatePartyIndex(index);
         msg(getName(uuid) + " was kicked from the party.");
@@ -120,6 +107,7 @@ public class ClientPacketHelper {
 
     public static void sendTrackerToClient(Player entity) {
         playerList.get(entity.getUUID()).setClientPlayer(entity);
+        System.out.println("Client Name: " + entity.getName().getContents());
         msg("You are now tracking " + getName(entity.getUUID()) + " on the client.");
         PartiesPacketHandler.sendToServer(new ServerPacketData(0, entity.getUUID()));
     }

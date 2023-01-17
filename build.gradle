@@ -128,7 +128,7 @@ minecraft {
             args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
-                examplemod {
+                sedparties {
                     source sourceSets.main
                 }
             }
@@ -149,9 +149,6 @@ repositories {
     // }
     maven { // JEI
         url "https://dvs1.progwml6.com/files/maven"
-    }
-    maven { // TOP
-        url "https://cursemaven.com"
     }
 }
 
@@ -176,7 +173,6 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
     implementation fg.deobf("mezz.jei:jei-${jei_version}")
 
-    implementation fg.deobf("curse.maven:the-one-probe-245211:3550084")
 }
 
 // Example for how to get properties into the manifest for reading at runtime.

@@ -12,7 +12,6 @@ import java.util.UUID;
 
 public class ClientPlayerData {
     public static HashMap<UUID, ClientPlayerData> playerList = new HashMap<>();
-    public static HashMap<UUID, Player> potentialTracks = new HashMap<>();
 
     //Client Information
     private static int globalIndex;
@@ -66,13 +65,13 @@ public class ClientPlayerData {
     }
 
     public String getName() {
-        return trackedOnClient ? clientPlayer.getDisplayName().getContents() : playerName;
+        return trackedOnClient ? clientPlayer.getName().getContents() : playerName;
     }
 
     public void setClientPlayer(Player entity) {
         clientPlayer = entity;
         trackedOnClient = true;
-        playerName = entity.getDisplayName().getContents();
+        playerName = entity.getName().getContents();
     }
 
     public void removeClientPlayer() {

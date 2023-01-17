@@ -6,8 +6,11 @@ import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.network.ClientPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
@@ -16,9 +19,13 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -50,12 +57,17 @@ public class PartyEvent {
     @SubscribeEvent
     public static void onEntitySpawned(EntityJoinWorldEvent event) {
         if (event.getWorld().isClientSide && event.getEntity() instanceof Player) {
-            System.out.println("PLAYER Spawned: " + event.getEntity().getName().getContents());
-            if (ClientPlayerData.playerList.containsKey(event.getEntity().getUUID()))
-                    if (ClientPlayerData.playerList.get(event.getEntity().getUUID()).isTrackedOnServer()) {
-                        ClientPacketHelper.sendTrackerToClient((Player) event.getEntity());
-                    }
+            if (ClientPlayerData.playerList.containsKey(event.getEntity().getUUID())) {
+                if (ClientPlayerData.playerList.get(event.getEntity().getUUID()).isTrackedOnServer()) {
+                    ClientPacketHelper.sendTrackerToClient((Player) event.getEntity());
+                }
+            }
         }
+    }
+
+    private static Iterator it;
+    @SubscribeEvent
+    public static void onChunkUnload(ChunkEvent.Unload event) {
     }
 
 
