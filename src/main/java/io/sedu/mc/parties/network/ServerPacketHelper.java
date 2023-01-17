@@ -15,11 +15,20 @@ public class ServerPacketHelper {
         //Send each member to future party member.
         System.out.println("Sending to player #1");
         PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, party), getServerPlayer(futureMember));
+        //Send each member's names to future party member.
+        party.forEach(id -> {
+            InfoPacketHelper.sendName(futureMember, id);
+        });
 
         //Send future member to each party member.
         party.forEach(id -> {
             System.out.println("Sending to player loop");
             PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, futureMember), getServerPlayer(id));
+            //Send future member name to each party member.
+            InfoPacketHelper.sendName(id, futureMember);
+            //Tell party member that new member is Online
+            if (isOnline(futureMember))
+                PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, futureMember), getServerPlayer(id));
             //Tell newly online player that this other member is also online.
             if (isOnline(id))
                 PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, id), getServerPlayer(futureMember));

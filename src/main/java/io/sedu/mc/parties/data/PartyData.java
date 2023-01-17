@@ -81,9 +81,11 @@ public class PartyData {
         //Remove previous member from party's trackers.
         party.forEach(id -> {
             PlayerData.trackerListOld.get(id).remove(removedMember);
+            System.out.println("Removing " + Util.getName(removedMember) + " trackers from " + Util.getName(id) + ".");
         });
         //Remove all trackers from removedMember.
         PlayerData.trackerListOld.remove(removedMember);
+        System.out.println("Removing all of " + Util.getName(removedMember) + "'s trackers.");
         //Delete party if necessary.
         if (party.size() == 1) {
             System.out.println("Party disbanding!");
@@ -105,6 +107,7 @@ public class PartyData {
             UUID member = i.next();
             Util.getPlayer(member).removeParty();
             PlayerData.trackerListOld.remove(member);
+            System.out.println("Removing old trackers from " + Util.getName(member) + ".");
             i.remove();
         }
         partyList.remove(partyId);

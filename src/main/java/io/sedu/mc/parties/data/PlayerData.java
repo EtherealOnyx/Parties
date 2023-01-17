@@ -54,7 +54,7 @@ public class PlayerData {
     }
 
     public String getName() {
-        return serverPlayer.get() != null ? serverPlayer.get().getName().getContents() : name;
+        return serverPlayer != null && serverPlayer.get() != null ? serverPlayer.get().getName().getContents() : name;
     }
 
     public PlayerData removeServerPlayer() {

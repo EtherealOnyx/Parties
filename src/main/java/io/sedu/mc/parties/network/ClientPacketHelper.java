@@ -79,31 +79,31 @@ public class ClientPacketHelper {
     }
 
     public static void dropParty() {
-        playerList.clear();
+        ClientPlayerData.reset();
         msg("You left the party.");
     }
 
     public static void removePartyMemberDropped(UUID uuid) {
         int index = playerList.get(uuid).getIndex();
+        msg(getName(uuid) + " left the party.");
         playerList.remove(uuid);
         updatePartyIndex(index);
-        msg(getName(uuid) + " left the party.");
     }
 
     public static void dropPartyKicked() {
-        playerList.clear();
+        ClientPlayerData.reset();
         msg("You have been kicked from the party.");
     }
 
     public static void removePartyMemberKicked(UUID uuid) {
         int index = playerList.get(uuid).getIndex();
+        msg(getName(uuid) + " was kicked from the party.");
         playerList.remove(uuid);
         updatePartyIndex(index);
-        msg(getName(uuid) + " was kicked from the party.");
     }
 
     public static void disbandParty() {
-        playerList.clear();
+        ClientPlayerData.reset();
         msg("Party disbanded.");
     }
 

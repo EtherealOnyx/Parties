@@ -33,15 +33,11 @@ public class ServerPacketData {
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            switch(type) {
-
-                case 0: //Send UUID to server to tell them the client is tracking it now.
-                    ServerPacketHelper.trackerToClient(ctx.getSender().getUUID(), data);
-                    break;
-
-                case 1: //Send UUID to server to tell them the client requests the server to track it now.
-                    ServerPacketHelper.trackerToServer(ctx.getSender().getUUID(), data);
-                    break;
+            switch (type) {
+                case 0 -> //Send UUID to server to tell them the client is tracking it now.
+                        ServerPacketHelper.trackerToClient(ctx.getSender().getUUID(), data);
+                case 1 -> //Send UUID to server to tell them the client requests the server to track it now.
+                        ServerPacketHelper.trackerToServer(ctx.getSender().getUUID(), data);
             }
         });
         return true;

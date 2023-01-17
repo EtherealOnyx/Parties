@@ -26,6 +26,7 @@ public class ClientPlayerData {
     //Client constructor.
     public ClientPlayerData() {
         trackedOnClient = false;
+        playerName = "???";
     }
 
     public static void updatePartyIndex(int indexRemoved) {
@@ -43,6 +44,11 @@ public class ClientPlayerData {
 
     public static int partySize() {
         return globalIndex;
+    }
+
+    public static void reset() {
+        playerList.clear();
+        globalIndex = 0;
     }
 
     public void setId(UUID uuid) {
@@ -85,5 +91,9 @@ public class ClientPlayerData {
 
     public static String getName(UUID uuid) {
         return playerList.get(uuid).getName();
+    }
+
+    public void setName(String data) {
+        playerName = data;
     }
 }

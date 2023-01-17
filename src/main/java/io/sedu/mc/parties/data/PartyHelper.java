@@ -38,8 +38,6 @@ public class PartyHelper {
             System.out.println("Target is not in your party!");
             return false;
         }
-        //Removes member.
-        //PacketHelper.kickPlayer(removedMember);
         return removePlayerFromParty(removedMember, true);
     }
 

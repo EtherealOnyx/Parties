@@ -40,6 +40,12 @@ public class PartiesPacketHandler {
            .encoder(ServerPacketData::encode)
            .consumer(ServerPacketData::handle)
            .add();
+
+        net.messageBuilder(RenderPacketData.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+           .decoder(RenderPacketData::new)
+           .encoder(RenderPacketData::encode)
+           .consumer(RenderPacketData::handle)
+           .add();
     }
 
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
