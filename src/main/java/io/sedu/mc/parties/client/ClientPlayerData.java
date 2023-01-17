@@ -83,10 +83,6 @@ public class ClientPlayerData {
         return !trackedOnClient;
     }
 
-    public Player getClientPlayer() {
-        return clientPlayer;
-    }
-
     public static String getName(UUID uuid) {
         return playerList.get(uuid).getName();
     }

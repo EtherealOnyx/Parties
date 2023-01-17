@@ -3,7 +3,6 @@ package io.sedu.mc.parties.network;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.data.Util;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -80,14 +79,14 @@ public class ServerPacketHelper {
     }
 
     public static void trackerToClient(UUID tracker, UUID playerToTrack) {
-        System.out.println("Tracker (" + tracker + " is now tracking player (" + playerToTrack +") on client");
-        PlayerData.trackerList.get(tracker).put(playerToTrack, false);
+        System.out.println("Tracker (" + Util.getName(tracker) + ") is now tracking player (" + Util.getName(playerToTrack) +") on client");
+        PlayerData.trackerListOld.get(tracker).put(playerToTrack, false);
     }
 
     public static void trackerToServer(UUID tracker, UUID playerToTrack) {
-        System.out.println("Tracker (" + tracker + " is now getting tracking info of player (" + playerToTrack
+        System.out.println("Tracker (" + Util.getName(tracker) + ") is now getting tracking info of player (" + Util.getName(playerToTrack)
                                    +") from server");
-        PlayerData.trackerList.get(tracker).put(playerToTrack, true);
+        PlayerData.trackerListOld.get(tracker).put(playerToTrack, true);
     }
 
     public static void sendNewLeader(UUID initiator) {

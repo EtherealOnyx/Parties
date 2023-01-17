@@ -1,11 +1,6 @@
 package io.sedu.mc.parties.data;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -16,12 +11,15 @@ public class PlayerData {
     public static HashMap<UUID, PlayerData> playerList = new HashMap<>();
     //Boolean true = server side tracking, false = client side tracking.
     //Inner UUID belongs to ID that the outer UUID is tracking.
-    public static HashMap<UUID, HashMap<UUID, Boolean>> trackerList = new HashMap<>();
+    public static HashMap<UUID, HashMap<UUID, Boolean>> trackerListOld = new HashMap<>();
 
 
 
     //Player Entity
     WeakReference<ServerPlayer> serverPlayer;
+
+    //Player Entity name
+    private String name;
 
     //The UUID of the party that this player belongs to.
     private UUID party;
@@ -51,7 +49,12 @@ public class PlayerData {
 
     public PlayerData setServerPlayer(ServerPlayer player) {
         serverPlayer = new WeakReference<>(player);
+        name = player.getName().getContents();
         return this;
+    }
+
+    public String getName() {
+        return serverPlayer.get() != null ? serverPlayer.get().getName().getContents() : name;
     }
 
     public PlayerData removeServerPlayer() {

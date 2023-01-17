@@ -6,27 +6,17 @@ import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.network.ClientPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.entity.LevelEntityGetter;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Iterator;
 import java.util.UUID;
 
 import static io.sedu.mc.parties.data.Util.getPlayer;
@@ -55,7 +45,15 @@ public class PartyEvent {
     }
 
     @SubscribeEvent
-    public static void onEntitySpawned(EntityJoinWorldEvent event) {
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (!event.getPlayer().level.isClientSide) {
+            getPlayer(event.getPlayer().getUUID()).setServerPlayer((ServerPlayer) event.getPlayer());//.setOffline();
+            System.out.println("Clone Event for :" + event.getPlayer().getName().getContents());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityJoin(EntityJoinWorldEvent event) {
         if (event.getWorld().isClientSide && event.getEntity() instanceof Player) {
             if (ClientPlayerData.playerList.containsKey(event.getEntity().getUUID())) {
                 if (ClientPlayerData.playerList.get(event.getEntity().getUUID()).isTrackedOnServer()) {
@@ -65,10 +63,24 @@ public class PartyEvent {
         }
     }
 
-    private static Iterator it;
     @SubscribeEvent
-    public static void onChunkUnload(ChunkEvent.Unload event) {
+    public static void onEntityLeave(EntityLeaveWorldEvent event) {
+        if (event.getWorld().isClientSide && event.getEntity() instanceof Player) {
+            if (ClientPlayerData.playerList.containsKey(event.getEntity().getUUID())) {
+                if (!ClientPlayerData.playerList.get(event.getEntity().getUUID()).isTrackedOnServer()) {
+                    ClientPacketHelper.sendTrackerToServer(event.getEntity().getUUID());
+                }
+            }
+        }
     }
+
+    @SubscribeEvent
+    public static void onWorldChange(WorldEvent.Unload event) {
+        if (event.getWorld().isClientSide()) {
+            ClientPacketHelper.refreshClientOnDimChange();
+        }
+    }
+
 
 
 

@@ -17,6 +17,10 @@ public class Util {
         return PlayerData.playerList.get(id);
     }
 
+    public static String getName(UUID id) {
+        return getPlayer(id).getName();
+    }
+
     public static PartyData getPartyFromMember(UUID playerId) {
         //Can a hashmap handle a null get()? No...
         return getPartyFromId(PlayerData.playerList.get(playerId).getPartyId());

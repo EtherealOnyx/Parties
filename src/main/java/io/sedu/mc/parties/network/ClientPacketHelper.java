@@ -1,11 +1,7 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.client.ClientPlayerData;
-import io.sedu.mc.parties.data.PartyData;
-import io.sedu.mc.parties.data.PlayerData;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Player;
 
@@ -67,6 +63,12 @@ public class ClientPacketHelper {
         });
     }
 
+    public static void refreshClientOnDimChange() {
+        ClientPlayerData.playerList.forEach((id, data) -> {
+               ClientPacketHelper.sendTrackerToServer(id);
+        });
+    }
+
 
 
     public static void changeLeader(ArrayList<UUID> list) {
@@ -107,15 +109,14 @@ public class ClientPacketHelper {
 
     public static void sendTrackerToClient(Player entity) {
         playerList.get(entity.getUUID()).setClientPlayer(entity);
-        System.out.println("Client Name: " + entity.getName().getContents());
         msg("You are now tracking " + getName(entity.getUUID()) + " on the client.");
         PartiesPacketHandler.sendToServer(new ServerPacketData(0, entity.getUUID()));
     }
 
-    public static void sendTrackerToServer(Player entity) {
-        playerList.get(entity.getUUID()).removeClientPlayer();
-        msg("You are no longer tracking " + getName(entity.getUUID()) + " on the client.");
-        PartiesPacketHandler.sendToServer(new ServerPacketData(1, entity.getUUID()));
+    public static void sendTrackerToServer(UUID id) {
+        playerList.get(id).removeClientPlayer();
+        msg("You are no longer tracking " + getName(id) + " on the client.");
+        PartiesPacketHandler.sendToServer(new ServerPacketData(1, id));
     }
 
     public static void setLeader() {
