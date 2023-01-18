@@ -6,8 +6,10 @@ import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.network.ClientPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
@@ -79,6 +81,15 @@ public class PartyEvent {
         if (event.getWorld().isClientSide()) {
             ClientPacketHelper.refreshClientOnDimChange();
         }
+    }
+
+    public static void onClientLeave(ClientPlayerNetworkEvent.LoggedOutEvent event) {
+        //Reset info.
+        System.out.println("Resetting info...");
+        ClientPlayerData.reset();
+    }
+
+    public static void onClientJoin(ClientPlayerNetworkEvent.LoggedInEvent event) {
     }
 
 

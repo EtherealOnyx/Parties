@@ -1,15 +1,11 @@
 package io.sedu.mc.parties;
 
-import io.sedu.mc.parties.commands.PartyCommands;
-import io.sedu.mc.parties.events.ClientEvent;
 import io.sedu.mc.parties.events.PartyEvent;
 import io.sedu.mc.parties.setup.ClientSetup;
 import io.sedu.mc.parties.setup.ModSetup;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -29,7 +25,7 @@ public class Parties
         //Registration.init();
         //Config.register();
 
-        // Register the setup method for modloading
+        // Register the setup method for mod-loading
         IEventBus modbus = FMLJavaModLoadingContext.get().getModEventBus();
         modbus.addListener(ModSetup::init);
         MinecraftForge.EVENT_BUS.register(PartyEvent.class);

@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.setup;
 
 import io.sedu.mc.parties.client.PartyOverlay;
-import io.sedu.mc.parties.events.ClientEvent;
+import io.sedu.mc.parties.events.PartyEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.gui.OverlayRegistry;
 import net.minecraftforge.common.MinecraftForge;
@@ -14,7 +14,8 @@ import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientSetup {
     public static void init(final FMLClientSetupEvent event) {
-        //OverlayRegistry.registerOverlayAbove(HOTBAR_ELEMENT, "name", PartyOverlay.HUD_PLAYER);
-        MinecraftForge.EVENT_BUS.register(ClientEvent.class);
+        OverlayRegistry.registerOverlayAbove(HOTBAR_ELEMENT, "party", PartyOverlay.HUD_PARTY);
+        MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientLeave);
+        MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientJoin);
     }
 }

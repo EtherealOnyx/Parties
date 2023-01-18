@@ -52,7 +52,7 @@ public class ClientPacketData {
 
     }
 
-    boolean handle(Supplier<NetworkEvent.Context> context) {
+    boolean handle(Supplier<NetworkEvent.Context> ctx) {
         switch (type) {
             //#0 - Sends a UUID to the client stating that the player is online.
             case 0 -> ClientPacketHelper.markOnline(list);

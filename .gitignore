@@ -1,6 +1,8 @@
 ## Based on GitHub's Eclipse .gitignore
 
 run/
+runC1/
+runC2/
 .gradle/
 build/
 gradle-app.setting

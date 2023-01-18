@@ -1,39 +1,24 @@
 package io.sedu.mc.parties.client;
 
-import com.mojang.authlib.GameProfile;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.resources.ResourceLocation;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.gui.IIngameOverlay;
 
+
 public class PartyOverlay {
-    public static ResourceLocation playerHead = null;
-
-
-    /*public static final IIngameOverlay HUD_PLAYER = (gui, poseStack, partialTicks, width, height) -> {
-
-        if (playerHead == null && Minecraft.getInstance().player.connection.getOnlinePlayers().size() > 0) {
-            for (PlayerInfo pi : Minecraft.getInstance().player.connection.getOnlinePlayers()) {
-                if (pi.getSkinLocation() != DefaultPlayerSkin.getDefaultSkin(pi.getProfile().getId()))
-                    playerHead = pi.getSkinLocation();
-            }
+    static int startX = 16;
+    static int startY = 16;
+    public static final IIngameOverlay HUD_PARTY = (gui, poseStack, partialTicks, width, height) -> {
+        for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++) {
+            renderMember(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack);
         }
+    };
 
-        String toDisplay = "Testing";
-        int x = 0;
-        int y = 0;
-        if (x >= 0 && y >= 0) {
-            x = 0;
-            y = 0;
-        }
-        if (playerHead != null) {
-            gui.setupOverlayRenderState(true, false, playerHead);
-            GuiUtils.drawTexturedModalRect(poseStack, 16, 16, 32, 32, 32, 32, 1);
-            gui.getFont().draw(poseStack, Minecraft.getInstance().player.getDisplayName().getString(), 56, 32, 0);
-        }
-
-
-    };*/
+    public static void renderMember(int partyIndex, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack) {
+        int yOffset = (partyIndex*64)+startY;
+        gui.setupOverlayRenderState(true, false, id.getHead());
+        GuiUtils.drawTexturedModalRect(poseStack, 16, yOffset+16, 32, 32, 32, 32, 1);
+        gui.getFont().draw(poseStack, id.getName(), 56, yOffset+32, 0);
+    }
 }

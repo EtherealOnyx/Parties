@@ -8,8 +8,8 @@ public class PartyHelper {
 
     public static boolean invitePlayer(UUID initiator, UUID futureMember) {
         //This checks if futureMember is a valid player that exists on the server.
-        if (getPlayer(futureMember) == null) {
-            System.out.println("Target member wasn't a player!");
+        if (getPlayer(futureMember) == null || initiator.equals(futureMember)) {
+            System.out.println("Target member wasn't valid!");
             return false;
         }
         //This checks if the target is currently in a party.

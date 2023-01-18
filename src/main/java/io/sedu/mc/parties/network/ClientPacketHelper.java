@@ -84,10 +84,9 @@ public class ClientPacketHelper {
     }
 
     public static void removePartyMemberDropped(UUID uuid) {
-        int index = playerList.get(uuid).getIndex();
         msg(getName(uuid) + " left the party.");
         playerList.remove(uuid);
-        updatePartyIndex(index);
+        playerOrderedList.remove(uuid);
     }
 
     public static void dropPartyKicked() {
@@ -96,10 +95,9 @@ public class ClientPacketHelper {
     }
 
     public static void removePartyMemberKicked(UUID uuid) {
-        int index = playerList.get(uuid).getIndex();
         msg(getName(uuid) + " was kicked from the party.");
         playerList.remove(uuid);
-        updatePartyIndex(index);
+        playerOrderedList.remove(uuid);
     }
 
     public static void disbandParty() {
