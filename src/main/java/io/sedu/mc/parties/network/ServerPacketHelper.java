@@ -67,7 +67,9 @@ public class ServerPacketHelper {
             //Pretend the party just formed and add all players for new online member.
             PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, mParty), player);
             mParty.forEach(id -> {
-                ServerPlayer p = getServerPlayer(id);
+                //Tell online player the current party member's name.
+                InfoPacketHelper.sendName(player, id);
+                //Tell party members that this player is now online.
                 PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, player.getUUID()), getServerPlayer(id));
                 //Tell newly online player that this other member is also online.
                 if (isOnline(id))
