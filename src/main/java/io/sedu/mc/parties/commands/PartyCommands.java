@@ -2,6 +2,7 @@ package io.sedu.mc.parties.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import io.sedu.mc.parties.data.PartyHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -13,7 +14,7 @@ public class PartyCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("party")
             .then(Commands.literal("invite")
-                .then(Commands.argument("player", EntityArgument.player())
+                .then(Commands.argument("player", new NotSelfArgument(false))
                     .executes(ctx -> {
                         if (PartyHelper.invitePlayer(ctx.getSource().getPlayerOrException().getUUID(),
                                 EntityArgument.getPlayer(ctx, "player").getUUID())) {
@@ -29,11 +30,11 @@ public class PartyCommands {
                 )
             )
             .then(Commands.literal("kick")
-                .then(Commands.argument("player", EntityArgument.player())
+                .then(Commands.argument("member", new NotSelfArgument(true))
                     .executes(ctx -> {
                         if (isLeader(ctx.getSource().getPlayerOrException().getUUID()) &&
                                 PartyHelper.kickPlayer(ctx.getSource().getPlayerOrException().getUUID(),
-                                        EntityArgument.getPlayer(ctx, "player").getUUID())) {
+                                        EntityArgument.getPlayer(ctx, "member").getUUID())) {
                             System.out.println("Player kick successful.");
                             return Command.SINGLE_SUCCESS;
                         }
@@ -56,10 +57,10 @@ public class PartyCommands {
                 })
             )
             .then(Commands.literal("leader")
-                .then(Commands.argument("player", EntityArgument.player())
+                .then(Commands.argument("member", new NotSelfArgument(true))
                     .executes(ctx -> {
                         if (isLeader(ctx.getSource().getPlayerOrException().getUUID()) &&
-                                PartyHelper.giveLeader(EntityArgument.getPlayer(ctx, "player").getUUID())) {
+                                PartyHelper.giveLeader(EntityArgument.getPlayer(ctx, "member").getUUID())) {
                             System.out.println("Party leader changed successfully.");
                             return Command.SINGLE_SUCCESS;
                         } else {

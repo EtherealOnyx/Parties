@@ -9,6 +9,7 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
@@ -33,7 +34,20 @@ public class ClientPlayerData {
     public static UUID leader;
     //Skin ResourceLocation
     private ResourceLocation skinLoc = null;
-    private static final ResourceLocation defaultLoc = new ResourceLocation(Parties.MODID, "default.png");
+
+    //PlayerData
+    private float health = 5f;
+    private float maxHealth = 20f;
+    private float absorb = 16f;
+    private int armor = 10;
+    private float armorToughness = 10f;
+
+
+
+    private int hunger = 20;
+    private int mana = 1000;
+
+
 
     //Client constructor.
     public ClientPlayerData() {
@@ -99,6 +113,12 @@ public class ClientPlayerData {
         if (skinLoc == null) {
             setSkin(playerName);
         }
+        //health = clientPlayer.getHealth();
+        //maxHealth = clientPlayer.getMaxHealth();
+        //hunger = clientPlayer.getFoodData().getFoodLevel();
+        //armor = clientPlayer.getArmorValue();
+        //armorToughness = (float)clientPlayer.getAttributeValue(Attributes.ARMOR_TOUGHNESS);
+
     }
 
     public void removeClientPlayer() {
@@ -120,6 +140,34 @@ public class ClientPlayerData {
     }
 
     public ResourceLocation getHead() {
-        return skinLoc == null ? defaultLoc : skinLoc;
+        return skinLoc == null ? DefaultPlayerSkin.getDefaultSkin() : skinLoc;
+    }
+
+    public float getHealth() {
+        return health;
+    }
+
+    public float getMaxHealth() {
+        return maxHealth;
+    }
+
+    public int getArmor() {
+        return armor;
+    }
+
+    public float getArmorToughness() {
+        return armorToughness;
+    }
+
+    public float getAbsorb() {
+        return absorb;
+    }
+
+    public int getHunger() {
+        return hunger;
+    }
+
+    public int getMana() {
+        return mana;
     }
 }
