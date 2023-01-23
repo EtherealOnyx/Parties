@@ -3,17 +3,13 @@ package io.sedu.mc.parties.client;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-import io.sedu.mc.parties.Parties;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,25 +18,27 @@ import java.util.UUID;
 public class ClientPlayerData {
     public static HashMap<UUID, ClientPlayerData> playerList = new HashMap<>();
     public static ArrayList<UUID> playerOrderedList = new ArrayList<>();
+    public static boolean showSelf = false;
+    private static UUID leader;
 
     //Client Information
     //private static int globalIndex;
     //private int partyIndex;
-    private Player clientPlayer;
+    public Player clientPlayer;
     //Client-side functionality.
     private boolean isOnline;
     private String playerName;
     private boolean trackedOnClient;
-    public static UUID leader;
+    private boolean isLeader;
     //Skin ResourceLocation
     private ResourceLocation skinLoc = null;
 
     //PlayerData
-    private float health = 5f;
+    private float health = 20f;
     private float maxHealth = 20f;
-    private float absorb = 16f;
-    private int armor = 10;
-    private float armorToughness = 10f;
+    private float absorb = 0f;
+    private int armor = 0;
+    private int level = 0;
 
 
 
@@ -70,6 +68,26 @@ public class ClientPlayerData {
         playerOrderedList.clear();
     }
 
+    public static void changeLeader(UUID uuid) {
+        //Create party of 1 (self) if necessary.
+        checkParty();
+        if (leader != null) {
+            ClientPlayerData.playerList.get(leader).isLeader = false;
+        }
+        leader = uuid;
+        ClientPlayerData.playerList.get(uuid).isLeader = true;
+    }
+
+    private static void checkParty() {
+        if (partySize() == 0)
+            addSelf();
+    }
+
+    public static void addSelf() {
+        ClientPlayerData.addClientMember(Minecraft.getInstance().player.getUUID());
+        ClientPlayerData.showSelf = true;
+    }
+
     public void setId(UUID uuid) {
         trackedOnClient = false;
         playerList.put(uuid, this);
@@ -77,17 +95,12 @@ public class ClientPlayerData {
     }
 
     private void setSkin(String name) {
-        System.out.println("Setting skin...");
-        //Magic, here we go.
         SkullBlockEntity.updateGameprofile(new GameProfile(null, name), (filledProfile) -> {
-            System.out.println("Found skin! :)");
             Minecraft minecraft = Minecraft.getInstance();
             Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = minecraft.getSkinManager().getInsecureSkinInformation(filledProfile);
             if (map.containsKey(MinecraftProfileTexture.Type.SKIN)) {
-                System.out.println("Has texture info...");
                 this.skinLoc = minecraft.getSkinManager().registerTexture(map.get(MinecraftProfileTexture.Type.SKIN), MinecraftProfileTexture.Type.SKIN);
             } else {
-                System.out.println("Still no texture!?");
                 this.skinLoc = DefaultPlayerSkin.getDefaultSkin(Player.createPlayerUUID(filledProfile));
             }
         });
@@ -103,6 +116,7 @@ public class ClientPlayerData {
 
     public String getName() {
         return trackedOnClient ? clientPlayer.getName().getContents() : playerName;
+        //return playerName;
     }
 
     public void setClientPlayer(Player entity) {
@@ -113,12 +127,12 @@ public class ClientPlayerData {
         if (skinLoc == null) {
             setSkin(playerName);
         }
-        //health = clientPlayer.getHealth();
-        //maxHealth = clientPlayer.getMaxHealth();
-        //hunger = clientPlayer.getFoodData().getFoodLevel();
-        //armor = clientPlayer.getArmorValue();
-        //armorToughness = (float)clientPlayer.getAttributeValue(Attributes.ARMOR_TOUGHNESS);
-
+        health = entity.getHealth();
+        maxHealth = entity.getMaxHealth();
+        hunger = entity.getFoodData().getFoodLevel();
+        armor = entity.getArmorValue();
+        level = entity.experienceLevel;
+        absorb = entity.getAbsorptionAmount();
     }
 
     public void removeClientPlayer() {
@@ -144,30 +158,43 @@ public class ClientPlayerData {
     }
 
     public float getHealth() {
-        return health;
+        return clientPlayer!= null ? clientPlayer.getHealth() : health;
     }
 
     public float getMaxHealth() {
-        return maxHealth;
+        return clientPlayer!= null ? clientPlayer.getMaxHealth() : maxHealth;
     }
 
     public int getArmor() {
-        return armor;
-    }
-
-    public float getArmorToughness() {
-        return armorToughness;
+        return clientPlayer!= null ? clientPlayer.getArmorValue() : armor;
     }
 
     public float getAbsorb() {
-        return absorb;
+        return clientPlayer!= null ? clientPlayer.getAbsorptionAmount() : absorb;
     }
 
     public int getHunger() {
         return hunger;
     }
 
+    public int getHungerForced() {
+        return clientPlayer.getFoodData().getFoodLevel();
+    }
+
+    public int getLevelForced() {
+        return clientPlayer.experienceLevel;
+    }
+
     public int getMana() {
         return mana;
     }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public boolean isLeader() {
+        return isLeader;
+    }
+
 }

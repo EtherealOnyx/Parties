@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 @Mod(Parties.MODID)
 public class Parties
 {
-    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger();
     public static final String MODID = "sedparties";
 
     public Parties() {

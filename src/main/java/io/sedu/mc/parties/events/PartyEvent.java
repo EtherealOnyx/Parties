@@ -15,11 +15,14 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.UUID;
+import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static io.sedu.mc.parties.data.Util.getPlayer;
 
@@ -59,11 +62,13 @@ public class PartyEvent {
         if (event.getWorld().isClientSide && event.getEntity() instanceof Player) {
             if (ClientPlayerData.playerList.containsKey(event.getEntity().getUUID())) {
                 if (ClientPlayerData.playerList.get(event.getEntity().getUUID()).isTrackedOnServer()) {
-                    ClientPacketHelper.sendTrackerToClient((Player) event.getEntity());
+                    Minecraft.getInstance().execute(() -> ClientPacketHelper.sendTrackerToClient((Player) event.getEntity()));
                 }
             }
         }
     }
+
+    //public static void onPlayerLevelUp(PlayerXpEvent)
 
     @SubscribeEvent
     public static void onEntityLeave(EntityLeaveWorldEvent event) {
@@ -94,6 +99,9 @@ public class PartyEvent {
 
 
 
+
+
+    //Client never receives any hunger updates OR xp level updates from the server for any entity aside from self.
 
     @SubscribeEvent
     public void onEntityDamage(LivingHurtEvent event) {

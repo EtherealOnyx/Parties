@@ -47,8 +47,9 @@ public class ClientPacketHelper {
 
     public static void addMembers(ArrayList<UUID> list) {
         try {
-            if (partySize() == 0)
-                ClientPlayerData.addClientMember(Minecraft.getInstance().player.getUUID());
+            if (partySize() == 0) {
+                ClientPlayerData.addSelf();
+            }
             list.forEach(ClientPlayerData::addClientMember);
         } catch (NullPointerException e) {
             error();
@@ -65,7 +66,7 @@ public class ClientPacketHelper {
 
     public static void refreshClientOnDimChange() {
         ClientPlayerData.playerList.forEach((id, data) -> {
-               ClientPacketHelper.sendTrackerToServer(id);
+               //ClientPacketHelper.sendTrackerToServer(id);
         });
     }
 
@@ -73,9 +74,8 @@ public class ClientPacketHelper {
 
     public static void changeLeader(ArrayList<UUID> list) {
         //list should always be size 1 here.
-        UUID uuid = list.get(0);
-        leader = list.get(0);
-        msg(getName(uuid) + " is now the party leader.");
+        ClientPlayerData.changeLeader(list.get(0));
+        msg(getName(list.get(0)) + " is now the party leader.");
     }
 
     public static void dropParty() {
@@ -118,7 +118,7 @@ public class ClientPacketHelper {
     }
 
     public static void setLeader() {
-        leader = Minecraft.getInstance().player.getUUID();
+        ClientPlayerData.changeLeader(Minecraft.getInstance().player.getUUID());
         msg("You are now the party leader.");
     }
 }
