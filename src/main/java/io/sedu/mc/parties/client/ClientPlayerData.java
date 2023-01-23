@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +25,7 @@ public class ClientPlayerData {
     //private int partyIndex;
     public Player clientPlayer;
     //Client-side functionality.
-    private boolean isOnline;
+    boolean isOnline;
     private String playerName;
     private boolean trackedOnClient;
     private boolean isLeader;
@@ -38,7 +37,7 @@ public class ClientPlayerData {
     private float maxHealth = 20f;
     private float absorb = 0f;
     private int armor = 0;
-    private int level = 0;
+    private int xpLevel = 0;
 
 
 
@@ -131,7 +130,7 @@ public class ClientPlayerData {
         maxHealth = entity.getMaxHealth();
         hunger = entity.getFoodData().getFoodLevel();
         armor = entity.getArmorValue();
-        level = entity.experienceLevel;
+        xpLevel = entity.experienceLevel;
         absorb = entity.getAbsorptionAmount();
     }
 
@@ -189,12 +188,35 @@ public class ClientPlayerData {
         return mana;
     }
 
-    public int getLevel() {
-        return level;
+    public int getXpLevel() {
+        return xpLevel;
     }
 
     public boolean isLeader() {
         return isLeader;
     }
 
+    public void setHealth(float data) {
+        health = data;
+    }
+
+    public void setAbsorb(float data) {
+        absorb = data;
+    }
+
+    public void setArmor(int data) {
+        armor = data;
+    }
+
+    public void setFood(int data) {
+        hunger = data;
+    }
+
+    public void setXp(int data) {
+        xpLevel = data;
+    }
+
+    public void setMaxHealth(float max) {
+        maxHealth = max;
+    }
 }

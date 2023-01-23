@@ -14,40 +14,17 @@ public class RenderPacketData {
 
     RenderPacketData(FriendlyByteBuf buf) {
         this.type = buf.readInt();
+        System.out.println(type);
         player = new UUID(buf.readLong(), buf.readLong());
+        System.out.println(player);
         readData(buf);
     }
 
-    private void readData(FriendlyByteBuf buf) {
-        switch(type) {
-            case 0: //Name
-                StringBuilder builder = new StringBuilder();
-                while (true) {
-                    try {
-                        builder.append(buf.readChar());
-                    } catch(IndexOutOfBoundsException e) {
-                        break;
-                    }
-                }
-                data = builder.toString();
-                break;
-
-            case 1: //???
-                break;
-        }
-    }
-
-    private void writeData(FriendlyByteBuf buf) {
-        switch(type) {
-            case 0: //Name
-                for (int letter : ((String)data).toCharArray()) {
-                    buf.writeChar(letter);
-                }
-                break;
-
-            case 1: //???
-                break;
-        }
+    public RenderPacketData(int i, UUID propOf, float health, float maxHealth, float absorptionAmount, int armorValue, int foodLevel, int experienceLevel) {
+        System.out.println("Sending packet with TYPE : MASTER");
+        this.type = i;
+        this.player = propOf;
+        data = new Object[]{health, maxHealth, absorptionAmount, armorValue, foodLevel, experienceLevel};
     }
 
     public RenderPacketData(int type, UUID player, Object data) {
@@ -55,6 +32,62 @@ public class RenderPacketData {
         this.type = type;
         this.player = player;
         this.data = data;
+    }
+
+    private void readData(FriendlyByteBuf buf) {
+        switch (type) {
+            case -1 ->
+                    data = new Object[]{buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readInt(),
+                            buf.readInt(), buf.readInt()};
+            case 0 -> { //Name
+                StringBuilder builder = new StringBuilder();
+                while (true) {
+                    try {
+                        builder.append(buf.readChar());
+                    } catch (IndexOutOfBoundsException e) {
+                        break;
+                    }
+                }
+                data = builder.toString();
+            }
+            case 1, 2, 3 -> {data = buf.readFloat();
+                System.out.println("Data: " + data);
+            }
+            case 4, 5, 6 -> {
+                data = buf.readInt();
+                System.out.println("Data: " + data);
+            }
+        }
+    }
+
+    private void writeData(FriendlyByteBuf buf) {
+        switch (type) {
+            case -1 -> {
+                buf.writeFloat((Float) ((Object[]) data)[0]);
+                buf.writeFloat((Float) ((Object[]) data)[1]);
+                buf.writeFloat((Float) ((Object[]) data)[2]);
+                buf.writeInt((Integer) ((Object[]) data)[3]);
+                buf.writeInt((Integer) ((Object[]) data)[4]);
+                buf.writeInt((Integer) ((Object[]) data)[5]);
+            }
+            case 0 -> { //Name
+                for (int letter : ((String) data).toCharArray()) {
+                    buf.writeChar(letter);
+                }
+            }
+            case 1, 2, 3 -> //Health, Max Health, Absorb
+            {
+                buf.writeFloat((Float) data);
+                System.out.println("Wrote value of: " + data);
+            }
+
+            case 4, 5, 6 -> //Armor, Hunger, XP Level
+            {
+                buf.writeInt((Integer) data);
+                System.out.println("Wrote value of: " + data);
+            }
+
+        }
     }
 
     void encode(FriendlyByteBuf buf) {
@@ -65,13 +98,27 @@ public class RenderPacketData {
     }
 
     boolean handle(Supplier<NetworkEvent.Context> context) {
-        switch (type) {
-            //Name
-            case 0 -> RenderPacketHelper.setName(player, (String) data);
-            default -> {
-                return false;
+        context.get().enqueueWork(() -> {
+            switch (type) {
+                case -1 -> {
+                    RenderPacketHelper.setHealth(player, (Float) ((Object[]) data)[0]);
+                    RenderPacketHelper.setMaxHealth(player, (Float) ((Object[]) data)[1]);
+                    RenderPacketHelper.setAbsorb(player, (Float) ((Object[]) data)[2]);
+                    RenderPacketHelper.setArmor(player, (Integer) ((Object[]) data)[3]);
+                    RenderPacketHelper.setFood(player, (Integer) ((Object[]) data)[4]);
+                    RenderPacketHelper.setXp(player, (Integer) ((Object[]) data)[5]);
+                }
+                case 0 -> RenderPacketHelper.setName(player, (String) data);
+                case 1 -> RenderPacketHelper.setHealth(player, (Float) data);
+                case 3 -> RenderPacketHelper.setAbsorb(player, (Float) data);
+                case 4 -> RenderPacketHelper.setArmor(player, (Integer) data);
+                case 5 -> RenderPacketHelper.setFood(player, (Integer) data);
+                case 6 -> RenderPacketHelper.setXp(player, (Integer) data);
+                default -> {
+
+                }
             }
-        }
+        });
         return true;
     }
 }

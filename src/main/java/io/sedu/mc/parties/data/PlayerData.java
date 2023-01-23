@@ -11,12 +11,17 @@ public class PlayerData {
     public static HashMap<UUID, PlayerData> playerList = new HashMap<>();
     //Boolean true = server side tracking, false = client side tracking.
     //Inner UUID belongs to ID that the outer UUID is tracking.
-    public static HashMap<UUID, HashMap<UUID, Boolean>> trackerListOld = new HashMap<>();
+    public static HashMap<UUID, HashMap<UUID, Boolean>> trackerListO = new HashMap<>();
+
+    //Inner UUID belongs to ID that is tracking the outer player.
+    public static HashMap<UUID,HashMap<UUID, Boolean>> playerTrackers = new HashMap<>();
+
+
 
 
 
     //Player Entity
-    WeakReference<ServerPlayer> serverPlayer;
+    protected WeakReference<ServerPlayer> serverPlayer;
 
     //Player Entity name
     private String name;
@@ -37,6 +42,10 @@ public class PlayerData {
             return false;
         party = id;
         return true;
+    }
+
+    public ServerPlayer getPlayer() {
+        return serverPlayer.get();
     }
 
     public UUID getPartyId() {
@@ -60,5 +69,25 @@ public class PlayerData {
     public PlayerData removeServerPlayer() {
         serverPlayer = null;
         return this;
+    }
+
+    public static void addTracker(UUID trackerHost, UUID toTrack) {
+        if(!playerTrackers.containsKey(toTrack)) {
+            playerTrackers.put(toTrack, new HashMap<>());
+        }
+        playerTrackers.get(toTrack).put(trackerHost, true);
+    }
+
+    public static void removeTracker(UUID trackerHost, UUID toTrack) {
+        if(!playerTrackers.containsKey(toTrack)) {
+            return;
+        }
+        playerTrackers.get(toTrack).remove(trackerHost);
+        if (playerTrackers.get(toTrack).size() == 0)
+            playerTrackers.remove(toTrack);
+    }
+
+    public static void changeTracker(UUID trackerHost, UUID toTrack, boolean serverTracked) {
+        playerTrackers.get(toTrack).put(trackerHost, serverTracked);
     }
 }
