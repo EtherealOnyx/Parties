@@ -34,6 +34,12 @@ public class RenderPacketData {
         this.data = data;
     }
 
+    public RenderPacketData(int i, UUID propOf) {
+        this.type = i;
+        this.player = propOf;
+        this.data = null;
+    }
+
     private void readData(FriendlyByteBuf buf) {
         switch (type) {
             case -1 ->
@@ -114,6 +120,8 @@ public class RenderPacketData {
                 case 4 -> RenderPacketHelper.setArmor(player, (Integer) data);
                 case 5 -> RenderPacketHelper.setFood(player, (Integer) data);
                 case 6 -> RenderPacketHelper.setXp(player, (Integer) data);
+                case 7 -> RenderPacketHelper.markDeath(player);
+                case 8 -> RenderPacketHelper.markLife(player);
                 default -> {
 
                 }

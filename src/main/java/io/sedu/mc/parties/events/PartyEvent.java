@@ -9,7 +9,6 @@ import io.sedu.mc.parties.network.InfoPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
@@ -25,8 +24,6 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.concurrent.RunnableFuture;
-import java.util.concurrent.TimeUnit;
 
 import static io.sedu.mc.parties.data.Util.getPlayer;
 
@@ -138,8 +135,25 @@ public class PartyEvent {
     }
     @SubscribeEvent
     public static void onEntityDeath(LivingDeathEvent event) {
-        //May not be required...
+        if (!event.getEntityLiving().level.isClientSide()) {
+            HashMap<UUID, Boolean> trackers;
+            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                trackers.keySet().forEach(id -> InfoPacketHelper.sendDeath(id, p.getUUID()));
+            }
+        }
     }
+
+    @SubscribeEvent
+    public static void onEntityRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        System.out.println("Both sides!?");
+        if (!event.getEntityLiving().level.isClientSide()) {
+            HashMap<UUID, Boolean> trackers;
+            if ((trackers = PlayerData.playerTrackers.get(event.getPlayer().getUUID())) != null) {
+                trackers.keySet().forEach(id -> InfoPacketHelper.sendAlive(id, event.getPlayer().getUUID()));
+            }
+        }
+    }
+
     @SubscribeEvent
     public static void onEntityArmorChange(LivingEquipmentChangeEvent event) {
         if (!event.getEntityLiving().level.isClientSide()) {
@@ -158,6 +172,8 @@ public class PartyEvent {
             }
         }
     }
+
+
     @SubscribeEvent
     public static void onFoodConsumption(LivingEntityUseItemEvent.Finish event) {
         if (!event.getEntityLiving().level.isClientSide()) {

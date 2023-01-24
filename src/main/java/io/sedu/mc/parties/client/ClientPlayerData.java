@@ -38,6 +38,7 @@ public class ClientPlayerData {
     private float absorb = 0f;
     private int armor = 0;
     private int xpLevel = 0;
+    boolean isDead = false;
 
 
 
@@ -177,11 +178,11 @@ public class ClientPlayerData {
     }
 
     public int getHungerForced() {
-        return clientPlayer.getFoodData().getFoodLevel();
+        return clientPlayer != null ? clientPlayer.getFoodData().getFoodLevel() : 20;
     }
 
     public int getLevelForced() {
-        return clientPlayer.experienceLevel;
+        return clientPlayer != null ? clientPlayer.experienceLevel : 0;
     }
 
     public int getMana() {
@@ -218,5 +219,13 @@ public class ClientPlayerData {
 
     public void setMaxHealth(float max) {
         maxHealth = max;
+    }
+
+    public void markDead() {
+        isDead = true;
+    }
+
+    public void markAlive() {
+        isDead = false;
     }
 }

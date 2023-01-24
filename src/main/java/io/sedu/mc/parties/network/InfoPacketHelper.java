@@ -58,4 +58,12 @@ public class InfoPacketHelper {
     private static void sendData(ServerPlayer serverPlayer, UUID propOf, float health, float maxHealth, float absorptionAmount, int armorValue, int foodLevel, int experienceLevel) {
         PartiesPacketHandler.sendToPlayer(new RenderPacketData(-1, propOf, health, maxHealth, absorptionAmount, armorValue, foodLevel, experienceLevel), serverPlayer);
     }
+
+    public static void sendDeath(UUID sendTo, UUID propOf) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(7, propOf), getServerPlayer(sendTo));
+    }
+
+    public static void sendAlive(UUID sendTo, UUID propOf) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(8, propOf), getServerPlayer(sendTo));
+    }
 }

@@ -50,4 +50,12 @@ public class RenderPacketHelper {
     public static void setMaxHealth(UUID player, float datum) {
         ClientPlayerData.playerList.get(player).setMaxHealth(datum);
     }
+
+    public static void markDeath(UUID player) {
+        ClientPlayerData.playerList.get(player).markDead();
+    }
+
+    public static void markLife(UUID player) {
+        ClientPlayerData.playerList.get(player).markAlive();
+    }
 }

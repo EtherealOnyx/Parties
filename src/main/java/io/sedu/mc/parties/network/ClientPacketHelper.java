@@ -12,9 +12,16 @@ import static io.sedu.mc.parties.data.Util.getClientPlayer;
 
 public class ClientPacketHelper {
 
+    private static boolean debug = false;
+    private static void msgDebug(String msg) {
+        if (debug)
+            Minecraft.getInstance().player.sendMessage(new TextComponent(msg), Minecraft.getInstance().player.getUUID());
+    }
+
     private static void msg(String msg) {
         Minecraft.getInstance().player.sendMessage(new TextComponent(msg), Minecraft.getInstance().player.getUUID());
     }
+
 
     private static void error() {
         System.out.println("Error executing packet task.");
@@ -66,7 +73,7 @@ public class ClientPacketHelper {
 
     public static void refreshClientOnDimChange() {
         ClientPlayerData.playerList.forEach((id, data) -> {
-               //ClientPacketHelper.sendTrackerToServer(id);
+               ClientPacketHelper.sendTrackerToServer(id);
         });
     }
 
@@ -107,13 +114,13 @@ public class ClientPacketHelper {
 
     public static void sendTrackerToClient(Player entity) {
         playerList.get(entity.getUUID()).setClientPlayer(entity);
-        msg("You are now tracking " + getName(entity.getUUID()) + " on the client.");
+        msgDebug("You are now tracking " + getName(entity.getUUID()) + " on the client.");
         PartiesPacketHandler.sendToServer(new ServerPacketData(0, entity.getUUID()));
     }
 
     public static void sendTrackerToServer(UUID id) {
         playerList.get(id).removeClientPlayer();
-        msg("You are no longer tracking " + getName(id) + " on the client.");
+        msgDebug("You are no longer tracking " + getName(id) + " on the client.");
         PartiesPacketHandler.sendToServer(new ServerPacketData(1, id));
     }
 
