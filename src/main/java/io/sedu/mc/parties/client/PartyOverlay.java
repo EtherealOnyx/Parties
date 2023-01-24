@@ -60,14 +60,14 @@ public class PartyOverlay {
                 gui.blit(poseStack,px(6)+3, py(6, partyIndex), 16, 0, 9, 9);
                 gui.blit(poseStack,px(6)+3, py(6, partyIndex), 160, 0, 9, 9);
             }
-            health = (int)(id.getHealth()+id.getAbsorb()) + "/" + (int)id.getMaxHealth();
+            health = "§6" + (int)(id.getHealth()+id.getAbsorb()) + "/" + (int)id.getMaxHealth();
         } else {
-            health = (int)(id.getHealth()) + "/" + (int)id.getMaxHealth();
+            health = "§f" + (int)(id.getHealth()) + "/" + (int)id.getMaxHealth();
         }
 
 
-        gui.getFont().draw(poseStack, "§f" + health, l(0)+((int)((w(0)-gui.getFont().width(health))/2f)), t(0, partyIndex)+1, 0);
-        gui.getFont().drawShadow(poseStack, "§f" + health, l(0)+((int)((w(0)-gui.getFont().width(health))/2f)), t(0, partyIndex)+1, 0);
+        gui.getFont().draw(poseStack, health, l(0)+((int)((w(0)-gui.getFont().width(health))/2f)), t(0, partyIndex)+1, 0);
+        gui.getFont().drawShadow(poseStack, health, l(0)+((int)((w(0)-gui.getFont().width(health))/2f)), t(0, partyIndex)+1, 0);
 
         //Head
         GuiUtils.drawGradientRect(poseStack.last().pose(), 0, px(0)-1, py(0, partyIndex)-1, px(0)+33, py(0, partyIndex)+33,0xCC111111, 0xCC555555);
@@ -134,12 +134,12 @@ public class PartyOverlay {
                         int fillAbsorptionOffset = l(0)+((int)(w(0)*Math.min(effectiveHealth, id.getMaxHealth())/id.getMaxHealth()));
                         GuiUtils.drawGradientRect(poseStack.last().pose(), 0, currHealthOffset-1, t(0, partyIndex), fillAbsorptionOffset+1, b(0, partyIndex), 0x77faf098, 0x77d9cd68);
                         GuiUtils.drawGradientRect(poseStack.last().pose(), 0, currHealthOffset, t(0, partyIndex)+1,fillAbsorptionOffset, b(0, partyIndex)-1, 0xCCFFCD42, 0xCCB08610);
-                        //Render Absorption Heart
-                        if (effectiveHealth > id.getMaxHealth()) {
-                            gui.setupOverlayRenderState(true, false);
-                            gui.blit(poseStack,px(6)+2, py(6, partyIndex), 16, 0, 9, 9);
-                            gui.blit(poseStack,px(6)+2, py(6, partyIndex), 160, 0, 9, 9);
-                        }
+                    }
+                    //Render Absorption Heart
+                    if (effectiveHealth > id.getMaxHealth()) {
+                        gui.setupOverlayRenderState(true, false);
+                        gui.blit(poseStack,px(6)+2, py(6, partyIndex), 16, 0, 9, 9);
+                        gui.blit(poseStack,px(6)+2, py(6, partyIndex), 160, 0, 9, 9);
                     }
                     health = "§6" + (int)(id.getHealth()+id.getAbsorb()) + "/" + (int)id.getMaxHealth();
                 } else {
