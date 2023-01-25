@@ -130,10 +130,6 @@ public class PartyOverlay {
         }
     }
 
-    private static int color(int color, int alpha) {
-        return color | (alpha << 24);
-    }
-
     private static void renderMember(int partyIndex, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack) {
         poseStack.pushPose();
         RenderSystem.setShaderColor(1f, 1f, 1f, id.alpha);

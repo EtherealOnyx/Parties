@@ -26,6 +26,11 @@ public class PlayerData {
     //Player Entity name
     private String name;
 
+    //Player tick;
+    private short tick = 0;
+    //Player old hunger;
+    private int oldHunger;
+
     //The UUID of the party that this player belongs to.
     private UUID party;
 
@@ -89,5 +94,17 @@ public class PlayerData {
 
     public static void changeTracker(UUID trackerHost, UUID toTrack, boolean serverTracked) {
         playerTrackers.get(toTrack).put(trackerHost, serverTracked);
+    }
+
+    public boolean setHunger(int hunger) {
+        if (oldHunger != hunger) {
+            oldHunger = hunger;
+            return true;
+        }
+        return false;
+    }
+
+    public int getHunger() {
+        return oldHunger;
     }
 }

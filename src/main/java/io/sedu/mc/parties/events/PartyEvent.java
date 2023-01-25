@@ -14,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
 import net.minecraftforge.event.entity.living.*;
@@ -21,7 +22,9 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
+import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -36,7 +39,7 @@ public class PartyEvent {
         if (!event.getPlayer().level.isClientSide) {
             UUID id = event.getPlayer().getUUID();
             if (getPlayer(id) == null) {
-                PlayerData d = new PlayerData(id);
+                new PlayerData(id);
             }
             getPlayer(id).setServerPlayer((ServerPlayer) event.getPlayer());//.setOnline();
             ServerPacketHelper.sendOnline((ServerPlayer) event.getPlayer());
@@ -65,6 +68,26 @@ public class PartyEvent {
             if (ClientPlayerData.playerList.containsKey(event.getEntity().getUUID())) {
                 if (ClientPlayerData.playerList.get(event.getEntity().getUUID()).isTrackedOnServer()) {
                     Minecraft.getInstance().execute(() -> ClientPacketHelper.sendTrackerToClient((Player) event.getEntity()));
+                }
+            }
+        }
+    }
+
+    private static final short tickRate = 10;
+    @SubscribeEvent
+    public static void onEntityTick(TickEvent.PlayerTickEvent e) {
+        if (e.side == LogicalSide.SERVER && e.phase == TickEvent.Phase.END) {
+            if (e.player.tickCount % tickRate == 3) {
+                HashMap<UUID, Boolean> trackers;
+                if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
+                    UUID player;
+                    int hunger;
+                    boolean updateHunger = PlayerData.playerList.get(player = e.player.getUUID()).setHunger(hunger = (e.player.getFoodData().getFoodLevel()));
+                    trackers.forEach((id, serverTracked) -> {
+                        if (updateHunger) {
+                            InfoPacketHelper.sendFood(id, player, hunger);
+                        }
+                    });
                 }
             }
         }
