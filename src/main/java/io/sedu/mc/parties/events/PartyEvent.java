@@ -209,7 +209,7 @@ public class PartyEvent {
                         //Send Info.
                         //If it's absorption, send absorption amount:
                         float absorb;
-                        if (event.getPotionEffect().getEffect() == MobEffects.ABSORPTION && (absorb = event.getPotionEffect().getAmplifier()*4f) >= p.getAbsorptionAmount()) {
+                        if (event.getPotionEffect().getEffect() == MobEffects.ABSORPTION && (absorb = (event.getPotionEffect().getAmplifier()+1)*4f) >= p.getAbsorptionAmount()) {
                             InfoPacketHelper.sendAbsorb(id, p.getUUID(), absorb);
                         }
 
@@ -230,7 +230,7 @@ public class PartyEvent {
                         //Send Info.
                         //If it's absorption, remove all absorption.
                         if (event.getPotionEffect().getEffect() == MobEffects.ABSORPTION) {
-                            InfoPacketHelper.sendAbsorb(id, p.getUUID(), event.getPotionEffect().getAmplifier()*4f);
+                            InfoPacketHelper.sendAbsorb(id, p.getUUID(), 0f);
                         }
 
                     }

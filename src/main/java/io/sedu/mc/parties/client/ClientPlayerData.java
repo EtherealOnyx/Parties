@@ -129,9 +129,7 @@ public class ClientPlayerData {
         }
         health = entity.getHealth();
         maxHealth = entity.getMaxHealth();
-        hunger = entity.getFoodData().getFoodLevel();
         armor = entity.getArmorValue();
-        xpLevel = entity.experienceLevel;
         absorb = entity.getAbsorptionAmount();
     }
 
