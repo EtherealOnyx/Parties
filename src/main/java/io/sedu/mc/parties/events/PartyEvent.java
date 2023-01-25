@@ -9,6 +9,7 @@ import io.sedu.mc.parties.network.InfoPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
@@ -166,7 +167,8 @@ public class PartyEvent {
                             val -= from.getDefense();
                         if (event.getTo().getItem() instanceof ArmorItem to)
                             val += to.getDefense();
-                        InfoPacketHelper.sendArmor(id, p.getUUID(), val);
+                        if (val != p.getArmorValue())
+                            InfoPacketHelper.sendArmor(id, p.getUUID(), val);
                     }
                 });
             }
@@ -189,7 +191,7 @@ public class PartyEvent {
         if (!event.getEntityLiving().level.isClientSide()) {
             HashMap<UUID, Boolean> trackers;
             if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
-                trackers.keySet().forEach(id -> InfoPacketHelper.sendXp(id, p.getUUID(), event.getLevels()));
+                trackers.keySet().forEach(id -> InfoPacketHelper.sendXp(id, p.getUUID(), p.experienceLevel + event.getLevels()));
             }
         }
     }
@@ -199,23 +201,42 @@ public class PartyEvent {
     public static void onPotionAdded(PotionEvent.PotionAddedEvent event) {
         //TODO : Send client data of potion added.
         //TODO: Send client data if the entity is being tracked.
-        if (event.getEntityLiving().level.isClientSide()) {
-            System.out.print("Client Side: ");
-        } else {
-            System.out.print("Server Side: ");
+        if (!event.getEntityLiving().level.isClientSide()) {
+            HashMap<UUID, Boolean> trackers;
+            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                trackers.forEach((id, serverTracked) -> {
+                    if (serverTracked) {
+                        //Send Info.
+                        //If it's absorption, send absorption amount:
+                        float absorb;
+                        if (event.getPotionEffect().getEffect() == MobEffects.ABSORPTION && (absorb = event.getPotionEffect().getAmplifier()*4f) >= p.getAbsorptionAmount()) {
+                            InfoPacketHelper.sendAbsorb(id, p.getUUID(), absorb);
+                        }
+
+                    }
+                });
+            }
         }
-        System.out.println(event.getClass());
     }
     @SubscribeEvent
     public static void onPotionRemoved(PotionEvent.PotionRemoveEvent event) {
         //TODO : Send client data of potion removed.
         //TODO: Send client data if the entity is being tracked.
-        if (event.getEntityLiving().level.isClientSide()) {
-            System.out.print("Client Side: ");
-        } else {
-            System.out.print("Server Side: ");
+        if (!event.getEntityLiving().level.isClientSide()) {
+            HashMap<UUID, Boolean> trackers;
+            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                trackers.forEach((id, serverTracked) -> {
+                    if (serverTracked) {
+                        //Send Info.
+                        //If it's absorption, remove all absorption.
+                        if (event.getPotionEffect().getEffect() == MobEffects.ABSORPTION) {
+                            InfoPacketHelper.sendAbsorb(id, p.getUUID(), event.getPotionEffect().getAmplifier()*4f);
+                        }
+
+                    }
+                });
+            }
         }
-        System.out.println(event.getClass());
     }
 
     @SubscribeEvent

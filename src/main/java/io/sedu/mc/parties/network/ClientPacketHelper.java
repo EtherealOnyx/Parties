@@ -13,7 +13,7 @@ import static io.sedu.mc.parties.data.Util.getClientPlayer;
 public class ClientPacketHelper {
 
     private static boolean debug = false;
-    private static void msgDebug(String msg) {
+    static void msgDebug(String msg) {
         if (debug)
             Minecraft.getInstance().player.sendMessage(new TextComponent(msg), Minecraft.getInstance().player.getUUID());
     }
