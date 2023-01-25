@@ -4,15 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.gui.IIngameOverlay;
-
-import javax.annotation.Nullable;
 
 import static io.sedu.mc.parties.client.RenderData.*;
 
@@ -82,8 +78,7 @@ public class PartyOverlay {
 
             //Render Chicken
             gui.setupOverlayRenderState(true, false);
-            gui.blit(poseStack, px(4), py(4, partyIndex), 16, 27, 9, 9);
-            gui.blit(poseStack, px(4), py(4, partyIndex), 52, 27, 9, 9);
+            chicken(poseStack, partyIndex, gui, id.getHungerForced());
             gui.getFont().draw(poseStack, String.valueOf(id.getHungerForced()), px(5), py(5, partyIndex), 0xDDF3FF);
             //Head
             GuiUtils.drawGradientRect(poseStack.last().pose(), 0, px(0)-1, py(0, partyIndex)-1, px(0)+33, py(0, partyIndex)+33,0xCC111111, 0xCC555555);
@@ -181,9 +176,7 @@ public class PartyOverlay {
                 gui.blit(poseStack, px(2), py(2, partyIndex), 34, 9, 9, 9);
 
                 //Render Chicken
-                //gui.setupOverlayRenderState(true, false);
-                gui.blit(poseStack, px(4), py(4, partyIndex), 16, 27, 9, 9);
-                gui.blit(poseStack, px(4), py(4, partyIndex), 52, 27, 9, 9);
+                chicken(poseStack, partyIndex, gui, id.getHunger());
 
                 //Armor Text
                 gui.getFont().draw(poseStack, String.valueOf(id.getArmor()), px(3), py(3, partyIndex), 0xDDF3FF | (id.alphaI << 24));
@@ -269,36 +262,17 @@ public class PartyOverlay {
         RenderSystem.setShaderColor(1f,1f,1f, alpha);
     }
 
-    public void setupOverlayRenderState(boolean blend, boolean depthTest, @Nullable ResourceLocation texture)
-    {
-        if (blend)
-        {
+    private static void chicken(PoseStack poseStack, int partyIndex, ForgeIngameGui gui, int hunger) {
+        if (hunger > 16) {
+            gui.blit(poseStack, px(4), py(4, partyIndex), 16, 27, 9, 9);
+            gui.blit(poseStack, px(4), py(4, partyIndex), 52, 27, 9, 9);
+        }
+        else if(hunger > 4) {
+            gui.blit(poseStack, px(4), py(4, partyIndex), 16, 27, 9, 9);
+            gui.blit(poseStack, px(4), py(4, partyIndex), 61, 27, 9, 9);
+        } else {
 
         }
-        else
-        {
-            RenderSystem.disableBlend();
-        }
-
-        if (depthTest)
-        {
-            RenderSystem.enableDepthTest();
-        }
-        else
-        {
-            RenderSystem.disableDepthTest();
-        }
-
-        if (texture != null)
-        {
-
-        }
-        else
-        {
-            RenderSystem.disableTexture();
-        }
-
-
     }
 
     //public void setupOverlayRenderState()
