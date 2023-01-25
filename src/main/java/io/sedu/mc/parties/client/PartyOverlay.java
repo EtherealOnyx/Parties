@@ -68,10 +68,10 @@ public class PartyOverlay {
                     gui.blit(poseStack,px(6)+2, py(6, partyIndex), 16, 0, 9, 9);
                     gui.blit(poseStack,px(6)+2, py(6, partyIndex), 160, 0, 9, 9);
                 }
-                health = (int)(id.getHealth()+id.getAbsorb()) + "/" + (int)id.getMaxHealth();
+                health = (int)Math.ceil(id.getHealth()+id.getAbsorb()) + "/" + (int)id.getMaxHealth();
                 healthC = 0xFFF399;
             } else {
-                health = (int)(id.getHealth()) + "/" + (int)id.getMaxHealth();
+                health = (int)Math.ceil(id.getHealth()) + "/" + (int)id.getMaxHealth();
                 healthC = 0xFFE3E3;
             }
 
@@ -173,10 +173,10 @@ public class PartyOverlay {
                         gui.blit(poseStack,px(6)+2, py(6, partyIndex), 16, 0, 9, 9);
                         gui.blit(poseStack,px(6)+2, py(6, partyIndex), 160, 0, 9, 9);
                     }
-                    health = (int)(id.getHealth()+id.getAbsorb()) + "/" + (int)id.getMaxHealth();
+                    health = (int)Math.ceil(id.getHealth()+id.getAbsorb()) + "/" + (int)id.getMaxHealth();
                     healthC = 0xFFF399;
                 } else {
-                    health = (int)(id.getHealth()) + "/" + (int)id.getMaxHealth();
+                    health = (int)Math.ceil(id.getHealth()) + "/" + (int)id.getMaxHealth();
                     healthC = 0xFFE3E3;
                 }
 

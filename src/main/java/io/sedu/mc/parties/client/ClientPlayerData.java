@@ -219,6 +219,7 @@ public class ClientPlayerData {
 
     public void setHealth(float data) {
         health = data;
+        System.out.println("Health for " + playerName + " is " + health);
     }
 
     public void setAbsorb(float data) {
