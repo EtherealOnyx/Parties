@@ -1,7 +1,9 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.client.ClientPlayerData;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Player;
 
@@ -12,14 +14,19 @@ import static io.sedu.mc.parties.data.Util.getClientPlayer;
 
 public class ClientPacketHelper {
 
-    private static boolean debug = true;
-    static void msgDebug(String msg) {
+    private static boolean debug = false;
+    static void msgDebug(MutableComponent msg) {
         //if (debug)
-            Minecraft.getInstance().player.sendMessage(new TextComponent(msg), Minecraft.getInstance().player.getUUID());
+            //Minecraft.getInstance().player.sendMessage(msg, Minecraft.getInstance().player.getUUID());
     }
 
-    private static void msg(String msg) {
-        Minecraft.getInstance().player.sendMessage(new TextComponent(msg), Minecraft.getInstance().player.getUUID());
+    static void msgDebug(String msg) {
+        msgDebug(new TextComponent(msg).withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(true)));
+    }
+
+
+    private static void msg(MutableComponent msg) {
+        Minecraft.getInstance().player.sendMessage(msg, Minecraft.getInstance().player.getUUID());
     }
 
 
@@ -32,7 +39,7 @@ public class ClientPacketHelper {
         list.forEach(uuid -> {
             try {
                 getClientPlayer(uuid).setOnline();
-                msg(getName(uuid) + " is now online.");
+                msgDebug(new TextComponent(getName(uuid)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" is now online.")));
             } catch (NullPointerException e) {
                 error();
                 e.printStackTrace();
@@ -44,7 +51,7 @@ public class ClientPacketHelper {
         list.forEach(uuid -> {
             try {
                 getClientPlayer(uuid).setOffline();
-                msg(getName(uuid) + " is now offline.");
+                msgDebug(new TextComponent(getName(uuid)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" is now offline.")));
             } catch (NullPointerException e) {
                 error();
                 e.printStackTrace();
@@ -62,7 +69,7 @@ public class ClientPacketHelper {
             error();
             e.printStackTrace();
         }
-        msg("You join the party.");
+        msg(new TextComponent("You join the party.").withStyle(ChatFormatting.DARK_AQUA));
         //Try to see if we can track any of our new members on the client.
         Minecraft.getInstance().level.players().forEach(player -> {
             if (ClientPlayerData.playerList.containsKey(player.getUUID())) {
@@ -82,34 +89,34 @@ public class ClientPacketHelper {
     public static void changeLeader(ArrayList<UUID> list) {
         //list should always be size 1 here.
         ClientPlayerData.changeLeader(list.get(0));
-        msg(getName(list.get(0)) + " is now the party leader.");
+        msg(new TextComponent(getName(list.get(0))).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" is now the party leader.").withStyle(ChatFormatting.DARK_AQUA)));
     }
 
     public static void dropParty() {
         ClientPlayerData.reset();
-        msg("You left the party.");
+        msg(new TextComponent("You left the party.").withStyle(ChatFormatting.DARK_AQUA));
     }
 
     public static void removePartyMemberDropped(UUID uuid) {
-        msg(getName(uuid) + " left the party.");
+        msg(new TextComponent(getName(uuid)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" left the party.").withStyle(ChatFormatting.DARK_AQUA)));
         playerList.remove(uuid);
         playerOrderedList.remove(uuid);
     }
 
     public static void dropPartyKicked() {
         ClientPlayerData.reset();
-        msg("You have been kicked from the party.");
+        msg(new TextComponent("You have been kicked from the party.").withStyle(ChatFormatting.DARK_AQUA));
     }
 
     public static void removePartyMemberKicked(UUID uuid) {
-        msg(getName(uuid) + " was kicked from the party.");
+        msg(new TextComponent(getName(uuid)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" was kicked from the party.").withStyle(ChatFormatting.DARK_AQUA)));
         playerList.remove(uuid);
         playerOrderedList.remove(uuid);
     }
 
     public static void disbandParty() {
         ClientPlayerData.reset();
-        msg("Party disbanded.");
+        msg(new TextComponent("Party disbanded.").withStyle(ChatFormatting.DARK_AQUA));
     }
 
     public static void sendTrackerToClient(Player entity) {
@@ -126,6 +133,6 @@ public class ClientPacketHelper {
 
     public static void setLeader() {
         ClientPlayerData.changeLeader(Minecraft.getInstance().player.getUUID());
-        msg("You are now the party leader.");
+        msg(new TextComponent("You are now the party leader.").withStyle(ChatFormatting.DARK_AQUA));
     }
 }

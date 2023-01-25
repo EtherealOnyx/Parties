@@ -2,7 +2,6 @@ package io.sedu.mc.parties.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import io.sedu.mc.parties.data.PartyHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -16,35 +15,35 @@ public class PartyCommands {
             .then(Commands.literal("invite")
                 .then(Commands.argument("player", new NotSelfArgument(false))
                     .executes(ctx -> {
-                        if (PartyHelper.invitePlayer(ctx.getSource().getPlayerOrException().getUUID(),
-                                EntityArgument.getPlayer(ctx, "player").getUUID())) {
-                            System.out.println("Party creation success.");
-                            return Command.SINGLE_SUCCESS;
-                        }
-                        else {
-                            System.out.println("Party creation failed!");
-                            return 0;
-                        }
-                    }
-                    )
+                        PartyHelper.questionPlayer(ctx.getSource().getPlayerOrException().getUUID(), EntityArgument.getPlayer(ctx, "player").getUUID());
+                        return Command.SINGLE_SUCCESS;})
                 )
-            )
-            .then(Commands.literal("kick")
-                .then(Commands.argument("member", new NotSelfArgument(true))
-                    .executes(ctx -> {
-                        if (isLeader(ctx.getSource().getPlayerOrException().getUUID()) &&
-                                PartyHelper.kickPlayer(ctx.getSource().getPlayerOrException().getUUID(),
-                                        EntityArgument.getPlayer(ctx, "member").getUUID())) {
-                            System.out.println("Player kick successful.");
-                            return Command.SINGLE_SUCCESS;
-                        }
-                        else {
-                            System.out.println("Player kick failed!");
-                            return 0;
-                        }
-                    })
-                )
-            )
+            ).then(Commands.literal("accept").then(Commands.argument("initiator", new NotSelfArgument(false)).executes(ctx -> {
+                if (PartyHelper.invitePlayer(EntityArgument.getPlayer(ctx, "initiator").getUUID(), ctx.getSource().getPlayerOrException().getUUID())) {
+                    System.out.println("Party creation success.");
+                    return Command.SINGLE_SUCCESS;
+                }
+                else {
+                    return 0;
+                }
+            })))
+            .then(Commands.literal("decline").then(Commands.argument("initiator", new NotSelfArgument(false)).executes(ctx -> {
+                if (PartyHelper.declineInvite(EntityArgument.getPlayer(ctx, "initiator").getUUID(), ctx.getSource().getPlayerOrException().getUUID())) {
+                    return Command.SINGLE_SUCCESS;
+                }
+                else {
+                    return 0;
+                }
+            })))
+            .then(Commands.literal("kick").then(Commands.argument("member", new NotSelfArgument(true)).executes(ctx -> {
+                if (isLeader(ctx.getSource().getPlayerOrException().getUUID()) && PartyHelper.kickPlayer(ctx.getSource().getPlayerOrException().getUUID(), EntityArgument.getPlayer(ctx, "member").getUUID())) {
+                    System.out.println("Player kick successful.");
+                    return Command.SINGLE_SUCCESS;
+                } else {
+                    System.out.println("Player kick failed!");
+                    return 0;
+                }
+            })))
             .then(Commands.literal("leave")
                 .executes(ctx -> {
                   if (PartyHelper.leaveParty(ctx.getSource().getPlayerOrException().getUUID())) {
@@ -54,8 +53,7 @@ public class PartyCommands {
                       System.out.println("Player leaving failed!");
                       return 0;
                   }
-                })
-            )
+                }))
             .then(Commands.literal("leader")
                 .then(Commands.argument("member", new NotSelfArgument(true))
                     .executes(ctx -> {

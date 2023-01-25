@@ -1,9 +1,12 @@
 package io.sedu.mc.parties.data;
 
+import io.sedu.mc.parties.events.PartyEvent;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 public class PlayerData {
@@ -26,8 +29,8 @@ public class PlayerData {
     //Player Entity name
     private String name;
 
-    //Player tick;
-    private short tick = 0;
+    //Invite tracker
+    private HashMap<UUID, Short> inviters = new HashMap<>();
     //Player old hunger;
     private int oldHunger;
 
@@ -42,6 +45,18 @@ public class PlayerData {
         return party != null;
     }
 
+    public boolean isInviter(UUID inviter) {
+        return inviters.containsKey(inviter);
+    }
+
+    public void removeInviter(UUID inviter) {
+        inviters.remove(inviter);
+    }
+
+    public void addInviter(UUID inviter) {
+        inviters.put(inviter, PartyEvent.playerAcceptTimer);
+    }
+
     public boolean addParty(UUID id) {
         if (party != null)
             return false;
@@ -50,7 +65,9 @@ public class PlayerData {
     }
 
     public ServerPlayer getPlayer() {
-        return serverPlayer.get();
+        if (serverPlayer != null)
+            return serverPlayer.get();
+        return null;
     }
 
     public UUID getPartyId() {
@@ -104,7 +121,22 @@ public class PlayerData {
         return false;
     }
 
-    public int getHunger() {
-        return oldHunger;
+    public void tickInviters() {
+        HashMap<UUID, Short> invNew = new HashMap<>();
+        inviters.forEach((uuid, aShort) -> {
+            if (aShort-- <= 0) {
+                PartyHelper.dismissInvite(this, uuid);
+            } else {
+                invNew.put(uuid, aShort);
+            }
+        });
+        inviters = invNew;
+    }
+
+    public void removeInviters() {
+        inviters.forEach((uuid, aShort) -> {
+            PartyHelper.dismissInvite(uuid);
+        });
+        inviters.clear();
     }
 }

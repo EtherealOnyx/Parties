@@ -25,7 +25,11 @@ public class Util {
 
     public static PartyData getPartyFromMember(UUID playerId) {
         //Can a hashmap handle a null get()? No...
-        return getPartyFromId(PlayerData.playerList.get(playerId).getPartyId());
+        UUID party;
+        PartyData p;
+        if ((party = PlayerData.playerList.get(playerId).getPartyId()) != null && (p = getPartyFromId(party)) != null)
+            return p;
+        return null;
     }
 
     public static List<String> getPartyNamesWithout(UUID memberId) {
@@ -48,7 +52,10 @@ public class Util {
     }
 
     public static boolean isLeader(UUID playerId) {
-        return getPartyFromMember(playerId).isLeader(playerId);
+        PartyData p;
+        if ((p = getPartyFromMember(playerId)) != null)
+            return p.isLeader(playerId);
+        return false;
     }
 
 

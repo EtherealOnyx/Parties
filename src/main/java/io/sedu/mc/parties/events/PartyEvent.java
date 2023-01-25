@@ -24,7 +24,6 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
-import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -49,7 +48,7 @@ public class PartyEvent {
     @SubscribeEvent
     public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
         if (!event.getPlayer().level.isClientSide) {
-            getPlayer(event.getPlayer().getUUID()).removeServerPlayer();//.setOffline();
+            getPlayer(event.getPlayer().getUUID()).removeServerPlayer().removeInviters();
             ServerPacketHelper.sendOffline(event.getPlayer().getUUID());
         }
     }
@@ -73,11 +72,13 @@ public class PartyEvent {
         }
     }
 
-    private static final short tickRate = 10;
+    private static final short playerUpdateInterval = 10;
+    public static final short playerAcceptTimer = 15;
+
     @SubscribeEvent
     public static void onEntityTick(TickEvent.PlayerTickEvent e) {
         if (e.side == LogicalSide.SERVER && e.phase == TickEvent.Phase.END) {
-            if (e.player.tickCount % tickRate == 3) {
+            if (e.player.tickCount % playerUpdateInterval == 3) {
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
@@ -89,6 +90,9 @@ public class PartyEvent {
                         }
                     });
                 }
+            }
+            if (e.player.tickCount % 20 == 7) {
+                PlayerData.playerList.get(e.player.getUUID()).tickInviters();
             }
         }
     }
