@@ -40,6 +40,10 @@ public class ClientPlayerData {
     private int xpLevel = 0;
     boolean isDead = false;
 
+    //Default to server tracker.
+    float alpha = .6f;
+    int alphaI = 216;
+
 
 
     private int hunger = 20;
@@ -116,7 +120,6 @@ public class ClientPlayerData {
 
     public String getName() {
         return trackedOnClient ? clientPlayer.getName().getContents() : playerName;
-        //return playerName;
     }
 
     public void setClientPlayer(Player entity) {
@@ -132,11 +135,15 @@ public class ClientPlayerData {
         armor = entity.getArmorValue();
         absorb = entity.getAbsorptionAmount();
         if (health > 0f) markAlive();
+        alpha = 1f;
+        alphaI = 255;
     }
 
     public void removeClientPlayer() {
         clientPlayer = null;
         trackedOnClient = false;
+        alpha = .6f;
+        alphaI = 216;
     }
 
     public boolean isTrackedOnServer() {
