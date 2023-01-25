@@ -55,7 +55,7 @@ public class ClientPacketHelper {
     public static void addMembers(ArrayList<UUID> list) {
         try {
             if (partySize() == 0) {
-                ClientPlayerData.addSelf();
+                ClientPlayerData.addSelfParty();
             }
             list.forEach(ClientPlayerData::addClientMember);
         } catch (NullPointerException e) {

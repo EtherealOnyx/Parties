@@ -17,7 +17,7 @@ import java.util.UUID;
 public class ClientPlayerData {
     public static HashMap<UUID, ClientPlayerData> playerList = new HashMap<>();
     public static ArrayList<UUID> playerOrderedList = new ArrayList<>();
-    public static boolean showSelf = false;
+    public static boolean showSelf = true;
     private static UUID leader;
 
     //Client Information
@@ -68,8 +68,17 @@ public class ClientPlayerData {
     }
 
     public static void reset() {
-        playerList.clear();
-        playerOrderedList.clear();
+        resetOnly();
+        addSelf();
+    }
+
+    public static void addSelf() {
+        Player p;
+        if (showSelf & (p = Minecraft.getInstance().player) != null)
+        {
+            ClientPlayerData.addClientMember(p.getUUID());
+            playerList.get(p.getUUID()).setClientPlayer(p);
+        }
     }
 
     public static void changeLeader(UUID uuid) {
@@ -84,12 +93,17 @@ public class ClientPlayerData {
 
     private static void checkParty() {
         if (partySize() == 0)
-            addSelf();
+            addSelfParty();
     }
 
-    public static void addSelf() {
+    public static void addSelfParty() {
         ClientPlayerData.addClientMember(Minecraft.getInstance().player.getUUID());
-        ClientPlayerData.showSelf = true;
+    }
+
+    public static void resetOnly() {
+        playerList.clear();
+        playerOrderedList.clear();
+        leader = null;
     }
 
     public void setId(UUID uuid) {

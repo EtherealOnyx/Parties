@@ -22,13 +22,13 @@ public class PartyOverlay {
     public static ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
 
     public static final IIngameOverlay HUD_PARTY = (gui, poseStack, partialTicks, width, height) -> {
-        if (ClientPlayerData.showSelf) {
+        if (ClientPlayerData.playerOrderedList.size() > 0) {
             //TODO: Allow rearranging party list. Use a variable that stores new index in an array[oldIndex]
             renderSelf(0, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0)), gui, poseStack);
-        }
-        for (int i = 1; i < ClientPlayerData.playerOrderedList.size(); i++) {
-            renderMember(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack);
-        }
+            for (int i = 1; i < ClientPlayerData.playerOrderedList.size(); i++) {
+                renderMember(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack);
+            }
+       }
     };
 
     private static void renderSelf(int partyIndex, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack) {

@@ -91,7 +91,13 @@ public class PartyEvent {
     public static void onClientLeave(ClientPlayerNetworkEvent.LoggedOutEvent event) {
         //Reset info.
         System.out.println("Resetting info...");
-        ClientPlayerData.reset();
+        ClientPlayerData.resetOnly();
+    }
+
+    public static void onClientJoin(ClientPlayerNetworkEvent.LoggedInEvent event) {
+        //Reset info.
+        System.out.println("Resetting info...");
+        ClientPlayerData.addSelf();
     }
 
 

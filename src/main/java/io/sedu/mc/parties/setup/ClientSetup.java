@@ -17,7 +17,7 @@ public class ClientSetup {
     public static void init(final FMLClientSetupEvent event) {
         OverlayRegistry.registerOverlayAbove(HOTBAR_ELEMENT, "party", PartyOverlay.HUD_PARTY);
         MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientLeave);
-        //MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientJoin);
+        MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientJoin);
         RenderData.setDefaultData();
     }
 }
