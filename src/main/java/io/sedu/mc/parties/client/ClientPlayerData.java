@@ -131,6 +131,7 @@ public class ClientPlayerData {
         maxHealth = entity.getMaxHealth();
         armor = entity.getArmorValue();
         absorb = entity.getAbsorptionAmount();
+        if (health > 0f) markAlive();
     }
 
     public void removeClientPlayer() {

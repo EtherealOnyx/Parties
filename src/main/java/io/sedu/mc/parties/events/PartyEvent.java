@@ -141,6 +141,11 @@ public class PartyEvent {
             if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
                 trackers.keySet().forEach(id -> InfoPacketHelper.sendDeath(id, p.getUUID()));
             }
+        } else {
+            UUID id;
+            if (ClientPlayerData.partySize() > 0 && event.getEntityLiving().getUUID().equals(id = Minecraft.getInstance().player.getUUID())) {
+                ClientPlayerData.playerList.get(id).markDead();
+            }
         }
     }
 
