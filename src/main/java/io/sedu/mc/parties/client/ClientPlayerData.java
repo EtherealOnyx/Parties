@@ -40,6 +40,14 @@ public class ClientPlayerData {
     private int xpLevel = 0;
     boolean isDead = false;
 
+    //Dimension
+    Integer dimension = 0;
+    Integer oldDimension = 0;
+    short dimAnim = 0;
+    boolean dimAnimActive = false;
+    int prevTick = 0;
+    int currTick = 0;
+
     //Default to server tracker.
     float alpha = .6f;
     int alphaI = 216;
@@ -248,5 +256,28 @@ public class ClientPlayerData {
 
     public void markAlive() {
         isDead = false;
+    }
+
+    public void setDim(Integer data) {
+        oldDimension = dimension;
+        dimension = data;
+        dimAnimActive = true;
+        dimAnim = 100;
+    }
+
+    public boolean tickWorldAnim() {
+        return dimAnim-- <= 0;
+    }
+
+    public boolean update(int guiTicks) {
+        return prevTick != guiTicks;
+    }
+
+    public boolean tick(int guiTicks) {
+        if (currTick != guiTicks) {
+            currTick = guiTicks;
+            return true;
+        }
+        return false;
     }
 }

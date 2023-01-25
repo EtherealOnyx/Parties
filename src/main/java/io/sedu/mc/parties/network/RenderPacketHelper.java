@@ -1,8 +1,6 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.client.ClientPlayerData;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
 
 import java.util.UUID;
 
@@ -55,5 +53,9 @@ public class RenderPacketHelper {
 
     public static void markLife(UUID player) {
         ClientPlayerData.playerList.get(player).markAlive();
+    }
+
+    public static void setDim(UUID player, Integer data) {
+        ClientPlayerData.playerList.get(player).setDim(data);
     }
 }

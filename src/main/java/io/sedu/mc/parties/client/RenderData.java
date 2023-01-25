@@ -85,6 +85,10 @@ public class RenderData {
         return cPos[type][0];
     }
 
+    public static int pyNM(int type) {
+        return cPos[type][1];
+    }
+
     public static int py(int type, int pOffset) {
         return cPos[type][1] + pOffset*height;
     }

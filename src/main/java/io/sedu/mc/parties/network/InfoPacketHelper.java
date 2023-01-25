@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.data.PlayerData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.UUID;
@@ -68,5 +69,19 @@ public class InfoPacketHelper {
 
     public static void sendAlive(UUID sendTo, UUID propOf) {
         PartiesPacketHandler.sendToPlayer(new RenderPacketData(8, propOf), getServerPlayer(sendTo));
+    }
+
+    public static void sendDim(UUID sendTo, UUID propOf, ResourceLocation world) {
+        sendData(getServerPlayer(sendTo), propOf, 9, getWorld(String.valueOf(world)));
+    }
+
+    private static Object getWorld(String world) {
+        if (world.equals("minecraft:overworld"))
+            return 1;
+        if (world.equals("minecraft:nether"))
+            return 2;
+        if (world.equals("minecraft:the_end"))
+            return 3;
+        return 0;
     }
 }

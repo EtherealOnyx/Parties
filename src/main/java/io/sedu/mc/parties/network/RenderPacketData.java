@@ -59,7 +59,7 @@ public class RenderPacketData {
             case 1, 2, 3 -> {data = buf.readFloat();
                 System.out.println("Data: " + data);
             }
-            case 4, 5, 6 -> {
+            case 4, 5, 6, 9 -> {
                 data = buf.readInt();
                 System.out.println("Data: " + data);
             }
@@ -87,7 +87,7 @@ public class RenderPacketData {
                 System.out.println("Wrote value of: " + data);
             }
 
-            case 4, 5, 6 -> //Armor, Hunger, XP Level
+            case 4, 5, 6, 9 -> //Armor, Hunger, XP Level
             {
                 buf.writeInt((Integer) data);
                 System.out.println("Wrote value of: " + data);
@@ -122,6 +122,7 @@ public class RenderPacketData {
                 case 6 -> RenderPacketHelper.setXp(player, (Integer) data);
                 case 7 -> RenderPacketHelper.markDeath(player);
                 case 8 -> RenderPacketHelper.markLife(player);
+                case 9 -> RenderPacketHelper.setDim(player, (Integer) data);
                 default -> {
 
                 }

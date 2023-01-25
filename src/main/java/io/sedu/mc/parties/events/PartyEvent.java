@@ -115,6 +115,15 @@ public class PartyEvent {
         }
     }
 
+    @SubscribeEvent
+    public static void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) {
+        HashMap<UUID, Boolean> trackers;
+        Player p;
+        if ((trackers = PlayerData.playerTrackers.get((p = event.getPlayer()).getUUID())) != null) {
+            trackers.keySet().forEach(id -> InfoPacketHelper.sendDim(id, p.getUUID(), event.getTo().location()));
+        }
+    }
+
     public static void onClientLeave(ClientPlayerNetworkEvent.LoggedOutEvent event) {
         //Reset info.
         System.out.println("Resetting info...");
@@ -184,7 +193,6 @@ public class PartyEvent {
 
     @SubscribeEvent
     public static void onEntityRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        System.out.println("Both sides!?");
         if (!event.getEntityLiving().level.isClientSide()) {
             HashMap<UUID, Boolean> trackers;
             if ((trackers = PlayerData.playerTrackers.get(event.getPlayer().getUUID())) != null) {

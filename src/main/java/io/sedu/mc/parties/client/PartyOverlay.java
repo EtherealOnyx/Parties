@@ -16,18 +16,20 @@ import static io.sedu.mc.parties.client.RenderData.*;
 public class PartyOverlay {
 
     public static ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
+    public static ResourceLocation worldPath = new ResourceLocation(Parties.MODID, "textures/worldicons.png");
 
     public static final IIngameOverlay HUD_PARTY = (gui, poseStack, partialTicks, width, height) -> {
         if (ClientPlayerData.playerOrderedList.size() > 0) {
             //TODO: Allow rearranging party list. Use a variable that stores new index in an array[oldIndex]
-            renderSelf(0, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0)), gui, poseStack);
+            renderSelf(0, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0)), gui, poseStack, partialTicks);
             for (int i = 1; i < ClientPlayerData.playerOrderedList.size(); i++) {
-                renderMember(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack);
+                renderMember(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack, partialTicks);
             }
        }
     };
 
-    private static void renderSelf(int partyIndex, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack) {
+    private static void renderSelf(int partyIndex, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
+                                   float partialTicks) {
 
         //Name BG
         GuiUtils.drawGradientRect(poseStack.last().pose(), 0, l(2), t(2, partyIndex), r(2),b(2, partyIndex), 0x44002024, 0x3300444d);
@@ -84,6 +86,13 @@ public class PartyOverlay {
             GuiUtils.drawGradientRect(poseStack.last().pose(), 0, px(0)-1, py(0, partyIndex)-1, px(0)+33, py(0, partyIndex)+33,0xCC111111, 0xCC555555);
             gui.setupOverlayRenderState(true, false, id.getHead());
             GuiUtils.drawTexturedModalRect(poseStack, px(0), py(0, partyIndex), 32, 32, 32, 32, 1);
+
+            //Render World
+            if (id.dimAnimActive)  {
+                worldAnim(poseStack, partyIndex, gui, 0, id, partialTicks);
+            } else {
+                world(poseStack, partyIndex, gui, 0);
+            }
         } else {
             //Missing Health
             GuiUtils.drawGradientRect(poseStack.last().pose(), 0, l(0)+1, t(0, partyIndex)+1,r(0), b(0, partyIndex)-1,0xFF450202, 0xFF620909);
@@ -125,7 +134,8 @@ public class PartyOverlay {
         }
     }
 
-    private static void renderMember(int partyIndex, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack) {
+    private static void renderMember(int partyIndex, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
+                                     float partialTicks) {
         poseStack.pushPose();
         RenderSystem.setShaderColor(1f, 1f, 1f, id.alpha);
         //Name BG
@@ -186,6 +196,13 @@ public class PartyOverlay {
                 GuiUtils.drawGradientRect(poseStack.last().pose(), 0, px(0)-1, py(0, partyIndex)-1, px(0)+33, py(0, partyIndex)+33,0x111111 | ((int)(id.alphaI*.75) << 24), 0x555555 | ((int)(id.alphaI*.75) << 24));
                 setup(id.alpha, id.getHead()); //Why does this require setShaderColor again...
                 gui.blit(poseStack, px(0), py(0, partyIndex), 32, 32, 32, 32);
+                //world(poseStack, partyIndex, gui, id.dimension);
+                //Render World
+                if (id.dimAnimActive)  {
+                    worldAnim(poseStack, partyIndex, gui, id.dimension, id, partialTicks);
+                } else {
+                    world(poseStack, partyIndex, gui, id.dimension);
+                }
             } else {
                 //Missing Health
                 GuiUtils.drawGradientRect(poseStack.last().pose(), 0, l(0)+1, t(0, partyIndex)+1,r(0), b(0, partyIndex)-1,0xFF450202, 0xFF620909);
@@ -273,6 +290,55 @@ public class PartyOverlay {
         } else {
 
         }
+    }
+
+    private static void world(PoseStack poseStack, int partyIndex, ForgeIngameGui gui, int i) {
+        //if (i == 0)
+            //return;
+        setWorldShader(poseStack);
+        RenderSystem.setShaderColor(1f,1f,1f, .75f);
+        poseStack.scale(.25f, .25f, .25f);
+        gui.blit(poseStack, (px(0)-10)*4, (py(0, partyIndex)+20)*4, 64*i, 0, 64, 64);
+        poseStack.popPose();
+    }
+
+
+
+    private static void worldAnim(PoseStack poseStack, int partyIndex, ForgeIngameGui gui, int i, ClientPlayerData d, float partialTicks) {
+        //Parties.LOGGER.debug(gui.getGuiTicks());
+        setWorldShader(poseStack);
+        int currTick;
+        if (d.tick(gui.getGuiTicks())) {
+            if (d.tickWorldAnim())
+                d.dimAnimActive = false;
+        }
+        System.out.println(d.dimAnim);
+        if (d.dimAnim > 90) {
+            currTick = 10 - (d.dimAnim - 90); //30 - 0
+            RenderSystem.setShaderColor(1f,1f,1f, .75f +  currTick/40f);
+            poseStack.scale(.25f+(currTick+partialTicks)/40f, .25f+(currTick+partialTicks)/40f, .25f+(currTick+partialTicks)/40f);
+            gui.blit(poseStack, (int) ((px(0)-10+currTick+partialTicks)*(4-((currTick+partialTicks)/5f))),  /*RenderData.height*i*/ + (int)((py(0, partyIndex)+(20-((currTick+partialTicks)*2f)))*(4-((currTick+partialTicks)/5f))), 64*d.oldDimension, 0, 64, 64);
+        } else if (d.dimAnim > 10) {
+            currTick = d.dimAnim - 10; //80 - 0
+            RenderSystem.setShaderColor(1f,1f,1f, ((currTick+(1*partialTicks))/80f));
+            poseStack.scale(.5f, .5f, .5f);
+            gui.blit(poseStack, (px(0))*2, (py(0, partyIndex))*2, 64*d.oldDimension, 0, 64, 64);
+            RenderSystem.setShaderColor(1f,1f,1f, 1f - ((currTick+(1*partialTicks))/80f));
+            gui.blit(poseStack, (px(0))*2, (py(0, partyIndex))*2, 64*d.dimension, 0, 64, 64);
+        } else {
+            RenderSystem.setShaderColor(1f,1f,1f, .75f + d.dimAnim/40f);
+            poseStack.scale(.25f+(d.dimAnim-partialTicks)/40f, .25f+(d.dimAnim-partialTicks)/40f, .25f+(d.dimAnim-partialTicks)/40f);
+
+            gui.blit(poseStack, (int) ((px(0)-10+d.dimAnim-partialTicks)*(4-((d.dimAnim-partialTicks)/5f))),  /*RenderData.height*i*/ + (int)((py(0, partyIndex)+(20-((d.dimAnim-partialTicks)*2f)))*(4-((d.dimAnim-partialTicks)/5f))), 64*d.dimension, 0, 64, 64);
+        }
+        poseStack.popPose();
+    }
+
+    private static void setWorldShader(PoseStack poseStack) {
+        poseStack.pushPose();
+        RenderSystem.setShaderTexture(0, worldPath);
+        RenderSystem.disableDepthTest();
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
     }
 
     //public void setupOverlayRenderState()

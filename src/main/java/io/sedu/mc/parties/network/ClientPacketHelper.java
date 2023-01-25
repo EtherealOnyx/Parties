@@ -121,12 +121,16 @@ public class ClientPacketHelper {
 
     public static void sendTrackerToClient(Player entity) {
         playerList.get(entity.getUUID()).setClientPlayer(entity);
+        if (entity.getUUID().equals(Minecraft.getInstance().player.getUUID()))
+            return;
         msgDebug("You are now tracking " + getName(entity.getUUID()) + " on the client.");
         PartiesPacketHandler.sendToServer(new ServerPacketData(0, entity.getUUID()));
     }
 
     public static void sendTrackerToServer(UUID id) {
         playerList.get(id).removeClientPlayer();
+        if (id.equals(Minecraft.getInstance().player.getUUID()))
+            return;
         msgDebug("You are no longer tracking " + getName(id) + " on the client.");
         PartiesPacketHandler.sendToServer(new ServerPacketData(1, id));
     }
