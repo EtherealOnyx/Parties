@@ -13,6 +13,7 @@ import net.minecraftforge.client.gui.IIngameOverlay;
 import java.util.ArrayList;
 
 import static io.sedu.mc.parties.client.RenderData.*;
+import static io.sedu.mc.parties.Parties.LOGGER;
 
 
 public class PartyOverlay {
@@ -303,7 +304,6 @@ public class PartyOverlay {
         poseStack.scale(.25f, .25f, .25f);
         gui.blit(poseStack, (px(0)-10)*4, (py(0, partyIndex)+20)*4, 64*i, 0, 64, 64);
         poseStack.popPose();
-
     }
 
 
@@ -342,33 +342,45 @@ public class PartyOverlay {
             RenderSystem.setShaderColor(1f,1f,1f, 1f - ((currTick+(1*partialTicks))/80f));
             gui.blit(poseStack, (px(0))*2, (py(0, partyIndex))*2, 64*id.dimension, 0, 64, 64);
             int x, y;
+            float transX;
             poseStack.scale(2f, 2f, 2f);
             if (currTick > 70) {
-                currTick = 10 - (currTick-70); // 0 - 10
-                alphaPercent = (currTick+partialTicks)/10f;
-                Parties.LOGGER.debug((int)(255*alphaPercent));
+                currTick = (currTick-70); // 10 - 0
+                alphaPercent = (10 - currTick+partialTicks)/10f;
                 for (int j = 0; j < id.dimName.size(); j++) {
-                    x = px(0)+((int)((32-gui.getFont().width(id.dimName.get(j)))/2f));
+                    if (j % 2 == 1)
+                        transX =  -(15+(2*(currTick-partialTicks)));
+                    else
+                        transX = (15+(2*(currTick-partialTicks)));
+                    x = (int) (px(0)+((32-gui.getFont().width(id.dimName.get(j)))/2f) + transX);
                     y = (py(0, partyIndex)+(j*gui.getFont().lineHeight)+1)+((int)((32-gui.getFont().lineHeight*id.dimName.size())/2f));
                     gui.getFont().draw(poseStack, id.dimName.get(j), x, y, 0xfff390 | (int)(255*alphaPercent) << 24);
-                    gui.getFont().drawShadow(poseStack, id.dimName.get(j), px(0)+((int)((32-gui.getFont().width(id.dimName.get(j)))/2f)), y, 0xfff390 | (int)(255*alphaPercent) << 24);
+                    gui.getFont().drawShadow(poseStack, id.dimName.get(j), x, y, 0xfff390 | (int)(255*alphaPercent) << 24);
                 }
             } else if (currTick > 10) {
                 currTick = currTick - 10; // 60 - 0
                 for (int j = 0; j < id.dimName.size(); j++) {
-                    x = px(0) + ((int) ((32 - gui.getFont().width(id.dimName.get(j))) / 2f));
+                    if (j % 2 == 1)
+                        transX = (30 - currTick-partialTicks)/2f;
+                    else
+                        transX = (currTick-partialTicks - 30)/2f;
+                    x = (int) (px(0)+((32-gui.getFont().width(id.dimName.get(j)))/2f) + transX);
+                    //poseStack.translate()
                     y = (py(0, partyIndex) + (j * gui.getFont().lineHeight) + 1) + ((int) ((32 - gui.getFont().lineHeight * id.dimName.size()) / 2f));
                     gui.getFont().draw(poseStack, id.dimName.get(j), x, y, 0xfff390 | (255 << 24));
-                    gui.getFont().drawShadow(poseStack, id.dimName.get(j), px(0) + ((int) ((32 - gui.getFont()
-                                                                                                    .width(id.dimName.get(j))) / 2f)), y, 0xfff390 | (255 << 24));
+                    gui.getFont().drawShadow(poseStack, id.dimName.get(j), x, y, 0xfff390 | (255 << 24));
                 }
             } else {
                 currTick = 10 - currTick; // 0 - 10
                 for (int j = 0; j < id.dimName.size(); j++) {
-                    x = px(0)+((int)((32-gui.getFont().width(id.dimName.get(j)))/2f));
+                    if (j % 2 == 1)
+                        transX = (int) (15+(2*(currTick+partialTicks)));
+                    else
+                        transX = (int) -(15+(2*(currTick+partialTicks)));
+                    x = (int) (px(0)+((32-gui.getFont().width(id.dimName.get(j)))/2f) + transX);
                     y = (py(0, partyIndex)+(j*gui.getFont().lineHeight)+1)+((int)((32-gui.getFont().lineHeight*id.dimName.size())/2f));
                     gui.getFont().draw(poseStack, id.dimName.get(j), x, y, 0xfff390 | (255 - (255*currTick/10) << 24));
-                    gui.getFont().drawShadow(poseStack, id.dimName.get(j), px(0)+((int)((32-gui.getFont().width(id.dimName.get(j)))/2f)), y, 0xfff390 | (255 - (255*currTick/10) << 24));
+                    gui.getFont().drawShadow(poseStack, id.dimName.get(j), x, y, 0xfff390 | (255 - (255*currTick/10) << 24));
                 }
             }
 

@@ -274,9 +274,9 @@ public class ClientPlayerData {
         List<String> dim = Arrays.asList(split);
         List<String> fString = new ArrayList<>();
         if (!dim.contains("the")) {
-            fString.add("The");
+            fString.add("§oThe");
         }
-        dim.forEach(word -> fString.add(word.substring(0, 1).toUpperCase() + word.substring(1)));
+        dim.forEach(word -> fString.add("§o" + word.substring(0, 1).toUpperCase() + word.substring(1)));
         this.dimName = fString;
     }
 
