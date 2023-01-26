@@ -8,6 +8,7 @@ import io.sedu.mc.parties.network.ClientPacketHelper;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
@@ -121,6 +122,13 @@ public class PartyEvent {
     }
 
     @SubscribeEvent
+    public static void onWorldChange(WorldEvent.Load event) {
+        if (event.getWorld().isClientSide()) {
+            ClientPlayerData.updateSelfDim(String.valueOf(((ClientLevel) event.getWorld()).dimension().location()));
+        }
+    }
+
+    @SubscribeEvent
     public static void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) {
         ResourceKey<Level> l = event.getTo();
         System.out.println(l.getRegistryName());
@@ -171,7 +179,7 @@ public class PartyEvent {
     public static void onEntityHealed(LivingHealEvent event) {
         if (!event.getEntityLiving().level.isClientSide()) {
             HashMap<UUID, Boolean> trackers;
-            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+            if (event.getEntity() instanceof Player p && !p.isDeadOrDying() && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
                 trackers.forEach((id, serverTracked) -> {
                     if (serverTracked) {
                         if (event.getAmount() != 0f) {
@@ -188,14 +196,13 @@ public class PartyEvent {
     public static void onEntityDeath(LivingDeathEvent event) {
         if (!event.getEntityLiving().level.isClientSide()) {
             HashMap<UUID, Boolean> trackers;
-            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
-                trackers.keySet().forEach(id -> InfoPacketHelper.sendDeath(id, p.getUUID()));
+            if (event.getEntity() instanceof Player p) {
+                InfoPacketHelper.sendDeath((ServerPlayer)p);
+                if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                    trackers.keySet().forEach(id -> InfoPacketHelper.sendDeath(id, p.getUUID()));
+                }
             }
-        } else {
-            UUID id;
-            if (ClientPlayerData.partySize() > 0 && event.getEntityLiving().getUUID().equals(id = Minecraft.getInstance().player.getUUID())) {
-                ClientPlayerData.playerList.get(id).markDead();
-            }
+
         }
     }
 
@@ -203,8 +210,16 @@ public class PartyEvent {
     public static void onEntityRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (!event.getEntityLiving().level.isClientSide()) {
             HashMap<UUID, Boolean> trackers;
-            if ((trackers = PlayerData.playerTrackers.get(event.getPlayer().getUUID())) != null) {
-                trackers.keySet().forEach(id -> InfoPacketHelper.sendAlive(id, event.getPlayer().getUUID()));
+            UUID p;
+            InfoPacketHelper.sendLife((ServerPlayer) event.getPlayer());
+            if ((trackers = PlayerData.playerTrackers.get(p = event.getPlayer().getUUID())) != null) {
+                trackers.forEach((id, serverTrack) -> {
+                    InfoPacketHelper.sendAlive(id, p);
+                    if (serverTrack)
+                        InfoPacketHelper.forceUpdate(id, p, false);
+                    InfoPacketHelper.sendDim(id, p, event.getEntityLiving().level.dimension().location());
+
+                });
             }
         }
     }

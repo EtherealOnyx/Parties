@@ -48,12 +48,14 @@ public class InfoPacketHelper {
         sendData(getServerPlayer(sendTo), levelOf, 6, levels);
     }
 
-    public static void forceUpdate(UUID sendTo, UUID propOf) {
+    public static void forceUpdate(UUID sendTo, UUID propOf, boolean withDim) {
         if (sendTo.equals(propOf))
             return;
         ServerPlayer p;
         if ((p = PlayerData.playerList.get(propOf).getPlayer()) != null) {
             InfoPacketHelper.sendData(getServerPlayer(sendTo), propOf, p.getHealth(), p.getMaxHealth(), p.getAbsorptionAmount(), p.getArmorValue(), p.getFoodData().getFoodLevel(), p.experienceLevel);
+            if (withDim)
+                InfoPacketHelper.sendDim(sendTo, propOf, getServerPlayer(propOf).level.dimension().location());
         }
     }
 
@@ -73,5 +75,13 @@ public class InfoPacketHelper {
 
     public static void sendDim(UUID sendTo, UUID propOf, ResourceLocation world) {
         PartiesPacketHandler.sendToPlayer(new RenderPacketData(propOf, world), getServerPlayer(sendTo));
+    }
+
+    public static void sendDeath(ServerPlayer p) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(10), p);
+    }
+
+    public static void sendLife(ServerPlayer p) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(11), p);
     }
 }

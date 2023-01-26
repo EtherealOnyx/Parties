@@ -15,9 +15,9 @@ public class RenderPacketData {
 
     RenderPacketData(FriendlyByteBuf buf) {
         this.type = buf.readInt();
-        System.out.println(type);
+        if (type == 10 || type == 11)
+            return;
         player = new UUID(buf.readLong(), buf.readLong());
-        System.out.println(player);
         readData(buf);
     }
 
@@ -46,6 +46,10 @@ public class RenderPacketData {
         this.type = 9;
         this.player = propOf;
         this.data = world.toString();
+    }
+
+    public RenderPacketData(int i) {
+        this.type = i;
     }
 
     private void readData(FriendlyByteBuf buf) {
@@ -106,6 +110,9 @@ public class RenderPacketData {
 
     void encode(FriendlyByteBuf buf) {
         buf.writeInt(type);
+        if (type == 10 || type == 11) {
+            return;
+        }
         buf.writeLong(player.getMostSignificantBits());
         buf.writeLong(player.getLeastSignificantBits());
         writeData(buf);
@@ -131,6 +138,8 @@ public class RenderPacketData {
                 case 7 -> RenderPacketHelper.markDeath(player);
                 case 8 -> RenderPacketHelper.markLife(player);
                 case 9 -> RenderPacketHelper.setDim(player, (String) data);
+                case 10 -> RenderPacketHelper.markDeath();
+                case 11 -> RenderPacketHelper.markLife();
                 default -> {
 
                 }

@@ -29,13 +29,13 @@ public class ServerPacketHelper {
             //Tell party member that new member is Online
             if (isOnline(futureMember)) {
                 PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, futureMember), getServerPlayer(id));
-                InfoPacketHelper.forceUpdate(id, futureMember);
+                InfoPacketHelper.forceUpdate(id, futureMember, true);
             }
 
             //Tell newly online player that this other member is also online.
             if (isOnline(id)) {
                 PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, id), getServerPlayer(futureMember));
-                InfoPacketHelper.forceUpdate(futureMember, id);
+                InfoPacketHelper.forceUpdate(futureMember, id, true);
             }
 
         });
@@ -77,11 +77,11 @@ public class ServerPacketHelper {
                 InfoPacketHelper.sendName(player, id);
                 //Tell party members that this player is now online.
                 PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, player.getUUID()), getServerPlayer(id));
-                InfoPacketHelper.forceUpdate(id, player.getUUID());
+                InfoPacketHelper.forceUpdate(id, player.getUUID(), true);
                 //Tell newly online player that this other member is also online.
                 if (isOnline(id)) {
                     PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, id), player);
-                    InfoPacketHelper.forceUpdate(player.getUUID(), id);
+                    InfoPacketHelper.forceUpdate(player.getUUID(), id, true);
                 }
 
             });

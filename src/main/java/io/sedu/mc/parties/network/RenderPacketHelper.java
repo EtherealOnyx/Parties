@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.client.ClientPlayerData;
+import net.minecraft.client.Minecraft;
 
 import java.util.UUID;
 
@@ -57,5 +58,18 @@ public class RenderPacketHelper {
 
     public static void setDim(UUID player, String data) {
         ClientPlayerData.playerList.get(player).setDim(data);
+    }
+
+    public static void markDeath() {
+        if (ClientPlayerData.partySize() > 0) {
+            markDeath(Minecraft.getInstance().player.getUUID());
+        }
+    }
+
+    public static void markLife() {
+        if (ClientPlayerData.partySize() > 0) {
+            markLife(Minecraft.getInstance().player.getUUID());
+            setDim(Minecraft.getInstance().player.getUUID(), String.valueOf(Minecraft.getInstance().level.dimension().location()));
+        }
     }
 }

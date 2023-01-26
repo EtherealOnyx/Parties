@@ -3,6 +3,7 @@ package io.sedu.mc.parties.client;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+import io.sedu.mc.parties.network.RenderPacketHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
@@ -43,6 +44,7 @@ public class ClientPlayerData {
     short dimAnim = 0;
     boolean dimAnimActive = false;
     List<String> dimName = new ArrayList<>();
+    int dimColor = 0xDDF3FF;
 
     int prevTick = 0;
     int currTick = 0;
@@ -60,9 +62,8 @@ public class ClientPlayerData {
 
     //Client constructor.
     public ClientPlayerData() {
-        dimName.add("Dim");
-        dimName.add("Name");
-        dimName.add("Test");
+        dimName.add("?");
+        dimName.add("?");
         trackedOnClient = false;
         playerName = "???";
     }
@@ -87,7 +88,7 @@ public class ClientPlayerData {
         if (showSelf & (p = Minecraft.getInstance().player) != null)
         {
             ClientPlayerData.addClientMember(p.getUUID());
-            playerList.get(p.getUUID()).setClientPlayer(p);
+            playerList.get(p.getUUID()).setClientPlayer(p).setDimForced(String.valueOf(p.level.dimension().location()));
         }
     }
 
@@ -114,6 +115,12 @@ public class ClientPlayerData {
         playerList.clear();
         playerOrderedList.clear();
         leader = null;
+    }
+
+    public static void updateSelfDim(String data) {
+        if(ClientPlayerData.playerList.size() > 0) {
+            playerList.get(Minecraft.getInstance().player.getUUID()).setDim(data);
+        }
     }
 
     public void setId(UUID uuid) {
@@ -146,7 +153,7 @@ public class ClientPlayerData {
         return trackedOnClient ? clientPlayer.getName().getContents() : playerName;
     }
 
-    public void setClientPlayer(Player entity) {
+    public ClientPlayerData setClientPlayer(Player entity) {
         clientPlayer = entity;
         trackedOnClient = true;
         playerName = entity.getName().getContents();
@@ -161,6 +168,7 @@ public class ClientPlayerData {
         if (health > 0f) markAlive();
         alpha = 1f;
         alphaI = 255;
+        return this;
     }
 
     public void removeClientPlayer() {
@@ -268,6 +276,14 @@ public class ClientPlayerData {
         dimAnim = 100;
     }
 
+    public void setDimForced(String data) {
+        dimension = getWorld(data);
+        oldDimension = dimension;
+        setDimName(data);
+        dimAnimActive = true;
+        dimAnim = 100;
+    }
+
     private void setDimName(String data) {
         data = data.substring(data.indexOf(':')+1).toLowerCase();
         String[] split = data.split("[-_]");
@@ -280,13 +296,22 @@ public class ClientPlayerData {
         this.dimName = fString;
     }
 
-    private static int getWorld(String world) {
-        if (world.equals("minecraft:overworld"))
+    private int getWorld(String world) {
+        if (world.equals("minecraft:overworld")) {
+            dimColor = 0x7CDF9D;
             return 1;
-        if (world.equals("minecraft:nether"))
+        }
+
+        if (world.equals("minecraft:the_nether")) {
+            dimColor = 0xFFDA7A;
             return 2;
-        if (world.equals("minecraft:the_end"))
+        }
+
+        if (world.equals("minecraft:the_end")) {
+            dimColor = 0xCF7CDF;
             return 3;
+        }
+        dimColor = 0xDDF3FF;
         return 0;
     }
 
