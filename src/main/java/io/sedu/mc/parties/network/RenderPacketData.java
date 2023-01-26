@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.network;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.ArrayList;
@@ -40,12 +41,19 @@ public class RenderPacketData {
         this.data = null;
     }
 
+
+    public RenderPacketData(UUID propOf, ResourceLocation world) {
+        this.type = 9;
+        this.player = propOf;
+        this.data = world.toString();
+    }
+
     private void readData(FriendlyByteBuf buf) {
         switch (type) {
             case -1 ->
                     data = new Object[]{buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readInt(),
                             buf.readInt(), buf.readInt()};
-            case 0 -> { //Name
+            case 0, 9 -> { //Name
                 StringBuilder builder = new StringBuilder();
                 while (true) {
                     try {
@@ -59,7 +67,7 @@ public class RenderPacketData {
             case 1, 2, 3 -> {data = buf.readFloat();
                 System.out.println("Data: " + data);
             }
-            case 4, 5, 6, 9 -> {
+            case 4, 5, 6 -> {
                 data = buf.readInt();
                 System.out.println("Data: " + data);
             }
@@ -76,7 +84,7 @@ public class RenderPacketData {
                 buf.writeInt((Integer) ((Object[]) data)[4]);
                 buf.writeInt((Integer) ((Object[]) data)[5]);
             }
-            case 0 -> { //Name
+            case 0, 9 -> { //Name
                 for (int letter : ((String) data).toCharArray()) {
                     buf.writeChar(letter);
                 }
@@ -87,7 +95,7 @@ public class RenderPacketData {
                 System.out.println("Wrote value of: " + data);
             }
 
-            case 4, 5, 6, 9 -> //Armor, Hunger, XP Level
+            case 4, 5, 6 -> //Armor, Hunger, XP Level
             {
                 buf.writeInt((Integer) data);
                 System.out.println("Wrote value of: " + data);
@@ -122,7 +130,7 @@ public class RenderPacketData {
                 case 6 -> RenderPacketHelper.setXp(player, (Integer) data);
                 case 7 -> RenderPacketHelper.markDeath(player);
                 case 8 -> RenderPacketHelper.markLife(player);
-                case 9 -> RenderPacketHelper.setDim(player, (Integer) data);
+                case 9 -> RenderPacketHelper.setDim(player, (String) data);
                 default -> {
 
                 }

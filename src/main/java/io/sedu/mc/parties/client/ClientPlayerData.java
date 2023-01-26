@@ -9,10 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class ClientPlayerData {
     public static HashMap<UUID, ClientPlayerData> playerList = new HashMap<>();
@@ -45,6 +42,8 @@ public class ClientPlayerData {
     Integer oldDimension = 0;
     short dimAnim = 0;
     boolean dimAnimActive = false;
+    List<String> dimName = new ArrayList<>();
+
     int prevTick = 0;
     int currTick = 0;
 
@@ -61,6 +60,9 @@ public class ClientPlayerData {
 
     //Client constructor.
     public ClientPlayerData() {
+        dimName.add("Dim");
+        dimName.add("Name");
+        dimName.add("Test");
         trackedOnClient = false;
         playerName = "???";
     }
@@ -258,11 +260,34 @@ public class ClientPlayerData {
         isDead = false;
     }
 
-    public void setDim(Integer data) {
+    public void setDim(String data) {
         oldDimension = dimension;
-        dimension = data;
+        dimension = getWorld(data);
+        setDimName(data);
         dimAnimActive = true;
         dimAnim = 100;
+    }
+
+    private void setDimName(String data) {
+        data = data.substring(data.indexOf(':')+1).toLowerCase();
+        String[] split = data.split("[-_]");
+        List<String> dim = Arrays.asList(split);
+        List<String> fString = new ArrayList<>();
+        if (!dim.contains("the")) {
+            fString.add("The");
+        }
+        dim.forEach(word -> fString.add(word.substring(0, 1).toUpperCase() + word.substring(1)));
+        this.dimName = fString;
+    }
+
+    private static int getWorld(String world) {
+        if (world.equals("minecraft:overworld"))
+            return 1;
+        if (world.equals("minecraft:nether"))
+            return 2;
+        if (world.equals("minecraft:the_end"))
+            return 3;
+        return 0;
     }
 
     public boolean tickWorldAnim() {

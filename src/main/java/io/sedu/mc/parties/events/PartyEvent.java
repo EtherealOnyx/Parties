@@ -8,10 +8,15 @@ import io.sedu.mc.parties.network.ClientPacketHelper;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.DimensionDefaults;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
@@ -117,6 +122,9 @@ public class PartyEvent {
 
     @SubscribeEvent
     public static void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) {
+        ResourceKey<Level> l = event.getTo();
+        System.out.println(l.getRegistryName());
+
         HashMap<UUID, Boolean> trackers;
         Player p;
         if ((trackers = PlayerData.playerTrackers.get((p = event.getPlayer()).getUUID())) != null) {

@@ -10,6 +10,8 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.gui.IIngameOverlay;
 
+import java.util.ArrayList;
+
 import static io.sedu.mc.parties.client.RenderData.*;
 
 
@@ -91,7 +93,7 @@ public class PartyOverlay {
             if (id.dimAnimActive)  {
                 worldAnim(poseStack, partyIndex, gui, 0, id, partialTicks);
             } else {
-                world(poseStack, partyIndex, gui, 0);
+                world(poseStack, partyIndex, gui, 0, id);
             }
         } else {
             //Missing Health
@@ -192,16 +194,12 @@ public class PartyOverlay {
                 gui.getFont().draw(poseStack, String.valueOf(id.getArmor()), px(3), py(3, partyIndex), 0xDDF3FF | (id.alphaI << 24));
                 //Chicken text
                 gui.getFont().draw(poseStack, String.valueOf(id.getHunger()), px(5), py(5, partyIndex), 0xDDF3FF | (id.alphaI << 24));
-                //Head
-                GuiUtils.drawGradientRect(poseStack.last().pose(), 0, px(0)-1, py(0, partyIndex)-1, px(0)+33, py(0, partyIndex)+33,0x111111 | ((int)(id.alphaI*.75) << 24), 0x555555 | ((int)(id.alphaI*.75) << 24));
-                setup(id.alpha, id.getHead()); //Why does this require setShaderColor again...
-                gui.blit(poseStack, px(0), py(0, partyIndex), 32, 32, 32, 32);
                 //world(poseStack, partyIndex, gui, id.dimension);
                 //Render World
                 if (id.dimAnimActive)  {
                     worldAnim(poseStack, partyIndex, gui, id.dimension, id, partialTicks);
                 } else {
-                    world(poseStack, partyIndex, gui, id.dimension);
+                    world(poseStack, partyIndex, gui, id.dimension, id);
                 }
             } else {
                 //Missing Health
@@ -292,44 +290,100 @@ public class PartyOverlay {
         }
     }
 
-    private static void world(PoseStack poseStack, int partyIndex, ForgeIngameGui gui, int i) {
+    private static void world(PoseStack poseStack, int partyIndex, ForgeIngameGui gui, int i, ClientPlayerData id) {
         //if (i == 0)
             //return;
+        //Head
+        GuiUtils.drawGradientRect(poseStack.last().pose(), 0, px(0)-1, py(0, partyIndex)-1, px(0)+33, py(0, partyIndex)+33,0x111111 | ((int)(id.alphaI*.75) << 24), 0x555555 | ((int)(id.alphaI*.75) << 24));
+        setup(id.alpha, id.getHead()); //Why does this require setShaderColor again...
+        gui.blit(poseStack, px(0), py(0, partyIndex), 32, 32, 32, 32);
+        //End Head
         setWorldShader(poseStack);
         RenderSystem.setShaderColor(1f,1f,1f, .75f);
         poseStack.scale(.25f, .25f, .25f);
         gui.blit(poseStack, (px(0)-10)*4, (py(0, partyIndex)+20)*4, 64*i, 0, 64, 64);
         poseStack.popPose();
+
     }
 
 
 
-    private static void worldAnim(PoseStack poseStack, int partyIndex, ForgeIngameGui gui, int i, ClientPlayerData d, float partialTicks) {
+    private static void worldAnim(PoseStack poseStack, int partyIndex, ForgeIngameGui gui, int i, ClientPlayerData id, float partialTicks) {
         //Parties.LOGGER.debug(gui.getGuiTicks());
-        setWorldShader(poseStack);
         int currTick;
-        if (d.tick(gui.getGuiTicks())) {
-            if (d.tickWorldAnim())
-                d.dimAnimActive = false;
+        float alphaPercent;
+        if (id.tick(gui.getGuiTicks())) {
+            if (id.tickWorldAnim())
+                id.dimAnimActive = false;
         }
-        System.out.println(d.dimAnim);
-        if (d.dimAnim > 90) {
-            currTick = 10 - (d.dimAnim - 90); //30 - 0
+        //System.out.println(id.dimAnim);
+        if (id.dimAnim > 90) {
+            currTick = 10 - (id.dimAnim - 90); //0-10
+            alphaPercent = ((id.dimAnim-80-partialTicks)/20f);
+            GuiUtils.drawGradientRect(poseStack.last().pose(), 0, px(0)-1, py(0, partyIndex)-1, px(0)+33, py(0, partyIndex)+33,0x11111 | (int)((id.alphaI*.75)*alphaPercent) << 24, 0x555555 | (int)((id.alphaI*.75)*alphaPercent) << 24);
+            setup(id.alpha*alphaPercent, id.getHead()); //Why does this require setShaderColor again...
+            gui.blit(poseStack, px(0), py(0, partyIndex), 32, 32, 32, 32);
+            setWorldShader(poseStack);
             RenderSystem.setShaderColor(1f,1f,1f, .75f +  currTick/40f);
             poseStack.scale(.25f+(currTick+partialTicks)/40f, .25f+(currTick+partialTicks)/40f, .25f+(currTick+partialTicks)/40f);
-            gui.blit(poseStack, (int) ((px(0)-10+currTick+partialTicks)*(4-((currTick+partialTicks)/5f))),  /*RenderData.height*i*/ + (int)((py(0, partyIndex)+(20-((currTick+partialTicks)*2f)))*(4-((currTick+partialTicks)/5f))), 64*d.oldDimension, 0, 64, 64);
-        } else if (d.dimAnim > 10) {
-            currTick = d.dimAnim - 10; //80 - 0
+            gui.blit(poseStack, (int) ((px(0)-10+currTick+partialTicks)*(4-((currTick+partialTicks)/5f))),
+                     + (int)((py(0, partyIndex)+(20-((currTick+partialTicks)*2f)))*(4-((currTick+partialTicks)/5f))), 64*id.oldDimension, 0, 64, 64);
+            //Dimension text
+
+        } else if (id.dimAnim > 10) {
+            GuiUtils.drawGradientRect(poseStack.last().pose(), 0, px(0)-1, py(0, partyIndex)-1, px(0)+33, py(0, partyIndex)+33,0x111111 | (int)((id.alphaI*.75)*.5f) << 24, 0x555555 | (int)((id.alphaI*.75)*.5f) << 24);
+            setup(id.alpha*.5f, id.getHead()); //Why does this require setShaderColor again...
+            gui.blit(poseStack, px(0), py(0, partyIndex), 32, 32, 32, 32);
+            setWorldShader(poseStack);
+            currTick = id.dimAnim - 10; //80 - 0
             RenderSystem.setShaderColor(1f,1f,1f, ((currTick+(1*partialTicks))/80f));
             poseStack.scale(.5f, .5f, .5f);
-            gui.blit(poseStack, (px(0))*2, (py(0, partyIndex))*2, 64*d.oldDimension, 0, 64, 64);
+            gui.blit(poseStack, (px(0))*2, (py(0, partyIndex))*2, 64*id.oldDimension, 0, 64, 64);
             RenderSystem.setShaderColor(1f,1f,1f, 1f - ((currTick+(1*partialTicks))/80f));
-            gui.blit(poseStack, (px(0))*2, (py(0, partyIndex))*2, 64*d.dimension, 0, 64, 64);
-        } else {
-            RenderSystem.setShaderColor(1f,1f,1f, .75f + d.dimAnim/40f);
-            poseStack.scale(.25f+(d.dimAnim-partialTicks)/40f, .25f+(d.dimAnim-partialTicks)/40f, .25f+(d.dimAnim-partialTicks)/40f);
+            gui.blit(poseStack, (px(0))*2, (py(0, partyIndex))*2, 64*id.dimension, 0, 64, 64);
+            int x, y;
+            poseStack.scale(2f, 2f, 2f);
+            if (currTick > 70) {
+                currTick = 10 - (currTick-70); // 0 - 10
+                alphaPercent = (currTick+partialTicks)/10f;
+                Parties.LOGGER.debug((int)(255*alphaPercent));
+                for (int j = 0; j < id.dimName.size(); j++) {
+                    x = px(0)+((int)((32-gui.getFont().width(id.dimName.get(j)))/2f));
+                    y = (py(0, partyIndex)+(j*gui.getFont().lineHeight)+1)+((int)((32-gui.getFont().lineHeight*id.dimName.size())/2f));
+                    gui.getFont().draw(poseStack, id.dimName.get(j), x, y, 0xfff390 | (int)(255*alphaPercent) << 24);
+                    gui.getFont().drawShadow(poseStack, id.dimName.get(j), px(0)+((int)((32-gui.getFont().width(id.dimName.get(j)))/2f)), y, 0xfff390 | (int)(255*alphaPercent) << 24);
+                }
+            } else if (currTick > 10) {
+                currTick = currTick - 10; // 60 - 0
+                for (int j = 0; j < id.dimName.size(); j++) {
+                    x = px(0) + ((int) ((32 - gui.getFont().width(id.dimName.get(j))) / 2f));
+                    y = (py(0, partyIndex) + (j * gui.getFont().lineHeight) + 1) + ((int) ((32 - gui.getFont().lineHeight * id.dimName.size()) / 2f));
+                    gui.getFont().draw(poseStack, id.dimName.get(j), x, y, 0xfff390 | (255 << 24));
+                    gui.getFont().drawShadow(poseStack, id.dimName.get(j), px(0) + ((int) ((32 - gui.getFont()
+                                                                                                    .width(id.dimName.get(j))) / 2f)), y, 0xfff390 | (255 << 24));
+                }
+            } else {
+                currTick = 10 - currTick; // 0 - 10
+                for (int j = 0; j < id.dimName.size(); j++) {
+                    x = px(0)+((int)((32-gui.getFont().width(id.dimName.get(j)))/2f));
+                    y = (py(0, partyIndex)+(j*gui.getFont().lineHeight)+1)+((int)((32-gui.getFont().lineHeight*id.dimName.size())/2f));
+                    gui.getFont().draw(poseStack, id.dimName.get(j), x, y, 0xfff390 | (255 - (255*currTick/10) << 24));
+                    gui.getFont().drawShadow(poseStack, id.dimName.get(j), px(0)+((int)((32-gui.getFont().width(id.dimName.get(j)))/2f)), y, 0xfff390 | (255 - (255*currTick/10) << 24));
+                }
+            }
 
-            gui.blit(poseStack, (int) ((px(0)-10+d.dimAnim-partialTicks)*(4-((d.dimAnim-partialTicks)/5f))),  /*RenderData.height*i*/ + (int)((py(0, partyIndex)+(20-((d.dimAnim-partialTicks)*2f)))*(4-((d.dimAnim-partialTicks)/5f))), 64*d.dimension, 0, 64, 64);
+        } else {
+            currTick = 10 - id.dimAnim;
+            alphaPercent = (currTick+partialTicks+10)/20f;
+            GuiUtils.drawGradientRect(poseStack.last().pose(), 0, px(0)-1, py(0, partyIndex)-1, px(0)+33, py(0, partyIndex)+33,0x11111 | (int)((id.alphaI*.75)*alphaPercent) << 24, 0x555555 | (int)((id.alphaI*.75)*alphaPercent) << 24);
+            setup(id.alpha*alphaPercent, id.getHead()); //Why does this require setShaderColor again...
+            gui.blit(poseStack, px(0), py(0, partyIndex), 32, 32, 32, 32);
+            setWorldShader(poseStack);
+            RenderSystem.setShaderColor(1f,1f,1f, .75f + id.dimAnim/40f);
+            poseStack.scale(.25f+(id.dimAnim-partialTicks)/40f, .25f+(id.dimAnim-partialTicks)/40f, .25f+(id.dimAnim-partialTicks)/40f);
+
+            gui.blit(poseStack, (int) ((px(0)-10+id.dimAnim-partialTicks)*(4-((id.dimAnim-partialTicks)/5f))),
+                     + (int)((py(0, partyIndex)+(20-((id.dimAnim-partialTicks)*2f)))*(4-((id.dimAnim-partialTicks)/5f))), 64*id.dimension, 0, 64, 64);
         }
         poseStack.popPose();
     }

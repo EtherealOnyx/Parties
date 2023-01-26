@@ -55,7 +55,7 @@ public class RenderPacketHelper {
         ClientPlayerData.playerList.get(player).markAlive();
     }
 
-    public static void setDim(UUID player, Integer data) {
+    public static void setDim(UUID player, String data) {
         ClientPlayerData.playerList.get(player).setDim(data);
     }
 }
