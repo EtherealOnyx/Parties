@@ -46,6 +46,10 @@ public class ClientPlayerData {
     List<String> dimName = new ArrayList<>();
     int dimColor = 0xDDF3FF;
 
+    //Potion Effects
+    List<ClientEffect> benefits = new ArrayList<>();
+    List<ClientEffect> debuffs = new ArrayList<>();
+
     int prevTick = 0;
     int currTick = 0;
 
@@ -66,6 +70,13 @@ public class ClientPlayerData {
         dimName.add("?");
         trackedOnClient = false;
         playerName = "???";
+        debuffs.add(new ClientEffect(2, 100));
+        debuffs.add(new ClientEffect(4, 10));
+        debuffs.add(new ClientEffect(9, 65238));
+        benefits.add(new ClientEffect(11, 77));
+        benefits.add(new ClientEffect(10, 555));
+        benefits.add(new ClientEffect(13, 4));
+        benefits.add(new ClientEffect(16,  2147483647));
     }
 
     public static void addClientMember(UUID uuid) {

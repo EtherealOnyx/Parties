@@ -3,17 +3,22 @@ package io.sedu.mc.parties.client;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.gui.IIngameOverlay;
 
-import java.util.ArrayList;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.sedu.mc.parties.client.RenderData.*;
-import static io.sedu.mc.parties.Parties.LOGGER;
 
 
 public class PartyOverlay {
@@ -91,7 +96,37 @@ public class PartyOverlay {
             } else {
                 world(poseStack, partyIndex, gui, id);
             }
-
+            //Debuffs
+            poseStack.pushPose();
+            poseStack.scale(.5f, .5f, .5f);
+            AtomicInteger currBuff = new AtomicInteger();
+            id.debuffs.forEach((effect) -> {
+                RenderSystem.setShaderColor(1f, 1f, 1f,1f);
+                RenderSystem.setShaderTexture(0, AbstractContainerScreen.INVENTORY_LOCATION);
+                gui.blit(poseStack, 124+28*currBuff.get(), 118, 141, 166, 24, 24);
+                TextureAtlasSprite textureatlassprite = Minecraft.getInstance().getMobEffectTextures().get(effect.getEffect());
+                RenderSystem.setShaderTexture(0, textureatlassprite.atlas().location());
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1f);
+                GuiComponent.blit(poseStack, 127+28*currBuff.get(), 121, gui.getBlitOffset(), 18, 18, textureatlassprite);
+                int x = 130+28*currBuff.get()+effect.getOffset();
+                gui.getFont().draw(poseStack, effect.getDisplay(), x, 145, 0xFFC2C2);
+                gui.getFont().drawShadow(poseStack, effect.getDisplay(), x, 145, 0xFFC2C2);
+                currBuff.getAndIncrement();
+            });
+            id.benefits.forEach((effect) -> {
+                RenderSystem.setShaderColor(1f, 1f, 1f,1f);
+                RenderSystem.setShaderTexture(0, AbstractContainerScreen.INVENTORY_LOCATION);
+                gui.blit(poseStack, 124+28*currBuff.get(), 118, 165, 166, 24, 24);
+                TextureAtlasSprite textureatlassprite = Minecraft.getInstance().getMobEffectTextures().get(effect.getEffect());
+                RenderSystem.setShaderTexture(0, textureatlassprite.atlas().location());
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1f);
+                GuiComponent.blit(poseStack, 127+28*currBuff.get(), 121, gui.getBlitOffset(), 18, 18, textureatlassprite);
+                int x = 130+28*currBuff.get()+effect.getOffset();
+                gui.getFont().draw(poseStack, effect.getDisplay(), x, 145, 0xC2FFFD);
+                gui.getFont().drawShadow(poseStack, effect.getDisplay(), x, 145, 0xC2FFFD);
+                currBuff.getAndIncrement();
+            });
+            poseStack.popPose();
         } else {
             //Missing Health
             GuiUtils.drawGradientRect(poseStack.last().pose(), 0, l(0)+1, t(0, partyIndex)+1,r(0), b(0, partyIndex)-1,0xFF450202, 0xFF620909);
@@ -200,6 +235,11 @@ public class PartyOverlay {
                 } else {
                     world(poseStack, partyIndex, gui, id);
                 }
+
+                //Potion Effects
+                //Debuffs
+                //System.out.println("Entered");
+                //
             } else {
                 //Missing Health
                 GuiUtils.drawGradientRect(poseStack.last().pose(), 0, l(0)+1, t(0, partyIndex)+1,r(0), b(0, partyIndex)-1,0xFF450202, 0xFF620909);
