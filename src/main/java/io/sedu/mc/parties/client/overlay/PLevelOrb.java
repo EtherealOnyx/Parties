@@ -12,13 +12,19 @@ public class PLevelOrb extends RenderSelfItem {
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.isOnline)
-            renderSelf(i, id, gui, poseStack, partialTicks);
+        if (id.isOnline) {
+            useAlpha(id.alpha);
+            setup(partyPath);
+            gui.blit(poseStack, x(i) - String.valueOf(id.getLevelForced()).length()*3, y(i), 9, 0, 9, 9);
+            resetColor();
+        }
     }
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+        useAlpha(id.alpha);
         setup(partyPath);
-        gui.blit(poseStack, x(i), y(i), 9, 0, 9, 9);
+        gui.blit(poseStack, x(i) - String.valueOf(id.getLevelForced()).length()*3, y(i), 9, 0, 9, 9);
+        resetColor();
     }
 }

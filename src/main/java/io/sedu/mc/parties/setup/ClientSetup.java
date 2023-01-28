@@ -20,19 +20,21 @@ public class ClientSetup {
         MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientLeave);
         MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientJoin);
 
+        //Icon above all
+        items.add(new PLeaderIcon("p_leader", 34, 33));
+
         //Text
         items.add(new PName("p_name", 46, 9, 0xDDF3FF));
         items.add(new PArmorText("p_armor_t", 57, 20, 0xDDF3FF));
         items.add(new PChickenText("p_chicken_t", 144, 20, 0xDDF3FF));
-        items.add(new PLevelText("p_lvl_t", 26, 42, 0x80FF8B));
+        items.add(new PLevelText("p_lvl_t", 29, 42, 0x80FF8B));
         items.add(new PHealthText("p_health_t", 102, 30, 0xFFE3E3, 0xFFF399, 0x530404));
-        items.add(new PDimIcon("p_dim", 8, 8)); //Includes text!
+        items.add(new PDimIcon("p_dim", 5, 34)); //Includes text!
 
         //Icons
-        items.add(new PLeaderIcon("p_leader", 34, 33));
         items.add(new PArmor("p_armor_i", 46, 19));
         items.add(new PChicken("p_chicken_i", 132, 19));
-        items.add(new PLevelOrb("p_lvl", 16, 41));
+        items.add(new PLevelOrb("p_lvl", 19, 41));
 
         //Containers
         items.add(new PHead("p_head", 8, 8));

@@ -45,6 +45,7 @@ public class ClientPlayerData {
     boolean dimAnimActive = false;
     List<String> dimName = new ArrayList<>();
     int dimColor = 0xDDF3FF;
+    int oldDimColor = 0xDDF3FF;
 
     //Potion Effects
     List<ClientEffect> benefits = new ArrayList<>();
@@ -312,6 +313,7 @@ public class ClientPlayerData {
     }
 
     private int getWorld(String world) {
+        oldDimColor = dimColor;
         if (world.equals("minecraft:overworld")) {
             dimColor = 0x7CDF9D;
             return 1;

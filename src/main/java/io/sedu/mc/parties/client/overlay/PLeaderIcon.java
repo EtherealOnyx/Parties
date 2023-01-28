@@ -12,8 +12,10 @@ public class PLeaderIcon extends RenderItem {
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isLeader()) {
+            useAlpha(id.alpha);
             setup(partyPath);
             gui.blit(poseStack, x(i), y(i), 0, 0, 9, 9);
+            resetColor();
         }
 
     }

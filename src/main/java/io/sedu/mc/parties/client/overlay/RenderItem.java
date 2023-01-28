@@ -151,6 +151,10 @@ public abstract class RenderItem {
 
     }
 
+    void rectScaled(int i, PoseStack pose, int z, int offset, int startColor, int endColor, float scale) {
+        GuiUtils.drawGradientRect(pose.last().pose(), z, (int) ((l(i)+offset)*scale), (int) ((t(i)+offset)*scale), (int) ((l(i)-offset)*scale)+width, (int)((t(i)-offset)*scale)+height, startColor, endColor);
+    }
+
     void textS(int i, ForgeIngameGui gui, PoseStack p, String text, int color) {
         text(i, gui, p, text, color);
         gui.getFont().drawShadow(p, text, x(i), y(i), color);
@@ -163,5 +167,13 @@ public abstract class RenderItem {
     void textCentered(int i, ForgeIngameGui gui, PoseStack p, String text, int color) {
         gui.getFont().draw(p, text, 1 + x(i) - gui.getFont().width(text)/2f, y(i), color);
         gui.getFont().drawShadow(p, text, 1 + x(i) - gui.getFont().width(text)/2f, y(i), color);
+    }
+
+    static void useAlpha(float alpha) {
+        setColor(1f,1f,1f,alpha);
+    }
+
+    static void resetColor() {
+        setColor(1f,1f,1f,1f);
     }
 }

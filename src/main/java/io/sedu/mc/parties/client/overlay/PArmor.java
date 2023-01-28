@@ -13,8 +13,10 @@ public class PArmor extends RenderSelfItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+        useAlpha(id.alpha);
         setup(Gui.GUI_ICONS_LOCATION);
         gui.blit(poseStack, x(i), y(i), 34, 9, 9, 9);
+        resetColor();
     }
 
     @Override

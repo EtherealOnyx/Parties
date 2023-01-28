@@ -19,7 +19,7 @@ public class PHealth extends RenderSelfItem {
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         //System.out.println(id.getName());
-        setColor(1f, 1f, 1f, id.alpha);
+        useAlpha(id.alpha);
         if (id.isDead) {
             rect(i, poseStack, 0, 0, 0xCC080101, 0xCCA11616);
             rect(i, poseStack, 0, 1, l(i), r(i), 0xFF450202, 0xFF620909);
@@ -41,7 +41,6 @@ public class PHealth extends RenderSelfItem {
         rect(i, poseStack, 0, 1,l(i), currHealthOffset, 0xFFC52C27, 0xFF6C0D15);
         rect(i, poseStack, 0, 1, currHealthOffset-2, r(i), 0xFF450202, 0xFF620909);
         rect(i, poseStack, 0, 1,currHealthOffset-2, fillAbsorptionOffset,  0xCCFFCD42, 0xCCB08610);
-
 
     }
 

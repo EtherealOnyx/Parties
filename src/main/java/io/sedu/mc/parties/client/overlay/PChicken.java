@@ -13,21 +13,24 @@ public class PChicken extends RenderSelfItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        renderChicken(i, gui, poseStack, id.getHungerForced());
+        renderChicken(i, gui, poseStack, id.getHungerForced(), id.alpha);
     }
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isOnline)
-            renderChicken(i, gui, poseStack, id.getHunger());
+            renderChicken(i, gui, poseStack, id.getHunger(), id.alpha);
+
     }
 
-    void renderChicken(int i, ForgeIngameGui gui, PoseStack poseStack, int hunger) {
+    void renderChicken(int i, ForgeIngameGui gui, PoseStack poseStack, int hunger, float alpha) {
+        useAlpha(alpha);
         setup(Gui.GUI_ICONS_LOCATION);
         gui.blit(poseStack, x(i), y(i), 16, 27, 9, 9);
         if (hunger > 16)
             gui.blit(poseStack, x(i), y(i), 52, 27, 9, 9);
         else if (hunger > 4)
             gui.blit(poseStack, x(i), y(i), 61, 27, 9, 9);
+        resetColor();
     }
 }

@@ -14,11 +14,15 @@ public class PLevelText extends RenderSelfItem {
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isOnline)
-            text(i, gui, poseStack, String.valueOf(id.getXpLevel()), color);
+            renderText(gui, poseStack, String.valueOf(id.getXpLevel()), x(i) - String.valueOf(id.getLevelForced()).length()*3, y(i));
     }
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        text(i, gui, poseStack, String.valueOf(id.getLevelForced()), color);
+        renderText(gui, poseStack, String.valueOf(id.getLevelForced()), x(i) - String.valueOf(id.getLevelForced()).length()*3, y(i));
+    }
+
+    private void renderText(ForgeIngameGui g, PoseStack p, String text, int x, int y) {
+        g.getFont().draw(p, text, x, y, color);
     }
 }

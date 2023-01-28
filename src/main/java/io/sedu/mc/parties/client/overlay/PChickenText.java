@@ -13,12 +13,18 @@ public class PChickenText extends RenderSelfItem {
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.isOnline)
-            text(i, gui, poseStack, String.valueOf(id.getHunger()), color);
+        if (id.isOnline) {
+            render(i, gui, poseStack, String.valueOf(id.getHunger()));
+        }
     }
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        text(i, gui, poseStack, String.valueOf(id.getHungerForced()), color);
+        render(i, gui, poseStack, String.valueOf(id.getHungerForced()));
+
+    }
+
+    void render(int i, ForgeIngameGui gui, PoseStack poseStack, String text) {
+        text(i, gui, poseStack, text, color);
     }
 }
