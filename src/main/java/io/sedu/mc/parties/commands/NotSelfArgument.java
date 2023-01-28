@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class NotSelfArgument extends EntityArgument {
-    private boolean partyOnly;
+    private final boolean partyOnly;
 
     protected NotSelfArgument(boolean partyOnly) {
         super(true, true);

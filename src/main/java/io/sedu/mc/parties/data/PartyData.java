@@ -18,9 +18,9 @@ public class PartyData {
     private UUID leader;
 
     //The list of players currently in the party.
-    private ArrayList<UUID> party;
+    private final ArrayList<UUID> party;
 
-    private UUID partyId;
+    private final UUID partyId;
 
     //This party is created by the initiator.
     //They automatically get lead and get added to a party.

@@ -14,6 +14,6 @@ public class ModSetup {
 
     public static void init(FMLCommonSetupEvent event) {
         PartiesPacketHandler.register();
-        ArgumentTypes.register(Parties.MODID + ":notself", NotSelfArgument.class, (ArgumentSerializer) new NotSelfArgument.Serializer());
+        ArgumentTypes.register(Parties.MODID + ":notself", NotSelfArgument.class, new NotSelfArgument.Serializer());
     }
 }

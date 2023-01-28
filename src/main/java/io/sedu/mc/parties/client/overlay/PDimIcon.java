@@ -95,7 +95,7 @@ public class PDimIcon extends RenderSelfItem {
                 alphaPercent = 1f;
                 transX = 20*((currTick-partialTicks)/60f) - 10;
             } else if (currTick > 5) {
-                ; // 5 - 0
+                // 5 - 0
                 alphaPercent = (currTick - partialTicks)/5f;
                 transX = -10-(10-(currTick-partialTicks))*4f;
             } else {

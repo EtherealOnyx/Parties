@@ -1,15 +1,13 @@
 package io.sedu.mc.parties.client.overlay;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.effect.MobEffect;
 
 public class ClientEffect {
+    private final MobEffect type;
     private int duration; //In seconds
     private String display;
     private int offset;
     private char suffix;
-
-    private MobEffect type;
 
     ClientEffect(int type, int duration) {
         this.type = MobEffect.byId(type);
@@ -47,7 +45,7 @@ public class ClientEffect {
         }
         if (suffix == type)
             return;
-        display = String.valueOf(duration/divisor) + type;
+        display = String.valueOf(duration / divisor) + type;
         if (display.length() == 3)
             offset -= 3;
         suffix = type;

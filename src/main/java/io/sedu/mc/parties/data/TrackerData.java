@@ -3,7 +3,7 @@ package io.sedu.mc.parties.data;
 import java.util.UUID;
 
 public class TrackerData {
-    private UUID playerToTrack;
+    private final UUID playerToTrack;
     private boolean trackedOnServer;
 
     public TrackerData(UUID playerToTrack) {

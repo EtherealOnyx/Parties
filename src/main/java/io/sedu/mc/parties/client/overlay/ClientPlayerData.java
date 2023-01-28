@@ -60,7 +60,7 @@ public class ClientPlayerData {
 
 
     private int hunger = 20;
-    private int mana = 1000;
+    private final int mana = 1000;
 
 
 

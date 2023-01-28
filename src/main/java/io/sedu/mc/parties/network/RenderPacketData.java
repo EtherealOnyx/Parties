@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 public class RenderPacketData {
     private UUID player;
-    private int type;
+    private final int type;
     private Object data;
 
     RenderPacketData(FriendlyByteBuf buf) {

@@ -15,7 +15,7 @@ import static io.sedu.mc.parties.Parties.MODID;
 
 @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientSetup {
-    private static List<RenderItem> items = new ArrayList<>();
+    private static final List<RenderItem> items = new ArrayList<>();
     public static void init(final FMLClientSetupEvent event) {
         MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientLeave);
         MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientJoin);

@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 public class ServerPacketData {
 
     private UUID data;
-    private int type;
+    private final int type;
 
     public ServerPacketData(FriendlyByteBuf buf) {
         this.type = buf.readInt();

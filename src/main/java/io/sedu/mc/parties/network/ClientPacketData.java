@@ -9,8 +9,8 @@ import java.util.function.Supplier;
 
 public class ClientPacketData {
 
-    private ArrayList<UUID> list;
-    private int type;
+    private final ArrayList<UUID> list;
+    private final int type;
 
     ClientPacketData(FriendlyByteBuf buf) {
         this.type = buf.readInt();
