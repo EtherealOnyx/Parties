@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.data;
 
-import io.sedu.mc.parties.client.ClientPlayerData;
+import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;

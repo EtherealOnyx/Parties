@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.network;
 
-import io.sedu.mc.parties.client.ClientPlayerData;
+import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import net.minecraft.client.Minecraft;
 
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.client;
+package io.sedu.mc.parties.client.overlay;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.effect.MobEffect;

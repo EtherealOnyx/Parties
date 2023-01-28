@@ -1,9 +1,8 @@
-package io.sedu.mc.parties.client;
+package io.sedu.mc.parties.client.overlay;
 
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-import io.sedu.mc.parties.network.RenderPacketHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +21,7 @@ public class ClientPlayerData {
     //private static int globalIndex;
     //private int partyIndex;
     public Player clientPlayer;
+
     //Client-side functionality.
     boolean isOnline;
     private String playerName;
@@ -55,7 +55,7 @@ public class ClientPlayerData {
 
     //Default to server tracker.
     float alpha = .6f;
-    int alphaI = 216;
+    public int alphaI = 216;
 
 
 
@@ -154,10 +154,14 @@ public class ClientPlayerData {
 
     public void setOnline() {
         isOnline = true;
+        alpha = 1f;
+        alphaI = 255;
     }
 
     public void setOffline() {
         isOnline = false;
+        alpha = .25f;
+        alphaI = 64;
     }
 
     public String getName() {
@@ -340,5 +344,13 @@ public class ClientPlayerData {
             return true;
         }
         return false;
+    }
+
+    public boolean isDead() {
+        return isDead;
+    }
+
+    public boolean isAlive() {
+        return !isDead;
     }
 }

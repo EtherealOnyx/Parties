@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.network;
 
-import io.sedu.mc.parties.client.ClientPlayerData;
+import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.MutableComponent;
@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
 
-import static io.sedu.mc.parties.client.ClientPlayerData.*;
+import static io.sedu.mc.parties.client.overlay.ClientPlayerData.*;
 import static io.sedu.mc.parties.data.Util.getClientPlayer;
 
 public class ClientPacketHelper {

@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.events;
 
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.client.ClientPlayerData;
+import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.network.ClientPacketHelper;
@@ -9,15 +9,12 @@ import io.sedu.mc.parties.network.InfoPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.dimension.DimensionDefaults;
-import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
