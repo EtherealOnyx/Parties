@@ -5,6 +5,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import io.sedu.mc.parties.client.overlay.anim.AnimHandler;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
+import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
@@ -51,6 +52,9 @@ public class ClientPlayerData {
 
     //Dimension Animation
     public DimAnim dim = new DimAnim(100, true);
+
+    //Health Animation
+    //public HealthAnim health = new HealthAnim(10, true);
 
 
 

@@ -30,12 +30,15 @@ public class ClientSetup {
         items.add(new PChickenText("p_chicken_t", 144, 20, 0xDDF3FF));
         items.add(new PLevelText("p_lvl_t", 29, 42, 0x80FF8B));
         items.add(new PHealthText("p_health_t", 102, 30, 0xFFE3E3, 0xFFF399, 0x530404));
+        items.add(new POfflineText("p_offline_t", 82, 20, 0xDDF3FF));
         items.add(new PDimIcon("p_dim", 5, 34)); //Includes text!
 
         //Icons
         items.add(new PArmor("p_armor_i", 46, 19));
         items.add(new PChicken("p_chicken_i", 132, 19));
         items.add(new PLevelOrb("p_lvl", 19, 41));
+        items.add(new POffline("p_offline", 148, 8));
+        items.add(new PAbsorb("p_absorb", 162, 30));
 
         //Containers
         items.add(new PHead("p_head", 8, 8));
