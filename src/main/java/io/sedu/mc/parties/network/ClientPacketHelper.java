@@ -14,10 +14,10 @@ import static io.sedu.mc.parties.data.Util.getClientPlayer;
 
 public class ClientPacketHelper {
 
-    private static final boolean debug = false;
+    private static final boolean debug = true;
     static void msgDebug(MutableComponent msg) {
-        //if (debug)
-            //Minecraft.getInstance().player.sendMessage(msg, Minecraft.getInstance().player.getUUID());
+        if (debug)
+            Minecraft.getInstance().player.sendMessage(msg, Minecraft.getInstance().player.getUUID());
     }
 
     static void msgDebug(String msg) {

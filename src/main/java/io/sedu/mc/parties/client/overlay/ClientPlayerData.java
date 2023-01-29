@@ -3,6 +3,8 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+import io.sedu.mc.parties.client.overlay.anim.AnimHandler;
+import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
@@ -38,25 +40,17 @@ public class ClientPlayerData {
     private int xpLevel = 0;
     boolean isDead = false;
 
-    //Dimension
-    Integer dimension = 0;
-    Integer oldDimension = 0;
-    short dimAnim = 0;
-    boolean dimAnimActive = false;
-    List<String> dimName = new ArrayList<>();
-    int dimColor = 0xDDF3FF;
-    int oldDimColor = 0xDDF3FF;
-
     //Potion Effects
     List<ClientEffect> benefits = new ArrayList<>();
     List<ClientEffect> debuffs = new ArrayList<>();
 
-    int prevTick = 0;
-    int currTick = 0;
 
     //Default to server tracker.
     float alpha = .6f;
     public int alphaI = 216;
+
+    //Dimension Animation
+    public DimAnim dim = new DimAnim(100, true);
 
 
 
@@ -67,8 +61,6 @@ public class ClientPlayerData {
 
     //Client constructor.
     public ClientPlayerData() {
-        dimName.add("?");
-        dimName.add("?");
         trackedOnClient = false;
         playerName = "???";
         debuffs.add(new ClientEffect(2, 100));
@@ -100,14 +92,14 @@ public class ClientPlayerData {
         if (showSelf & (p = Minecraft.getInstance().player) != null)
         {
             ClientPlayerData.addClientMember(p.getUUID());
-            playerList.get(p.getUUID()).setClientPlayer(p).setDimForced(String.valueOf(p.level.dimension().location()));
+            playerList.get(p.getUUID()).setClientPlayer(p).dim.activate(String.valueOf(p.level.dimension().location()), true);
         }
     }
 
     public static void changeLeader(UUID uuid) {
         //Create party of 1 (self) if necessary.
         checkParty();
-        if (leader != null) {
+        if (ClientPlayerData.playerList.get(leader) != null) {
             ClientPlayerData.playerList.get(leader).isLeader = false;
         }
         leader = uuid;
@@ -131,7 +123,7 @@ public class ClientPlayerData {
 
     public static void updateSelfDim(String data) {
         if(ClientPlayerData.playerList.size() > 0) {
-            playerList.get(Minecraft.getInstance().player.getUUID()).setDim(data);
+            playerList.get(Minecraft.getInstance().player.getUUID()).dim.activate(data, false);
         }
     }
 
@@ -155,6 +147,12 @@ public class ClientPlayerData {
 
     public void setOnline() {
         isOnline = true;
+        if (isTrackedOnServer()) {
+            //Default to server tracker.
+            alpha = .6f;
+            alphaI = 216;
+            return;
+        }
         alpha = 1f;
         alphaI = 255;
     }
@@ -282,70 +280,6 @@ public class ClientPlayerData {
 
     public void markAlive() {
         isDead = false;
-    }
-
-    public void setDim(String data) {
-        oldDimension = dimension;
-        dimension = getWorld(data);
-        setDimName(data);
-        dimAnimActive = true;
-        dimAnim = 100;
-    }
-
-    public void setDimForced(String data) {
-        dimension = getWorld(data);
-        oldDimension = dimension;
-        setDimName(data);
-        dimAnimActive = true;
-        dimAnim = 100;
-    }
-
-    private void setDimName(String data) {
-        data = data.substring(data.indexOf(':')+1).toLowerCase();
-        String[] split = data.split("[-_]");
-        List<String> dim = Arrays.asList(split);
-        List<String> fString = new ArrayList<>();
-        if (!dim.contains("the")) {
-            fString.add("§oThe");
-        }
-        dim.forEach(word -> fString.add("§o" + word.substring(0, 1).toUpperCase() + word.substring(1)));
-        this.dimName = fString;
-    }
-
-    private int getWorld(String world) {
-        oldDimColor = dimColor;
-        if (world.equals("minecraft:overworld")) {
-            dimColor = 0x7CDF9D;
-            return 1;
-        }
-
-        if (world.equals("minecraft:the_nether")) {
-            dimColor = 0xFFDA7A;
-            return 2;
-        }
-
-        if (world.equals("minecraft:the_end")) {
-            dimColor = 0xCF7CDF;
-            return 3;
-        }
-        dimColor = 0xDDF3FF;
-        return 0;
-    }
-
-    public boolean tickWorldAnim() {
-        return dimAnim-- <= 0;
-    }
-
-    public boolean update(int guiTicks) {
-        return prevTick != guiTicks;
-    }
-
-    public boolean tick(int guiTicks) {
-        if (currTick != guiTicks) {
-            currTick = guiTicks;
-            return true;
-        }
-        return false;
     }
 
     public boolean isDead() {

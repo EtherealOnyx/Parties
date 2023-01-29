@@ -19,6 +19,7 @@ public class ClientSetup {
     public static void init(final FMLClientSetupEvent event) {
         MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientLeave);
         MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientJoin);
+        MinecraftForge.EVENT_BUS.addListener(PartyEvent::ticker);
 
         //Icon above all
         items.add(new PLeaderIcon("p_leader", 34, 33));

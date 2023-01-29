@@ -2,6 +2,7 @@ package io.sedu.mc.parties.events;
 
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
+import io.sedu.mc.parties.client.overlay.anim.AnimHandler;
 import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.network.ClientPacketHelper;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -24,6 +26,7 @@ import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
@@ -87,11 +90,8 @@ public class PartyEvent {
                     UUID player;
                     int hunger;
                     boolean updateHunger = PlayerData.playerList.get(player = e.player.getUUID()).setHunger(hunger = (e.player.getFoodData().getFoodLevel()));
-                    trackers.forEach((id, serverTracked) -> {
-                        if (updateHunger) {
-                            InfoPacketHelper.sendFood(id, player, hunger);
-                        }
-                    });
+                    if (updateHunger)
+                        trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendFood(id, player, hunger));
                 }
             }
             if (e.player.tickCount % 20 == 7) {
@@ -147,6 +147,11 @@ public class PartyEvent {
         //Reset info.
         System.out.println("Resetting info...");
         ClientPlayerData.addSelf();
+    }
+
+    public static void ticker(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END)
+            AnimHandler.tick();
     }
 
 
@@ -317,4 +322,5 @@ public class PartyEvent {
     public static void RegisterCommands(RegisterCommandsEvent event) {
         PartyCommands.register(event.getDispatcher());
     }
+
 }

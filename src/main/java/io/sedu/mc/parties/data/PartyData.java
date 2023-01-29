@@ -43,8 +43,6 @@ public class PartyData {
     public void addMember(UUID futureMember) {
         //No checks necessary here as they have already been done.
         System.out.println("In addMember()...");
-        ServerPacketHelper.sendNewMember(futureMember, party);
-        System.out.println("Packet sent successfully...");
         //Add future member to party's trackers.
         party.forEach(id -> {
             //Add future member to id's trackers.
@@ -52,6 +50,9 @@ public class PartyData {
             //Add id to future member's trackers.
             addTracker(futureMember, id);
         });
+
+        ServerPacketHelper.sendNewMember(futureMember, party);
+        System.out.println("Packet sent successfully...");
         party.add(futureMember);
         System.out.println("Added member to party...");
         Util.getPlayer(futureMember).addParty(partyId);

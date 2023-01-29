@@ -15,7 +15,7 @@ public class PLevelOrb extends RenderSelfItem {
         if (id.isOnline) {
             useAlpha(id.alpha);
             setup(partyPath);
-            gui.blit(poseStack, x(i) - String.valueOf(id.getLevelForced()).length()*3, y(i), 9, 0, 9, 9);
+            gui.blit(poseStack, x(i) - String.valueOf(id.getXpLevel()).length()*3, y(i), 9, 0, 9, 9);
             resetColor();
         }
     }

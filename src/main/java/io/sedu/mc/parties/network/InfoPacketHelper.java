@@ -20,6 +20,8 @@ public class InfoPacketHelper {
     }
 
     public static void sendData(ServerPlayer sendTo, UUID propOf, int type, Object data) {
+        if (sendTo == null)
+            return;
         if (!sendTo.getUUID().equals(propOf))
             PartiesPacketHandler.sendToPlayer(new RenderPacketData(type, propOf, data), sendTo);
     }
@@ -52,10 +54,10 @@ public class InfoPacketHelper {
         if (sendTo.equals(propOf))
             return;
         ServerPlayer p;
-        if ((p = PlayerData.playerList.get(propOf).getPlayer()) != null) {
+        if ((p = getServerPlayer(propOf)) != null) {
             InfoPacketHelper.sendData(getServerPlayer(sendTo), propOf, p.getHealth(), p.getMaxHealth(), p.getAbsorptionAmount(), p.getArmorValue(), p.getFoodData().getFoodLevel(), p.experienceLevel);
             if (withDim)
-                InfoPacketHelper.sendDim(sendTo, propOf, getServerPlayer(propOf).level.dimension().location());
+                InfoPacketHelper.sendDim(sendTo, propOf, p.level.dimension().location());
         }
     }
 

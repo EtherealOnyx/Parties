@@ -14,7 +14,7 @@ public class PLevelText extends RenderSelfItem {
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isOnline)
-            renderText(gui, poseStack, String.valueOf(id.getXpLevel()), x(i) - String.valueOf(id.getLevelForced()).length()*3, y(i));
+            renderText(gui, poseStack, String.valueOf(id.getXpLevel()), x(i) - String.valueOf(id.getXpLevel()).length()*3, y(i));
     }
 
     @Override
