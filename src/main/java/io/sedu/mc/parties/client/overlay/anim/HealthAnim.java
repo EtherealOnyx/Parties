@@ -6,11 +6,12 @@ public class HealthAnim extends AnimHandler {
     public float max = 20f;
     public float absorb = 0f;
 
-    public float oldL, oldR, curL, curR = 0f;
+    public float oldH, curH, oldA, curA = 0f;
     public float oldCur = 0f;
     public float oldMax = 20f;
     public float oldAbsorb = 0f;
-    public boolean iAnim = true;
+    public boolean hInc = true;
+    public boolean aInc = true;
     public boolean reset = false;
 
     public HealthAnim(int length, boolean enabled) {
@@ -21,15 +22,23 @@ public class HealthAnim extends AnimHandler {
     void activateValues(Object... data) {
         float b1 = getPercent(oldCur, oldMax, oldAbsorb);
         float b2 = getPercent((Float) data[0], (Float) data[1], (Float) data[2]);
-        if (b1 < b2) {
-            iAnim = true;
-            oldL = b1;
-            oldR = curR = curL = b2;
+        hInc = b1 < b2;
+        oldH = b1;
+        curH = b2;
+
+        if ((Float) data[2] > 0) {
+            b1 = getPercentE(oldCur, oldMax, oldAbsorb);
+            b2 = getPercentE((Float) data[0], (Float) data[1], (Float) data[2]);
+            aInc = b1 < b2;
+            oldA = b1;
+            curA = b2;
         } else {
-            iAnim = false;
-            oldL = curL = curR = b2;
-            oldR = b1;
+            oldA = curA = 0;
         }
+
+
+
+
         cur = (Float) data[0];
         max = (Float) data[1];
         absorb = (Float) data[2];
@@ -38,7 +47,7 @@ public class HealthAnim extends AnimHandler {
     @Override
     boolean tickAnim() {
         if (super.tickAnim()) {
-            oldL = curL = oldR = curR = 0f;
+            oldH = curH = 0f;
             oldCur = cur;
             oldMax = max;
             oldAbsorb = absorb;
@@ -61,23 +70,86 @@ public class HealthAnim extends AnimHandler {
     }
 
     public void reset(float pCur, float pMax, float pAbsorb) {
-        System.out.println("Entered");
-        float b2 = getPercent(pCur, pMax, pAbsorb);
-        if (iAnim) {
-            oldR = curR = curL = b2;
+        curH = getPercent(pCur, pMax, pAbsorb);
+        if (hInc) {
+            if (curH < oldH) {
+                hInc = false;
+                animTime = 10;
+            }
         } else {
-            oldL = curL = curR = b2;
+            if (curH > oldH) {
+                hInc = true;
+                animTime = 10;
+            }
         }
 
+        if (pAbsorb > 0) {
+            curA = getPercentE(pCur, pMax, pAbsorb);
+        } else {
+            if (curA == oldA) {
+                oldAbsorb = pAbsorb;
+            }
+        }
+
+
+
         //Slow: animTime = 15. TODO: Add setting.
-        animTime = 10;
+        if (animTime < 11) {
+            animTime = 10;
+        }
+
     }
 
     public static float getPercent(float cur, float max, float absorb) {
         return cur / Math.max(absorb+cur, max);
     }
 
+    public static float getPercentE(float cur, float max, float absorb) {
+        return (cur+absorb) / Math.max(absorb+cur, max);
+    }
+
     public static float getPercentA(float cur, float max, float absorb) {
         return absorb / Math.max(absorb+cur, max);
+    }
+
+    public boolean effH() {
+        return (absorb + cur) > max;
+    }
+
+    public boolean effHOld() {
+        return (oldAbsorb + oldCur) > oldMax;
+    }
+
+    public void checkHealth(float data) {
+        if (data != cur) {
+            if (active) {
+                reset(data, max, absorb);
+            } else {
+                activate(data, max, absorb);
+            }
+            cur = data;
+        }
+    }
+
+    public void checkAbsorb(float data) {
+        if (data != absorb) {
+            if (active) {
+                reset(cur, max, data);
+            } else {
+                activate(cur, max, data);
+            }
+            absorb = data;
+        }
+    }
+
+    public void checkMax(float data) {
+        if (data != max) {
+            if (active) {
+                reset(cur, data, absorb);
+            } else {
+                activate(cur, data, absorb);
+            }
+            max = data;
+        }
     }
 }

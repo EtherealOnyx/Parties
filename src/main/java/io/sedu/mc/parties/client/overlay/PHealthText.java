@@ -24,7 +24,7 @@ public class PHealthText extends RenderSelfItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        /*if (!id.isDead) {
+        if (!id.isDead) {
             if (id.health.absorb > 0) {
                 textCentered(i, gui, poseStack, (int)Math.ceil(id.health.cur+id.health.absorb) + "/" + (int)id.health.max, absorbColor);
             } else {
@@ -32,7 +32,7 @@ public class PHealthText extends RenderSelfItem {
             }
         } else {
             textCentered(i, gui, poseStack, "Dead", deadColor);
-        }*/
+        }
     }
 
 

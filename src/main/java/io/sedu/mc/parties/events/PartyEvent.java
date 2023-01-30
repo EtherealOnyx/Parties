@@ -314,6 +314,27 @@ public class PartyEvent {
     }
 
     @SubscribeEvent
+    public static void onPotionExpired(PotionEvent.PotionExpiryEvent event) {
+        //TODO : Send client data of potion removed.
+        //TODO: Send client data if the entity is being tracked.
+        if (!event.getEntityLiving().level.isClientSide()) {
+            HashMap<UUID, Boolean> trackers;
+            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                trackers.forEach((id, serverTracked) -> {
+                    if (serverTracked) {
+                        //Send Info.
+                        //If it's absorption, remove all absorption.
+                        if (event.getPotionEffect().getEffect() == MobEffects.ABSORPTION) {
+                            InfoPacketHelper.sendAbsorb(id, p.getUUID(), 0f);
+                        }
+
+                    }
+                });
+            }
+        }
+    }
+
+    @SubscribeEvent
     public static void track(PlayerEvent.StartTracking event) {
     }
 

@@ -57,16 +57,30 @@ public class PHealth extends RenderSelfItem {
     }
 
     private void renderHealthAnim(int i, PoseStack poseStack, ClientPlayerData id, float partialTicks) {
-        //L 1 -> .75
-        if (id.health.animTime-partialTicks < 10) {
-            //System.out.println(id.health.animTime-partialTicks);
-            id.health.oldL += (id.health.curL - id.health.oldL) * animPos(10 - id.health.animTime, partialTicks, true, 10, 1);
-            id.health.oldR += (id.health.curR - id.health.oldR) * animPos(10 - id.health.animTime, partialTicks, true, 10, 1);
+        if (id.health.animTime - partialTicks < 10) {
+            id.health.oldH += (id.health.curH - id.health.oldH) * animPos(10 - id.health.animTime, partialTicks, true, 10, 1);
+            id.health.oldA += (id.health.curA - id.health.oldA) * animPos(10 - id.health.animTime, partialTicks, true, 10, 1);
         }
-        if (id.health.iAnim)
-            rectB(poseStack, i, 0, id.health.oldL, id.health.oldR, 0xFFC5FFFF, 0xFF6CFFFF);
+
+        if (id.health.hInc) {
+            if (id.health.effHOld())
+                rectB(poseStack, i, 0, id.health.oldH, id.health.curH, 0xFFFFCD72, 0xFFB08672);
+            else
+                rectB(poseStack, i, 0, id.health.oldH, id.health.curH, 0xFFC5FFC5, 0xFF6CFF6C);
+
+        } else {
+            if (id.health.effH())
+                rectB(poseStack, i, 0, id.health.curH, id.health.oldH, 0xFFFFCD72, 0xFFB08672);
+            else
+                rectB(poseStack, i, 0, id.health.curH, id.health.oldH, 0xFFFFC5C5, 0xFFFF6C6C);
+
+        }
+
+        if (id.health.aInc)
+            rectB(poseStack, i, 0, id.health.oldA, id.health.curA, 0xFFFFCD72, 0xFFB08672);
         else
-            rectB(poseStack, i, 0, id.health.oldL, id.health.oldR, 0xFFC52C27, 0xFF6CFFFF);
+            rectB(poseStack, i, 0, id.health.curA, id.health.oldA, 0xFFFFCD72, 0xFFB08672);
+
     }
 
 

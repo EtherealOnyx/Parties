@@ -238,12 +238,11 @@ public class ClientPlayerData {
     }
 
     public void setHealth(float data) {
-        health.cur = data;
-        System.out.println("Health for " + playerName + " is " + health);
+        health.checkHealth(data);
     }
 
     public void setAbsorb(float data) {
-        health.absorb = data;
+        health.checkAbsorb(data);
     }
 
     public void setArmor(int data) {
@@ -259,7 +258,7 @@ public class ClientPlayerData {
     }
 
     public void setMaxHealth(float max) {
-        health.max = max;
+        health.checkMax(max);
     }
 
     public void markDead() {
