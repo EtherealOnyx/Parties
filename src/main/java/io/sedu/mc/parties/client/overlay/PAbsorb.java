@@ -14,7 +14,7 @@ public class PAbsorb extends RenderSelfItem {
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         useAlpha(id.alpha);
-        if (id.getHealth() + id.getAbsorb() > id.getMaxHealth() && !id.isDead) {
+        if (/*id.health.effH() > id.health.max &&*/ !id.isDead) {
             setup(Gui.GUI_ICONS_LOCATION);
             gui.blit(poseStack,x(i), y(i)-1, 16, 0, 9, 9);
             gui.blit(poseStack,x(i), y(i)-1, 160, 0, 9, 9);

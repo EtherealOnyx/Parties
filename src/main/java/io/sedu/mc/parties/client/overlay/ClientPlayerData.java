@@ -34,9 +34,6 @@ public class ClientPlayerData {
     private ResourceLocation skinLoc = null;
 
     //PlayerData
-    private float health = 20f;
-    private float maxHealth = 20f;
-    private float absorb = 0f;
     private int armor = 0;
     private int xpLevel = 0;
     boolean isDead = false;
@@ -54,7 +51,7 @@ public class ClientPlayerData {
     public DimAnim dim = new DimAnim(100, true);
 
     //Health Animation
-    //public HealthAnim health = new HealthAnim(10, true);
+    public HealthAnim health = new HealthAnim(20, true);
 
 
 
@@ -179,11 +176,9 @@ public class ClientPlayerData {
         if (skinLoc == null) {
             setSkin(playerName);
         }
-        health = entity.getHealth();
-        maxHealth = entity.getMaxHealth();
+        health.activate(entity.getHealth(), entity.getMaxHealth(), entity.getAbsorptionAmount());
         armor = entity.getArmorValue();
-        absorb = entity.getAbsorptionAmount();
-        if (health > 0f) markAlive();
+        if (health.cur > 0f) markAlive();
         alpha = 1f;
         alphaI = 255;
         return this;
@@ -213,20 +208,9 @@ public class ClientPlayerData {
         return skinLoc == null ? DefaultPlayerSkin.getDefaultSkin() : skinLoc;
     }
 
-    public float getHealth() {
-        return clientPlayer!= null ? clientPlayer.getHealth() : health;
-    }
-
-    public float getMaxHealth() {
-        return clientPlayer!= null ? clientPlayer.getMaxHealth() : maxHealth;
-    }
 
     public int getArmor() {
         return clientPlayer!= null ? clientPlayer.getArmorValue() : armor;
-    }
-
-    public float getAbsorb() {
-        return clientPlayer!= null ? clientPlayer.getAbsorptionAmount() : absorb;
     }
 
     public int getHunger() {
@@ -254,12 +238,12 @@ public class ClientPlayerData {
     }
 
     public void setHealth(float data) {
-        health = data;
+        health.cur = data;
         System.out.println("Health for " + playerName + " is " + health);
     }
 
     public void setAbsorb(float data) {
-        absorb = data;
+        health.absorb = data;
     }
 
     public void setArmor(int data) {
@@ -275,7 +259,7 @@ public class ClientPlayerData {
     }
 
     public void setMaxHealth(float max) {
-        maxHealth = max;
+        health.max = max;
     }
 
     public void markDead() {
@@ -292,5 +276,11 @@ public class ClientPlayerData {
 
     public boolean isAlive() {
         return !isDead;
+    }
+
+    public void tick() {
+        if (trackedOnClient)
+            health.checkAnim(clientPlayer.getHealth(), clientPlayer.getMaxHealth(), clientPlayer.getAbsorptionAmount());
+        //System.out.println(clientPlayer.getHealth());
     }
 }

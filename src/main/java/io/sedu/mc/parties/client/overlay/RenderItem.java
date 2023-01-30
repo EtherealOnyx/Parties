@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import io.sedu.mc.parties.Parties;
 import net.minecraft.client.gui.Gui;
@@ -139,20 +139,50 @@ public abstract class RenderItem {
     }
 
     void rect(int i, PoseStack pose, int z, int offset, int startColor, int endColor, int alpha) {
-        GuiUtils.drawGradientRect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor | (alpha << 24), endColor | (alpha << 24));
+        drawRect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor | (alpha << 24), endColor | (alpha << 24));
     }
 
     void rect(int i, PoseStack pose, int z, int offset, int startColor, int endColor) {
-        GuiUtils.drawGradientRect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor, endColor);
+        drawRect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor, endColor);
     }
 
     void rect(int i, PoseStack pose, int z, int offset, int l, int r, int startColor, int endColor) {
-        GuiUtils.drawGradientRect(pose.last().pose(), z, l+offset, t(i)+offset, r-offset, b(i)-offset, startColor, endColor);
+        drawRect(pose.last().pose(), z, l+offset, t(i)+offset, r-offset, b(i)-offset, startColor, endColor);
 
     }
 
     void rectScaled(int i, PoseStack pose, int z, int offset, int startColor, int endColor, float scale) {
-        GuiUtils.drawGradientRect(pose.last().pose(), z, (int) ((l(i)+offset)*scale), (int) ((t(i)+offset)*scale), (int) ((l(i)-offset)*scale)+width, (int)((t(i)-offset)*scale)+height, startColor, endColor);
+        drawRect(pose.last().pose(), z, (int) ((l(i)+offset)*scale), (int) ((t(i)+offset)*scale), (int) ((l(i)-offset)*scale)+width, (int)((t(i)-offset)*scale)+height, startColor, endColor);
+    }
+
+    public static void drawRect(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int startColor, int endColor)
+    {
+        float startAlpha = (float)(startColor >> 24 & 255) / 255.0F;
+        float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
+        float startGreen = (float)(startColor >>  8 & 255) / 255.0F;
+        float startBlue  = (float)(startColor       & 255) / 255.0F;
+        float endAlpha   = (float)(endColor   >> 24 & 255) / 255.0F;
+        float endRed     = (float)(endColor   >> 16 & 255) / 255.0F;
+        float endGreen   = (float)(endColor   >>  8 & 255) / 255.0F;
+        float endBlue    = (float)(endColor         & 255) / 255.0F;
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, right,    top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  left,    top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  left, bottom, zLevel).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
+        buffer.vertex(mat, right, bottom, zLevel).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
     }
 
     void textS(int i, ForgeIngameGui gui, PoseStack p, String text, int color) {
@@ -175,5 +205,9 @@ public abstract class RenderItem {
 
     static void resetColor() {
         setColor(1f,1f,1f,1f);
+    }
+
+    static float animPos(int currTick, float partialTicks, boolean countingUp, int animLength, float scaleFactor) {
+        return (float) (countingUp ? Math.pow((currTick+partialTicks)/animLength, scaleFactor) : Math.pow((currTick-partialTicks)/animLength, scaleFactor));
     }
 }

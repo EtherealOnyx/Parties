@@ -150,8 +150,11 @@ public class PartyEvent {
     }
 
     public static void ticker(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END)
+        if (event.phase == TickEvent.Phase.END) {
             AnimHandler.tick();
+            ClientPlayerData.playerList.values().forEach(ClientPlayerData::tick);
+        }
+
     }
 
 

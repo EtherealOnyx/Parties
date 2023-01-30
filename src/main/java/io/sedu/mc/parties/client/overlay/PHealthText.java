@@ -24,15 +24,15 @@ public class PHealthText extends RenderSelfItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (!id.isDead) {
-            if (id.getAbsorb() > 0) {
-                textCentered(i, gui, poseStack, (int)Math.ceil(id.getHealth()+id.getAbsorb()) + "/" + (int)id.getMaxHealth(), absorbColor);
+        /*if (!id.isDead) {
+            if (id.health.absorb > 0) {
+                textCentered(i, gui, poseStack, (int)Math.ceil(id.health.cur+id.health.absorb) + "/" + (int)id.health.max, absorbColor);
             } else {
-                textCentered(i, gui, poseStack, (int)Math.ceil(id.getHealth()) + "/" + (int)id.getMaxHealth(), color);
+                textCentered(i, gui, poseStack, (int)Math.ceil(id.health.cur) + "/" + (int)id.health.max, color);
             }
         } else {
             textCentered(i, gui, poseStack, "Dead", deadColor);
-        }
+        }*/
     }
 
 

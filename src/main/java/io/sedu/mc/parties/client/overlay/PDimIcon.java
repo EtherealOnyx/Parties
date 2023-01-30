@@ -103,9 +103,7 @@ public class PDimIcon extends RenderSelfItem {
         resetColor();
     }
 
-    private float animPos(int currTick, float partialTicks, boolean countingUp, int animLength, float scaleFactor) {
-        return (float) (countingUp ? Math.pow((currTick+partialTicks)/animLength, scaleFactor) : Math.pow((currTick-partialTicks)/animLength, scaleFactor));
-    }
+
 
     private void doTextRender(int partyIndex, ForgeIngameGui gui, PoseStack poseStack, int currTick, float partialTicks, List<String> name, int color) {
         int x, y;
