@@ -32,7 +32,7 @@ public class PartyHelper {
 
     //This adds the player to the given party.
     public static boolean addPlayerToParty(UUID futureMember, PartyData currentParty) {
-        System.out.println("In addPlayerToParty()...");
+        
         currentParty.addMember(futureMember);
         return true;
     }
@@ -40,7 +40,7 @@ public class PartyHelper {
     //Kicks player from party.
     public static boolean kickPlayer(UUID initiator, UUID removedMember) {
         if (!inSameParty(initiator, removedMember)) {
-            System.out.println("Target is not in your party!");
+            
             return false;
         }
         return removePlayerFromParty(removedMember, true);
@@ -67,9 +67,9 @@ public class PartyHelper {
 
     public static void questionPlayer(UUID initiator, UUID futureMember) {
         //This checks if futureMember is a valid player that exists on the server.
-        System.out.println("Questioned player..");
+        
         if (verifyRequest(initiator, futureMember) && !getPlayer(futureMember).isInviter(initiator)) {
-            System.out.println("Verified player..");
+            
             getPlayer(futureMember).addInviter(initiator);
             //Sends message to futureMember.
             getPlayer(futureMember).getPlayer().sendMessage(
@@ -105,23 +105,23 @@ public class PartyHelper {
 
     private static boolean verifyRequest(UUID initiator, UUID futureMember) {
         if (getPlayer(futureMember) == null || getPlayer(initiator) == null || initiator.equals(futureMember)) {
-            System.out.println("Target member wasn't valid!");
+            
             return false;
         }
-        System.out.println("Exists Verified");
+        
         //This checks if the target is currently in a party.
         if (getPlayer(futureMember).hasParty()) {
-            System.out.println("Target player already has a party!");
+            
             return false;
         }
-        System.out.println("Party Verified");
+        
 
         if (getPlayer(initiator).hasParty() && !isLeader(initiator)) {
-            System.out.println("You aren't the leader!");
+            
             return false;
         }
 
-        System.out.println("Leader Verified");
+        
         return true;
     }
 

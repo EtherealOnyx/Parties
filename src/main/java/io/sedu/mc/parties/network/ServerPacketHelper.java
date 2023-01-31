@@ -13,7 +13,7 @@ public class ServerPacketHelper {
 
     public static void sendNewMember(UUID futureMember, ArrayList<UUID> party) {
         //Send each member to future party member.
-        System.out.println("Sending to player #1");
+        
         PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, party), getServerPlayer(futureMember));
         //Send each member's properties to future party member.
         party.forEach(id -> {
@@ -22,7 +22,7 @@ public class ServerPacketHelper {
 
         //Send future member to each party member.
         party.forEach(id -> {
-            System.out.println("Sending to player loop");
+            
             PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, futureMember), getServerPlayer(id));
             //Send future member properties to each party member.
             InfoPacketHelper.sendName(id, futureMember);
@@ -41,7 +41,7 @@ public class ServerPacketHelper {
         });
 
         //Send leader to future party member.
-        System.out.println("Sending to player #2");
+        
         PartiesPacketHandler.sendToPlayer(new ClientPacketData(3, getPartyFromMember(party.get(0)).getLeader()),
                                           getServerPlayer(futureMember));
     }
@@ -100,7 +100,7 @@ public class ServerPacketHelper {
     }
 
     public static void trackerToClient(UUID tracker, UUID playerToTrack) {
-        System.out.println("Tracker (" + Util.getName(tracker) + ") is now tracking player (" + Util.getName(playerToTrack) +") on client");
+        
         PlayerData.changeTracker(tracker, playerToTrack, false);
     }
 

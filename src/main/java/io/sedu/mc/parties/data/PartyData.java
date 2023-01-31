@@ -42,7 +42,7 @@ public class PartyData {
 
     public void addMember(UUID futureMember) {
         //No checks necessary here as they have already been done.
-        System.out.println("In addMember()...");
+        
         //Add future member to party's trackers.
         party.forEach(id -> {
             //Add future member to id's trackers.
@@ -52,11 +52,11 @@ public class PartyData {
         });
 
         ServerPacketHelper.sendNewMember(futureMember, party);
-        System.out.println("Packet sent successfully...");
+        
         party.add(futureMember);
-        System.out.println("Added member to party...");
+        
         Util.getPlayer(futureMember).addParty(partyId);
-        System.out.println("Added party id to member...");
+        
 
     }
 
@@ -75,7 +75,7 @@ public class PartyData {
     public void removeMember(UUID removedMember, boolean wasKicked) {
         if (!party.remove(removedMember))
             //Some error occured!
-            System.out.println("This should never get here");
+            
         Util.getPlayer(removedMember).removeParty();
         ServerPacketHelper.sendRemoveMember(removedMember, party, wasKicked);
         //Remove previous member from party's trackers.
@@ -86,7 +86,7 @@ public class PartyData {
         });
         //Delete party if necessary.
         if (party.size() == 1) {
-            System.out.println("Party disbanding!");
+            
             disband();
             return;
         }

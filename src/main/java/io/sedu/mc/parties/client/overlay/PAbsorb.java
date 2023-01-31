@@ -16,8 +16,8 @@ public class PAbsorb extends RenderSelfItem {
         if (id.health.effH() && !id.isDead) {
             useAlpha(id.alpha);
             setup(Gui.GUI_ICONS_LOCATION);
-            gui.blit(poseStack,x(i), y(i)-1, 16, 0, 9, 9);
-            gui.blit(poseStack,x(i), y(i)-1, 160, 0, 9, 9);
+            gui.blit(poseStack,x(i), y(i), 16 + (gui.getGuiTicks() >> 3 & 1)*9, 45, 9, 9);
+            gui.blit(poseStack,x(i), y(i), 160,  0, 9, 9);
             resetColor();
         }
 

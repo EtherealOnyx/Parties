@@ -20,7 +20,7 @@ public class PartyCommands {
                 )
             ).then(Commands.literal("accept").then(Commands.argument("initiator", new NotSelfArgument(false)).executes(ctx -> {
                 if (PartyHelper.invitePlayer(EntityArgument.getPlayer(ctx, "initiator").getUUID(), ctx.getSource().getPlayerOrException().getUUID())) {
-                    System.out.println("Party creation success.");
+                    
                     return Command.SINGLE_SUCCESS;
                 }
                 else {
@@ -37,20 +37,20 @@ public class PartyCommands {
             })))
             .then(Commands.literal("kick").then(Commands.argument("member", new NotSelfArgument(true)).executes(ctx -> {
                 if (isLeader(ctx.getSource().getPlayerOrException().getUUID()) && PartyHelper.kickPlayer(ctx.getSource().getPlayerOrException().getUUID(), EntityArgument.getPlayer(ctx, "member").getUUID())) {
-                    System.out.println("Player kick successful.");
+                    
                     return Command.SINGLE_SUCCESS;
                 } else {
-                    System.out.println("Player kick failed!");
+                    
                     return 0;
                 }
             })))
             .then(Commands.literal("leave")
                 .executes(ctx -> {
                   if (PartyHelper.leaveParty(ctx.getSource().getPlayerOrException().getUUID())) {
-                      System.out.println("Player left party successfully.");
+                      
                       return Command.SINGLE_SUCCESS;
                   } else {
-                      System.out.println("Player leaving failed!");
+                      
                       return 0;
                   }
                 }))
@@ -59,10 +59,10 @@ public class PartyCommands {
                     .executes(ctx -> {
                         if (isLeader(ctx.getSource().getPlayerOrException().getUUID()) &&
                                 PartyHelper.giveLeader(EntityArgument.getPlayer(ctx, "member").getUUID())) {
-                            System.out.println("Party leader changed successfully.");
+                            
                             return Command.SINGLE_SUCCESS;
                         } else {
-                            System.out.println("Party leader change failed!");
+                            
                             return 0;
                         }
                     })

@@ -63,7 +63,7 @@ public class PartyEvent {
     public static void onPlayerClone(PlayerEvent.Clone event) {
         if (!event.getPlayer().level.isClientSide) {
             getPlayer(event.getPlayer().getUUID()).setServerPlayer((ServerPlayer) event.getPlayer());//.setOffline();
-            System.out.println("Clone Event for :" + event.getPlayer().getName().getContents());
+            
         }
     }
 
@@ -128,7 +128,7 @@ public class PartyEvent {
     @SubscribeEvent
     public static void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) {
         ResourceKey<Level> l = event.getTo();
-        System.out.println(l.getRegistryName());
+        
 
         HashMap<UUID, Boolean> trackers;
         Player p;
@@ -139,13 +139,13 @@ public class PartyEvent {
 
     public static void onClientLeave(ClientPlayerNetworkEvent.LoggedOutEvent event) {
         //Reset info.
-        System.out.println("Resetting info...");
+        
         ClientPlayerData.resetOnly();
     }
 
     public static void onClientJoin(ClientPlayerNetworkEvent.LoggedInEvent event) {
         //Reset info.
-        System.out.println("Resetting info...");
+        
         ClientPlayerData.addSelf();
     }
 

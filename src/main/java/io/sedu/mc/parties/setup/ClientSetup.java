@@ -38,7 +38,8 @@ public class ClientSetup {
         items.add(new PChicken("p_chicken_i", 132, 19));
         items.add(new PLevelOrb("p_lvl", 19, 41));
         items.add(new POffline("p_offline", 148, 8));
-        items.add(new PAbsorb("p_absorb", 162, 30));
+        items.add(new PAbsorb("p_absorb", 161, 30));
+        items.add(new PDead("p_dead", 161, 30));
 
         //Containers
         items.add(new PHead("p_head", 8, 8));

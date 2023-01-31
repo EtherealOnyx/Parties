@@ -22,14 +22,14 @@ public class RenderPacketData {
     }
 
     public RenderPacketData(int i, UUID propOf, float health, float maxHealth, float absorptionAmount, int armorValue, int foodLevel, int experienceLevel) {
-        System.out.println("Sending packet with TYPE : MASTER");
+        
         this.type = i;
         this.player = propOf;
         data = new Object[]{health, maxHealth, absorptionAmount, armorValue, foodLevel, experienceLevel};
     }
 
     public RenderPacketData(int type, UUID player, Object data) {
-        System.out.println("Sending packet with TYPE : " + type);
+        
         this.type = type;
         this.player = player;
         this.data = data;
@@ -69,11 +69,11 @@ public class RenderPacketData {
                 data = builder.toString();
             }
             case 1, 2, 3 -> {data = buf.readFloat();
-                System.out.println("Data: " + data);
+                
             }
             case 4, 5, 6 -> {
                 data = buf.readInt();
-                System.out.println("Data: " + data);
+                
             }
         }
     }
@@ -96,13 +96,13 @@ public class RenderPacketData {
             case 1, 2, 3 -> //Health, Max Health, Absorb
             {
                 buf.writeFloat((Float) data);
-                System.out.println("Wrote value of: " + data);
+                
             }
 
             case 4, 5, 6 -> //Armor, Hunger, XP Level
             {
                 buf.writeInt((Integer) data);
-                System.out.println("Wrote value of: " + data);
+                
             }
 
         }

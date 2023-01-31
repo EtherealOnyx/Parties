@@ -18,8 +18,6 @@ public class PHealth extends RenderSelfItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        //System.out.println(id.getName());
-        useAlpha(id.alpha);
         if (id.isDead) {
             rect(i, poseStack, 0, 0, 0xCC080101, 0xCCA11616);
             rect(i, poseStack, 0, 1, 0xFF450202, 0xFF620909);
@@ -28,6 +26,8 @@ public class PHealth extends RenderSelfItem {
         renderHealth(i, poseStack, id);
         if (id.health.active)
             renderHealthAnim(i, poseStack, id, partialTicks);
+        //Dimmer
+        rect(i, poseStack, 0, 0, 255 - id.alphaI << 24, 255 - id.alphaI << 24);
 
     }
 

@@ -58,6 +58,8 @@ public class InfoPacketHelper {
             InfoPacketHelper.sendData(getServerPlayer(sendTo), propOf, p.getHealth(), p.getMaxHealth(), p.getAbsorptionAmount(), p.getArmorValue(), p.getFoodData().getFoodLevel(), p.experienceLevel);
             if (withDim)
                 InfoPacketHelper.sendDim(sendTo, propOf, p.level.dimension().location());
+            if (p.isDeadOrDying())
+                InfoPacketHelper.sendDeath(sendTo, propOf);
         }
     }
 

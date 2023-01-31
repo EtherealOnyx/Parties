@@ -31,7 +31,7 @@ public class ClientPacketHelper {
 
 
     private static void error() {
-        System.out.println("Error executing packet task.");
+        
         Thread.dumpStack();
     }
 

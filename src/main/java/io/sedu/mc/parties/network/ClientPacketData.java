@@ -25,20 +25,20 @@ public class ClientPacketData {
     }
 
     public ClientPacketData(int i, ArrayList<UUID> party) {
-        System.out.println("Sending packet with TYPE : " + i);
+        
         this.type = i;
         list = party;
     }
 
     public ClientPacketData(int i, UUID futureMember) {
-        System.out.println("Sending packet with TYPE : " + i);
+        
         list = new ArrayList<>();
         list.add(futureMember);
         this.type = i;
     }
 
     public ClientPacketData(int i) {
-        System.out.println("Sending packet with TYPE : " + i);
+        
         this.type = i;
         list = new ArrayList<>();
     }

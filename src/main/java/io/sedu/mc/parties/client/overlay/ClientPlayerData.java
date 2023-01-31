@@ -178,7 +178,10 @@ public class ClientPlayerData {
         }
         health.activate(entity.getHealth(), entity.getMaxHealth(), entity.getAbsorptionAmount());
         armor = entity.getArmorValue();
-        if (health.cur > 0f) markAlive();
+        if (health.cur > 0f)
+            markAlive();
+        else
+            markDead();
         alpha = 1f;
         alphaI = 255;
         return this;
@@ -280,6 +283,6 @@ public class ClientPlayerData {
     public void tick() {
         if (trackedOnClient)
             health.checkAnim(clientPlayer.getHealth(), clientPlayer.getMaxHealth(), clientPlayer.getAbsorptionAmount());
-        //System.out.println(clientPlayer.getHealth());
+        //
     }
 }
