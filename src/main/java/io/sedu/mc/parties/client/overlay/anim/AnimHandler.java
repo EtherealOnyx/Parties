@@ -27,6 +27,7 @@ public abstract class AnimHandler {
 
         animTime -= 1;
         if (animTime <= 0) {
+            animTime = 0;
             active = false;
             return true;
         }
@@ -37,6 +38,13 @@ public abstract class AnimHandler {
 
 
     public void activate(Object... data) {
+        System.out.println(animTime);
+        if (animTime != 0) {
+            //Already tracked
+            activateValues(data); //Reset anim with new data.
+            animTime = length;
+            return;
+        }
         activateValues(data);
         animTime = length;
         active = true;

@@ -35,13 +35,17 @@ public class HealthAnim extends AnimHandler {
         } else {
             oldA = curA = 0;
         }
-
-
-
-
         cur = (Float) data[0];
         max = (Float) data[1];
         absorb = (Float) data[2];
+    }
+
+    @Override
+    public void activate(Object... data) {
+        activateValues(data);
+        animTime = length;
+        active = true;
+        animTickers.add(this);
     }
 
     @Override

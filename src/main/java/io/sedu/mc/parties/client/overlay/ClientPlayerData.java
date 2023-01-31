@@ -191,7 +191,7 @@ public class ClientPlayerData {
         clientPlayer = null;
         trackedOnClient = false;
         alpha = .6f;
-        alphaI = 216;
+        alphaI = 192;
     }
 
     public boolean isTrackedOnServer() {
