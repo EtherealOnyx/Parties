@@ -3,6 +3,7 @@ package io.sedu.mc.parties.network;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.data.Util;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffect;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -89,6 +90,7 @@ public class ServerPacketHelper {
             PartiesPacketHandler.sendToPlayer(
                     new ClientPacketData(3, getPartyFromMember(player.getUUID()).getLeader()), player);
         }
+        player.getActiveEffects().forEach(effect -> InfoPacketHelper.sendEffect(player.getUUID(), MobEffect.getId(effect.getEffect()), effect.getDuration(), effect.getAmplifier()));
     }
 
     public static void sendOffline(UUID player) {

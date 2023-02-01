@@ -156,4 +156,8 @@ public class HealthAnim extends AnimHandler {
             max = data;
         }
     }
+
+    public float getAbsorb() {
+        return absorb;
+    }
 }

@@ -3,12 +3,16 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-import io.sedu.mc.parties.client.overlay.anim.AnimHandler;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
+import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
+import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
+import io.sedu.mc.parties.network.InfoPacketHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 
@@ -38,10 +42,6 @@ public class ClientPlayerData {
     private int xpLevel = 0;
     boolean isDead = false;
 
-    //Potion Effects
-    List<ClientEffect> benefits = new ArrayList<>();
-    List<ClientEffect> debuffs = new ArrayList<>();
-
 
     //Default to server tracker.
     float alpha = .6f;
@@ -53,7 +53,8 @@ public class ClientPlayerData {
     //Health Animation
     public HealthAnim health = new HealthAnim(20, true);
 
-
+    //Potion Effects
+    public EffectHolder effects = new EffectHolder();
 
     private int hunger = 20;
     private final int mana = 1000;
@@ -64,13 +65,6 @@ public class ClientPlayerData {
     public ClientPlayerData() {
         trackedOnClient = false;
         playerName = "???";
-        debuffs.add(new ClientEffect(2, 100));
-        debuffs.add(new ClientEffect(4, 10));
-        debuffs.add(new ClientEffect(9, 65238));
-        benefits.add(new ClientEffect(11, 77));
-        benefits.add(new ClientEffect(10, 555));
-        benefits.add(new ClientEffect(13, 4));
-        benefits.add(new ClientEffect(16,  2147483647));
     }
 
     public static void addClientMember(UUID uuid) {
@@ -266,6 +260,7 @@ public class ClientPlayerData {
 
     public void markDead() {
         isDead = true;
+        effects.markForRemoval();
     }
 
     public void markAlive() {
@@ -280,9 +275,30 @@ public class ClientPlayerData {
         return !isDead;
     }
 
+    public void addEffect(int type, int duration, int amp) {
+        effects.add(type, (int) Math.ceil(duration/20f), amp);
+        if (MobEffect.byId(type) == MobEffects.ABSORPTION) {
+            float absorb = (amp+1)*4f;
+            if (health.getAbsorb() < absorb)
+                health.checkAbsorb(absorb);
+        }
+
+    }
+
+    public void removeEffect(int type) {
+        effects.markForRemoval(type);
+    }
+
     public void tick() {
         if (trackedOnClient)
             health.checkAnim(clientPlayer.getHealth(), clientPlayer.getMaxHealth(), clientPlayer.getAbsorptionAmount());
-        //
+        //Potion
+        //TODO: Decide if we automatically remove effects or wait for the server to tell us to remove them.
+        //Remove automatically for now.
+    }
+
+    public void slowTick() {
+        if (!isDead)
+            effects.removeIf(ClientEffect::update);
     }
 }

@@ -21,25 +21,28 @@ public class RenderPacketData {
         readData(buf);
     }
 
-    public RenderPacketData(int i, UUID propOf, float health, float maxHealth, float absorptionAmount, int armorValue, int foodLevel, int experienceLevel) {
-        
+    /*public RenderPacketData(int i, UUID propOf, float health, float maxHealth, float absorptionAmount, int armorValue, int foodLevel, int experienceLevel) {
+
         this.type = i;
         this.player = propOf;
         data = new Object[]{health, maxHealth, absorptionAmount, armorValue, foodLevel, experienceLevel};
-    }
+    }*/
 
-    public RenderPacketData(int type, UUID player, Object data) {
+    public RenderPacketData(int type, UUID player, Object... data) {
         
         this.type = type;
         this.player = player;
-        this.data = data;
+        if (data.length == 1)
+            this.data = data[0]; //Remove Unnecessary array.
+        else
+            this.data = data;
     }
 
-    public RenderPacketData(int i, UUID propOf) {
+    /*public RenderPacketData(int i, UUID propOf) {
         this.type = i;
         this.player = propOf;
         this.data = null;
-    }
+    }*/
 
 
     public RenderPacketData(UUID propOf, ResourceLocation world) {
@@ -68,13 +71,9 @@ public class RenderPacketData {
                 }
                 data = builder.toString();
             }
-            case 1, 2, 3 -> {data = buf.readFloat();
-                
-            }
-            case 4, 5, 6 -> {
-                data = buf.readInt();
-                
-            }
+            case 1, 2, 3 -> data = buf.readFloat();
+            case 4, 5, 6, 13 -> data = buf.readInt();
+            case 12 -> data = new Object[]{buf.readInt(), buf.readInt(), buf.readInt()};
         }
     }
 
@@ -99,10 +98,15 @@ public class RenderPacketData {
                 
             }
 
-            case 4, 5, 6 -> //Armor, Hunger, XP Level
+            case 4, 5, 6, 13 -> //Armor, Hunger, XP Level
             {
                 buf.writeInt((Integer) data);
                 
+            }
+            case 12 -> {
+                buf.writeInt((Integer) ((Object[]) data)[0]); //Type
+                buf.writeInt((Integer) ((Object[]) data)[1]); //Duration
+                buf.writeInt((Integer) ((Object[]) data)[2]); //Amp
             }
 
         }
@@ -138,8 +142,10 @@ public class RenderPacketData {
                 case 7 -> RenderPacketHelper.markDeath(player);
                 case 8 -> RenderPacketHelper.markLife(player);
                 case 9 -> RenderPacketHelper.setDim(player, (String) data);
-                case 10 -> RenderPacketHelper.markDeath();
-                case 11 -> RenderPacketHelper.markLife();
+                case 10 -> RenderPacketHelper.markDeath(); //Self
+                case 11 -> RenderPacketHelper.markLife(); //Self
+                case 12 -> RenderPacketHelper.addPotionEffect(player, (Integer) ((Object[]) data)[0], (Integer) ((Object[]) data)[1], (Integer) ((Object[]) data)[2]);
+                case 13 -> RenderPacketHelper.removePotionEffect(player, (Integer) data);
                 default -> {
 
                 }

@@ -49,6 +49,10 @@ public class ClientSetup {
         items.add(new PRectO("p_bg1", 7, 41, 34, 11));
         items.add(new PRectD("p_bg2", 44, 7, 116, 34));
 
+        //Effects
+        //items.add(new PEffects("p_effects", 46, 42, 30, 42, 5, 5));
+        items.add(new PEffectsB("p_effects_b", 46, 42, 30, 42, 7, 7));
+        items.add(new PEffectsD("p_effects_d", 162, 21, 30, 42, 8, 4));
 
 
         items.forEach(RenderItem::register);

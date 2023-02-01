@@ -72,4 +72,13 @@ public class RenderPacketHelper {
             setDim(Minecraft.getInstance().player.getUUID(), String.valueOf(Minecraft.getInstance().level.dimension().location()));
         }
     }
+
+    public static void addPotionEffect(UUID player, int type, int duration, int amp) {
+        ClientPlayerData.playerList.get(player).addEffect(type, duration, amp);
+
+    }
+
+    public static void removePotionEffect(UUID player, int type) {
+        ClientPlayerData.playerList.get(player).removeEffect(type);
+    }
 }

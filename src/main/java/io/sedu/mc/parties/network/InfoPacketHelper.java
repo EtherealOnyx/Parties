@@ -1,8 +1,8 @@
 package io.sedu.mc.parties.network;
 
-import io.sedu.mc.parties.data.PlayerData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffect;
 
 import java.util.UUID;
 
@@ -60,6 +60,9 @@ public class InfoPacketHelper {
                 InfoPacketHelper.sendDim(sendTo, propOf, p.level.dimension().location());
             if (p.isDeadOrDying())
                 InfoPacketHelper.sendDeath(sendTo, propOf);
+            p.getActiveEffects().forEach(effect -> {
+               sendEffect(sendTo, propOf, MobEffect.getId(effect.getEffect()), effect.getDuration(), effect.getAmplifier());
+            });
         }
     }
 
@@ -87,5 +90,23 @@ public class InfoPacketHelper {
 
     public static void sendLife(ServerPlayer p) {
         PartiesPacketHandler.sendToPlayer(new RenderPacketData(11), p);
+    }
+
+    public static void sendEffectExpired(UUID sendTo, UUID propOf, int potionEffect) {
+
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(13, propOf, potionEffect), getServerPlayer(sendTo));
+
+    }
+
+    public static void sendEffect(UUID sendTo, UUID propOf, int type, int duration, int amp) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(12, propOf, type, duration, amp), getServerPlayer(sendTo));
+    }
+
+    public static void sendEffectExpired(UUID sendTo, int id) {
+        sendEffectExpired(sendTo, sendTo, id);
+    }
+
+    public static void sendEffect(UUID sendTo, int id, int duration, int amplifier) {
+        sendEffect(sendTo, sendTo, id, duration, amplifier);
     }
 }

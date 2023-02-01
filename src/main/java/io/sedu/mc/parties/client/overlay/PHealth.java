@@ -33,6 +33,7 @@ public class PHealth extends RenderSelfItem {
 
     private void renderHealth(int i, PoseStack poseStack, ClientPlayerData id) {
 
+
         float hB, aB;
         hB = HealthAnim.getPercent(id.health.cur, id.health.max, id.health.absorb);
         if (id.health.absorb > 0) {

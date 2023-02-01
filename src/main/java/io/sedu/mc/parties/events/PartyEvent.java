@@ -12,6 +12,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
@@ -48,6 +50,9 @@ public class PartyEvent {
             }
             getPlayer(id).setServerPlayer((ServerPlayer) event.getPlayer());//.setOnline();
             ServerPacketHelper.sendOnline((ServerPlayer) event.getPlayer());
+            //Fake damage to update absorption
+            //event.getPlayer().hurt(DamageSource.GENERIC, 0f);
+            System.out.println(event.getPlayer().getAbsorptionAmount());
         }
     }
 
@@ -149,12 +154,14 @@ public class PartyEvent {
         ClientPlayerData.addSelf();
     }
 
+    public static int tick = 0;
     public static void ticker(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             AnimHandler.tick();
             ClientPlayerData.playerList.values().forEach(ClientPlayerData::tick);
+            if (tick++ % 20 == 8)
+                ClientPlayerData.playerList.values().forEach(ClientPlayerData::slowTick);
         }
-
     }
 
 
@@ -273,22 +280,21 @@ public class PartyEvent {
 
     @SubscribeEvent
     public static void onPotionAdded(PotionEvent.PotionAddedEvent event) {
+        System.out.println("Potion Effect Added: " + event.getPotionEffect().getAmplifier() + " | " + event.getPotionEffect().getDuration());
         //TODO : Send client data of potion added.
         //TODO: Send client data if the entity is being tracked.
         if (!event.getEntityLiving().level.isClientSide()) {
-            HashMap<UUID, Boolean> trackers;
-            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
-                trackers.forEach((id, serverTracked) -> {
-                    if (serverTracked) {
-                        //Send Info.
-                        //If it's absorption, send absorption amount:
-                        float absorb;
-                        if (event.getPotionEffect().getEffect() == MobEffects.ABSORPTION && (absorb = (event.getPotionEffect().getAmplifier()+1)*4f) >= p.getAbsorptionAmount()) {
-                            InfoPacketHelper.sendAbsorb(id, p.getUUID(), absorb);
-                        }
-
-                    }
-                });
+            if (event.getEntity() instanceof Player p) {
+                InfoPacketHelper.sendEffect(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()), event.getPotionEffect().getDuration(),
+                                            event.getPotionEffect().getAmplifier());
+                HashMap<UUID, Boolean> trackers;
+                if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                    trackers.forEach((id, serverTracked) -> {
+                        InfoPacketHelper.sendEffect(id, p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()),
+                                                    event.getPotionEffect().getDuration(),
+                                                    event.getPotionEffect().getAmplifier());
+                    });
+                }
             }
         }
     }
@@ -297,18 +303,14 @@ public class PartyEvent {
         //TODO : Send client data of potion removed.
         //TODO: Send client data if the entity is being tracked.
         if (!event.getEntityLiving().level.isClientSide()) {
-            HashMap<UUID, Boolean> trackers;
-            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
-                trackers.forEach((id, serverTracked) -> {
-                    if (serverTracked) {
-                        //Send Info.
-                        //If it's absorption, remove all absorption.
-                        if (event.getPotionEffect().getEffect() == MobEffects.ABSORPTION) {
-                            InfoPacketHelper.sendAbsorb(id, p.getUUID(), 0f);
-                        }
-
-                    }
-                });
+            if (event.getEntity() instanceof Player p) {
+                InfoPacketHelper.sendEffectExpired(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
+                HashMap<UUID, Boolean> trackers;
+                if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                   trackers.forEach((id, serverTracked) -> {
+                        InfoPacketHelper.sendEffectExpired(id, p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
+                    });
+                }
             }
         }
     }
@@ -318,18 +320,14 @@ public class PartyEvent {
         //TODO : Send client data of potion removed.
         //TODO: Send client data if the entity is being tracked.
         if (!event.getEntityLiving().level.isClientSide()) {
-            HashMap<UUID, Boolean> trackers;
-            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
-                trackers.forEach((id, serverTracked) -> {
-                    if (serverTracked) {
-                        //Send Info.
-                        //If it's absorption, remove all absorption.
-                        if (event.getPotionEffect().getEffect() == MobEffects.ABSORPTION) {
-                            InfoPacketHelper.sendAbsorb(id, p.getUUID(), 0f);
-                        }
-
-                    }
-                });
+            if (event.getEntity() instanceof Player p) {
+                InfoPacketHelper.sendEffectExpired(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
+                HashMap<UUID, Boolean> trackers;
+                if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                    trackers.forEach((id, serverTracked) -> {
+                        InfoPacketHelper.sendEffectExpired(id, p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
+                    });
+                }
             }
         }
     }
