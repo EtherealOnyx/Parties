@@ -14,8 +14,6 @@ public class PEffectsD extends PEffects{
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        y = frameY + 21;
-        x = frameX + 162;
         //OverlayRegistry.enableOverlay(ForgeIngameGui.POTION_ICONS_ELEMENT, false);
         if (id.effects.sizeBad() > 0) {
             start(poseStack, i, id.effects.sizeBad());

@@ -50,9 +50,6 @@ public class PartyEvent {
             }
             getPlayer(id).setServerPlayer((ServerPlayer) event.getPlayer());//.setOnline();
             ServerPacketHelper.sendOnline((ServerPlayer) event.getPlayer());
-            //Fake damage to update absorption
-            //event.getPlayer().hurt(DamageSource.GENERIC, 0f);
-            System.out.println(event.getPlayer().getAbsorptionAmount());
         }
     }
 

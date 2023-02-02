@@ -113,9 +113,9 @@ public class EffectHolder {
     public boolean leftMoreThanRight(int left, int right) {
 
         if (effects.get(left).isInstant() && !effects.get(right).isInstant())
-            return true;
-        if (effects.get(right).isInstant() && !effects.get(left).isInstant())
             return false;
+        if (effects.get(right).isInstant() && !effects.get(left).isInstant())
+            return true;
         if (effects.get(right).isInstant() && effects.get(left).isInstant())
                 return !effects.get(right).bene() && effects.get(left).bene();
         if (effects.get(left).cur.duration > effects.get(right).cur.duration) {

@@ -3,6 +3,7 @@ package io.sedu.mc.parties.client.overlay;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 public class PHealth extends RenderSelfItem {
 
@@ -32,8 +33,6 @@ public class PHealth extends RenderSelfItem {
     }
 
     private void renderHealth(int i, PoseStack poseStack, ClientPlayerData id) {
-
-
         float hB, aB;
         hB = HealthAnim.getPercent(id.health.cur, id.health.max, id.health.absorb);
         if (id.health.absorb > 0) {

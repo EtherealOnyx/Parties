@@ -60,9 +60,10 @@ public class InfoPacketHelper {
                 InfoPacketHelper.sendDim(sendTo, propOf, p.level.dimension().location());
             if (p.isDeadOrDying())
                 InfoPacketHelper.sendDeath(sendTo, propOf);
-            p.getActiveEffects().forEach(effect -> {
-               sendEffect(sendTo, propOf, MobEffect.getId(effect.getEffect()), effect.getDuration(), effect.getAmplifier());
-            });
+            else
+                p.getActiveEffects().forEach(effect -> {
+                   sendEffect(sendTo, propOf, MobEffect.getId(effect.getEffect()), effect.getDuration(), effect.getAmplifier());
+                });
         }
     }
 

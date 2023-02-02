@@ -13,9 +13,6 @@ public class PEffectsB extends PEffects{
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        max = 8;
-        maxPerRow = 8;
-        width = 30;
         if (id.effects.sizeBene() > 0) {
             start(poseStack, i, id.effects.sizeBene());
             AtomicInteger iX = new AtomicInteger();

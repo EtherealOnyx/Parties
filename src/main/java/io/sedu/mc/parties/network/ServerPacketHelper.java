@@ -90,7 +90,8 @@ public class ServerPacketHelper {
             PartiesPacketHandler.sendToPlayer(
                     new ClientPacketData(3, getPartyFromMember(player.getUUID()).getLeader()), player);
         }
-        player.getActiveEffects().forEach(effect -> InfoPacketHelper.sendEffect(player.getUUID(), MobEffect.getId(effect.getEffect()), effect.getDuration(), effect.getAmplifier()));
+        if(!player.isDeadOrDying())
+            player.getActiveEffects().forEach(effect -> InfoPacketHelper.sendEffect(player.getUUID(), MobEffect.getId(effect.getEffect()), effect.getDuration(), effect.getAmplifier()));
     }
 
     public static void sendOffline(UUID player) {
