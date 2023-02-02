@@ -7,10 +7,13 @@ import io.sedu.mc.parties.Parties;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import net.minecraftforge.client.gui.OverlayRegistry;
+
+import java.awt.*;
 
 import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 
@@ -52,11 +55,11 @@ public abstract class RenderItem {
         return pOffset*frameW;
     }
 
-    int x(int pOffset) {
+    public int x(int pOffset) {
         return x + wOffset(pOffset);
     }
 
-    int y(int pOffset) {
+    public int y(int pOffset) {
         return y + hOffset(pOffset);
     }
 

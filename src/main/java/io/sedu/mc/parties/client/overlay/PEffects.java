@@ -71,10 +71,10 @@ public class PEffects extends RenderSelfItem {
     void renderEffect(ClientEffect effect, ForgeIngameGui gui, PoseStack poseStack, int i, int iX, int iY, float partialTicks) {
         //BG Border
         if (effect.isInstant() && (gui.getGuiTicks() >> 3 & 1) == 0) {
-            rectInscribedFlash(poseStack.last().pose(), 2, sX(i, iX), sY(i, iY), 26, 26, effect.getEffect()
+            rectInscribedFlash(poseStack.last().pose(), 1, sX(i, iX), sY(i, iY), 26, 26, effect.getEffect()
                                                                                                            .getColor());
         } else {
-            rectInscribed(poseStack.last().pose(), 2, sX(i, iX), sY(i, iY), 26, 26, effect.getEffect()
+            rectInscribed(poseStack.last().pose(), 1, sX(i, iX), sY(i, iY), 26, 26, effect.getEffect()
                                                                                                       .getColor(), effect.bene());
         }
 

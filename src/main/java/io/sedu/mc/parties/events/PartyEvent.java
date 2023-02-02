@@ -5,21 +5,21 @@ import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.anim.AnimHandler;
 import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.client.overlay.gui.HoverScreen;
 import io.sedu.mc.parties.network.ClientPacketHelper;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
+import io.sedu.mc.parties.setup.ClientSetup;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -28,7 +28,6 @@ import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
@@ -129,9 +128,6 @@ public class PartyEvent {
 
     @SubscribeEvent
     public static void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) {
-        ResourceKey<Level> l = event.getTo();
-        
-
         HashMap<UUID, Boolean> trackers;
         Player p;
         if ((trackers = PlayerData.playerTrackers.get((p = event.getPlayer()).getUUID())) != null) {
@@ -161,8 +157,11 @@ public class PartyEvent {
         }
     }
 
-
-
+    public static void keyPress(InputEvent.KeyInputEvent event) {
+        if (ClientSetup.showMouse.getKey().getValue() == event.getKey()) {
+            Minecraft.getInstance().setScreen(ClientSetup.mS.key(ClientSetup.showMouse.getKey().getValue()));
+        }
+    }
 
 
     //Client never receives any hunger updates OR xp level updates from the server for any entity aside from self.

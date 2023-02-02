@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 public class PHealthText extends RenderSelfItem {

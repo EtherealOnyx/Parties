@@ -2,26 +2,38 @@ package io.sedu.mc.parties.setup;
 
 //import io.sedu.mc.parties.client.PartyOverlay;
 import io.sedu.mc.parties.client.overlay.*;
+import io.sedu.mc.parties.client.overlay.gui.HoverScreen;
 import io.sedu.mc.parties.events.PartyEvent;
+import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.OverlayRegistry;
+import net.minecraftforge.client.settings.KeyConflictContext;
+import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.sedu.mc.parties.Parties.MODID;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_ALT;
 
 @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientSetup {
-    private static final List<RenderItem> items = new ArrayList<>();
+
+    public static final KeyMapping showMouse = new KeyMapping(MODID + ".key.hover", GLFW_KEY_LEFT_ALT, KeyMapping.CATEGORY_INTERFACE);
+    public static final List<RenderItem> items = new ArrayList<>();
+
+    public static final HoverScreen mS = new HoverScreen();
     public static void init(final FMLClientSetupEvent event) {
         MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientLeave);
         MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientJoin);
         MinecraftForge.EVENT_BUS.addListener(PartyEvent::ticker);
+        MinecraftForge.EVENT_BUS.addListener(PartyEvent::keyPress);
 
         //Icon above all
         items.add(new PLeaderIcon("p_leader", 34, 33));
@@ -61,6 +73,10 @@ public class ClientSetup {
 
         //Disable Overlays
         OverlayRegistry.enableOverlay(ForgeIngameGui.POTION_ICONS_ELEMENT, false);
+
+        //Register keybinding
+
+        ClientRegistry.registerKeyBinding(showMouse);
         /*final PartyOverlay p = new PartyOverlay();
         p.register();*/
     }

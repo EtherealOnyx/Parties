@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
+import io.sedu.mc.parties.client.overlay.gui.BoundsEntry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.MutableComponent;
@@ -94,28 +95,36 @@ public class ClientPacketHelper {
 
     public static void dropParty() {
         ClientPlayerData.reset();
+        BoundsEntry.elements.clear();
         msg(new TextComponent("You left the party.").withStyle(ChatFormatting.DARK_AQUA));
     }
 
     public static void removePartyMemberDropped(UUID uuid) {
         msg(new TextComponent(getName(uuid)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" left the party.").withStyle(ChatFormatting.DARK_AQUA)));
-        playerList.remove(uuid);
-        playerOrderedList.remove(uuid);
+        remove(uuid);
+    }
+
+    private static void remove(UUID id) {
+        playerList.remove(id);
+        int i = playerOrderedList.indexOf(id);
+        playerOrderedList.remove(id);
+        if (i >= 0) BoundsEntry.elements.values().forEach(boundsEntries -> boundsEntries.remove(i));
     }
 
     public static void dropPartyKicked() {
         ClientPlayerData.reset();
+        BoundsEntry.elements.clear();
         msg(new TextComponent("You have been kicked from the party.").withStyle(ChatFormatting.DARK_AQUA));
     }
 
     public static void removePartyMemberKicked(UUID uuid) {
         msg(new TextComponent(getName(uuid)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" was kicked from the party.").withStyle(ChatFormatting.DARK_AQUA)));
-        playerList.remove(uuid);
-        playerOrderedList.remove(uuid);
+        remove(uuid);
     }
 
     public static void disbandParty() {
         ClientPlayerData.reset();
+        BoundsEntry.elements.clear();
         msg(new TextComponent("Party disbanded.").withStyle(ChatFormatting.DARK_AQUA));
     }
 

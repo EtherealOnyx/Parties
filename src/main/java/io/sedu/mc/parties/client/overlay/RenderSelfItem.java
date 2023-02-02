@@ -27,6 +27,7 @@ public abstract class RenderSelfItem extends RenderItem {
     public void initItem() {
         //If forced items are required and different (i.e, chicken)
         item = (gui, poseStack, partialTicks, width, height) -> {
+            if (ClientPlayerData.playerOrderedList.size() == 0) return;
             renderSelf(0, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0)), gui, poseStack, partialTicks);
             for (int i = 1; i < ClientPlayerData.playerOrderedList.size(); i++) {
                 renderMember(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack, partialTicks);

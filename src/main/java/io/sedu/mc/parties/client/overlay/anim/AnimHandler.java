@@ -1,7 +1,6 @@
 package io.sedu.mc.parties.client.overlay.anim;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public abstract class AnimHandler {
@@ -38,7 +37,6 @@ public abstract class AnimHandler {
 
 
     public void activate(Object... data) {
-        System.out.println(animTime);
         if (animTime != 0) {
             //Already tracked
             activateValues(data); //Reset anim with new data.
