@@ -6,18 +6,22 @@ import com.mojang.math.Matrix4f;
 import io.sedu.mc.parties.Parties;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import net.minecraftforge.client.gui.OverlayRegistry;
 
-import java.awt.*;
+import java.util.List;
 
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseX;
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseY;
 import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 
 public abstract class RenderItem {
+
 
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
     static final ResourceLocation worldPath = new ResourceLocation(Parties.MODID, "textures/worldicons.png");
@@ -27,10 +31,16 @@ public abstract class RenderItem {
     public static int frameH = 56;
     public static int frameW = 0;
 
+    public static int currentY = 0;
+
     int x, y, width, height, l, r, t, b;
     float scale;
     //TODO: Allow alpha changes in config per item?
     float alpha;
+
+    public static void resetPos() {
+        currentY = 0;
+    }
 
     void setDefaults(int x, int y) {
         this.x = x + frameX;
@@ -63,19 +73,19 @@ public abstract class RenderItem {
         return y + hOffset(pOffset);
     }
 
-    int l(int pOffset) {
+    public int l(int pOffset) {
         return l + wOffset(pOffset);
     }
 
-    int r(int pOffset) {
+    public int r(int pOffset) {
         return r + wOffset(pOffset);
     }
 
-    int t(int pOffset) {
+    public int t(int pOffset) {
         return t + hOffset(pOffset);
     }
 
-    int b(int pOffset) {
+    public int b(int pOffset) {
         return b + hOffset(pOffset);
     }
 
@@ -125,15 +135,18 @@ public abstract class RenderItem {
 
     static void setup(float alpha, ResourceLocation loc) {
         setup(loc);
-       setColor(1f, 1f, 1f, alpha);
+        setColor(1f, 1f, 1f, alpha);
     }
     static void setup(ResourceLocation loc) {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.disableDepthTest();
         RenderSystem.enableTexture();
         RenderSystem.setShaderTexture(0, loc);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
+    }
+
+    static void blit(PoseStack p, int x, int y, int u, int v, int w, int h) {
+        GuiUtils.drawTexturedModalRect(p, x, y, u, v, w, h, 0);
     }
 
 
@@ -149,13 +162,43 @@ public abstract class RenderItem {
         drawRect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor, endColor);
     }
 
-    void rect(int i, PoseStack pose, int z, int offset, int l, int r, int startColor, int endColor) {
-        drawRect(pose.last().pose(), z, l+offset, t(i)+offset, r-offset, b(i)-offset, startColor, endColor);
+    void rectCO(PoseStack pose, int z, int offset, int l, int t, int r, int b, int startColor, int endColor) {
+        drawRectCO(pose.last().pose(), z, l+offset, t+offset, r-offset, b-offset, startColor, endColor);
 
     }
 
     void rectScaled(int i, PoseStack pose, int z, int offset, int startColor, int endColor, float scale) {
         drawRect(pose.last().pose(), z, (int) ((l(i)+offset)*scale), (int) ((t(i)+offset)*scale), (int) ((l(i)-offset)*scale)+width, (int)((t(i)-offset)*scale)+height, startColor, endColor);
+    }
+
+    public static void drawRectCO(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int startColor, int endColor)
+    {
+        float startAlpha = 1f;
+        float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
+        float startGreen = (float)(startColor >>  8 & 255) / 255.0F;
+        float startBlue  = (float)(startColor       & 255) / 255.0F;
+        float endAlpha   = 1f;
+        float endRed     = (float)(endColor   >> 16 & 255) / 255.0F;
+        float endGreen   = (float)(endColor   >>  8 & 255) / 255.0F;
+        float endBlue    = (float)(endColor         & 255) / 255.0F;
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, right,    top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  left,    top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  left, bottom, zLevel).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
+        buffer.vertex(mat, right, bottom, zLevel).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
     }
 
     public static void drawRect(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int startColor, int endColor)
@@ -213,4 +256,60 @@ public abstract class RenderItem {
     static float animPos(int currTick, float partialTicks, boolean countingUp, int animLength, float scaleFactor) {
         return (float) (countingUp ? Math.pow((currTick+partialTicks)/animLength, scaleFactor) : Math.pow((currTick-partialTicks)/animLength, scaleFactor));
     }
+
+    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, MutableComponent text, int outStart, int outEnd, int inStart, int inEnd, int textColor) {
+
+        poseStack.pushPose();
+        poseStack.translate(0, 0, 400);
+        rectCO(poseStack, 0, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+gui.getFont().width(text)+offsetX, currentY+mouseY()+(gui.getFont().lineHeight)+offsetY, outStart, outEnd);
+        rectCO(poseStack, 0, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+gui.getFont().width(text)+offsetX, currentY+mouseY()+(gui.getFont().lineHeight)+offsetY, inStart, inEnd);
+        gui.getFont().draw(poseStack, text, mouseX()+offsetX, currentY+mouseY()+1, textColor);
+        gui.getFont().drawShadow(poseStack, text, mouseX()+offsetX, currentY+mouseY()+1, textColor);
+        poseStack.popPose();
+
+        currentY += gui.getFont().lineHeight+offsetY+8;
+
+    }
+
+    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, String text, int outStart, int outEnd, int inStart, int inEnd, int textColor) {
+        renderTooltip(poseStack, gui, offsetX, offsetY, new TextComponent(text), outStart, outEnd, inStart, inEnd, textColor);
+    }
+
+    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, String text, int outStart, int outEnd, int textColor) {
+        renderTooltip(poseStack, gui, offsetX, offsetY, new TextComponent(text), outStart, outEnd, 0x140514, 0x140514, textColor);
+    }
+
+    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, MutableComponent text, int outStart, int outEnd, int textColor) {
+        renderTooltip(poseStack, gui, offsetX, offsetY, text, outStart, outEnd, 0x140514, 0x140514, textColor);
+    }
+
+    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, List<ColorComponent> text, int outStart, int outEnd, int inStart, int inEnd) {
+        poseStack.pushPose();
+        poseStack.translate(0, 0, 400);
+        int max = 0;
+        int y = 0;
+        for (ColorComponent c : text) {
+            gui.getFont().draw(poseStack, c.c, mouseX()+offsetX, currentY+mouseY()+1+y, c.color);
+            gui.getFont().drawShadow(poseStack, c.c, mouseX()+offsetX, currentY+mouseY()+1+y, c.color);
+            max = Math.max(max, gui.getFont().width(c.c));
+            y += gui.getFont().lineHeight+offsetY;
+        }
+        rectCO(poseStack, -1, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+max+offsetX, currentY+mouseY()+y+offsetY, outStart, outEnd);
+        rectCO(poseStack, -1, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+max+offsetX, currentY+mouseY()+y+offsetY, inStart, inEnd);
+        poseStack.popPose();
+        currentY += y+8;
+    }
+
+    static class ColorComponent {
+        static final ColorComponent EMPTY = new ColorComponent(new TextComponent(""), 0);
+        MutableComponent c;
+        int color;
+
+        ColorComponent(MutableComponent c, int color) {
+            this.color = color;
+            this.c = c;
+        }
+    }
+
+
 }

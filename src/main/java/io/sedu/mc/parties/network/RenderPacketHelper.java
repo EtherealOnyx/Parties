@@ -1,7 +1,6 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import net.minecraft.client.Minecraft;
 
 import java.util.UUID;
@@ -59,7 +58,6 @@ public class RenderPacketHelper {
 
     public static void setDim(UUID player, String data) {
         ClientPlayerData.playerList.get(player).dim.activate(data, false);
-        DimAnim.updateBounds(ClientPlayerData.playerOrderedList.indexOf(player));
     }
 
     public static void markDeath() {

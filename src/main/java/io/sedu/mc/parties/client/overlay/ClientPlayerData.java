@@ -7,7 +7,6 @@ import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
-import io.sedu.mc.parties.network.InfoPacketHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
@@ -17,7 +16,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class ClientPlayerData {
     public static HashMap<UUID, ClientPlayerData> playerList = new HashMap<>();
@@ -89,7 +87,6 @@ public class ClientPlayerData {
         {
             ClientPlayerData.addClientMember(p.getUUID());
             playerList.get(p.getUUID()).setClientPlayer(p).dim.activate(String.valueOf(p.level.dimension().location()), true);
-            DimAnim.updateBounds(playerOrderedList.indexOf(Minecraft.getInstance().player.getUUID()));
         }
     }
 
@@ -121,7 +118,6 @@ public class ClientPlayerData {
     public static void updateSelfDim(String data) {
         if(ClientPlayerData.playerOrderedList.size() > 0) {
             playerList.get(Minecraft.getInstance().player.getUUID()).dim.activate(data, false);
-            DimAnim.updateBounds(playerOrderedList.indexOf(Minecraft.getInstance().player.getUUID()));
         }
     }
 

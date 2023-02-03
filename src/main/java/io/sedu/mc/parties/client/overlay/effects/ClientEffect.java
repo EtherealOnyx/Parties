@@ -8,6 +8,7 @@ public class ClientEffect {
 
     private String display;
     private String roman;
+    private String romanTrimmed;
     private int offset;
     boolean removal = false;
     Effect cur;
@@ -17,13 +18,23 @@ public class ClientEffect {
             cur.amp = amp;
             cur.duration = 1;
             roman = roman(cur.amp);
+            romanTrimmed = romanT(cur.amp);
             return;
         }
 
         cur.addEffect(new Effect(duration, amp));
         calculate();
         roman = roman(cur.amp);
+        romanTrimmed = romanT(cur.amp);
         removal = false;
+    }
+
+    private String romanT(int amp) {
+        if (amp == 0)
+            return "";
+        if (amp > 9)
+            return "★";
+        return roman;
     }
 
     public boolean isInstant() {
@@ -35,16 +46,20 @@ public class ClientEffect {
         return type.isBeneficial();
     }
 
-    public String getRoman() {
-        return roman;
-    }
-
-    public String getAmp() {
-        return String.valueOf(cur.amp+1);
+    public String getRomanTrimmed() {
+        return romanTrimmed;
     }
 
     public boolean isDying() {
         return cur.duration < 10;
+    }
+
+    public String getRoman() {
+        return roman;
+    }
+
+    public String getDur() {
+        return String.valueOf(cur.duration);
     }
 
     class Effect { //TODO: Tick all hidden effects. Remove them if the duration < 0. Remove entire effect structure on expirey event from server (markForRemoval), Implement amp tracker.
@@ -98,6 +113,7 @@ public class ClientEffect {
             cur.amp = cur.hidden.amp;
             cur.hidden = cur.hidden.hidden;
             roman = roman(cur.amp);
+            romanTrimmed = romanT(cur.amp);
         }
         return cur.duration;
     }
@@ -106,6 +122,7 @@ public class ClientEffect {
         this.type = MobEffect.byId(type);
         cur = new Effect(duration, amp);
         roman = roman(cur.amp);
+        romanTrimmed = romanT(cur.amp);
         if (isInstant()) {
             cur.duration = 1;
             return;
@@ -115,18 +132,12 @@ public class ClientEffect {
     }
 
     private static String roman(int num) {
-        if (num == 0)
-            return "";
         num++;
-        if (num > 9)
-            return "★";
-        int[] values = {9,5,4,1};
-        String[] romanLetters = {"IX","V","IV","I"};
+        int[] values = {1000,900,500,400,100,90,50,40,10,9,5,4,1};
+        String[] romanLetters = {"M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"};
         StringBuilder roman = new StringBuilder();
-        for(int i=0;i<values.length;i++)
-        {
-            while(num >= values[i])
-            {
+        for(int i=0;i<values.length;i++) {
+            while (num >= values[i]) {
                 num = num - values[i];
                 roman.append(romanLetters[i]);
             }

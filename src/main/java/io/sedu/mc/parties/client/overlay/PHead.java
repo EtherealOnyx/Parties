@@ -18,7 +18,7 @@ public class PHead extends RenderItem {
             setColor(1f, 1f, 1f, id.alpha);
         rect(i, poseStack,0,  -1,  0x111111, 0x555555, (int)(id.alphaI*.75));
         setup(id.getHead());
-        gui.blit(poseStack, x(i), y(i), 32, 32, 32, 32);
+        blit(poseStack, x(i), y(i), 32, 32, 32, 32);
         resetColor();
     }
 }

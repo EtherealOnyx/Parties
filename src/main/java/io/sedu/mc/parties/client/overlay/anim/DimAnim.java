@@ -1,11 +1,6 @@
 package io.sedu.mc.parties.client.overlay.anim;
 
-import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.client.overlay.PDimIcon;
-import io.sedu.mc.parties.client.overlay.gui.BoundsEntry;
-import io.sedu.mc.parties.setup.ClientSetup;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TextComponent;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +15,7 @@ public class DimAnim extends AnimHandler {
     public int dimension = 0;
     public int color = 0xDDF3FF;
     public List<String> dimName = new ArrayList<>();
+    public String dimNorm = "";
 
 
     public DimAnim(int length, boolean enabled) {
@@ -42,14 +38,6 @@ public class DimAnim extends AnimHandler {
         oldColor = color;
     }
 
-    @Override
-    boolean tickAnim() {
-        if (super.tickAnim()) {
-            return true;
-        }
-        return false;
-    }
-
     private void setupDim(String data) {
         dimension = getWorld(data);
         data = data.substring(data.indexOf(':')+1).toLowerCase();
@@ -61,6 +49,7 @@ public class DimAnim extends AnimHandler {
         }
         dim.forEach(word -> fString.add("§o" + word.substring(0, 1).toUpperCase() + word.substring(1)));
         this.dimName = fString;
+        this.dimNorm = String.join(" ", dimName).replace("§o", "");
     }
 
     private int getWorld(String world) {
@@ -80,17 +69,5 @@ public class DimAnim extends AnimHandler {
         }
         color = 0xDDF3FF;
         return 0;
-    }
-
-    public static void updateBounds(int index) {
-        if (index == -1)
-            return;
-        DimAnim d = ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(index)).dim;
-        PDimIcon i = (PDimIcon) ClientSetup.items.get(7);
-        BoundsEntry b = new BoundsEntry(i.x(index), i.x(index)+8, i.y(index), i.y(index)+8);
-        b.expand(5);
-        b.setTooltip((TextComponent) new TextComponent(String.join(" ", d.dimName).replace("§o", "")).withStyle(ChatFormatting.RESET));
-        b.setColor(d.color);
-        BoundsEntry.add(0, index, b);
     }
 }

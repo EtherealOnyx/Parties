@@ -1,12 +1,11 @@
 package io.sedu.mc.parties.client.overlay;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.GuiUtils;
 
 import java.util.List;
+
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.*;
 
 public class PDimIcon extends RenderSelfItem {
 
@@ -37,9 +36,13 @@ public class PDimIcon extends RenderSelfItem {
         rectScaled(pI, poseStack, 0, -1, ((id.dim.color & 0xfefefe) >> 1) | id.alphaI << 24, (id.dim.color) | id.alphaI << 24, 4f);
         setup(worldPath);
         useAlpha(id.alpha);
-        gui.blit(poseStack, x(pI)*4, y(pI)*4, 32*id.dim.dimension, 0, 32, 32);
+        blit(poseStack, x(pI)*4, y(pI)*4, 32*id.dim.dimension, 0, 32, 32);
         poseStack.popPose();
         resetColor();
+        //Tooltip Render
+        if (isActive() && withinBounds(x(pI), y(pI), x(pI)+8, y(pI)+8, 4)) {
+            renderTooltip(poseStack, gui, 10, 0, id.dim.dimNorm, (id.dim.color & 0xfefefe) >> 1, id.dim.color, 0, (id.dim.color & 0xfefefe) >> 1, id.dim.color);
+        }
     }
 
 
@@ -81,21 +84,21 @@ public class PDimIcon extends RenderSelfItem {
             setColor(1f,1f,1f,alphaOld);
             rectScaled(pI, poseStack, 0, -1, ((id.dim.oldColor & 0xfefefe) >> 1) | (int)(255*alphaOld) << 24, id.dim.oldColor | (int)(255*alphaOld) << 24 , 4 - scale);
             setup(worldPath);
-            gui.blit(poseStack, (int) (x(pI)*(4-scale)), (int) (y(pI)*(4-scale)), 32*id.dim.oldDimension, 0, 32, 32);
+            blit(poseStack, (int) (x(pI)*(4-scale)), (int) (y(pI)*(4-scale)), 32*id.dim.oldDimension, 0, 32, 32);
         }
 
         if (alphaNew > 0f) {
             setColor(1f,1f,1f,alphaNew);
             rectScaled(pI, poseStack, 0, -1, ((id.dim.color & 0xfefefe) >> 1) | (int)(255*alphaNew) << 24, id.dim.color | (int)(255*alphaNew) << 24 , 4 - scale);
             setup(worldPath);
-            gui.blit(poseStack, (int) (x(pI)*(4-scale)), (int) (y(pI)*(4-scale)), 32*id.dim.dimension, 0, 32, 32);
+            blit(poseStack, (int) (x(pI)*(4-scale)), (int) (y(pI)*(4-scale)), 32*id.dim.dimension, 0, 32, 32);
 
         }
 
         //rectScaled(pI, poseStack, 0, -1, ((id.dimColor & 0xfefefe) >> 1) | id.alphaI << 24, (id.dimColor) | id.alphaI << 24, 4 - scale);
         //setWorldShader(poseStack);
         //useAlpha(id.alpha);
-        //gui.blit(poseStack, (int) (x(pI)*(4-scale)), (int) (y(pI)*(4-scale)), 32*id.dimension, 0, 32, 32);
+        //blit(poseStack, (int) (x(pI)*(4-scale)), (int) (y(pI)*(4-scale)), 32*id.dimension, 0, 32, 32);
         poseStack.popPose();
 
         if (renderText)
@@ -121,7 +124,7 @@ public class PDimIcon extends RenderSelfItem {
             alphaPercent = 1f;
             transX = 20*((currTick-partialTicks)/60f) - 10;
         } else if (currTick > 5) {
-            ; // 5 - 0
+            // 5 - 0
             alphaPercent = (currTick - partialTicks)/5f;
             transX = -10-(10-(currTick-partialTicks))*4f;
         } else {
@@ -143,4 +146,5 @@ public class PDimIcon extends RenderSelfItem {
             poseStack.popPose();
         }
     }
+
 }

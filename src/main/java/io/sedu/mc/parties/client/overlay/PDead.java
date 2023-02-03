@@ -14,9 +14,9 @@ public class PDead extends RenderItem {
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isDead) {
             setup(Gui.GUI_ICONS_LOCATION);
+            blit(poseStack,x(i), y(i), 16 + (gui.getGuiTicks() >> 4 & 1)*9, 0, 9, 9);
 
-            gui.blit(poseStack,x(i), y(i), 16 + (gui.getGuiTicks() >> 4 & 1)*9, 0, 9, 9);
-            //gui.blit(poseStack,x(i), y(i), 124, 0, 9, 9);
+
         }
     }
 }

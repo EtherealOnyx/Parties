@@ -4,13 +4,21 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.isActive;
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
 public class PEffects extends RenderSelfItem {
 
@@ -74,27 +82,26 @@ public class PEffects extends RenderSelfItem {
             rectInscribedFlash(poseStack.last().pose(), 1, sX(i, iX), sY(i, iY), 26, 26, effect.getEffect()
                                                                                                            .getColor());
         } else {
-            rectInscribed(poseStack.last().pose(), 1, sX(i, iX), sY(i, iY), 26, 26, effect.getEffect()
-                                                                                                      .getColor(), effect.bene());
+            rectInscribed(poseStack.last().pose(), 1, sX(i, iX), sY(i, iY), 26, 26, effect.getEffect().getColor(), effect.bene());
         }
 
         //Texture
-        TextureAtlasSprite textureatlassprite = Minecraft.getInstance().getMobEffectTextures().get(effect.getEffect());
-        RenderSystem.setShaderTexture(0, textureatlassprite.atlas().location());
+        TextureAtlasSprite sprite = Minecraft.getInstance().getMobEffectTextures().get(effect.getEffect());
+        RenderSystem.setShaderTexture(0, sprite.atlas().location());
         RenderSystem.enableBlend();
         if (effect.isDying())
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks) / 2f) / 4f));
         else
             resetColor();
-        Gui.blit(poseStack, sX(i, iX) + 4, sY(i, iY) + 4, gui.getBlitOffset(), 18, 18, textureatlassprite);
+        Gui.blit(poseStack, sX(i, iX) + 4, sY(i, iY) + 4,0, 18, 18, sprite);
 
         //Text
         int x, y;
-        if (!effect.getRoman().equals("")) {
-            x = sX(i, iX) + 24 - gui.getFont().width(effect.getRoman());
+        if (!effect.getRomanTrimmed().equals("")) {
+            x = sX(i, iX) + 24 - gui.getFont().width(effect.getRomanTrimmed());
             y = sY(i, iY) + 16;
-            gui.getFont().draw(poseStack, effect.getRoman(), x, y, 0xFFD700);
-            gui.getFont().drawShadow(poseStack, effect.getRoman(), x, y, 0xFFD700);
+            gui.getFont().draw(poseStack, effect.getRomanTrimmed(), x, y, 0xFFD700);
+            gui.getFont().drawShadow(poseStack, effect.getRomanTrimmed(), x, y, 0xFFD700);
         }
 
         if (!effect.isInstant()) {
@@ -103,22 +110,35 @@ public class PEffects extends RenderSelfItem {
             gui.getFont().draw(poseStack, effect.getDisplay(), x, y, 0xFFFFFF);
             gui.getFont().drawShadow(poseStack, effect.getDisplay(), x, y, 0xFFFFFF);
         }
+        //System.out.println("Hello");
+        if (isActive() && withinBounds(rX(i, iX), rY(i, iY), rX(i, iX)+13, rY(i, iY)+13, 2)) {
+            poseStack.scale(2f,2f,2f);
+            List<ColorComponent> list = new ArrayList<>();
+            list.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" " + effect.getRoman()), effect.getEffect().isBeneficial() ? 0xA9E5FF : 0xFFA9A9));
+            //TODO: Support descriptions via datapacks :)
+            list.add(ColorComponent.EMPTY);
+            list.add(new ColorComponent(new TextComponent(effect.getDur() + " second(s)").withStyle(ChatFormatting.ITALIC), 0xAAAAAA));
+            renderTooltip(poseStack, gui, 10, 0, list,
+                          (effect.getEffect().getColor() & 0xfefefe) >> 1, effect.getEffect().getColor(),
+                          0x140514, (effect.getEffect().getColor() & 0xfefefe) >> 1);
+            poseStack.scale(.5f,.5f,.5f);
+        }
     }
+
 
     void start(PoseStack poseStack, int i, int size) {
         poseStack.pushPose();
         drawRect(poseStack.last().pose(), -1, x(i) - 2, (y(i) - 2),
                  x(i) + (width * Math.min(size, maxPerRow) >> 1),
-                 y(i) + (height * (int) Math.ceil((double) Math.min(max, size) / maxPerRow) >> 1),
+                 -1 + y(i) + (height * (int) Math.ceil((double) Math.min(max, size) / maxPerRow) >> 1),
                  0x44002024, 0x44002024);
         poseStack.scale(.5f, .5f, .5f);
-        RenderSystem.disableDepthTest();
+        RenderSystem.enableDepthTest();
     }
 
     void end(PoseStack poseStack) {
         resetColor();
         RenderSystem.disableBlend();
-        RenderSystem.enableDepthTest();
         poseStack.popPose();
     }
 
@@ -151,6 +171,7 @@ public class PEffects extends RenderSelfItem {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.enableDepthTest();
 
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
@@ -169,8 +190,16 @@ public class PEffects extends RenderSelfItem {
         return (frameW<<1)*pI+(x<<1)+width*bI;
     }
 
+    private int rX(int pI, int bI) {
+        return frameW*pI+x+(width>>1)*bI;
+    }
+
     private int sY(int pI, int bI) {
         return (frameH<<1)*pI+(y<<1)+height*bI;
+    }
+
+    private int rY(int pI, int bI) {
+        return frameH*pI+y+(height>>1)*bI;
     }
 
 
