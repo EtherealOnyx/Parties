@@ -138,7 +138,8 @@ public class PDimIcon extends RenderSelfItem {
             else
                 poseStack.translate(transX, 0, 0);
             x = (int) (x(partyIndex)-gui.getFont().width(name.get(j))/2f)+18;
-            y = y(partyIndex) + (j*gui.getFont().lineHeight)-18;
+            //TODO: Remove hardcoding of 11 for when scaling is allowed.
+            y = y(partyIndex) - 11 + (j*gui.getFont().lineHeight) - ((gui.getFont().lineHeight*name.size()-1)>>1);
            if (alphaPercent > 0f) {
                 gui.getFont().draw(poseStack, name.get(j), x, y, color | ((int)(255*alphaPercent) << 24));
                 gui.getFont().drawShadow(poseStack, name.get(j), x, y, color | ((int)(255*alphaPercent) << 24));

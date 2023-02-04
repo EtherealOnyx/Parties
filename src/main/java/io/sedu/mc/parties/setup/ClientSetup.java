@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.setup;
 
 import io.sedu.mc.parties.client.overlay.*;
-import io.sedu.mc.parties.events.PartyEvent;
+import io.sedu.mc.parties.events.ClientEvent;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ClientRegistry;
@@ -28,15 +28,16 @@ public class ClientSetup {
     private static final IIngameOverlay control = (gui, poseStack, partialTicks, width, height) -> RenderItem.resetPos();
 
     public static void init(final FMLClientSetupEvent event) {
-        MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientLeave);
-        MinecraftForge.EVENT_BUS.addListener(PartyEvent::onClientJoin);
-        MinecraftForge.EVENT_BUS.addListener(PartyEvent::ticker);
-        MinecraftForge.EVENT_BUS.addListener(PartyEvent::keyPress);
-        MinecraftForge.EVENT_BUS.addListener(PartyEvent::guiOpen);
-        MinecraftForge.EVENT_BUS.addListener(PartyEvent::guiRender);
+        MinecraftForge.EVENT_BUS.addListener(ClientEvent::onClientLeave);
+        MinecraftForge.EVENT_BUS.addListener(ClientEvent::onClientJoin);
+        MinecraftForge.EVENT_BUS.addListener(ClientEvent::ticker);
+        MinecraftForge.EVENT_BUS.addListener(ClientEvent::keyPress);
+        MinecraftForge.EVENT_BUS.addListener(ClientEvent::guiOpen);
+        MinecraftForge.EVENT_BUS.addListener(ClientEvent::guiRender);
 
         //Icon above all
         items.add(new PLeaderIcon("p_leader", 34, 33));
+
 
         //Text
         items.add(new PName("p_name", 46, 9, 0xDDF3FF));
