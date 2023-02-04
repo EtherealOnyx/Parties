@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.setup;
 
 import io.sedu.mc.parties.client.overlay.*;
+import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.events.ClientEvent;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
@@ -64,10 +65,11 @@ public class ClientSetup {
         items.add(new PRectD("p_bg2", 44, 7, 122, 34));
 
         //Effects
-        //items.add(new PEffects("p_effects", 46, 42, 30, 42, 8, 8));
+        items.add(new PEffects("p_effects", 46, 42, 30, 42, 8, 8));
+        EffectHolder.setValues(3, 5, 8,true); //TODO: Make sure buff + debuff = max - 1;
         //TODO: Make bottom ones auto disabled.
-        items.add(new PEffectsB("p_effects_b", 46, 42, 30, 42, 8, 8));
-        items.add(new PEffectsD("p_effects_d", 168, 21, 30, 42, 8, 4));
+        //items.add(new PEffectsB("p_effects_b", 46, 42, 30, 42, 8, 8));
+        //items.add(new PEffectsD("p_effects_d", 168, 21, 30, 42, 8, 4));
 
 
         items.forEach(RenderItem::register);

@@ -15,6 +15,18 @@ public class EffectHolder {
     List<Integer> sortedEffectBene = new ArrayList<>();
     List<Integer> sortedEffectBad = new ArrayList<>();
 
+    static int dLim;
+    static int bLim;
+    static boolean debuffFirst = true;
+    static int max;
+
+
+    public static void setValues(int buff, int debuff, int mx, boolean dFirst) {
+        bLim = buff;
+        dLim = debuff;
+        debuffFirst = dFirst;
+        max = mx;
+    }
 
     public EffectHolder() {
 
@@ -66,8 +78,46 @@ public class EffectHolder {
         sortBad();
         if(seperate) {
             sortedEffectAll.clear();
-            sortedEffectAll.addAll(sortedEffectBad);
-            sortedEffectAll.addAll(sortedEffectBene);
+            if (sortedEffectBad.size() + sortedEffectBene.size() > max) {
+                int mx;
+                if (debuffFirst) {
+                    mx = Math.max(dLim, (max - sortedEffectBene.size())-1);
+                    for(int i = 0; i < mx && i < sortedEffectBad.size(); i++) {
+                        sortedEffectAll.add(sortedEffectBad.get(i));
+                    }
+                    for(int i = 0; i < bLim && i < sortedEffectBene.size(); i++) {
+                        sortedEffectAll.add(sortedEffectBene.get(i));
+                    }
+                    for(int i = mx; i < sortedEffectBad.size(); i++) {
+                        sortedEffectAll.add(sortedEffectBad.get(i));
+                    }
+                    for(int i = bLim; i < sortedEffectBene.size(); i++) {
+                        sortedEffectAll.add(sortedEffectBene.get(i));
+                    }
+                } else {
+                    mx = Math.max(bLim, (max - sortedEffectBad.size())-1);
+                    for(int i = 0; i < mx && i < sortedEffectBene.size(); i++) {
+                        sortedEffectAll.add(sortedEffectBene.get(i));
+                    }
+                    for(int i = 0; i < dLim && i < sortedEffectBad.size(); i++) {
+                        sortedEffectAll.add(sortedEffectBad.get(i));
+                    }
+                    for(int i = mx; i < sortedEffectBene.size(); i++) {
+                        sortedEffectAll.add(sortedEffectBene.get(i));
+                    }
+                    for(int i = dLim; i < sortedEffectBad.size(); i++) {
+                        sortedEffectAll.add(sortedEffectBad.get(i));
+                    }
+                }
+            } else {
+                if (debuffFirst) {
+                    sortedEffectAll.addAll(sortedEffectBad);
+                    sortedEffectAll.addAll(sortedEffectBene);
+                } else {
+                    sortedEffectAll.addAll(sortedEffectBene);
+                    sortedEffectAll.addAll(sortedEffectBad);
+                }
+            }
         } else {
             sortAll();
         }
