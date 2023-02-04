@@ -83,9 +83,12 @@ public class PartyEvent {
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
                     int hunger;
-                    boolean updateHunger = PlayerData.playerList.get(player = e.player.getUUID()).setHunger(hunger = (e.player.getFoodData().getFoodLevel()));
-                    if (updateHunger)
+                    boolean update = PlayerData.playerList.get(player = e.player.getUUID()).setHunger(hunger = (e.player.getFoodData().getFoodLevel()));
+                    if (update)
                         trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendFood(id, player, hunger));
+                    update = PlayerData.playerList.get(player).setXpBar(e.player.experienceProgress);
+                    if (update)
+                        trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendXpBar(id, player, e.player.experienceProgress));
                 }
             }
             if (e.player.tickCount % 20 == 7) {

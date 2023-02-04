@@ -81,4 +81,8 @@ public class RenderPacketHelper {
     public static void removePotionEffect(UUID player, int type) {
         ClientPlayerData.playerList.get(player).removeEffect(type);
     }
+
+    public static void setXpBar(UUID player, Float data) {
+        ClientPlayerData.playerList.get(player).setXpBar(data);
+    }
 }

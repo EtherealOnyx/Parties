@@ -19,10 +19,15 @@ public class PLevelText extends RenderSelfItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        renderText(gui, poseStack, String.valueOf(id.getLevelForced()), x(i) - String.valueOf(id.getLevelForced()).length()*3, y(i));
+        renderText(gui, poseStack, String.valueOf(id.getLevelForced()), x(i) - (gui.getFont().width(String.valueOf(id.getLevelForced()))>>1), y(i));
     }
 
-    private void renderText(ForgeIngameGui g, PoseStack p, String text, int x, int y) {
-        g.getFont().draw(p, text, x, y, color);
+    private void renderText(ForgeIngameGui g, PoseStack poseStack, String s, int x, int y) {
+        this.x = frameX + 25;
+        g.getFont().draw(poseStack, s, (float)(x + 1), (float)y, 0);
+        g.getFont().draw(poseStack, s, (float)(x - 1), (float)y, 0);
+        g.getFont().draw(poseStack, s, (float)x, (float)(y + 1), 0);
+        g.getFont().draw(poseStack, s, (float)x, (float)(y - 1), 0);
+        g.getFont().draw(poseStack, s, (float)x, (float)y, 8453920); //8453920
     }
 }

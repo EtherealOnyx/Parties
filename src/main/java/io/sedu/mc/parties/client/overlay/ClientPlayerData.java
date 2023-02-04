@@ -39,6 +39,7 @@ public class ClientPlayerData {
     //PlayerData
     private int armor = 0;
     private int xpLevel = 0;
+    private float xpBar = 0f;
     boolean isDead = false;
 
 
@@ -221,6 +222,10 @@ public class ClientPlayerData {
         return clientPlayer != null ? clientPlayer.experienceLevel : 0;
     }
 
+    public float getXpBarForced() { return clientPlayer != null ? clientPlayer.experienceProgress : 0;}
+
+    public float getXpBar() {return xpBar;}
+
     public int getMana() {
         return mana;
     }
@@ -299,5 +304,10 @@ public class ClientPlayerData {
     public void slowTick() {
         if (!isDead)
             effects.removeIf(ClientEffect::update);
+    }
+
+    public void setXpBar(Float data) {
+        this.xpBar = data;
+        System.out.println("XpBar: " + data);
     }
 }

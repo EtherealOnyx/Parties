@@ -5,19 +5,18 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 
 public class PlayerData {
 
     public static HashMap<UUID, PlayerData> playerList = new HashMap<>();
-    //Boolean true = server side tracking, false = client side tracking.
-    //Inner UUID belongs to ID that the outer UUID is tracking.
-    public static HashMap<UUID, HashMap<UUID, Boolean>> trackerListO = new HashMap<>();
 
+    //Boolean true = server side tracking, false = client side tracking.
     //Inner UUID belongs to ID that is tracking the outer player.
     public static HashMap<UUID,HashMap<UUID, Boolean>> playerTrackers = new HashMap<>();
+
+    //Left = Tracked, right = trackers
+    public static HashMap<UUID, UUID> xpTrackers = new HashMap<>();
 
 
 
@@ -33,6 +32,9 @@ public class PlayerData {
     private HashMap<UUID, Short> inviters = new HashMap<>();
     //Player old hunger;
     private int oldHunger;
+
+    //Player old bar;
+    private float xpBar;
 
     //The UUID of the party that this player belongs to.
     private UUID party;
@@ -138,5 +140,13 @@ public class PlayerData {
             PartyHelper.dismissInvite(uuid);
         });
         inviters.clear();
+    }
+
+    public boolean setXpBar(float v) {
+        if (xpBar != v) {
+            xpBar = v;
+            return true;
+        }
+        return false;
     }
 }

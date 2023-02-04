@@ -4,7 +4,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
 
-import java.util.ArrayList;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -71,7 +70,7 @@ public class RenderPacketData {
                 }
                 data = builder.toString();
             }
-            case 1, 2, 3 -> data = buf.readFloat();
+            case 1, 2, 3, 14 -> data = buf.readFloat();
             case 4, 5, 6, 13 -> data = buf.readInt();
             case 12 -> data = new Object[]{buf.readInt(), buf.readInt(), buf.readInt()};
         }
@@ -92,7 +91,7 @@ public class RenderPacketData {
                     buf.writeChar(letter);
                 }
             }
-            case 1, 2, 3 -> //Health, Max Health, Absorb
+            case 1, 2, 3, 14 -> //Health, Max Health, Absorb
             {
                 buf.writeFloat((Float) data);
                 
@@ -146,6 +145,7 @@ public class RenderPacketData {
                 case 11 -> RenderPacketHelper.markLife(); //Self
                 case 12 -> RenderPacketHelper.addPotionEffect(player, (Integer) ((Object[]) data)[0], (Integer) ((Object[]) data)[1], (Integer) ((Object[]) data)[2]);
                 case 13 -> RenderPacketHelper.removePotionEffect(player, (Integer) data);
+                case 14 -> RenderPacketHelper.setXpBar(player, (Float) data);
                 default -> {
 
                 }

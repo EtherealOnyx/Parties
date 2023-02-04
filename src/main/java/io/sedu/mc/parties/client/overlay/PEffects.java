@@ -110,7 +110,7 @@ public class PEffects extends RenderSelfItem {
             gui.getFont().draw(poseStack, effect.getDisplay(), x, y, 0xFFFFFF);
             gui.getFont().drawShadow(poseStack, effect.getDisplay(), x, y, 0xFFFFFF);
         }
-        //System.out.println("Hello");
+
         if (isActive() && withinBounds(rX(i, iX), rY(i, iY), rX(i, iX)+13, rY(i, iY)+13, 2)) {
             poseStack.scale(2f,2f,2f);
             List<ColorComponent> list = new ArrayList<>();

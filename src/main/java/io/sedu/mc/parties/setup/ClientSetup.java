@@ -52,7 +52,7 @@ public class ClientSetup {
         //Icons
         items.add(new PArmor("p_armor_i", 46, 19));
         items.add(new PChicken("p_chicken_i", 140, 19));
-        items.add(new PLevelOrb("p_lvl", 19, 42));
+        items.add(new PLevelBar("p_lvlbar", 4, 44, 40, 5));
         items.add(new POffline("p_offline", 164, 8));
         items.add(new PDead("p_dead", 155, 9));
 
@@ -61,7 +61,7 @@ public class ClientSetup {
         items.add(new PHealth("p_health", 46, 29, 118, 10));
 
         //Backgrounds
-        items.add(new PRectO("p_bg1", 7, 41, 34, 11));
+        //items.add(new PRectO("p_bg1", 7, 41, 34, 11));
         items.add(new PRectD("p_bg2", 44, 7, 122, 34));
 
         //Effects

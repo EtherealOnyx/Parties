@@ -110,4 +110,8 @@ public class InfoPacketHelper {
     public static void sendEffect(UUID sendTo, int id, int duration, int amplifier) {
         sendEffect(sendTo, sendTo, id, duration, amplifier);
     }
+
+    public static void sendXpBar(UUID sendTo, UUID propOf, float bar) {
+        sendData(getServerPlayer(sendTo), propOf, 14, bar);
+    }
 }
