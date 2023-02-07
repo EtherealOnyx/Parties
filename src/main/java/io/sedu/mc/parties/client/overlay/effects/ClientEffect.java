@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.client.overlay.effects;
 
+import io.sedu.mc.parties.client.config.Config;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 
@@ -60,6 +61,10 @@ public class ClientEffect {
 
     public String getDur() {
         return String.valueOf(cur.duration);
+    }
+
+    public int colorType() {
+        return getEffect().isBeneficial() ? Config.cG() : Config.cB();
     }
 
     class Effect { //TODO: Tick all hidden effects. Remove them if the duration < 0. Remove entire effect structure on expirey event from server (markForRemoval), Implement amp tracker.

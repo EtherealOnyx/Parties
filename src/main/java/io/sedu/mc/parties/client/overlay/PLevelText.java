@@ -23,7 +23,6 @@ public class PLevelText extends RenderSelfItem {
     }
 
     private void renderText(ForgeIngameGui g, PoseStack poseStack, String s, int x, int y) {
-        this.x = frameX + 25;
         g.getFont().draw(poseStack, s, (float)(x + 1), (float)y, 0);
         g.getFont().draw(poseStack, s, (float)(x - 1), (float)y, 0);
         g.getFont().draw(poseStack, s, (float)x, (float)(y + 1), 0);

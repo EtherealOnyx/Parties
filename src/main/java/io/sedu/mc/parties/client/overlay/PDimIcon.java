@@ -1,11 +1,16 @@
 package io.sedu.mc.parties.client.overlay;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.config.DimConfig;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.List;
 
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.*;
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.isActive;
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
 public class PDimIcon extends RenderSelfItem {
 
@@ -31,18 +36,23 @@ public class PDimIcon extends RenderSelfItem {
 
 
     private void world(PoseStack poseStack, int pI, ForgeIngameGui gui, ClientPlayerData id) {
-        poseStack.pushPose();
-        poseStack.scale(.25f, .25f, .25f);
-        rectScaled(pI, poseStack, 0, -1, ((id.dim.color & 0xfefefe) >> 1) | id.alphaI << 24, (id.dim.color) | id.alphaI << 24, 4f);
-        setup(worldPath);
-        useAlpha(id.alpha);
-        blit(poseStack, x(pI)*4, y(pI)*4, 32*id.dim.dimension, 0, 32, 32);
-        poseStack.popPose();
-        resetColor();
-        //Tooltip Render
-        if (isActive() && withinBounds(x(pI), y(pI), x(pI)+8, y(pI)+8, 4)) {
-            renderTooltip(poseStack, gui, 10, 0, id.dim.dimNorm, (id.dim.color & 0xfefefe) >> 1, id.dim.color, 0, (id.dim.color & 0xfefefe) >> 1, id.dim.color);
-        }
+        DimConfig.entry(id.dim.dimension, (sprite, color) -> {
+            poseStack.pushPose();
+            poseStack.scale(.25f, .25f, .25f);
+
+            rectScaled(pI, poseStack, 0, -1, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 4f);
+
+            RenderSystem.setShaderTexture(0, sprite.atlas().location());
+            RenderSystem.enableBlend();
+            Gui.blit(poseStack, x(pI)<<2, y(pI)<<2, 0, 32, 32, sprite);
+
+            poseStack.popPose();
+
+            //Tooltip Render
+            if (isActive() && withinBounds(x(pI), y(pI), x(pI)+8, y(pI)+8, 4)) {
+                renderTooltip(poseStack, gui, 10, 0, id.dim.dimNorm, (color & 0xfefefe) >> 1, color, 0, (color & 0xfefefe) >> 1, color);
+            }
+        });
     }
 
 
@@ -80,29 +90,39 @@ public class PDimIcon extends RenderSelfItem {
         poseStack.pushPose();
         poseStack.scale(.25f+scaleSlow, .25f+scaleSlow, .25f+scaleSlow);
         poseStack.translate(translateX, translateY, 0);
+        int color, x, y;
+        TextureAtlasSprite sprite;
+        x = (int) (x(pI)*(4-scale));
+        y = (int) (y(pI)*(4-scale));
         if (alphaOld > 0f) {
+
+            sprite = DimConfig.sprite(id.dim.oldDimension);
+            color = DimConfig.color(id.dim.oldDimension);
             setColor(1f,1f,1f,alphaOld);
-            rectScaled(pI, poseStack, 0, -1, ((id.dim.oldColor & 0xfefefe) >> 1) | (int)(255*alphaOld) << 24, id.dim.oldColor | (int)(255*alphaOld) << 24 , 4 - scale);
-            setup(worldPath);
-            blit(poseStack, (int) (x(pI)*(4-scale)), (int) (y(pI)*(4-scale)), 32*id.dim.oldDimension, 0, 32, 32);
+            rectScaled(pI, poseStack, 0, -1, ((color & 0xfefefe) >> 1) | (int)(255*alphaOld) << 24, color | (int)(255*alphaOld) << 24 , 4 - scale);
+
+            RenderSystem.setShaderTexture(0, sprite.atlas().location());
+            RenderSystem.enableBlend();
+            Gui.blit(poseStack, x, y, 0, 32, 32, sprite);
+
         }
 
+        color = DimConfig.color(id.dim.dimension);
         if (alphaNew > 0f) {
+            sprite = DimConfig.sprite(id.dim.dimension);
             setColor(1f,1f,1f,alphaNew);
-            rectScaled(pI, poseStack, 0, -1, ((id.dim.color & 0xfefefe) >> 1) | (int)(255*alphaNew) << 24, id.dim.color | (int)(255*alphaNew) << 24 , 4 - scale);
-            setup(worldPath);
-            blit(poseStack, (int) (x(pI)*(4-scale)), (int) (y(pI)*(4-scale)), 32*id.dim.dimension, 0, 32, 32);
+            rectScaled(pI, poseStack, 0, -1, ((color & 0xfefefe) >> 1) | (int)(255*alphaNew) << 24, color | (int)(255*alphaNew) << 24 , 4 - scale);
+
+
+            RenderSystem.setShaderTexture(0, sprite.atlas().location());
+            RenderSystem.enableBlend();
+            Gui.blit(poseStack, x, y, 0, 32, 32, sprite);
 
         }
-
-        //rectScaled(pI, poseStack, 0, -1, ((id.dimColor & 0xfefefe) >> 1) | id.alphaI << 24, (id.dimColor) | id.alphaI << 24, 4 - scale);
-        //setWorldShader(poseStack);
-        //useAlpha(id.alpha);
-        //blit(poseStack, (int) (x(pI)*(4-scale)), (int) (y(pI)*(4-scale)), 32*id.dimension, 0, 32, 32);
         poseStack.popPose();
 
         if (renderText)
-            doTextRender(pI, gui, poseStack, currTick, partialTicks, id.dim.dimName, id.dim.color);
+            doTextRender(pI, gui, poseStack, currTick, partialTicks, id.dim.dimName, color);
         resetColor();
     }
 

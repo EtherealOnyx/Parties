@@ -10,10 +10,8 @@ public class DimAnim extends AnimHandler {
 
 
     //Specific data
-    public int oldDimension = 0;
-    public int oldColor = 0xDDF3FF;
-    public int dimension = 0;
-    public int color = 0xDDF3FF;
+    public String oldDimension = "";
+    public String dimension = "";
     public List<String> dimName = new ArrayList<>();
     public String dimNorm = "";
 
@@ -28,18 +26,17 @@ public class DimAnim extends AnimHandler {
     void activateValues(Object... data) {
         setOld();
         setupDim((String) data[0]);
-        if ((Boolean) data[1]) {
+        if ((Boolean) data[1] || oldDimension.equals("")) {
             setOld();
         }
     }
 
     void setOld() {
         oldDimension = dimension;
-        oldColor = color;
     }
 
     private void setupDim(String data) {
-        dimension = getWorld(data);
+        dimension = data;
         data = data.substring(data.indexOf(':')+1).toLowerCase();
         String[] split = data.split("[-_]");
         List<String> dim = Arrays.asList(split);
@@ -50,24 +47,5 @@ public class DimAnim extends AnimHandler {
         dim.forEach(word -> fString.add("§o" + word.substring(0, 1).toUpperCase() + word.substring(1)));
         this.dimName = fString;
         this.dimNorm = String.join(" ", dimName).replace("§o", "");
-    }
-
-    private int getWorld(String world) {
-        if (world.equals("minecraft:overworld")) {
-            color = 0x7CDF9D;
-            return 1;
-        }
-
-        if (world.equals("minecraft:the_nether")) {
-            color = 0xFFDA7A;
-            return 2;
-        }
-
-        if (world.equals("minecraft:the_end")) {
-            color = 0xCF7CDF;
-            return 3;
-        }
-        color = 0xDDF3FF;
-        return 0;
     }
 }

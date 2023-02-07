@@ -1,7 +1,7 @@
 package io.sedu.mc.parties;
 
 //import io.sedu.mc.parties.client.PartyOverlay;
-import io.sedu.mc.parties.data.PartyData;
+
 import io.sedu.mc.parties.events.PartyEvent;
 import io.sedu.mc.parties.setup.ClientSetup;
 import io.sedu.mc.parties.setup.ModSetup;
@@ -33,6 +33,7 @@ public class Parties
         MinecraftForge.EVENT_BUS.register(PartyEvent.class);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             modbus.addListener(ClientSetup::init);
+            modbus.addListener(ClientSetup::postInit);
         }
 
         );

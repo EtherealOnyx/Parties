@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.client.overlay.effects;
 
+import io.sedu.mc.parties.client.config.Config;
 import net.minecraft.world.effect.MobEffect;
 
 import java.util.*;
@@ -18,14 +19,11 @@ public class EffectHolder {
     static int dLim;
     static int bLim;
     static boolean debuffFirst = true;
-    static int max;
 
-
-    public static void setValues(int buff, int debuff, int mx, boolean dFirst) {
+    public static void setValues(int buff, int debuff, boolean dFirst) {
         bLim = buff;
         dLim = debuff;
         debuffFirst = dFirst;
-        max = mx;
     }
 
     public EffectHolder() {
@@ -35,7 +33,38 @@ public class EffectHolder {
 
     public void forEachAll(Consumer<ClientEffect> action) {
         Objects.requireNonNull(action);
-        sortedEffectAll.forEach(integer -> action.accept(effects.get(integer)));
+        for (int i = 0; i < Math.min(Config.mA(), sortedEffectAll.size()); i++)
+            sortedEffectAll.forEach(integer -> action.accept(effects.get(integer)));
+    }
+
+    public void forEachAllLim(Consumer<ClientEffect> action) {
+        for (int i = 0; i < Config.mA()-1; i++)
+            action.accept(effects.get(sortedEffectAll.get(i)));
+    }
+
+    public void forEachBeneLim(Consumer<ClientEffect> action) {
+        for (int i = 0; i < Config.mG()-1; i++)
+            action.accept(effects.get(sortedEffectBene.get(i)));
+    }
+
+    public void forEachBadLim(Consumer<ClientEffect> action) {
+        for (int i = 0; i < Config.mB()-1; i++)
+            action.accept(effects.get(sortedEffectBad.get(i)));
+    }
+
+    public void forAllRemainder(Consumer<ClientEffect> action) {
+        for (int i = Config.mA()-1; i < sortedEffectAll.size(); i++)
+            action.accept(effects.get(sortedEffectAll.get(i)));
+    }
+
+    public void forBeneRemainder(Consumer<ClientEffect> action) {
+        for (int i = Config.mG()-1; i < sortedEffectBene.size(); i++)
+            action.accept(effects.get(sortedEffectBene.get(i)));
+    }
+
+    public void forBadRemainder(Consumer<ClientEffect> action) {
+        for (int i = Config.mB()-1; i < sortedEffectBad.size(); i++)
+            action.accept(effects.get(sortedEffectBad.get(i)));
     }
 
     public int sizeAll() {
@@ -78,10 +107,10 @@ public class EffectHolder {
         sortBad();
         if(seperate) {
             sortedEffectAll.clear();
-            if (sortedEffectBad.size() + sortedEffectBene.size() > max) {
+            if (sortedEffectBad.size() + sortedEffectBene.size() > Config.mA()) {
                 int mx;
                 if (debuffFirst) {
-                    mx = Math.max(dLim, (max - sortedEffectBene.size())-1);
+                    mx = Math.max(dLim, (Config.mA() - sortedEffectBene.size())-1);
                     for(int i = 0; i < mx && i < sortedEffectBad.size(); i++) {
                         sortedEffectAll.add(sortedEffectBad.get(i));
                     }
@@ -95,7 +124,7 @@ public class EffectHolder {
                         sortedEffectAll.add(sortedEffectBene.get(i));
                     }
                 } else {
-                    mx = Math.max(bLim, (max - sortedEffectBad.size())-1);
+                    mx = Math.max(bLim, (Config.mA() - sortedEffectBad.size())-1);
                     for(int i = 0; i < mx && i < sortedEffectBene.size(); i++) {
                         sortedEffectAll.add(sortedEffectBene.get(i));
                     }
@@ -213,4 +242,18 @@ public class EffectHolder {
     public void markForRemoval() {
         effects.values().forEach(ClientEffect::markForRemoval);
     }
+
+    public boolean largerAll() {
+        return sortedEffectAll.size() > Config.mA();
+    }
+
+    public boolean largerBene() {
+        return sortedEffectAll.size() > Config.mG();
+    }
+
+    public boolean largerBad() {
+        return sortedEffectAll.size() > Config.mB();
+    }
+
+
 }

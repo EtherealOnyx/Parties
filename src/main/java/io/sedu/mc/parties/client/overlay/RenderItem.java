@@ -24,7 +24,6 @@ public abstract class RenderItem {
 
 
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
-    static final ResourceLocation worldPath = new ResourceLocation(Parties.MODID, "textures/worldicons.png");
 
     public static int frameX = 16;
     public static int frameY = 16;
@@ -283,21 +282,45 @@ public abstract class RenderItem {
         renderTooltip(poseStack, gui, offsetX, offsetY, text, outStart, outEnd, 0x140514, 0x140514, textColor);
     }
 
-    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, List<ColorComponent> text, int outStart, int outEnd, int inStart, int inEnd) {
+    protected void renderGroupEffectTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, List<ColorComponent> text, int outStart, int outEnd, int inStart, int inEnd) {
         poseStack.pushPose();
-        poseStack.translate(0, 0, 400);
         int max = 0;
-        int y = 0;
+        int y = offsetY;
+        poseStack.translate(0,0,400);
         for (ColorComponent c : text) {
             gui.getFont().draw(poseStack, c.c, mouseX()+offsetX, currentY+mouseY()+1+y, c.color);
             gui.getFont().drawShadow(poseStack, c.c, mouseX()+offsetX, currentY+mouseY()+1+y, c.color);
             max = Math.max(max, gui.getFont().width(c.c));
-            y += gui.getFont().lineHeight+offsetY;
+            y += gui.getFont().lineHeight+1;
         }
         rectCO(poseStack, -1, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+max+offsetX, currentY+mouseY()+y+offsetY, outStart, outEnd);
         rectCO(poseStack, -1, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+max+offsetX, currentY+mouseY()+y+offsetY, inStart, inEnd);
         poseStack.popPose();
         currentY += y+8;
+    }
+
+    protected void renderSingleEffectTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, List<ColorComponent> text, int color) {
+        poseStack.pushPose();
+        poseStack.translate(0, 0, 400);
+        int max = 0;
+        int y = 0;
+
+        ColorComponent c = text.get(0);
+        gui.getFont().draw(poseStack, c.c, mouseX()+offsetX, currentY+mouseY()+1, c.color);
+        gui.getFont().drawShadow(poseStack, c.c, mouseX()+offsetX, currentY+mouseY()+1, c.color);
+        max = Math.max(max, gui.getFont().width(c.c));
+        y += (gui.getFont().lineHeight)+offsetY+4;
+
+        c = text.get(1);
+        max = Math.max(max, gui.getFont().width(c.c));
+        gui.getFont().draw(poseStack, c.c, (mouseX()+offsetX)+((max-gui.getFont().width(c.c))>>1), (currentY+mouseY()+1+y), c.color);
+        gui.getFont().drawShadow(poseStack, c.c, (mouseX()+offsetX)+((max-gui.getFont().width(c.c))>>1), (currentY+mouseY()+1+y), c.color);
+
+        y += gui.getFont().lineHeight;
+        rectCO(poseStack, -1, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+max+offsetX, currentY+mouseY()+y+offsetY, (color & 0xfefefe) >> 1, color);
+        rectCO(poseStack, -1, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+max+offsetX, currentY+mouseY()+y+offsetY, 0x140514, (color & 0xfefefe) >> 1);
+        poseStack.popPose();
+        currentY += y+5;
     }
 
     static class ColorComponent {

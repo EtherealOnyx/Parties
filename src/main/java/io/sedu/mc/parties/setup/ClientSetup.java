@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.setup;
 
+import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.*;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.events.ClientEvent;
@@ -12,6 +13,7 @@ import net.minecraftforge.client.gui.OverlayRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +46,7 @@ public class ClientSetup {
         items.add(new PName("p_name", 46, 9, 0xDDF3FF));
         items.add(new PArmorText("p_armor_t", 57, 20, 0xDDF3FF));
         items.add(new PChickenText("p_chicken_t", 152, 20, 0xDDF3FF));
-        items.add(new PLevelText("p_lvl_t", 29, 43, 0x80FF8B));
+        items.add(new PLevelText("p_lvl_t", 25, 43, 0x80FF8B));
         items.add(new PHealthText("p_health_t", 105, 30, 0xFFE3E3, 0xFFF399, 0x530404));
         items.add(new POfflineText("p_offline_t", 85, 20, 0xDDF3FF));
         items.add(new PDimIcon("p_dim", 5, 34)); //Includes text!
@@ -65,11 +67,11 @@ public class ClientSetup {
         items.add(new PRectD("p_bg2", 44, 7, 122, 34));
 
         //Effects
-        items.add(new PEffects("p_effects", 46, 42, 30, 42, 8, 8));
-        EffectHolder.setValues(3, 5, 8,true); //TODO: Make sure buff + debuff = max - 1;
+        //items.add(new PEffects("p_effects", 46, 42, 30, 42));
+        EffectHolder.setValues(2, 5,true); //TODO: Make sure buff + debuff = max - 1;
         //TODO: Make bottom ones auto disabled.
-        //items.add(new PEffectsB("p_effects_b", 46, 42, 30, 42, 8, 8));
-        //items.add(new PEffectsD("p_effects_d", 168, 21, 30, 42, 8, 4));
+        items.add(new PEffectsB("p_effects_b", 46, 42, 30, 42));
+        items.add(new PEffectsD("p_effects_d", 168, 21, 30, 42));
 
 
         items.forEach(RenderItem::register);
@@ -84,6 +86,10 @@ public class ClientSetup {
         //Controller
         OverlayRegistry.registerOverlayAbove(HOTBAR_ELEMENT, "p_ctrl", control);
 
+        //DimConfig.init();
+    }
 
+    public static void postInit(FMLLoadCompleteEvent event) {
+        DimConfig.init();
     }
 }

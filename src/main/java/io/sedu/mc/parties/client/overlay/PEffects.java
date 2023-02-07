@@ -3,14 +3,15 @@ package io.sedu.mc.parties.client.overlay;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
+import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
@@ -23,14 +24,11 @@ import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 public class PEffects extends RenderSelfItem {
 
     //Potion Effects
-    int max;
-    int maxPerRow;
 
 
-    public PEffects(String name, int x, int y, int width, int height, int maxEffects, int maxPerRow) {
+
+    public PEffects(String name, int x, int y, int width, int height) {
         super(name, x, y, width, height);
-        max = maxEffects;
-        this.maxPerRow = maxPerRow;
     }
 
     @Override
@@ -43,43 +41,71 @@ public class PEffects extends RenderSelfItem {
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.effects.sizeAll() > 0) {
-            start(poseStack, i, id.effects.sizeAll());
+            start(poseStack, i, id.effects.sizeAll(), Config.rA(), Config.mA());
             AtomicInteger iX = new AtomicInteger();
             AtomicInteger iY = new AtomicInteger();
-            id.effects.forEachAll((effect) -> {
-                //If we reached the limit
-                if (check(iX.get(), iY.get())) {
-                    return;
+            if (id.effects.largerAll()) {
+                id.effects.forEachAllLim((effect) -> {
+                    //If we reached max per row
+                    if (checkRow(iX.get())) {
+                        iX.set(0);
+                        iY.getAndIncrement();
+                    }
+                    renderEffect(effect, gui, poseStack, i, iX.get(), iY.get(), partialTicks);
+                    iX.getAndIncrement();
+                    resetColor();
+                });
+                poseStack.pushPose();
+                poseStack.scale(2f,2f,2f);
+                if (renderOverflow(gui, poseStack, i, iX.get(), iY.get(), partialTicks)) {
+
+                    List<ColorComponent> lC = new ArrayList<>();
+                    //poseStack.translate((mouseX()+10), (mouseY()), 0);
+                    id.effects.forAllRemainder((effect) -> {
+
+                        lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.colorType()));
+                        //renderTooltip(poseStack, gui, 10, 0, new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.getEffect().getColor(), (effect.getEffect().getColor() & 0xfefefe) >> 1, effect.colorType());
+                    });
+                    renderGroupEffectTooltip(poseStack, gui, 10, 0, lC, 0x3101b8, 0x24015b, 0x150615, 0x150615);
+
                 }
+                poseStack.popPose();
+            } else {
+                id.effects.forEachAll((effect) -> {
+                    //If we reached max per row
+                    if (checkRow(iX.get())) {
+                        iX.set(0);
+                        iY.getAndIncrement();
+                    }
+                    renderEffect(effect, gui, poseStack, i, iX.get(), iY.get(), partialTicks);
+                    iX.getAndIncrement();
+                    resetColor();
+                });
+            }
 
-
-                //If we reached max per row
-                if (checkRow(iX.get())) {
-                    iX.set(0);
-                    iY.getAndIncrement();
-                }
-
-                renderEffect(effect, gui, poseStack, i, iX.get(), iY.get(), partialTicks);
-
-                iX.getAndIncrement();
-                resetColor();
-            });
             end(poseStack);
         }
     }
 
-    boolean check(int x, int y) {
-        return x + y*maxPerRow+1 > max;
+    boolean renderOverflow(ForgeIngameGui gui, PoseStack poseStack, int i, int iX, int iY, float partialTicks) {
+        gui.getFont().draw(poseStack, "▪▪▪", rX(i, iX)+2, rY(i, iY)+3, Config.cG());
+        gui.getFont().drawShadow(poseStack, "▪▪▪", rX(i, iX)+2, rY(i, iY)+3, Config.cG());
+        int alpha = (int) Mth.clamp((255*(float) (.5f + Math.sin((gui.getGuiTicks() + partialTicks) / 4f) / 2f)), 10, 245);
+        //TODO: Remove width hardcoding for all values here. Maybe.
+        gui.getFont().draw(poseStack, "▫▫▫", rX(i, iX)+2, rY(i, iY)+3, Config.cB() | alpha << 24);
+        gui.getFont().drawShadow(poseStack, "▫▫▫", rX(i, iX)+2, rY(i, iY)+3, Config.cB() | alpha << 24);
+        return (isActive() && withinBounds(rX(i, iX), rY(i, iY), rX(i, iX)+13, rY(i, iY)+13, 1));
     }
 
     boolean checkRow(int x) {
-        return x+1 > maxPerRow;
+        return x+1 > Config.rA();
     }
 
     void renderEffect(ClientEffect effect, ForgeIngameGui gui, PoseStack poseStack, int i, int iX, int iY, float partialTicks) {
         //BG Border
         if (effect.isInstant() && (gui.getGuiTicks() >> 3 & 1) == 0) {
-            rectInscribedFlash(poseStack.last().pose(), 1, sX(i, iX), sY(i, iY), 26, 26, effect.getEffect()
+            //TODO: Remove width hardcoding for all values here. Maybe.
+            rectInscribedFlash(poseStack.last().pose(), 1, sX(i, iX), sY(i, iY), 26, 26, 0xFFFFFF, effect.getEffect()
                                                                                                            .getColor());
         } else {
             rectInscribed(poseStack.last().pose(), 1, sX(i, iX), sY(i, iY), 26, 26, effect.getEffect().getColor(), effect.bene());
@@ -104,33 +130,36 @@ public class PEffects extends RenderSelfItem {
             gui.getFont().drawShadow(poseStack, effect.getRomanTrimmed(), x, y, 0xFFD700);
         }
 
+        String secs = "§oInstant";
+        int scol = 0x88888888;
         if (!effect.isInstant()) {
             x = sX(i, iX) + effect.getOffset() + 8;
             y = sY(i, iY) + 29;
             gui.getFont().draw(poseStack, effect.getDisplay(), x, y, 0xFFFFFF);
             gui.getFont().drawShadow(poseStack, effect.getDisplay(), x, y, 0xFFFFFF);
+            secs = effect.getDur() + "s";
+            scol = 0xFFFFFF;
         }
 
-        if (isActive() && withinBounds(rX(i, iX), rY(i, iY), rX(i, iX)+13, rY(i, iY)+13, 2)) {
+        if (isActive() && withinBounds(rX(i, iX), rY(i, iY), rX(i, iX)+13, rY(i, iY)+13, 1)) {
+            poseStack.pushPose();
             poseStack.scale(2f,2f,2f);
             List<ColorComponent> list = new ArrayList<>();
-            list.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" " + effect.getRoman()), effect.getEffect().isBeneficial() ? 0xA9E5FF : 0xFFA9A9));
+            list.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.colorType()));
             //TODO: Support descriptions via datapacks :)
-            list.add(ColorComponent.EMPTY);
-            list.add(new ColorComponent(new TextComponent(effect.getDur() + " second(s)").withStyle(ChatFormatting.ITALIC), 0xAAAAAA));
-            renderTooltip(poseStack, gui, 10, 0, list,
-                          (effect.getEffect().getColor() & 0xfefefe) >> 1, effect.getEffect().getColor(),
-                          0x140514, (effect.getEffect().getColor() & 0xfefefe) >> 1);
-            poseStack.scale(.5f,.5f,.5f);
+            list.add(new ColorComponent(new TextComponent(secs), scol));
+            renderSingleEffectTooltip(poseStack, gui, 10, 0, list,
+                                      effect.getEffect().getColor());
+            poseStack.popPose();
         }
     }
 
 
-    void start(PoseStack poseStack, int i, int size) {
+    void start(PoseStack poseStack, int i, int size, int row, int max) {
         poseStack.pushPose();
         drawRect(poseStack.last().pose(), -1, x(i) - 2, (y(i) - 2),
-                 x(i) + (width * Math.min(size, maxPerRow) >> 1),
-                 -1 + y(i) + (height * (int) Math.ceil((double) Math.min(max, size) / maxPerRow) >> 1),
+                 x(i) + (width * Math.min(size, row) >> 1),
+                 -1 + y(i) + (height * (int) Math.ceil((double) Math.min(max, size) / row) >> 1),
                  0x44002024, 0x44002024);
         poseStack.scale(.5f, .5f, .5f);
         RenderSystem.enableDepthTest();
@@ -145,14 +174,14 @@ public class PEffects extends RenderSelfItem {
 
     private void rectInscribed(Matrix4f pose, int radius, int x, int y, int width, int height, int outColor, boolean ben) {
         if (ben)
-            rectC(pose, x, y, width, height, 0xA9E5FF, 0x74E5FF);
+            rectC(pose, x, y, width, height, Config.cG(), Config.cG());
         else
-            rectC(pose, x, y, width, height,  0xFFA9A9, 0xFF7474);
+            rectC(pose, x, y, width, height,  Config.cB(), Config.cB());
         rectC(pose, x+radius, y+radius, width-(radius*2), height-(radius*2), 0x212121, (outColor & 0xfefefe) >> 1);
     }
 
-    private void rectInscribedFlash(Matrix4f pose, int radius, int x, int y, int width, int height, int outColor) {
-        rectC(pose, x, y, width, height,  0xFFFFFF, 0xFFFFFF);
+    private void rectInscribedFlash(Matrix4f pose, int radius, int x, int y, int width, int height, int flashColor, int outColor) {
+        rectC(pose, x, y, width, height,  Config.cF(), flashColor);
         rectC(pose, x+radius, y+radius, width-(radius*2), height-(radius*2), 0x212121, (outColor & 0xfefefe) >> 1);
     }
 
