@@ -1,13 +1,15 @@
 package io.sedu.mc.parties.data;
 
+import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.network.ServerPacketHelper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
-import io.sedu.mc.parties.network.ServerPacketHelper;
-
-import static io.sedu.mc.parties.data.PlayerData.*;
+import static io.sedu.mc.parties.data.PlayerData.addTracker;
+import static io.sedu.mc.parties.data.PlayerData.removeTracker;
 
 public class PartyData {
 
@@ -74,6 +76,7 @@ public class PartyData {
 
     public void removeMember(UUID removedMember, boolean wasKicked) {
         if (!party.remove(removedMember))
+            Parties.LOGGER.error("Error removing a party member from party!");
             //Some error occured!
             
         Util.getPlayer(removedMember).removeParty();

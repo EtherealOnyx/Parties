@@ -308,6 +308,5 @@ public class ClientPlayerData {
 
     public void setXpBar(Float data) {
         this.xpBar = data;
-        System.out.println("XpBar: " + data);
     }
 }

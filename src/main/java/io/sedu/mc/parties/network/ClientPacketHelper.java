@@ -14,7 +14,7 @@ import static io.sedu.mc.parties.data.Util.getClientPlayer;
 
 public class ClientPacketHelper {
 
-    private static final boolean debug = true;
+    private static final boolean debug = false;
     static void msgDebug(MutableComponent msg) {
         if (debug)
             Minecraft.getInstance().player.sendMessage(msg, Minecraft.getInstance().player.getUUID());
