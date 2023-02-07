@@ -1,7 +1,9 @@
 package io.sedu.mc.parties.data;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.UUID;
@@ -94,10 +96,10 @@ public class PartyHelper {
                             )
                     ), futureMember
             );
+
             getPlayer(initiator).getPlayer().sendMessage(new TextComponent("You have sent a party invite to ").withStyle(ChatFormatting.DARK_AQUA)
                                                                                      .append(new TextComponent(getName(futureMember)).withStyle(ChatFormatting.YELLOW
                                                                                      )).append(new TextComponent(".").withStyle(ChatFormatting.DARK_AQUA)), initiator);
-
         }
 
 
@@ -114,14 +116,14 @@ public class PartyHelper {
             
             return false;
         }
-        
+
 
         if (getPlayer(initiator).hasParty() && !isLeader(initiator)) {
-            
+
             return false;
         }
 
-        
+
         return true;
     }
 

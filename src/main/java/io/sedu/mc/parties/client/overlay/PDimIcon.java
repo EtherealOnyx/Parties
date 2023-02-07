@@ -3,11 +3,12 @@ package io.sedu.mc.parties.client.overlay;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.config.DimConfig;
+import io.sedu.mc.parties.client.overlay.anim.DimAnim;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-
-import java.util.List;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.isActive;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
@@ -73,6 +74,7 @@ public class PDimIcon extends RenderSelfItem {
             scaleSlow = .75f*animPos(currTick, partialTicks, true, 10, 1.5f);
             translateX = 3*(currTick+partialTicks)/10;
             translateY =-26*(currTick+partialTicks)/10;
+
         } else if (id.dim.animTime > 10) {
             currTick = id.dim.animTime - 10; //80 - 0
             renderText = true;
@@ -122,18 +124,23 @@ public class PDimIcon extends RenderSelfItem {
         poseStack.popPose();
 
         if (renderText)
-            doTextRender(pI, gui, poseStack, currTick, partialTicks, id.dim.dimName, color);
+            //TODO: Revert id.dim to id.dim.dimName and extract sounds to their own implementation
+            doTextRender(pI, gui, poseStack, currTick, partialTicks, id.dim, color);
         resetColor();
     }
 
 
 
-    private void doTextRender(int partyIndex, ForgeIngameGui gui, PoseStack poseStack, int currTick, float partialTicks, List<String> name, int color) {
+    private void doTextRender(int partyIndex, ForgeIngameGui gui, PoseStack poseStack, int currTick, float partialTicks, DimAnim dim, int color) {
         int x, y;
         float transX;
         transX = 0;
         float alphaPercent = 0f;
         if (currTick > 75) {
+            if (!dim.soundPlayed) {
+                dim.soundPlayed = true;
+                Minecraft.getInstance().player.playSound(SoundEvents.UI_TOAST_IN, 1.5f, 1f);
+            }
 
         } else if (currTick > 70) {
             currTick = (currTick-70); // 5 - 0
@@ -145,24 +152,28 @@ public class PDimIcon extends RenderSelfItem {
             transX = 20*((currTick-partialTicks)/60f) - 10;
         } else if (currTick > 5) {
             // 5 - 0
+            if (dim.soundPlayed) {
+                dim.soundPlayed = false;
+                Minecraft.getInstance().player.playSound(SoundEvents.UI_TOAST_OUT, 1.5f, 1f);
+            }
             alphaPercent = (currTick - partialTicks)/5f;
             transX = -10-(10-(currTick-partialTicks))*4f;
         } else {
             transX = -10-(10-(currTick-partialTicks))*4f;
         }
 
-        for (int j = 0; j < name.size(); j++) {
+        for (int j = 0; j < dim.dimName.size(); j++) {
             poseStack.pushPose();
             if (j % 2 == 1)
                 poseStack.translate(-transX, 0, 0);
             else
                 poseStack.translate(transX, 0, 0);
-            x = (int) (x(partyIndex)-gui.getFont().width(name.get(j))/2f)+18;
+            x = (int) (x(partyIndex)-gui.getFont().width(dim.dimName.get(j))/2f)+18;
             //TODO: Remove hardcoding of 11 for when scaling is allowed.
-            y = y(partyIndex) - 11 + (j*gui.getFont().lineHeight) - ((gui.getFont().lineHeight*name.size()-1)>>1);
+            y = y(partyIndex) - 11 + (j*gui.getFont().lineHeight) - ((gui.getFont().lineHeight*dim.dimName.size()-1)>>1);
            if (alphaPercent > 0f) {
-                gui.getFont().draw(poseStack, name.get(j), x, y, color | ((int)(255*alphaPercent) << 24));
-                gui.getFont().drawShadow(poseStack, name.get(j), x, y, color | ((int)(255*alphaPercent) << 24));
+                gui.getFont().draw(poseStack, dim.dimName.get(j), x, y, color | ((int)(255*alphaPercent) << 24));
+                gui.getFont().drawShadow(poseStack, dim.dimName.get(j), x, y, color | ((int)(255*alphaPercent) << 24));
             }
             poseStack.popPose();
         }

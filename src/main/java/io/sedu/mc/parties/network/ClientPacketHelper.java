@@ -5,6 +5,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
@@ -46,6 +47,8 @@ public class ClientPacketHelper {
                 e.printStackTrace();
             }
         });
+        Minecraft.getInstance().player.playSound(SoundEvents.NOTE_BLOCK_CHIME, .5f, 1.25f);
+        Minecraft.getInstance().player.playSound(SoundEvents.NOTE_BLOCK_CHIME, .25f, 1f);
     }
 
     public static void markOffline(ArrayList<UUID> list) {
@@ -59,6 +62,8 @@ public class ClientPacketHelper {
                 e.printStackTrace();
             }
         });
+        Minecraft.getInstance().player.playSound(SoundEvents.NOTE_BLOCK_XYLOPHONE, .5f, .25f);
+        Minecraft.getInstance().player.playSound(SoundEvents.NOTE_BLOCK_BIT, .25f, 1f);
     }
 
     public static void addMembers(ArrayList<UUID> list) {
@@ -78,6 +83,9 @@ public class ClientPacketHelper {
                 ClientPacketHelper.sendTrackerToClient(player);
             }
         });
+
+        Minecraft.getInstance().player.playSound(SoundEvents.BEACON_ACTIVATE, .25f, 1f);
+
     }
 
     public static void refreshClientOnDimChange() {
@@ -90,12 +98,16 @@ public class ClientPacketHelper {
         //list should always be size 1 here.
         ClientPlayerData.changeLeader(list.get(0));
         msg(new TextComponent(getName(list.get(0))).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" is now the party leader.").withStyle(ChatFormatting.DARK_AQUA)));
+        Minecraft.getInstance().player.playSound(SoundEvents.NOTE_BLOCK_XYLOPHONE, .5f, 1f);
+        Minecraft.getInstance().player.playSound(SoundEvents.NOTE_BLOCK_CHIME, .5f, 1.25f);
     }
 
     public static void dropParty() {
         ClientPlayerData.reset();
         //BoundsEntry.elements.clear();
         msg(new TextComponent("You left the party.").withStyle(ChatFormatting.DARK_AQUA));
+        Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
+
     }
 
     public static void removePartyMemberDropped(UUID uuid) {
@@ -125,6 +137,7 @@ public class ClientPacketHelper {
         ClientPlayerData.reset();
         //BoundsEntry.elements.clear();
         msg(new TextComponent("Party disbanded.").withStyle(ChatFormatting.DARK_AQUA));
+        Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
     }
 
     public static void sendTrackerToClient(Player entity) {

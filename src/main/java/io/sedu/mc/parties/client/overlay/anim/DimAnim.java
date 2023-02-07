@@ -14,6 +14,7 @@ public class DimAnim extends AnimHandler {
     public String dimension = "";
     public List<String> dimName = new ArrayList<>();
     public String dimNorm = "";
+    public boolean soundPlayed = false;
 
 
     public DimAnim(int length, boolean enabled) {
@@ -26,6 +27,7 @@ public class DimAnim extends AnimHandler {
     void activateValues(Object... data) {
         setOld();
         setupDim((String) data[0]);
+        soundPlayed = false;
         if ((Boolean) data[1] || oldDimension.equals("")) {
             setOld();
         }
