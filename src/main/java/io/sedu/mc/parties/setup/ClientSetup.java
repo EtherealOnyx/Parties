@@ -15,10 +15,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static io.sedu.mc.parties.Parties.MODID;
+import static io.sedu.mc.parties.client.overlay.RenderItem.items;
 import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_ALT;
 
@@ -26,7 +24,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_ALT;
 public class ClientSetup {
 
     public static final KeyMapping showMouse = new KeyMapping(MODID + ".key.hover", GLFW_KEY_LEFT_ALT, KeyMapping.CATEGORY_INTERFACE);
-    public static final List<RenderItem> items = new ArrayList<>();
 
     private static final IIngameOverlay control = (gui, poseStack, partialTicks, width, height) -> RenderItem.resetPos();
 
@@ -37,6 +34,8 @@ public class ClientSetup {
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::keyPress);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::guiOpen);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::guiRender);
+        //MinecraftForge.EVENT_BUS.addListener(ClientEvent::mouseDrag);
+        //MinecraftForge.EVENT_BUS.addListener(ClientEvent::mouseUnclick);
 
         //Icon above all
         items.add(new PLeaderIcon("p_leader", 34, 33));
@@ -72,6 +71,8 @@ public class ClientSetup {
         //TODO: Make bottom ones auto disabled.
         items.add(new PEffectsB("p_effects_b", 46, 42, 30, 42));
         items.add(new PEffectsD("p_effects_d", 168, 21, 30, 42));
+        items.add(new PRectC("p_bgc", 7, 7, 159, 34));
+        //items.add(new ConfigOverlay("p_config"));
 
 
         items.forEach(RenderItem::register);

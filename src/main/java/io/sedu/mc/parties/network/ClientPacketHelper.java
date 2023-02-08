@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
+import io.sedu.mc.parties.client.overlay.gui.HoverScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.MutableComponent;
@@ -8,7 +9,8 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.UUID;
 
 import static io.sedu.mc.parties.client.overlay.ClientPlayerData.*;
 import static io.sedu.mc.parties.data.Util.getClientPlayer;
@@ -85,7 +87,7 @@ public class ClientPacketHelper {
         });
 
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_ACTIVATE, .25f, 1f);
-
+        HoverScreen.reInit();
     }
 
     public static void refreshClientOnDimChange() {
@@ -107,7 +109,7 @@ public class ClientPacketHelper {
         //BoundsEntry.elements.clear();
         msg(new TextComponent("You left the party.").withStyle(ChatFormatting.DARK_AQUA));
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
-
+        HoverScreen.reInit();
     }
 
     public static void removePartyMemberDropped(UUID uuid) {
@@ -120,12 +122,15 @@ public class ClientPacketHelper {
         //int i = playerOrderedList.indexOf(id);
         playerOrderedList.remove(id);
         //if (i >= 0) BoundsEntry.elements.values().forEach(boundsEntries -> boundsEntries.remove(i));
+        HoverScreen.reInit();
     }
 
     public static void dropPartyKicked() {
         ClientPlayerData.reset();
         //BoundsEntry.elements.clear();
         msg(new TextComponent("You have been kicked from the party.").withStyle(ChatFormatting.DARK_AQUA));
+        Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
+        HoverScreen.reInit();
     }
 
     public static void removePartyMemberKicked(UUID uuid) {
@@ -138,6 +143,7 @@ public class ClientPacketHelper {
         //BoundsEntry.elements.clear();
         msg(new TextComponent("Party disbanded.").withStyle(ChatFormatting.DARK_AQUA));
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
+        HoverScreen.reInit();
     }
 
     public static void sendTrackerToClient(Player entity) {

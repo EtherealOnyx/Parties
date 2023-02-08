@@ -15,7 +15,10 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class ClientPlayerData {
     public static HashMap<UUID, ClientPlayerData> playerList = new HashMap<>();
@@ -121,6 +124,14 @@ public class ClientPlayerData {
             playerList.get(Minecraft.getInstance().player.getUUID()).dim.activate(data, false);
         }
     }
+
+    public static void swap(int f, int s) {
+        UUID temp = ClientPlayerData.playerOrderedList.get(f);
+        ClientPlayerData.playerOrderedList.set(f, ClientPlayerData.playerOrderedList.get(s));
+        ClientPlayerData.playerOrderedList.set(s, temp);
+        RenderSelfItem.updateSelfIndex();
+    }
+
 
     public void setId(UUID uuid) {
         trackedOnClient = false;

@@ -14,6 +14,7 @@ import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import net.minecraftforge.client.gui.OverlayRegistry;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseX;
@@ -22,7 +23,7 @@ import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 
 public abstract class RenderItem {
 
-
+    public static final List<RenderItem> items = new ArrayList<>();
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
 
     public static int frameX = 16;
@@ -32,7 +33,7 @@ public abstract class RenderItem {
 
     public static int currentY = 0;
 
-    int x, y, width, height, l, r, t, b;
+    int x, y, width, height;
     float scale;
     //TODO: Allow alpha changes in config per item?
     float alpha;
@@ -42,18 +43,14 @@ public abstract class RenderItem {
     }
 
     void setDefaults(int x, int y) {
-        this.x = x + frameX;
-        this.y = y + frameY;
+        this.x = x;
+        this.y = y;
     }
 
     void setDefaults(int x, int y, int width, int height) {
         setDefaults(x, y);
         this.width = width;
         this.height = height;
-        l = this.x;
-        r = l + width;
-        t = this.y;
-        b = t + height;
     }
 
     int hOffset(int pOffset) {
@@ -65,27 +62,27 @@ public abstract class RenderItem {
     }
 
     public int x(int pOffset) {
-        return x + wOffset(pOffset);
+        return x+frameX + wOffset(pOffset);
     }
 
     public int y(int pOffset) {
-        return y + hOffset(pOffset);
+        return y+frameY + hOffset(pOffset);
     }
 
     public int l(int pOffset) {
-        return l + wOffset(pOffset);
+        return x+frameX  + wOffset(pOffset);
     }
 
     public int r(int pOffset) {
-        return r + wOffset(pOffset);
+        return x+frameX  + width + wOffset(pOffset);
     }
 
     public int t(int pOffset) {
-        return t + hOffset(pOffset);
+        return y+frameY + hOffset(pOffset);
     }
 
     public int b(int pOffset) {
-        return b + hOffset(pOffset);
+        return y+frameY + height + hOffset(pOffset);
     }
 
     abstract void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
@@ -161,7 +158,7 @@ public abstract class RenderItem {
         drawRect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor, endColor);
     }
 
-    void rectCO(PoseStack pose, int z, int offset, int l, int t, int r, int b, int startColor, int endColor) {
+    public static void rectCO(PoseStack pose, int z, int offset, int l, int t, int r, int b, int startColor, int endColor) {
         drawRectCO(pose.last().pose(), z, l+offset, t+offset, r-offset, b-offset, startColor, endColor);
 
     }
@@ -323,6 +320,14 @@ public abstract class RenderItem {
         rectCO(poseStack, -1, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+max+offsetX, currentY+mouseY()+y+offsetY, 0x140514, (color & 0xfefefe) >> 1);
         poseStack.popPose();
         currentY += y+5;
+    }
+
+    public int w() {
+        return width;
+    }
+
+    public int h() {
+        return height;
     }
 
     static class ColorComponent {
