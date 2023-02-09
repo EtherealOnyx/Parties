@@ -10,7 +10,7 @@ public class ConfigOverlay extends RenderItem {
     private static boolean configMode = true;
 
     private static final IIngameOverlay CONFIG = (gui, poseStack, partialTicks, width, height) -> {
-        if (HoverScreen.isActive()) {
+        if (HoverScreen.notEditing()) {
 
         }
     };

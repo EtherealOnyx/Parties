@@ -116,6 +116,7 @@ public class ClientPlayerData {
     public static void resetOnly() {
         playerList.clear();
         playerOrderedList.clear();
+        RenderSelfItem.selfIndex = 0;
         leader = null;
     }
 

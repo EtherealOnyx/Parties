@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.isActive;
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
 public class PHealth extends RenderSelfItem {
@@ -32,7 +32,7 @@ public class PHealth extends RenderSelfItem {
         //Dimmer
         rect(i, poseStack, 0, 0, 255 - id.alphaI << 24, 255 - id.alphaI << 24);
 
-        if (isActive() && withinBounds(l(i), t(i), r(i), b(i), 2)) {
+        if (notEditing() && withinBounds(l(i), t(i), r(i), b(i), 2)) {
             renderTooltip(poseStack, gui, 10, 0, "Health: " + (id.health.cur + id.health.absorb) + "/" + id.health.max, 0xfc807c, 0x4d110f, 0xffbfbd);
         }
 

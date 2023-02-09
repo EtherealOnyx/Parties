@@ -16,6 +16,7 @@ public class POffline extends RenderSelfItem {
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+        x = 154;
         if (!id.isOnline) {
             setup(Gui.GUI_ICONS_LOCATION);
             blit(poseStack, x(i), y(i), 0, 216, 10, 8);

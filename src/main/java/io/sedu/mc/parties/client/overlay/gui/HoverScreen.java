@@ -8,14 +8,15 @@ import io.sedu.mc.parties.client.overlay.RenderItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class HoverScreen extends Screen {
 
@@ -28,6 +29,8 @@ public class HoverScreen extends Screen {
     private int revertY = 0;
     private int oldX = 0;
     private int oldY = 0;
+    private int botLim = 0;
+    private int rightLim = 0;
     private Integer oldMX = null;
     private Integer oldMY = null;
     private int index = 0;
@@ -39,10 +42,10 @@ public class HoverScreen extends Screen {
     private List<Button> moveFrame = new ArrayList<>();
     private Button settingsButton;
     private Button goBackButton;
-    private List<Widget> smallRender = new ArrayList<>();
 
     private static boolean isArranging = false;
     private static boolean isMoving = false;
+    private static boolean notEditing = false;
 
     //public boolean rendered;
     public HoverScreen(int value) {
@@ -67,25 +70,62 @@ public class HoverScreen extends Screen {
     protected void init() {
         //TODO: Add 'rearranging' boolean to know when config is in this state or not. helps with 2nd todo.
         int y = Math.max(0, clickArea.t(0) - 10);
-        settingsButton = addRenderableWidget(new SmallButton(clickArea.l(0), y, "⚙", p -> doTask(1), Button.NO_TOOLTIP, .5f, .5f, 1f, .5f));
-        goBackButton = addRenderableWidget(new SmallButton(clickArea.l(0), y,"x", p -> doTask(1), Button.NO_TOOLTIP, 1f, .5f, .5f));
+        settingsButton = addRenderableWidget(new SmallButton(clickArea.l(0), y, "⚙", p -> doTask(1), tip("Open Party Settings"), .5f, .5f, 1f, .5f));
+        goBackButton = addRenderableWidget(new SmallButton(clickArea.l(0), y,"x", p -> doTask(1), tip("Close"), 1f, .5f, .5f));
         initPartyButtons();
         initMenuButtons(y);
-        initDragButtons(y);
+        initDragButtons();
         //TODO: Add a way to reinitialize buttons in case party comp changes. HoverScreen.reInit();
         //Perhaps force close the screen. Easy!
         doTask(0);
     }
 
-    private void initDragButtons(int y) {
-        moveFrame.add(addRenderableWidget(new SmallButton(clickArea.l(0), y, "x", p -> revertPos(), Button.NO_TOOLTIP, 1, .5f, .5f)));
-        Button b = addRenderableWidget(new SmallButton(clickArea.l(0)+11, y,"◄", p -> updatePos(true), Button.NO_TOOLTIP, 1, 1, .5f));
+    protected void initPartyButtons() {
+        if (ClientPlayerData.partySize() > 1) {
+            Button b;
+            //moveParty.add(addRenderableWidget(new Button(clickArea.l(0) + (clickArea.w() >> 1) - 9, clickArea.t(0) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("⬇"), pButton -> ClientPlayerData.swap(finalI, finalI+1))));
+            for (int i = 0; i < ClientPlayerData.partySize(); i++) {
+                int finalI = i;
+                if (i == ClientPlayerData.partySize()-1) {
+                    b = addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, tip("Move Down")));
+                    b.active = false;
+                    moveParty.add(b);
+                }
+                else
+                    moveParty.add(addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI+1), tip("Move Down"))));
+
+                if (i == 0) {
+                    b = addRenderableWidget(new Button(clickArea.l(i) , clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, tip("Move Up")));
+                    b.active = false;
+                    moveParty.add(b);
+                }
+                else
+                    moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI-1, finalI), tip("Move Up"))));
+                //RenderItem.rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
+            }
+        }
+    }
+
+    private void initMenuButtons(int y) {
+        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0), y,"x", p -> doTask(0), tip("Close Menu"), 1f, .5f, .5f)));
+        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0)+11, y,"⬆⬇", p -> doTask(2), tip("Change Party Order"), .5f, .5f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0)+22, y,"✥", p -> doTask(3), tip("Reposition Party Frame"), 0, 1, .5f, .5f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0)+33, y,"⚙", p -> doTask(4), tip("Open Advanced Settings"), 0, 1, .5f, 1f, 1f)));
+
+    }
+
+    private void initDragButtons() {
+        int y = Math.max(0, RenderItem.frameY - 10);
+        moveFrame.add(addRenderableWidget(new SmallButton(RenderItem.frameX, y, "x", p -> revertPos(), tip("Revert & Close"), 1, .5f, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(RenderItem.frameX+11, y,"↺", p -> defaultPos(), tip("Reset To Default & Close"), .5f, 1f, 1f)));
+        Button b = addRenderableWidget(new SmallButton(RenderItem.frameX+22, y,"◄", p -> updatePos(true), tip("Undo Move"), 1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        b = addRenderableWidget(new SmallButton(clickArea.l(0)+22, y, "►", p -> updatePos(false), Button.NO_TOOLTIP,1, 1, .5f));
+        b = addRenderableWidget(new SmallButton(RenderItem.frameX+33, y, "►", p -> updatePos(false), tip("Redo Move"),1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        moveFrame.add(addRenderableWidget(new SmallButton(clickArea.l(0)+33, y,"✓", p -> acceptPos(), Button.NO_TOOLTIP, .5f, 1, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(RenderItem.frameX+44, y,"✓", p -> acceptPos(), tip("Save Position & Close"), .5f, 1, .5f)));
+
     }
 
     private void acceptPos() {
@@ -122,22 +162,14 @@ public class HoverScreen extends Screen {
 
     private void checkIndex() {
         if (index == 0)
-            moveFrame.get(1).active = false;
+            moveFrame.get(2).active = false;
         else if (index <= fX.size())
-            moveFrame.get(1).active = true;
+            moveFrame.get(2).active = true;
 
         if (index >= fX.size()-1)
-            moveFrame.get(2).active = false;
+            moveFrame.get(3).active = false;
         else if (index >= 0)
-            moveFrame.get(2).active = true;
-    }
-
-
-    private void initMenuButtons(int y) {
-        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0), y,"x", p -> doTask(0), Button.NO_TOOLTIP, 1f, .5f, .5f)));
-        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0)+11, y,"⬆⬇", p -> doTask(2), Button.NO_TOOLTIP, .5f, .5f, 1f)));
-        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0)+22, y,"✥", p -> doTask(3), Button.NO_TOOLTIP, 0, 1, .5f, .5f, 1f)));
-
+            moveFrame.get(3).active = true;
     }
 
     private void revertPos() {
@@ -149,22 +181,54 @@ public class HoverScreen extends Screen {
         doTask(1);
     }
 
+    private void defaultPos() {
+        RenderItem.frameX = 16;
+        RenderItem.frameY = 16;
+        fX.clear();
+        fY.clear();
+        refreshAllButtons();
+        doTask(1);
+    }
+
     private void move(int x, int y) {
+
         if (oldMX == null) {
             oldMX = x;
             oldMY = y;
             oldX = RenderItem.frameX;
             oldY = RenderItem.frameY;
         }
-        RenderItem.frameX = x - oldMX + oldX;
-        RenderItem.frameY = y - oldMY + oldY;
+
+        checkLimits(x, y);
         refreshDragButtons();
     }
 
+    private void checkLimits(int x, int y) {
+        int tempFrame = x - oldMX + oldX;
+        if (tempFrame < 0) {
+            RenderItem.frameX = 0;
+        } else if (tempFrame + rightLim > this.width) {
+            RenderItem.frameX = this.width - rightLim;
+        } else {
+            RenderItem.frameX = x - oldMX + oldX;
+        }
+
+        tempFrame = y - oldMY + oldY;
+        if (tempFrame < 0) {
+            RenderItem.frameY = 0;
+        } else if (tempFrame + botLim > this.height) {
+            RenderItem.frameY = this.height - botLim;
+        } else {
+            RenderItem.frameY = y - oldMY + oldY;
+        }
+
+    }
+
+
     private void refreshDragButtons() {
-        int y = Math.max(0, clickArea.t(0) - 10);
+        int y = Math.max(0, RenderItem.frameY - 10);
         for (int i = 0; i < moveFrame.size(); i++) {
-            moveFrame.get(i).x = clickArea.l(0)+(i*11);
+            moveFrame.get(i).x = RenderItem.frameX+(i*11);
             moveFrame.get(i).y = y;
         }
     }
@@ -189,6 +253,7 @@ public class HoverScreen extends Screen {
     protected void doTask(int task) {
         isArranging = false;
         isMoving = false;
+        notEditing = true;
         settingsButton.visible = false;
         goBackButton.visible = false;
         menu.forEach(b -> b.visible = false);
@@ -198,49 +263,52 @@ public class HoverScreen extends Screen {
             case 0 -> //Standard screen
                     settingsButton.visible = true;
             case 1 -> //Settings screen
+            {
                 menu.forEach(b -> b.visible = true);
+                notEditing = false;
+            }
+
             case 2 -> { //Arranging screen
                 moveParty.forEach(b -> b.visible = true);
                 goBackButton.visible = true;
                 isArranging = true;
+                notEditing = false;
             }
             case 3 -> {
                 isMoving = true;
                 moveFrame.forEach(b -> b.visible = true);
                 revertX = RenderItem.frameX;
                 revertY = RenderItem.frameY;
+                fX.clear();
+                fY.clear();
+                index = 0;
                 fX.add(revertX);
                 fY.add(revertY);
+                notEditing = false;
+                botLim = RenderItem.frameH == 0 ? clickArea.b(ClientPlayerData.playerOrderedList.size()-1) - RenderItem.frameY: clickArea.t(0)+(RenderItem.frameH*ClientPlayerData.playerOrderedList.size()) - RenderItem.frameY;
+                rightLim = RenderItem.frameW == 0 ? clickArea.r(ClientPlayerData.playerOrderedList.size()-1)  - RenderItem.frameX: clickArea.l(0)+(RenderItem.frameW*ClientPlayerData.playerOrderedList.size()) - RenderItem.frameX;
+            }
+            case 4 -> {
+                //Still technically active?
+                Minecraft.getInstance().setScreen(new SettingsScreen());
             }
         }
     }
 
-    protected void initPartyButtons() {
-        if (ClientPlayerData.partySize() > 1) {
-            Button b;
-            //moveParty.add(addRenderableWidget(new Button(clickArea.l(0) + (clickArea.w() >> 1) - 9, clickArea.t(0) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("⬇"), pButton -> ClientPlayerData.swap(finalI, finalI+1))));
-            for (int i = 0; i < ClientPlayerData.partySize(); i++) {
-                int finalI = i;
-                if (i == ClientPlayerData.partySize()-1) {
-                    b = addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}));
-                    b.active = false;
-                    moveParty.add(b);
-                }
-                else
-                    moveParty.add(addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI+1))));
+    private Button.OnTooltip tip(String t) {
+        return new Button.OnTooltip() {
+            private final Component text = new TextComponent(t);
 
-                if (i == 0) {
-                    b = addRenderableWidget(new Button(clickArea.l(i) , clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}));
-                    b.active = false;
-                    moveParty.add(b);
-                }
-                else
-                    moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI-1, finalI))));
-                //RenderItem.rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
+            public void onTooltip(Button b, PoseStack p, int mX, int mY) {
+                if (b.active)
+                    HoverScreen.this.renderTooltip(p, text, mX, mY+16);
             }
-        }
-    }
 
+            public void narrateTooltip(Consumer<Component> p_169456_) {
+                p_169456_.accept(this.text);
+            }
+        };
+    }
 
 
     public void render(PoseStack poseStack, int mX, int mY, float partialTick) {
@@ -303,14 +371,20 @@ public class HoverScreen extends Screen {
 
     public static void disable() {
         active = false;
+        notEditing = false;
         mouseX = -1;
         mouseY = -1;
     }
 
     public static void activate() {
         active = true;
+        notEditing = true;
         mouseX = -1;
         mouseY = -1;
+    }
+
+    public static boolean notEditing() {
+        return notEditing;
     }
 
     public static boolean isActive() {
@@ -320,6 +394,7 @@ public class HoverScreen extends Screen {
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
         if (pKeyCode != key) {
             active = false;
+            notEditing = false;
             if (isMoving) {
                 revertPos();
                 isMoving = false;
@@ -400,11 +475,14 @@ public class HoverScreen extends Screen {
             pPoseStack.scale(.5f,.5f,.5f);
             this.blit(pPoseStack, this.x<<1, this.y<<1, 0, 46 + i * 20, 10, 20);
             this.blit(pPoseStack, (this.x<<1) + 10, this.y<<1, 190, 46 + i * 20, 10, 20);
+
             pPoseStack.scale(2f,2f,2f);
             this.renderBg(pPoseStack, minecraft, pMouseX, pMouseY);
             int j = getFGColor();
             drawCenteredString(pPoseStack, font, this.getMessage(), this.x+5+offX, this.y+offY, j);
-            //Might have to add tooltip logic.
+            if (this.isHoveredOrFocused()) {
+                this.renderToolTip(pPoseStack, pMouseX, pMouseY);
+            }
         }
 
 

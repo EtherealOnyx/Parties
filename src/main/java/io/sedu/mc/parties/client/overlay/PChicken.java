@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Gui;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.isActive;
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
 public class PChicken extends RenderSelfItem {
@@ -48,7 +48,7 @@ public class PChicken extends RenderSelfItem {
 
 
         resetColor();
-        if (isActive() && withinBounds(x(i), y(i), x(i)+9, y(i)+9, 2)) {
+        if (notEditing() && withinBounds(x(i), y(i), x(i)+9, y(i)+9, 2)) {
             renderTooltip(poseStack, gui, 10, 0, "Hunger: " + hunger + "/20", 0xb88458, 0x613c1b, 0xffd5b0);
         }
     }

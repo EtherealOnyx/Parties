@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.isActive;
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
 public class PDimIcon extends RenderSelfItem {
@@ -50,7 +50,7 @@ public class PDimIcon extends RenderSelfItem {
             poseStack.popPose();
 
             //Tooltip Render
-            if (isActive() && withinBounds(x(pI), y(pI), x(pI)+8, y(pI)+8, 4)) {
+            if (notEditing() && withinBounds(x(pI), y(pI), x(pI)+8, y(pI)+8, 4)) {
                 renderTooltip(poseStack, gui, 10, 0, id.dim.dimNorm, (color & 0xfefefe) >> 1, color, 0, (color & 0xfefefe) >> 1, color);
             }
         });

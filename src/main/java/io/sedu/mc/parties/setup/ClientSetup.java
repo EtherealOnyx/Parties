@@ -34,8 +34,6 @@ public class ClientSetup {
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::keyPress);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::guiOpen);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::guiRender);
-        //MinecraftForge.EVENT_BUS.addListener(ClientEvent::mouseDrag);
-        //MinecraftForge.EVENT_BUS.addListener(ClientEvent::mouseUnclick);
 
         //Icon above all
         items.add(new PLeaderIcon("p_leader", 34, 33));
@@ -54,7 +52,7 @@ public class ClientSetup {
         items.add(new PArmor("p_armor_i", 46, 19));
         items.add(new PChicken("p_chicken_i", 140, 19));
         items.add(new PLevelBar("p_lvlbar", 4, 44, 40, 5));
-        items.add(new POffline("p_offline", 164, 8));
+        items.add(new POffline("p_offline", 154, 8));
         items.add(new PDead("p_dead", 155, 9));
 
         //Containers

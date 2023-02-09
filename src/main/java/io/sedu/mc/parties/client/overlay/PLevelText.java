@@ -35,7 +35,7 @@ public class PLevelText extends RenderSelfItem {
         g.getFont().draw(poseStack, s, (float)x, (float)(y - 1), 0);
         g.getFont().draw(poseStack, s, (float)x, (float)y, 8453920); //8453920
 
-        if (isActive() && withinBounds(x, y, x+g.getFont().width(s), y + g.getFont().lineHeight, 2)) {
+        if (notEditing() && withinBounds(x, y, x+g.getFont().width(s), y + g.getFont().lineHeight, 2)) {
             renderXpTooltip(poseStack, g, 10, 0, level);
         }
 

@@ -27,6 +27,7 @@ public class PRectC extends RenderItem {
                 }
             } else {
 
+                //Config stuffies
                 if (HoverScreen.arranging()) {
                     int alpha = (int) (255*(.25f+Math.sin((gui.getGuiTicks() + partialTicks) / 6f) / 8f));
                     for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
@@ -38,7 +39,7 @@ public class PRectC extends RenderItem {
                     int index = ClientPlayerData.playerOrderedList.size()-1;
                     //System.out.println(ClientPlayerData.playerOrderedList.size());
 
-                    drawRect(poseStack.last().pose(), -2, l(0), t(0),
+                    drawRect(poseStack.last().pose(), -2, frameX, frameY,
                              frameW == 0 ? r(index) : l(0)+(frameW*ClientPlayerData.playerOrderedList.size()),
                              frameH == 0 ? b(index) : t(0)+(frameH*ClientPlayerData.playerOrderedList.size()),
                              alpha << 24, alpha << 24);

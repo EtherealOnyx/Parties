@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.isActive;
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
 public class PEffects extends RenderSelfItem {
@@ -94,7 +94,7 @@ public class PEffects extends RenderSelfItem {
         //TODO: Remove width hardcoding for all values here. Maybe.
         gui.getFont().draw(poseStack, "▫▫▫", rX(i, iX)+2, rY(i, iY)+3, Config.cB() | alpha << 24);
         gui.getFont().drawShadow(poseStack, "▫▫▫", rX(i, iX)+2, rY(i, iY)+3, Config.cB() | alpha << 24);
-        return (isActive() && withinBounds(rX(i, iX), rY(i, iY), rX(i, iX)+13, rY(i, iY)+13, 1));
+        return (notEditing() && withinBounds(rX(i, iX), rY(i, iY), rX(i, iX)+13, rY(i, iY)+13, 1));
     }
 
     boolean checkRow(int x) {
@@ -141,7 +141,7 @@ public class PEffects extends RenderSelfItem {
             scol = 0xFFFFFF;
         }
 
-        if (isActive() && withinBounds(rX(i, iX), rY(i, iY), rX(i, iX)+13, rY(i, iY)+13, 1)) {
+        if (notEditing() && withinBounds(rX(i, iX), rY(i, iY), rX(i, iX)+13, rY(i, iY)+13, 1)) {
             poseStack.pushPose();
             poseStack.scale(2f,2f,2f);
             List<ColorComponent> list = new ArrayList<>();
@@ -216,19 +216,19 @@ public class PEffects extends RenderSelfItem {
     }
 
     private int sX(int pI, int bI) {
-        return (frameW<<1)*pI+(x<<1)+width*bI;
+        return (frameW<<1)*pI+((x+frameX)<<1)+width*bI;
     }
 
     private int rX(int pI, int bI) {
-        return frameW*pI+x+(width>>1)*bI;
+        return frameW*pI+x+frameX+(width>>1)*bI;
     }
 
     private int sY(int pI, int bI) {
-        return (frameH<<1)*pI+(y<<1)+height*bI;
+        return (frameH<<1)*pI+((y+frameY)<<1)+height*bI;
     }
 
     private int rY(int pI, int bI) {
-        return frameH*pI+y+(height>>1)*bI;
+        return frameH*pI+(y+frameY)+(height>>1)*bI;
     }
 
 

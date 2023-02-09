@@ -59,16 +59,4 @@ public class ClientEvent {
         }
     }
 
-    public static void mouseClick(ScreenEvent.MouseClickedEvent.Post event) {
-        if (HoverScreen.moving() && Minecraft.getInstance().screen instanceof HoverScreen hS) {
-            //hS.drag(event.getDragX(), event.getDragY());
-        }
-    }
-
-    public static void mouseUnclick(ScreenEvent.MouseReleasedEvent.Post event) {
-        if (HoverScreen.moving()) {
-            System.out.println("Release");
-        }
-    }
-
 }
