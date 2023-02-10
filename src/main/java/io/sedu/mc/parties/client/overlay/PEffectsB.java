@@ -1,8 +1,14 @@
 package io.sedu.mc.parties.client.overlay;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.config.Config;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
@@ -10,6 +16,14 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PEffectsB extends PEffects{
+
+    @Override
+    void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
+        RenderSystem.enableDepthTest();
+        TextureAtlasSprite sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.JUMP);
+        RenderSystem.setShaderTexture(0, sprite.atlas().location());
+        Gui.blit(poseStack, b.x + 7, b.y+2, 0, 18, 18, sprite);
+    }
 
     public PEffectsB(String name, int x, int y, int width, int height) {
         super(name, x, y, width, height);

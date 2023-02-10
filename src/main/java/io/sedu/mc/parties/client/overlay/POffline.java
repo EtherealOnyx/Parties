@@ -1,13 +1,34 @@
 package io.sedu.mc.parties.client.overlay;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+
+import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
 public class POffline extends RenderSelfItem {
 
     public POffline(String name, int x, int y) {
         super(name, x, y);
+    }
+
+    @Override
+    int getColor() {
+        return 0x5d6166;
+    }
+
+    @Override
+    public String getType() {
+        return "Icon";
+    }
+
+    @Override
+    void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
+        setup(GUI_ICONS_LOCATION);
+        RenderSystem.enableDepthTest();
+        blit(poseStack, b.x+11, b.y+7, 0, 216, 10, 8);
     }
 
     @Override

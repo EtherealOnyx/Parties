@@ -1,0 +1,22 @@
+{
+  "gui.sedparties.name.p_leader":"Leader Icon",
+  "gui.sedparties.name.p_name":"Name Text",
+  "gui.sedparties.name.p_armor_t":"Armor Text",
+  "gui.sedparties.name.p_chicken_t":"Hunger Text",
+  "gui.sedparties.name.p_lvl_t":"Level Text",
+  "gui.sedparties.name.p_health_t":"Health Text",
+  "gui.sedparties.name.p_offline_t":"Offline Text",
+  "gui.sedparties.name.p_dim":"Dimension Icon & Text",
+  "gui.sedparties.name.p_armor_i":"Armor Icon",
+  "gui.sedparties.name.p_chicken_i":"Hunger Icon",
+  "gui.sedparties.name.p_lvlbar":"Level Bar",
+  "gui.sedparties.name.p_offline":"Offline Icon",
+  "gui.sedparties.name.p_dead":"Dead Icon",
+  "gui.sedparties.name.p_head":"Player Head Icon",
+  "gui.sedparties.name.p_health":"Health Bar",
+  "gui.sedparties.name.p_bg1":"Background",
+  "gui.sedparties.name.p_effects_b":"Buff Bar",
+  "gui.sedparties.name.p_effects_d":"Debuff Bar",
+  "gui.sedparties.name.p_effects":"Combined Buff/Debuff Bar"
+}
+

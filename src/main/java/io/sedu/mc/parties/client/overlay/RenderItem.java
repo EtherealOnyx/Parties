@@ -1,11 +1,15 @@
 package io.sedu.mc.parties.client.overlay;
 
+import Util.Render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.client.overlay.gui.TabButton;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -14,7 +18,7 @@ import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import net.minecraftforge.client.gui.OverlayRegistry;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseX;
@@ -23,7 +27,7 @@ import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 
 public abstract class RenderItem {
 
-    public static final List<RenderItem> items = new ArrayList<>();
+    public static final LinkedHashMap<String, RenderItem> items = new LinkedHashMap<>();
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
 
     public static int frameX = 16;
@@ -87,6 +91,9 @@ public abstract class RenderItem {
 
     abstract void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
 
+    String name;
+    IIngameOverlay item;
+
     public void initItem() {
         item = (gui, poseStack, partialTicks, width, height) -> {
             for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++) {
@@ -95,8 +102,14 @@ public abstract class RenderItem {
         };
     }
 
-    String name;
-    IIngameOverlay item;
+    public boolean isTabRendered() {
+        return true;
+    }
+
+    public String translateName() {
+        return "gui.sedparties.name." + name;
+    }
+
 
     public RenderItem(String name) {
         this.name = name;
@@ -166,6 +179,34 @@ public abstract class RenderItem {
     void rectScaled(int i, PoseStack pose, int z, int offset, int startColor, int endColor, float scale) {
         drawRect(pose.last().pose(), z, (int) ((l(i)+offset)*scale), (int) ((t(i)+offset)*scale), (int) ((l(i)-offset)*scale)+width, (int)((t(i)-offset)*scale)+height, startColor, endColor);
     }
+
+    void renderTypeText(PoseStack p, ForgeIngameGui gui, Component type, int x, int y) {
+        gui.getFont().drawShadow(p, type, x+16-(gui.getFont().width(type)>>1), y+22, getColor());
+    }
+
+    void renderTab(PoseStack p, TabButton b, ForgeIngameGui gui) {
+        RenderSystem.enableDepthTest();
+        Render.setColor(getColor());
+        Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 150,  new ResourceLocation("textures/block/glass.png"));
+        Render.sizeRect(p.last().pose(), b.x, b.y, b.getWidth(), b.getHeight(), 0x44FFFFFF, 0x88000000);
+        resetColor();
+        Render.borderRect(p.last().pose(), -2, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 150 << 24,getColor() | 100 << 24);
+        renderTypeText(p, gui, b.type, b.x, b.y);
+    }
+
+
+    void renderTabHover(PoseStack p, TabButton b) {
+        Render.sizeRect(p.last().pose(), b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 150 << 24, 0x88000000);
+        Render.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 200 << 24, getColor());
+    }
+
+    void renderTabClicked(PoseStack p, TabButton b) {
+        Render.sizeRect(p.last().pose(), b.x, b.y, b.getWidth(), b.getHeight(), 0x00444444, 0x88000000);
+        Render.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 255 << 24, 0);
+    }
+
+    abstract int getColor();
+
 
     public static void drawRectCO(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int startColor, int endColor)
     {
@@ -258,7 +299,6 @@ public abstract class RenderItem {
     }
 
     void textS(int i, ForgeIngameGui gui, PoseStack p, String text, int color) {
-        text(i, gui, p, text, color);
         gui.getFont().drawShadow(p, text, x(i), y(i), color);
     }
 
@@ -267,7 +307,6 @@ public abstract class RenderItem {
     }
 
     void textCentered(int i, ForgeIngameGui gui, PoseStack p, String text, int color) {
-        gui.getFont().draw(p, text, 1 + x(i) - gui.getFont().width(text)/2f, y(i), color);
         gui.getFont().drawShadow(p, text, 1 + x(i) - gui.getFont().width(text)/2f, y(i), color);
     }
 
@@ -289,13 +328,14 @@ public abstract class RenderItem {
         poseStack.translate(0, 0, 400);
         rectCO(poseStack, 0, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+gui.getFont().width(text)+offsetX, currentY+mouseY()+(gui.getFont().lineHeight)+offsetY, outStart, outEnd);
         rectCO(poseStack, 0, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+gui.getFont().width(text)+offsetX, currentY+mouseY()+(gui.getFont().lineHeight)+offsetY, inStart, inEnd);
-        gui.getFont().draw(poseStack, text, mouseX()+offsetX, currentY+mouseY()+1, textColor);
         gui.getFont().drawShadow(poseStack, text, mouseX()+offsetX, currentY+mouseY()+1, textColor);
         poseStack.popPose();
 
         currentY += gui.getFont().lineHeight+offsetY+8;
 
     }
+
+    public abstract String getType();
 
 
 
@@ -317,7 +357,6 @@ public abstract class RenderItem {
         int y = offsetY;
         poseStack.translate(0,0,400);
         for (ColorComponent c : text) {
-            gui.getFont().draw(poseStack, c.c, mouseX()+offsetX, currentY+mouseY()+1+y, c.color);
             gui.getFont().drawShadow(poseStack, c.c, mouseX()+offsetX, currentY+mouseY()+1+y, c.color);
             max = Math.max(max, gui.getFont().width(c.c));
             y += gui.getFont().lineHeight+1;
@@ -335,21 +374,19 @@ public abstract class RenderItem {
         int y = 0;
 
         ColorComponent c = text.get(0);
-        gui.getFont().draw(poseStack, c.c, mouseX()+offsetX, currentY+mouseY()+1, c.color);
         gui.getFont().drawShadow(poseStack, c.c, mouseX()+offsetX, currentY+mouseY()+1, c.color);
         max = Math.max(max, gui.getFont().width(c.c));
         y += (gui.getFont().lineHeight)+offsetY+4;
 
         c = text.get(1);
         max = Math.max(max, gui.getFont().width(c.c));
-        gui.getFont().draw(poseStack, c.c, (mouseX()+offsetX)+((max-gui.getFont().width(c.c))>>1), (currentY+mouseY()+1+y), c.color);
         gui.getFont().drawShadow(poseStack, c.c, (mouseX()+offsetX)+((max-gui.getFont().width(c.c))>>1), (currentY+mouseY()+1+y), c.color);
 
         y += gui.getFont().lineHeight;
         rectCO(poseStack, -1, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+max+offsetX, currentY+mouseY()+y+offsetY, (color & 0xfefefe) >> 1, color);
         rectCO(poseStack, -1, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+max+offsetX, currentY+mouseY()+y+offsetY, 0x140514, (color & 0xfefefe) >> 1);
         poseStack.popPose();
-        currentY += y+5;
+        currentY += y+7;
     }
 
     public int w() {
@@ -359,6 +396,15 @@ public abstract class RenderItem {
     public int h() {
         return height;
     }
+
+    public TabButton.OnRender render(ForgeIngameGui gui) {
+        return (poseStack, b) -> {
+            renderTab(poseStack, b, gui);
+            renderElement(poseStack, gui, b);
+        };
+    }
+
+    abstract void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b);
 
     static class ColorComponent {
         static final ColorComponent EMPTY = new ColorComponent(new TextComponent(""), 0);

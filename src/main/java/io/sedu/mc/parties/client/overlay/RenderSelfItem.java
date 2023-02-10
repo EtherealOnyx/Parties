@@ -26,6 +26,7 @@ public abstract class RenderSelfItem extends RenderItem {
     abstract void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
                              float partialTicks);
 
+
     @Override
     public void initItem() {
         //If forced items are required and different (i.e, chicken)

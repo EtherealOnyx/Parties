@@ -1,23 +1,25 @@
 package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static Util.Render.sizeRectNoA;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
@@ -29,6 +31,27 @@ public class PEffects extends RenderSelfItem {
 
     public PEffects(String name, int x, int y, int width, int height) {
         super(name, x, y, width, height);
+    }
+
+    @Override
+    int getColor() {
+        return Config.cG();
+    }
+
+    @Override
+    public String getType() {
+        return "Bar";
+    }
+
+    @Override
+    void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
+        RenderSystem.enableDepthTest();
+        TextureAtlasSprite sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.BAD_OMEN);
+        RenderSystem.setShaderTexture(0, sprite.atlas().location());
+        Gui.blit(poseStack, b.x + 11, b.y+2,0, 18, 18, sprite);
+        sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.DAMAGE_RESISTANCE);
+        RenderSystem.setShaderTexture(0, sprite.atlas().location());
+        Gui.blit(poseStack, b.x + 3, b.y +3,0, 18, 18, sprite);
     }
 
     @Override
@@ -88,11 +111,9 @@ public class PEffects extends RenderSelfItem {
     }
 
     boolean renderOverflow(ForgeIngameGui gui, PoseStack poseStack, int i, int iX, int iY, float partialTicks) {
-        gui.getFont().draw(poseStack, "▪▪▪", rX(i, iX)+2, rY(i, iY)+3, Config.cG());
         gui.getFont().drawShadow(poseStack, "▪▪▪", rX(i, iX)+2, rY(i, iY)+3, Config.cG());
         int alpha = (int) Mth.clamp((255*(float) (.5f + Math.sin((gui.getGuiTicks() + partialTicks) / 4f) / 2f)), 10, 245);
         //TODO: Remove width hardcoding for all values here. Maybe.
-        gui.getFont().draw(poseStack, "▫▫▫", rX(i, iX)+2, rY(i, iY)+3, Config.cB() | alpha << 24);
         gui.getFont().drawShadow(poseStack, "▫▫▫", rX(i, iX)+2, rY(i, iY)+3, Config.cB() | alpha << 24);
         return (notEditing() && withinBounds(rX(i, iX), rY(i, iY), rX(i, iX)+13, rY(i, iY)+13, 1));
     }
@@ -126,7 +147,6 @@ public class PEffects extends RenderSelfItem {
         if (!effect.getRomanTrimmed().equals("")) {
             x = sX(i, iX) + 24 - gui.getFont().width(effect.getRomanTrimmed());
             y = sY(i, iY) + 16;
-            gui.getFont().draw(poseStack, effect.getRomanTrimmed(), x, y, 0xFFD700);
             gui.getFont().drawShadow(poseStack, effect.getRomanTrimmed(), x, y, 0xFFD700);
         }
 
@@ -135,7 +155,6 @@ public class PEffects extends RenderSelfItem {
         if (!effect.isInstant()) {
             x = sX(i, iX) + effect.getOffset() + 8;
             y = sY(i, iY) + 29;
-            gui.getFont().draw(poseStack, effect.getDisplay(), x, y, 0xFFFFFF);
             gui.getFont().drawShadow(poseStack, effect.getDisplay(), x, y, 0xFFFFFF);
             secs = effect.getDur() + "s";
             scol = 0xFFFFFF;
@@ -174,45 +193,15 @@ public class PEffects extends RenderSelfItem {
 
     private void rectInscribed(Matrix4f pose, int radius, int x, int y, int width, int height, int outColor, boolean ben) {
         if (ben)
-            rectC(pose, x, y, width, height, Config.cG(), Config.cG());
+            sizeRectNoA(pose, x, y, width, height, Config.cG(), Config.cG());
         else
-            rectC(pose, x, y, width, height,  Config.cB(), Config.cB());
-        rectC(pose, x+radius, y+radius, width-(radius*2), height-(radius*2), 0x212121, (outColor & 0xfefefe) >> 1);
+            sizeRectNoA(pose, x, y, width, height, Config.cB(), Config.cB());
+        sizeRectNoA(pose, x+radius, y+radius, width-(radius*2), height-(radius*2), 0x212121, (outColor & 0xfefefe) >> 1);
     }
 
     private void rectInscribedFlash(Matrix4f pose, int radius, int x, int y, int width, int height, int flashColor, int outColor) {
-        rectC(pose, x, y, width, height,  Config.cF(), flashColor);
-        rectC(pose, x+radius, y+radius, width-(radius*2), height-(radius*2), 0x212121, (outColor & 0xfefefe) >> 1);
-    }
-
-    public static void rectC(Matrix4f mat, float x, float y, int width, int height, int startColor, int endColor)
-    {
-        float startAlpha = 1f;
-        float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
-        float startGreen = (float)(startColor >>  8 & 255) / 255.0F;
-        float startBlue  = (float)(startColor       & 255) / 255.0F;
-        float endAlpha   = 1f;
-        float endRed     = (float)(endColor   >> 16 & 255) / 255.0F;
-        float endGreen   = (float)(endColor   >>  8 & 255) / 255.0F;
-        float endBlue    = (float)(endColor         & 255) / 255.0F;
-
-        RenderSystem.disableTexture();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        RenderSystem.enableDepthTest();
-
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(mat, x+width,    y, 0).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat,  x,    y, 0).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat,  x, y+height, 0).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
-        buffer.vertex(mat, x+width, y+height, 0).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
-        tessellator.end();
-
-        RenderSystem.disableBlend();
-        RenderSystem.enableTexture();
+        sizeRectNoA(pose, x, y, width, height, Config.cF(), flashColor);
+        sizeRectNoA(pose, x+radius, y+radius, width-(radius*2), height-(radius*2), 0x212121, (outColor & 0xfefefe) >> 1);
     }
 
     private int sX(int pI, int bI) {

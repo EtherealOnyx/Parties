@@ -2,6 +2,7 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.gui.HoverScreen;
+import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.IIngameOverlay;
 
@@ -17,6 +18,21 @@ public class ConfigOverlay extends RenderItem {
 
     public ConfigOverlay(String name) {
         super(name);
+    }
+
+    @Override
+    int getColor() {
+        return 0;
+    }
+
+    @Override
+    public String getType() {
+        return null;
+    }
+
+    @Override
+    void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
+
     }
 
     @Override

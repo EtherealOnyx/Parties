@@ -6,8 +6,10 @@ import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
@@ -15,9 +17,25 @@ import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
 public class PDimIcon extends RenderSelfItem {
 
+    public static ItemStack dimIcon = null;
 
     public PDimIcon(String name, int x, int y) {
         super(name, x, y, 32, 32);
+    }
+
+    @Override
+    int getColor() {
+        return 0x93c263;
+    }
+
+    @Override
+    public String getType() {
+        return "Misc";
+    }
+
+    @Override
+    void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
+        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(dimIcon, b.x+8, b.y+3, 0);
     }
 
     @Override
@@ -39,7 +57,8 @@ public class PDimIcon extends RenderSelfItem {
     private void world(PoseStack poseStack, int pI, ForgeIngameGui gui, ClientPlayerData id) {
         DimConfig.entry(id.dim.dimension, (sprite, color) -> {
             poseStack.pushPose();
-            poseStack.scale(.25f, .25f, .25f);
+            poseStack.scale(.25f, .25f, 1f);
+            poseStack.translate(0,0,10f);
 
             rectScaled(pI, poseStack, 0, -1, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 4f);
 
@@ -54,6 +73,7 @@ public class PDimIcon extends RenderSelfItem {
                 renderTooltip(poseStack, gui, 10, 0, id.dim.dimNorm, (color & 0xfefefe) >> 1, color, 0, (color & 0xfefefe) >> 1, color);
             }
         });
+
     }
 
 
@@ -90,8 +110,8 @@ public class PDimIcon extends RenderSelfItem {
         }
 
         poseStack.pushPose();
-        poseStack.scale(.25f+scaleSlow, .25f+scaleSlow, .25f+scaleSlow);
-        poseStack.translate(translateX, translateY, 0);
+        poseStack.scale(.25f+scaleSlow, .25f+scaleSlow, 1f);
+        poseStack.translate(translateX, translateY, 10);
         int color, x, y;
         TextureAtlasSprite sprite;
         x = (int) (x(pI)*(4-scale));
@@ -165,14 +185,13 @@ public class PDimIcon extends RenderSelfItem {
         for (int j = 0; j < dim.dimName.size(); j++) {
             poseStack.pushPose();
             if (j % 2 == 1)
-                poseStack.translate(-transX, 0, 0);
+                poseStack.translate(-transX, 0, 10);
             else
-                poseStack.translate(transX, 0, 0);
+                poseStack.translate(transX, 0, 10);
             x = (int) (x(partyIndex)-gui.getFont().width(dim.dimName.get(j))/2f)+18;
             //TODO: Remove hardcoding of 11 for when scaling is allowed.
             y = y(partyIndex) - 11 + (j*gui.getFont().lineHeight) - ((gui.getFont().lineHeight*dim.dimName.size()-1)>>1);
            if (alphaPercent > 0f) {
-                gui.getFont().draw(poseStack, dim.dimName.get(j), x, y, color | ((int)(255*alphaPercent) << 24));
                 gui.getFont().drawShadow(poseStack, dim.dimName.get(j), x, y, color | ((int)(255*alphaPercent) << 24));
             }
             poseStack.popPose();

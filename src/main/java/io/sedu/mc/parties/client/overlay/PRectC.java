@@ -2,6 +2,7 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.gui.HoverScreen;
+import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 public class PRectC extends RenderItem {
@@ -13,9 +14,29 @@ public class PRectC extends RenderItem {
     }
 
     @Override
+    int getColor() {
+        return 0;
+    }
+
+    @Override
+    public String getType() {
+        return "BG";
+    }
+
+    @Override
+    void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
+
+    }
+
+    @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         //Clickable
         //rect(i, poseStack,-2, 0, 0x88FFFFFF, 0x88FFFFFF);
+    }
+
+    @Override
+    public boolean isTabRendered() {
+        return false;
     }
 
     @Override

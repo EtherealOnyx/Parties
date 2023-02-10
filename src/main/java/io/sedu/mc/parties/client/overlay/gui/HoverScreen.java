@@ -11,12 +11,12 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+
+import static Util.Render.tip;
 
 public class HoverScreen extends Screen {
 
@@ -70,8 +70,8 @@ public class HoverScreen extends Screen {
     protected void init() {
         //TODO: Add 'rearranging' boolean to know when config is in this state or not. helps with 2nd todo.
         int y = Math.max(0, clickArea.t(0) - 10);
-        settingsButton = addRenderableWidget(new SmallButton(clickArea.l(0), y, "⚙", p -> doTask(1), tip("Open Party Settings"), .5f, .5f, 1f, .5f));
-        goBackButton = addRenderableWidget(new SmallButton(clickArea.l(0), y,"x", p -> doTask(1), tip("Close"), 1f, .5f, .5f));
+        settingsButton = addRenderableWidget(new SmallButton(clickArea.l(0), y, "⚙", p -> doTask(1), tip(this, "Open Party Settings"), .5f, .5f, 1f, .5f));
+        goBackButton = addRenderableWidget(new SmallButton(clickArea.l(0), y,"x", p -> doTask(1), tip(this, "Close"), 1f, .5f, .5f));
         initPartyButtons();
         initMenuButtons(y);
         initDragButtons();
@@ -87,44 +87,44 @@ public class HoverScreen extends Screen {
             for (int i = 0; i < ClientPlayerData.partySize(); i++) {
                 int finalI = i;
                 if (i == ClientPlayerData.partySize()-1) {
-                    b = addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, tip("Move Down")));
+                    b = addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, tip(this, "Move Down")));
                     b.active = false;
                     moveParty.add(b);
                 }
                 else
-                    moveParty.add(addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI+1), tip("Move Down"))));
+                    moveParty.add(addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI+1), tip(this, "Move Down"))));
 
                 if (i == 0) {
-                    b = addRenderableWidget(new Button(clickArea.l(i) , clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, tip("Move Up")));
+                    b = addRenderableWidget(new Button(clickArea.l(i) , clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, tip(this, "Move Up")));
                     b.active = false;
                     moveParty.add(b);
                 }
                 else
-                    moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI-1, finalI), tip("Move Up"))));
+                    moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI-1, finalI), tip(this, "Move Up"))));
                 //RenderItem.rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
             }
         }
     }
 
     private void initMenuButtons(int y) {
-        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0), y,"x", p -> doTask(0), tip("Close Menu"), 1f, .5f, .5f)));
-        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0)+11, y,"⬆⬇", p -> doTask(2), tip("Change Party Order"), .5f, .5f, 1f)));
-        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0)+22, y,"✥", p -> doTask(3), tip("Reposition Party Frame"), 0, 1, .5f, .5f, 1f)));
-        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0)+33, y,"⚙", p -> doTask(4), tip("Open Advanced Settings"), 0, 1, .5f, 1f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0), y,"x", p -> doTask(0), tip(this, "Close Menu"), 1f, .5f, .5f)));
+        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0)+11, y,"⬆⬇", p -> doTask(2), tip(this, "Change Party Order"), .5f, .5f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0)+22, y,"✥", p -> doTask(3), tip(this, "Reposition Party Frame"), 0, 1, .5f, .5f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(clickArea.l(0)+33, y,"⚙", p -> doTask(4), tip(this, "Open Advanced Settings"), 0, 1, .5f, 1f, 1f)));
 
     }
 
     private void initDragButtons() {
         int y = Math.max(0, RenderItem.frameY - 10);
-        moveFrame.add(addRenderableWidget(new SmallButton(RenderItem.frameX, y, "x", p -> revertPos(), tip("Revert & Close"), 1, .5f, .5f)));
-        moveFrame.add(addRenderableWidget(new SmallButton(RenderItem.frameX+11, y,"↺", p -> defaultPos(), tip("Reset To Default & Close"), .5f, 1f, 1f)));
-        Button b = addRenderableWidget(new SmallButton(RenderItem.frameX+22, y,"◄", p -> updatePos(true), tip("Undo Move"), 1, 1, .5f));
+        moveFrame.add(addRenderableWidget(new SmallButton(RenderItem.frameX, y, "x", p -> revertPos(), tip(this, "Revert & Close"), 1, .5f, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(RenderItem.frameX+11, y,"↺", p -> defaultPos(), tip(this, "Reset To Default & Close"), .5f, 1f, 1f)));
+        Button b = addRenderableWidget(new SmallButton(RenderItem.frameX+22, y,"◄", p -> updatePos(true), tip(this, "Undo Move"), 1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        b = addRenderableWidget(new SmallButton(RenderItem.frameX+33, y, "►", p -> updatePos(false), tip("Redo Move"),1, 1, .5f));
+        b = addRenderableWidget(new SmallButton(RenderItem.frameX+33, y, "►", p -> updatePos(false), tip(this, "Redo Move"),1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        moveFrame.add(addRenderableWidget(new SmallButton(RenderItem.frameX+44, y,"✓", p -> acceptPos(), tip("Save Position & Close"), .5f, 1, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(RenderItem.frameX+44, y,"✓", p -> acceptPos(), tip(this, "Save Position & Close"), .5f, 1, .5f)));
 
     }
 
@@ -293,21 +293,6 @@ public class HoverScreen extends Screen {
                 Minecraft.getInstance().setScreen(new SettingsScreen());
             }
         }
-    }
-
-    private Button.OnTooltip tip(String t) {
-        return new Button.OnTooltip() {
-            private final Component text = new TextComponent(t);
-
-            public void onTooltip(Button b, PoseStack p, int mX, int mY) {
-                if (b.active)
-                    HoverScreen.this.renderTooltip(p, text, mX, mY+16);
-            }
-
-            public void narrateTooltip(Consumer<Component> p_169456_) {
-                p_169456_.accept(this.text);
-            }
-        };
     }
 
 
