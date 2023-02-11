@@ -23,12 +23,14 @@ import java.util.List;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseX;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseY;
+import static io.sedu.mc.parties.client.overlay.gui.SettingsScreen.INNER_LOC;
 import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 
 public abstract class RenderItem {
 
     public static final LinkedHashMap<String, RenderItem> items = new LinkedHashMap<>();
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
+    static final ResourceLocation TAB_LOC = new ResourceLocation("textures/block/glass.png");
 
     public static int frameX = 16;
     public static int frameY = 16;
@@ -184,25 +186,35 @@ public abstract class RenderItem {
         gui.getFont().drawShadow(p, type, x+16-(gui.getFont().width(type)>>1), y+22, getColor());
     }
 
-    void renderTab(PoseStack p, TabButton b, ForgeIngameGui gui) {
+    void renderTab(PoseStack p, TabButton b) {
         RenderSystem.enableDepthTest();
         Render.setColor(getColor());
-        Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 150,  new ResourceLocation("textures/block/glass.png"));
+        Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 150, new ResourceLocation("textures/block/glass.png"));
         Render.sizeRect(p.last().pose(), b.x, b.y, b.getWidth(), b.getHeight(), 0x44FFFFFF, 0x88000000);
         resetColor();
-        Render.borderRect(p.last().pose(), -2, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 150 << 24,getColor() | 100 << 24);
-        renderTypeText(p, gui, b.type, b.x, b.y);
+        Render.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 100 << 24,getColor() | 100 << 24);
+
     }
 
 
     void renderTabHover(PoseStack p, TabButton b) {
-        Render.sizeRect(p.last().pose(), b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 150 << 24, 0x88000000);
+        RenderSystem.enableDepthTest();
+        Render.setColor(getColor());
+        Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 255, new ResourceLocation("textures/block/glass.png"));
+        Render.sizeRect(p.last().pose(), b.x, b.y, b.getWidth(), b.getHeight(), 0x66FFFFFF, 0x22FFFFFF);
+        resetColor();
         Render.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 200 << 24, getColor());
     }
 
     void renderTabClicked(PoseStack p, TabButton b) {
-        Render.sizeRect(p.last().pose(), b.x, b.y, b.getWidth(), b.getHeight(), 0x00444444, 0x88000000);
-        Render.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 255 << 24, 0);
+        RenderSystem.enableDepthTest();
+        Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 110, INNER_LOC);
+        Render.setColor(getColor());
+        Render.sizeRect(p.last().pose(), b.x, b.y, b.getWidth(), b.getHeight(), 0x77FFFFFF, 0x00FFFFFF);
+        resetColor();
+        p.translate(0,0,5);
+        Render.borderRectNoBottom(p.last().pose(), -1, 2, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 255 << 24, getColor() | 150 << 24);
+        p.translate(0,0,-5);
     }
 
     abstract int getColor();
@@ -397,10 +409,34 @@ public abstract class RenderItem {
         return height;
     }
 
-    public TabButton.OnRender render(ForgeIngameGui gui) {
-        return (poseStack, b) -> {
-            renderTab(poseStack, b, gui);
-            renderElement(poseStack, gui, b);
+    public TabButton.Action render(ForgeIngameGui gui) {
+        return new TabButton.Action() {
+
+            @Override
+            public void onRender(PoseStack p, TabButton b) {
+                renderTab(p, b);
+                renderTypeText(p, gui, b.type, b.x, b.y);
+                renderElement(p, gui, b);
+            }
+
+            @Override
+            public void onHover(PoseStack p, TabButton b) {
+                renderTabHover(p, b);
+                renderTypeText(p, gui, b.type, b.x, b.y);
+                renderElement(p, gui, b);
+            }
+
+            @Override
+            public void onSelect(PoseStack p, TabButton b) {
+                renderTabClicked(p, b);
+                renderTypeText(p, gui, b.type, b.x, b.y);
+                renderElement(p, gui, b);
+            }
+
+            @Override
+            public void onRenderOptions(PoseStack poseStack, ForgeIngameGui gui, int x, int y, int w, int h) {
+                Render.sizeRectNoA(poseStack.last().pose(), x, y, w+100, 20, 0xFFFFFF);
+            }
         };
     }
 

@@ -160,27 +160,27 @@ public class Render {
 
     public static void borderRectNoA(Matrix4f pose, int offset, int thickness, int x, int y, int width, int height, int colorStart, int colorEnd) {
         Render.sizeRectNoA(pose, x - thickness - offset, y - thickness - offset, width + ((thickness + offset)<<1), thickness, colorStart, colorStart);
-        Render.sizeRectNoA(pose, x - thickness - offset, y + width + offset, width + ((thickness + offset)<<1), thickness, colorEnd, colorEnd);
+        Render.sizeRectNoA(pose, x - thickness - offset, y + height + offset, width + ((thickness + offset)<<1), thickness, colorEnd, colorEnd);
         Render.sizeRectNoA(pose, x - thickness - offset, y - (offset), thickness, height+(offset<<1), colorStart, colorEnd);
         Render.sizeRectNoA(pose, x + width + offset, y - (offset), thickness, height+(offset<<1), colorStart, colorEnd);
     }
 
     public static void borderRectNoA(Matrix4f pose, int offset, int thickness, int x, int y, int width, int height, int color) {
         Render.sizeRectNoA(pose, x - thickness - offset, y - thickness - offset, width + ((thickness + offset)<<1), thickness, color);
-        Render.sizeRectNoA(pose, x - thickness - offset, y + width + offset, width + ((thickness + offset)<<1), thickness, color);
+        Render.sizeRectNoA(pose, x - thickness - offset, y + height + offset, width + ((thickness + offset)<<1), thickness, color);
         Render.sizeRectNoA(pose, x - thickness - offset, y - (offset), thickness, height+(offset<<1), color);
         Render.sizeRectNoA(pose, x + width + offset, y - (offset), thickness, height+(offset<<1), color);
     }
 
     public static void borderRect(Matrix4f pose, int offset, int thickness, int x, int y, int width, int height, int color) {
         Render.sizeRect(pose, x - thickness - offset, y - thickness - offset, width + ((thickness + offset)<<1), thickness, color);
-        Render.sizeRect(pose, x - thickness - offset, y + width + offset, width + ((thickness + offset)<<1), thickness, color);
+        Render.sizeRect(pose, x - thickness - offset, y + height + offset, width + ((thickness + offset)<<1), thickness, color);
         Render.sizeRect(pose, x - thickness - offset, y - (offset), thickness, height+(offset<<1), color);
         Render.sizeRect(pose, x + width + offset, y - (offset), thickness, height+(offset<<1), color);
     }
     public static void borderRect(Matrix4f pose, int offset, int thickness, int x, int y, int width, int height, int colorStart, int colorEnd) {
         Render.sizeRect(pose, x - thickness - offset, y - thickness - offset, width + ((thickness + offset)<<1), thickness, colorStart, colorStart);
-        Render.sizeRect(pose, x - thickness - offset, y + width + offset, width + ((thickness + offset)<<1), thickness, colorEnd, colorEnd);
+        Render.sizeRect(pose, x - thickness - offset, y + height + offset, width + ((thickness + offset)<<1), thickness, colorEnd, colorEnd);
         Render.sizeRect(pose, x - thickness - offset, y - (offset), thickness, height+(offset<<1), colorStart, colorEnd);
         Render.sizeRect(pose, x + width + offset, y - (offset), thickness, height+(offset<<1), colorStart, colorEnd);
     }
@@ -204,5 +204,12 @@ public class Render {
         float startGreen = (float)(color >>  8 & 255) / 255.0F;
         float startBlue  = (float)(color       & 255) / 255.0F;
         RenderSystem.setShaderColor(startRed, startGreen, startBlue, 1f);
+    }
+
+    public static void borderRectNoBottom(Matrix4f pose, int offset, int thickness, int x, int y, int width, int height, int colorStart, int colorEnd) {
+        Render.sizeRect(pose, x - thickness - offset, y - thickness - offset, width + ((thickness + offset)<<1), thickness, colorStart, colorStart);
+        //Render.sizeRect(pose, x - thickness - offset, y + width + offset, width + ((thickness + offset)<<1), thickness, colorEnd, colorEnd);
+        Render.sizeRect(pose, x - thickness - offset, y - (offset), thickness, height + offset, colorStart, colorEnd);
+        Render.sizeRect(pose, x + width + offset, y - (offset), thickness,  height + offset, colorStart, colorEnd);
     }
 }

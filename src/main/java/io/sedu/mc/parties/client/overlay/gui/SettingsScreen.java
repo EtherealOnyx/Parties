@@ -19,16 +19,19 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import static Util.Render.renderBg;
 import static Util.Render.tip;
 
 public class SettingsScreen extends Screen {
-    private final ResourceLocation MENU_LOC = new ResourceLocation("textures/block/deepslate_tiles.png");
+    private final ResourceLocation MENU_LOC = new ResourceLocation("textures/block/spruce_planks.png");
     private final ResourceLocation MOD_LOC = new ResourceLocation("textures/block/polished_basalt_side.png");
-    private final ResourceLocation INNER_LOC = new ResourceLocation("textures/block/deepslate_bricks.png");
+    public static ResourceLocation INNER_LOC = new ResourceLocation("textures/block/deepslate_bricks.png");
     private final ResourceLocation OPTIONS_LOC = new ResourceLocation("textures/block/polished_basalt_side.png");
-    private final ResourceLocation SEARCH_LOC = new ResourceLocation("textures/block/stone.png");
+    private final ResourceLocation SEARCH_LOC = new ResourceLocation("textures/block/deepslate_tiles.png");
+
     int screenW;
     int screenH;
     int screenX = 0;
@@ -38,7 +41,7 @@ public class SettingsScreen extends Screen {
     int eleBoxY;
     int eleBoxW;
     int eleBoxH;
-    private static int selEle = 0;
+    static int selEle = 0;
     private static int offEle = 0;
     int maxEles = 0;
     HashMap<String, TabButton> tabs = new HashMap<>();
@@ -62,10 +65,10 @@ public class SettingsScreen extends Screen {
 
     //TODO: Save changes into a new class that tracks the component and the subtype and the value of the change. Disable clearing until they press X
 
-    private Button left = new Button(0, 0, 20, 20, new TextComponent("◄"), b -> cycleElements(true), tip(this, "Cycle Elements Left"));
-    private Button right = new Button(0, 0, 20, 20, new TextComponent("►"), b -> cycleElements(false), tip(this, "Cycle Elements Right"));
-    private Button showModBox = new Button(0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters"));
-    private Button hideModBox = new Button(0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters"));
+    private Button left = new ColorButton(0xbb8f44, 0, 0, 20, 20, new TextComponent("◄"), b -> cycleElements(true), tip(this, "Cycle Elements Left"));
+    private Button right = new ColorButton(0xbb8f44,0, 0, 20, 20, new TextComponent("►"), b -> cycleElements(false), tip(this, "Cycle Elements Right"));
+    private Button showModBox = new ColorButton(0x6536c3,0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters"));
+    private Button hideModBox = new ColorButton(0x6536c3,0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters"));
 
     private void toggleModBox(boolean show) {
         if (show) {
@@ -96,16 +99,16 @@ public class SettingsScreen extends Screen {
         }
     }
 
+
+
+
     @Override
-    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
-        if (pKeyCode == 256 && this.shouldCloseOnEsc()) {
-            this.onClose();
-            PHead.playerHead = null;
-            PName.nameTag = null;
-            PDimIcon.dimIcon = null;
-            return true;
-        }
-        return false;
+    public void onClose() {
+        PHead.playerHead = null;
+        PName.nameTag = null;
+        PDimIcon.dimIcon = null;
+        INNER_LOC = null;
+        super.onClose();
     }
 
     private void removeRenderButtons() {
@@ -123,50 +126,46 @@ public class SettingsScreen extends Screen {
         //this.renderBackground(poseStack);
         //renderBg();
 
-        renderBack(poseStack);
+        renderConfig();
+        assert minecraft != null;
+        tabs.get(tabsOrder.get(selEle)).renderInner(poseStack, (ForgeIngameGui) minecraft.gui, screenX + modBoxW, screenY + eleBoxH, screenW - 64, screenH - 56);
         renderElementBox(poseStack);
         if (modVisible)
-            renderModBox(poseStack);
-        renderGenBox(poseStack);
-        renderOptionsBox(poseStack);
-        renderSearchBox(poseStack);
+            renderModBox();
+        renderOptionsBox();
+        renderSearchBox();
         renderShadows(poseStack);
+
+
         super.render(poseStack, pMouseX, pMouseY, pPartialTick);
+
     }
 
-    private void renderSearchBox(PoseStack poseStack) {
-        renderBg(searchBoxX, searchBoxY, searchBoxX + searchBoxW, searchBoxY + searchBoxH, searchBoxW, searchBoxH, 100, SEARCH_LOC);
+    private void renderConfig() {
+        renderBg(screenX, screenY + eleBoxH, screenX + screenW - optBoxW, screenY + screenH - searchBoxH, screenW - modBoxW - optBoxW, screenH - eleBoxH - searchBoxH, 110, INNER_LOC);
     }
 
-    private void renderOptionsBox(PoseStack poseStack) {
+    private void renderSearchBox() {
+        renderBg(searchBoxX, searchBoxY, searchBoxX + searchBoxW, searchBoxY + searchBoxH, searchBoxW, searchBoxH, 200, SEARCH_LOC);
+    }
+
+    private void renderOptionsBox() {
         renderBg(optBoxX, optBoxY, optBoxX + optBoxW, optBoxY + optBoxH, optBoxW, optBoxH, 175, OPTIONS_LOC);
     }
 
-    private void renderModBox(PoseStack poseStack) {
+    private void renderModBox() {
         //RenderItem.drawRect(poseStack.last().pose(), 0,modBoxX - 40, modBoxY, modBoxX + modBoxW, modBoxY + modBoxH, 0x33000000, 0x33000000);
         renderBg(modBoxX, modBoxY, modBoxX + modBoxW, modBoxY + modBoxH, modBoxW, modBoxH, 175, MOD_LOC);
     }
 
-    private void renderBack(PoseStack poseStack) {
-        //RenderItem.drawRectCO(poseStack.last().pose(), -2, screenX-2, screenY-2, screenX + screenW+2, screenY + screenH+2, 0, 0);
-        renderBg(screenX, screenY + eleBoxH, screenX + screenW - optBoxW, screenY + screenH - searchBoxH, screenW - modBoxW - optBoxW, screenH - eleBoxH - searchBoxH, 110, INNER_LOC);
-        //renderBg(screenX, screenY, screenX + screenW, screenY + screenH, screenW, screenH, 255, INNER_LOC);
-    }
-
-    private void renderGenBox(PoseStack poseStack) {
-        //renderBg(screenX, screenY, screenX + 32, screenY + 32, 32, 32, 255, GEN_LOC);
-        //RenderItem.drawRectCO(poseStack.last().pose(), 0, screenX, screenY, screenX + 32, screenY + 32, 0xAAAAFF, 0xAAAAFF);
-    }
-
     private void renderElementBox(PoseStack poseStack) {
         //RenderItem.drawRect(poseStack.last().pose(), 0,eleBoxX, eleBoxY, eleBoxX + eleBoxW, eleBoxY + eleBoxH, 0x33000000, 0x33000000);
-        renderBg(eleBoxX-32, eleBoxY, eleBoxX + eleBoxW, eleBoxY + eleBoxH, eleBoxW+32, eleBoxH, 255, MENU_LOC);
+        renderBg(eleBoxX, eleBoxY, eleBoxX + eleBoxW, eleBoxY + eleBoxH, eleBoxW+32, eleBoxH, 255, MENU_LOC);
 
-        int numElements = 20;
         //With Arrows
-        if (numElements > maxEles) {
+        if (tabs.size() > maxEles) {
             for (int i = 0; i < maxEles-2; i++) {
-                renderElementTab(poseStack, i, 34 + i*34);
+                renderElementTab(poseStack, i, 34 + i*32);
             }
         }
 
@@ -197,11 +196,13 @@ public class SettingsScreen extends Screen {
 
 
     protected void init() {
+        INNER_LOC = new ResourceLocation("textures/block/deepslate_bricks.png");
         PHead.playerHead = new ItemStack(Items.PLAYER_HEAD);
         assert Minecraft.getInstance().player != null;
         PHead.playerHead.addTagElement("SkullOwner", StringTag.valueOf(Minecraft.getInstance().player.getName().getContents()));
         PName.nameTag = Items.NAME_TAG.getDefaultInstance();
         PDimIcon.dimIcon = Items.END_PORTAL_FRAME.getDefaultInstance();
+
         setBounds(width, height);
         //Setup Data.
         initTabButtons();
@@ -209,19 +210,28 @@ public class SettingsScreen extends Screen {
     }
 
     private void initTabButtons() {
-        RenderItem.items.forEach((s, renderItem) -> {
-            if (renderItem.isTabRendered()) {
-                tabsOrder.add(s);
+        int i = 0;
+        Iterator<Map.Entry<String, RenderItem>> iter = RenderItem.items.entrySet().iterator();
+        Map.Entry<String, RenderItem> item;
+        while (iter.hasNext()) {
+            item = iter.next();
+            if (item.getValue().isTabRendered()) {
+                tabsOrder.add(item.getKey());
                 assert minecraft != null;
-                tabs.put(s, new TabButton(0, 0, 32, 32, pButton -> {},
-                                          Render.tip(this, new TranslatableComponent(renderItem.translateName())),
-                                          renderItem.render((ForgeIngameGui) minecraft.gui),
-                                          renderItem.getType()
+                tabs.put(item.getKey(), new TabButton(i, 0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
+                                                      Render.tip(this, new TranslatableComponent(item.getValue().translateName())),
+                                                      item.getValue().render((ForgeIngameGui) minecraft.gui),
+                                                      item.getValue().getType()
 
                 ));
+                i++;
             }
-        });
+        }
         initRenderButtons();
+    }
+
+    private void selectButton(int i) {
+        selEle = i;
     }
 
     private void initRenderButtons() {
@@ -277,9 +287,9 @@ public class SettingsScreen extends Screen {
         screenY = (height-screenH)>>1;
 
 
-        eleBoxW = screenW - 32;
+        eleBoxW = screenW;
         maxEles = (eleBoxW) / 32;
-        eleBoxX = screenX + 32;
+        eleBoxX = screenX;
         eleBoxY = screenY;
         eleBoxH = Math.min(32, screenH);
 
