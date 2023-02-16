@@ -1,16 +1,13 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PRectC;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.TextComponent;
 
 import java.util.ArrayList;
@@ -390,86 +387,5 @@ public class HoverScreen extends Screen {
             Minecraft.getInstance().setScreen(null);
         }
         return true;
-    }
-
-    private class SmallButton extends Button {
-
-        private float startAlpha = 1f;
-        private float r = 1f;
-        private float g = 1f;
-        private float b = 1f;
-        private int offX = 0;
-        private int offY = 0;
-        public SmallButton(int pX, int pY, String m, OnPress pOnPress, OnTooltip pOnTooltip, float a) {
-            super(pX, pY, 10,10, new TextComponent(m), pOnPress, pOnTooltip);
-            startAlpha = a;
-        }
-
-        public SmallButton(int pX, int pY, String m, OnPress pOnPress, OnTooltip pOnTooltip) {
-            super(pX, pY, 10,10, new TextComponent(m), pOnPress, pOnTooltip);
-        }
-
-        public SmallButton(int pX, int pY, String m, OnPress pOnPress, OnTooltip pOnTooltip, int offX, int offY) {
-            super(pX, pY, 10,10, new TextComponent(m), pOnPress, pOnTooltip);
-            this.offX = offX;
-            this.offY = offY;
-        }
-
-        public SmallButton(int pX, int pY, String m, OnPress pOnPress, OnTooltip pOnTooltip, float r, float g, float b) {
-            super(pX, pY, 10,10, new TextComponent(m), pOnPress, pOnTooltip);
-            this.r = r;
-            this.g = g;
-            this.b = b;
-
-        }
-
-        public SmallButton(int pX, int pY, String m, OnPress pOnPress, OnTooltip pOnTooltip, float r, float g, float b, float a) {
-            super(pX, pY, 10,10, new TextComponent(m), pOnPress, pOnTooltip);
-            this.r = r;
-            this.g = g;
-            this.b = b;
-            this.startAlpha = a;
-        }
-
-        public SmallButton(int pX, int pY, String m, OnPress pOnPress, OnTooltip pOnTooltip, int offX, int offY, float r, float g, float b) {
-            super(pX, pY, 10,10, new TextComponent(m), pOnPress, pOnTooltip);
-            this.offX = offX;
-            this.offY = offY;
-            this.r = r;
-            this.g = g;
-            this.b = b;
-        }
-
-        public void renderButton(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-            Minecraft minecraft = Minecraft.getInstance();
-            Font font = minecraft.font;
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderTexture(0, WIDGETS_LOCATION);
-
-            int i;
-            if (this.isHoveredOrFocused()) {
-                i = this.getYImage(true);
-                RenderSystem.setShaderColor(r, g, b, 1f);
-            } else {
-                i = this.getYImage(false);
-                RenderSystem.setShaderColor(r, g, b, startAlpha);
-            }
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.enableDepthTest();
-            pPoseStack.scale(.5f,.5f,.5f);
-            this.blit(pPoseStack, this.x<<1, this.y<<1, 0, 46 + i * 20, 10, 20);
-            this.blit(pPoseStack, (this.x<<1) + 10, this.y<<1, 190, 46 + i * 20, 10, 20);
-
-            pPoseStack.scale(2f,2f,2f);
-            this.renderBg(pPoseStack, minecraft, pMouseX, pMouseY);
-            int j = getFGColor();
-            drawCenteredString(pPoseStack, font, this.getMessage(), this.x+5+offX, this.y+offY, j);
-            if (this.isHoveredOrFocused()) {
-                this.renderToolTip(pPoseStack, pMouseX, pMouseY);
-            }
-        }
-
-
     }
 }

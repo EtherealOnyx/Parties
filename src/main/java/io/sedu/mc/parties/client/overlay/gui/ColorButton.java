@@ -36,6 +36,7 @@ public class ColorButton extends Button {
         int j = getFGColor();
         drawCenteredString(pPoseStack, font, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, j | Mth.ceil(this.alpha * 255.0F) << 24);
         if (this.isHoveredOrFocused()) {
+            RenderSystem.enableDepthTest();
             this.renderToolTip(pPoseStack, pMouseX, pMouseY);
         }
         RenderSystem.setShaderColor(1f,1f,1f,1f);

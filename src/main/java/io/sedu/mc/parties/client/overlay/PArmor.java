@@ -10,11 +10,13 @@ import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
-public class PArmor extends RenderSelfItem {
+public class PArmor extends RenderIconTextItem {
 
-    public PArmor(String name, int x, int y) {
-        super(name, x, y);
+    public PArmor(String name, int x, int y, int textColor) {
+        super(name, x, y, textColor);
     }
+
+
 
     @Override
     int getColor() {
@@ -39,19 +41,34 @@ public class PArmor extends RenderSelfItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        useAlpha(id.alpha);
-        setup(Gui.GUI_ICONS_LOCATION);
-        blit(poseStack, x(i), y(i), 34, 9, 9, 9);
-        resetColor();
-
-        if (notEditing() && withinBounds(x(i), y(i), x(i)+9, y(i)+9, 2)) {
-            renderTooltip(poseStack, gui, 10, 0, "Armor: " + id.getArmor(), 0xabfcff, 0x629b9e, 0xd1d1d1);
-        }
+        renderArmor(i, poseStack, gui, id.getArmor(), id.alpha);
     }
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isOnline)
-            renderSelf(i, id, gui, poseStack,partialTicks);
+            renderArmor(i, poseStack, gui, id.getArmor(), id.alpha);
+    }
+
+    void renderArmor(int i, PoseStack poseStack, ForgeIngameGui gui, int armor, float alpha){
+        useAlpha(alpha);
+        setup(Gui.GUI_ICONS_LOCATION);
+        blit(poseStack, x(i), y(i), 34, 9, 9, 9);
+        resetColor();
+
+        if (notEditing() && withinBounds(x(i), y(i), x(i)+9, y(i)+9, 2)) {
+            renderTooltip(poseStack, gui, 10, 0, "Armor: " + armor, 0xabfcff, 0x629b9e, 0xd1d1d1);
+        }
+        gui.getFont().draw(poseStack, String.valueOf(armor), tX(i), tY(i), color);
+    }
+
+    @Override
+    protected int attachedX(int pOffset) {
+        return x(pOffset) + 11;
+    }
+
+    @Override
+    protected int attachedY(int pOffset) {
+        return y(pOffset) + 1;
     }
 }

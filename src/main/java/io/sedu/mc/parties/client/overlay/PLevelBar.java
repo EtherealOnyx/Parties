@@ -8,12 +8,17 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
-public class PLevelBar extends RenderSelfItem {
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.*;
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseY;
+
+public class PLevelBar extends RenderIconTextItem {
 
 
-    public PLevelBar(String name, int x, int y, int width, int height) {
-        super(name, x, y, width, height);
+    public PLevelBar(String name, int x, int y, int width, int height, int textColor) {
+        super(name, x, y, width, height, textColor, true);
     }
+
+
 
     @Override
     int getColor() {
@@ -61,17 +66,17 @@ public class PLevelBar extends RenderSelfItem {
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isOnline) {
-            renderBar(i, poseStack, id.getXpBar());
+            renderBar(i, poseStack, id.getXpBar(), id.getXpLevel(), gui);
         }
     }
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         //useAlpha(id.alpha);
-        renderBar(i, poseStack, id.getXpBarForced());
+        renderBar(i, poseStack, id.getXpBarForced(), id.getLevelForced(), gui);
     }
 
-    void renderBar(int i, PoseStack poseStack, float bar) {
+    void renderBar(int i, PoseStack poseStack, float bar, int level, ForgeIngameGui gui) {
         setup(Gui.GUI_ICONS_LOCATION);
         RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
         RenderSystem.enableDepthTest();
@@ -86,6 +91,44 @@ public class PLevelBar extends RenderSelfItem {
         } else {
             blit(poseStack, x(i), y(i), 0, 69, w, height);
         }
+        renderText(gui, poseStack, String.valueOf(level), tX(i) - (gui.getFont().width(String.valueOf(level))>>1), tY(i), bar);
+    }
+
+    private void renderText(ForgeIngameGui g, PoseStack poseStack, String s, int x, int y, float level) {
+        poseStack.translate(0,0,1);
+        g.getFont().draw(poseStack, s, (float)(x + 1), (float)y, 0);
+        g.getFont().draw(poseStack, s, (float)(x - 1), (float)y, 0);
+        g.getFont().draw(poseStack, s, (float)x, (float)(y + 1), 0);
+        g.getFont().draw(poseStack, s, (float)x, (float)(y - 1), 0);
+        g.getFont().draw(poseStack, s, (float)x, (float)y, 8453920);
+        poseStack.translate(0,0,-1);
+        if (notEditing() && withinBounds(x, y, x+g.getFont().width(s), y + g.getFont().lineHeight, 2)) {
+            renderXpTooltip(poseStack, g, 10, 0, level);
+        }
+    }
+
+    protected void renderXpTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, float level) {
+
+        poseStack.pushPose();
+        poseStack.translate(0, 0, 400);
+        rectCO(poseStack, 0, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+offsetX+182, currentY+mouseY()+5+offsetY, 0x8ec265, 0x385e1a);
+        rectCO(poseStack, 0, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+offsetX+182, currentY+mouseY()+5+offsetY, 0x140514, 0x140514);
+        setup(Gui.GUI_ICONS_LOCATION);
+        RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
+        blit(poseStack, mouseX()+offsetX, currentY+mouseY()+offsetY, 0, 64, 182, 5);
+        blit(poseStack, mouseX()+offsetX, currentY+mouseY()+offsetY, 0, 69, (int) (182*level), 5);
+        poseStack.popPose();
+        currentY += gui.getFont().lineHeight+offsetY+8;
+    }
+
+    @Override
+    protected int attachedX(int pOffset) {
+        return l(pOffset) + (width>>1);
+    }
+
+    @Override
+    protected int attachedY(int pOffset) {
+        return y(pOffset) - 1;
     }
 
 

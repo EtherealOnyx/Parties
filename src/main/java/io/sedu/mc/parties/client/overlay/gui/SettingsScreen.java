@@ -1,7 +1,9 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
 import Util.Render;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.overlay.PDimIcon;
 import io.sedu.mc.parties.client.overlay.PHead;
 import io.sedu.mc.parties.client.overlay.PName;
@@ -41,11 +43,16 @@ public class SettingsScreen extends Screen {
     int eleBoxY;
     int eleBoxW;
     int eleBoxH;
+    int eleOffsetX;
     static int selEle = 0;
     private static int offEle = 0;
     int maxEles = 0;
     HashMap<String, TabButton> tabs = new HashMap<>();
     ArrayList<String> tabsOrder = new ArrayList<>();
+
+
+    private ConfigOptionsList options;
+    ArrayList<InputBox> tickables = new ArrayList<>();
 
     int modBoxX;
     int modBoxY;
@@ -65,10 +72,16 @@ public class SettingsScreen extends Screen {
 
     //TODO: Save changes into a new class that tracks the component and the subtype and the value of the change. Disable clearing until they press X
 
-    private Button left = new ColorButton(0xbb8f44, 0, 0, 20, 20, new TextComponent("◄"), b -> cycleElements(true), tip(this, "Cycle Elements Left"));
-    private Button right = new ColorButton(0xbb8f44,0, 0, 20, 20, new TextComponent("►"), b -> cycleElements(false), tip(this, "Cycle Elements Right"));
-    private Button showModBox = new ColorButton(0x6536c3,0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters"));
-    private Button hideModBox = new ColorButton(0x6536c3,0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters"));
+    private final Button left = new ColorButton(0xbb8f44, 0, 0, 20, 20, new TextComponent("◄"), b -> cycleElements(true), tip(this, "Cycle Elements Left"));
+    private final Button right = new ColorButton(0xbb8f44, 0, 0, 20, 20, new TextComponent("►"), b -> cycleElements(false), tip(this, "Cycle Elements Right"));
+    private final Button showModBox = new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters"));
+    private final Button hideModBox = new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters"));
+    private final Button toggleRGBMode = new SmallButton(0, 0, "c", b -> toggleRGB(), tip(this, "Toggle RGB Input Mode"), 1f, 1f, 1f);
+
+    private void toggleRGB() {
+        HexBox.rgbMode = !HexBox.rgbMode;
+        options.markDirty();
+    }
 
     private void toggleModBox(boolean show) {
         if (show) {
@@ -80,6 +93,7 @@ public class SettingsScreen extends Screen {
             hideModBox.visible = false;
             showModBox.visible = true;
         }
+        updateOptionsBounds();
     }
 
     private void cycleElements(boolean isLeftCycle) {
@@ -99,6 +113,10 @@ public class SettingsScreen extends Screen {
         }
     }
 
+    public void tick() {
+        tickables.forEach(InputBox::tick);
+    }
+
 
 
 
@@ -111,12 +129,19 @@ public class SettingsScreen extends Screen {
         super.onClose();
     }
 
-    private void removeRenderButtons() {
-        for (int i = offEle; i < offEle + maxEles - 2; i++)
-            removeWidget(tabs.get(tabsOrder.get(i)));
+    void addTickableEntry(InputBox input) {
+        tickables.add(input);
     }
 
-    ;
+    void resetTickables() {
+        tickables.clear();
+    }
+
+    private void removeRenderButtons() {
+        tabs.values().forEach(tabButton -> tabButton.visible = false);
+        //for (int i = offEle; i < offEle + maxEles - 2; i++)
+            //removeWidget(tabs.get(tabsOrder.get(i)));
+    }
 
     protected SettingsScreen() {
         super(new TextComponent("Party Advanced Settings"));
@@ -127,8 +152,12 @@ public class SettingsScreen extends Screen {
         //renderBg();
 
         renderConfig();
+        RenderSystem.enableDepthTest();
+        this.options.render(poseStack, pMouseX, pMouseY, pPartialTick);
         assert minecraft != null;
-        tabs.get(tabsOrder.get(selEle)).renderInner(poseStack, (ForgeIngameGui) minecraft.gui, screenX + modBoxW, screenY + eleBoxH, screenW - 64, screenH - 56);
+        //TODO: Store tab data in a variable in screen instead of constantly calling render
+        //TODO: Or implement another interface that is stored as a variable - the interface draws the config.
+        //TODO: If second method, also store config index and value in a new object class, and then store that in HashMap<String, configEntry>
         renderElementBox(poseStack);
         if (modVisible)
             renderModBox();
@@ -136,13 +165,12 @@ public class SettingsScreen extends Screen {
         renderSearchBox();
         renderShadows(poseStack);
 
-
         super.render(poseStack, pMouseX, pMouseY, pPartialTick);
 
     }
 
     private void renderConfig() {
-        renderBg(screenX, screenY + eleBoxH, screenX + screenW - optBoxW, screenY + screenH - searchBoxH, screenW - modBoxW - optBoxW, screenH - eleBoxH - searchBoxH, 110, INNER_LOC);
+        //renderBg( 0,0,0,0,0,0, 255, INNER_LOC);
     }
 
     private void renderSearchBox() {
@@ -203,9 +231,9 @@ public class SettingsScreen extends Screen {
         PName.nameTag = Items.NAME_TAG.getDefaultInstance();
         PDimIcon.dimIcon = Items.END_PORTAL_FRAME.getDefaultInstance();
 
-        setBounds(width, height);
         //Setup Data.
         initTabButtons();
+        setBounds(width, height, true);
         super.init();
     }
 
@@ -227,24 +255,34 @@ public class SettingsScreen extends Screen {
                 i++;
             }
         }
-        initRenderButtons();
+        removeRenderButtons();
+        //initRenderButtons();
+    }
+
+    @Override
+    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
+        tickables.forEach(inputBox -> inputBox.setFocus(false));
+        return super.mouseClicked(pMouseX,pMouseY, pButton);
     }
 
     private void selectButton(int i) {
+        //TODO: Prevent replace if setting has been changed without saving?
+        //TODO: Store items in double hashmap list if using bottom option.
+        //TODO: Or, save changes in a set list. Iterate through list updating each widget the list updates. Clear list when finally saved.
         selEle = i;
+        removeWidget(options);
+        options = null;
+        updateOptionsBounds();
     }
 
     private void initRenderButtons() {
         if (maxEles < tabsOrder.size()) {
-            left.x = eleBoxX + 6;
+            left.x = eleBoxX + 6 + eleOffsetX;
             left.y = eleBoxY + 6;
-            right.x = eleBoxX + 6 + (maxEles-1)*32;
+            right.x = eleBoxX + 6 + (maxEles-1)*32 + eleOffsetX;
             right.y = eleBoxY + 6;
             left.visible = true;
             right.visible = true;
-            addRenderableWidget(left);
-            addRenderableWidget(right);
-            //TODO: Test this in future: Scroll to right most, then expand window.
             if (offEle + maxEles - 2 > tabsOrder.size()) {
                 offEle = tabsOrder.size() - maxEles + 2;
             }
@@ -260,9 +298,9 @@ public class SettingsScreen extends Screen {
         Button b;
         for (int i = 0; i < maxEles - 2; i++) {
             b = tabs.get(tabsOrder.get(offEle+i));
-            b.x = eleBoxX + (i+1)*32;
+            b.x = eleOffsetX + eleBoxX + (i+1)*32;
             b.y = eleBoxY;
-            addRenderableWidget(b);
+            b.visible = true;
         }
     }
 
@@ -277,7 +315,7 @@ public class SettingsScreen extends Screen {
             right.active = true;
     }
 
-    private void setBounds(int width, int height) {
+    private void setBounds(int width, int height, boolean init) {
         this.screenW = Math.min(width>>1, 320);
         this.screenH = Math.min((height>>2)*3, 300);
         if (width > 720)
@@ -288,12 +326,14 @@ public class SettingsScreen extends Screen {
 
 
         eleBoxW = screenW;
-        maxEles = (eleBoxW) / 32;
+        maxEles = eleBoxW / 32;
+        eleOffsetX = (eleBoxW - (maxEles*32)) / 2;
         eleBoxX = screenX;
         eleBoxY = screenY;
         eleBoxH = Math.min(32, screenH);
 
-        clearWidgets();
+
+        removeRenderButtons();
         initRenderButtons();
 
         modBoxW = Math.min(32, screenW);
@@ -308,24 +348,63 @@ public class SettingsScreen extends Screen {
         hideModBox.y = showModBox.y;
         showModBox.visible = !modVisible;
         hideModBox.visible = modVisible;
-        addRenderableWidget(showModBox);
-        addRenderableWidget(hideModBox);
+
 
         optBoxH = screenH - eleBoxH;
         optBoxW = Math.min(32, screenW);
         optBoxX = screenX + screenW - optBoxW;
         optBoxY = screenY + eleBoxH;
+        toggleRGBMode.x = optBoxX + 11;
+        toggleRGBMode.y = optBoxY + 8;
 
         searchBoxH = Math.min(24, screenH);
         searchBoxW = screenW;
         searchBoxX = screenX;
         searchBoxY = screenY + screenH - searchBoxH;
 
+
+        if (init) {
+            addRenderableWidget(showModBox);
+            addRenderableWidget(hideModBox);
+            addRenderableWidget(left);
+            addRenderableWidget(right);
+            addRenderableWidget(toggleRGBMode);
+            tabs.values().forEach(this::addRenderableWidget);
+        }
+        updateOptionsBounds();
+
+    }
+
+    private void updateOptionsBounds() {
+        if (this.options == null) {
+            this.options = tabs.get(tabsOrder.get(selEle)).getOptions(this, minecraft, 0, 0, 0, 0);
+            this.addWidget(this.options);
+        }
+
+        if (modVisible)
+            this.options.resetPosition(modBoxX+modBoxW, eleBoxY + eleBoxH, screenW - modBoxW - optBoxW, screenH - eleBoxH - searchBoxH);
+        else
+            this.options.resetPosition(modBoxX, eleBoxY + eleBoxH, screenW - optBoxW, screenH - eleBoxH - searchBoxH);
     }
 
 
     public void resize(Minecraft pMinecraft, int pWidth, int pHeight) {
-        setBounds(pWidth, pHeight);
+        setBounds(pWidth, pHeight, false);
     }
 
+    public void finalizeUpdate(String name, int type, Object data) {
+        Parties.LOGGER.error("TRIGGERED FINALIZATION UPDATE FOR: " + tabsOrder.get(selEle) + " | " + name + " | " + data);
+        switch(type) {
+            case 0:
+                break;
+        }
+    }
+
+    public void triggerUpdate(String name, int type, Object data) {
+        Parties.LOGGER.error("TRIGGERED UPDATE FOR: " + tabsOrder.get(selEle) + " | " + name + " | " + data);
+        switch(type) {
+            case 0:
+                break;
+        }
+    }
 }

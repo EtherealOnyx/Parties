@@ -5,7 +5,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
+import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.client.overlay.gui.TabButton;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.GameRenderer;
@@ -300,9 +303,9 @@ public abstract class RenderItem {
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
         buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(mat, right,    top, zLevel).color(startRed, startGreen, startBlue, endAlpha).endVertex();
+        buffer.vertex(mat, right,    top, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
         buffer.vertex(mat,  left,    top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat,  left, bottom, zLevel).color(  endRed,   endGreen,   endBlue,   startAlpha).endVertex();
+        buffer.vertex(mat,  left, bottom, zLevel).color(  startRed, startGreen, startBlue,   startAlpha).endVertex();
         buffer.vertex(mat, right, bottom, zLevel).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
         tessellator.end();
 
@@ -318,8 +321,8 @@ public abstract class RenderItem {
         gui.getFont().draw(p, text, x(i), y(i), color);
     }
 
-    void textCentered(int i, ForgeIngameGui gui, PoseStack p, String text, int color) {
-        gui.getFont().drawShadow(p, text, 1 + x(i) - gui.getFont().width(text)/2f, y(i), color);
+    void textCentered(int i, int x, int y, ForgeIngameGui gui, PoseStack p, String text, int color) {
+        gui.getFont().drawShadow(p, text, x - gui.getFont().width(text)/2f, y, color);
     }
 
     static void useAlpha(float alpha) {
@@ -434,8 +437,9 @@ public abstract class RenderItem {
             }
 
             @Override
-            public void onRenderOptions(PoseStack poseStack, ForgeIngameGui gui, int x, int y, int w, int h) {
-                Render.sizeRectNoA(poseStack.last().pose(), x, y, w+100, 20, 0xFFFFFF);
+            public ConfigOptionsList getOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
+                ConfigOptionsList c = new ConfigOptionsList(getColor(), s, minecraft, x, y, w, h);
+                return c;
             }
         };
     }

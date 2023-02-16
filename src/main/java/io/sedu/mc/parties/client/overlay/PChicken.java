@@ -11,11 +11,11 @@ import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
-public class PChicken extends RenderSelfItem {
+public class PChicken extends RenderIconTextItem {
 
 
-    public PChicken(String name, int x, int y) {
-        super(name, x, y);
+    public PChicken(String name, int x, int y, int textColor) {
+        super(name, x, y, textColor);
     }
 
     @Override
@@ -66,6 +66,7 @@ public class PChicken extends RenderSelfItem {
     }
 
     void renderChicken(int i, ForgeIngameGui gui, PoseStack poseStack, int hunger, float alpha) {
+        textAttached = true;
         useAlpha(alpha);
         setup(Gui.GUI_ICONS_LOCATION);
         RenderSystem.enableDepthTest();
@@ -89,5 +90,17 @@ public class PChicken extends RenderSelfItem {
         if (notEditing() && withinBounds(x(i), y(i), x(i)+9, y(i)+9, 2)) {
             renderTooltip(poseStack, gui, 10, 0, "Hunger: " + hunger + "/20", 0xb88458, 0x613c1b, 0xffd5b0);
         }
+        gui.getFont().draw(poseStack, String.valueOf(hunger), tX(i), tY(i), color);
     }
+
+    @Override
+    protected int attachedX(int pOffset) {
+        return x(pOffset) + 11;
+    }
+
+    @Override
+    protected int attachedY(int pOffset) {
+        return y(pOffset) + 1;
+    }
+
 }

@@ -11,10 +11,15 @@ import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
-public class PHealth extends RenderSelfItem {
+public class PHealth extends RenderIconTextItem {
 
-    public PHealth(String name, int x, int y, int width, int height) {
-        super(name, x, y, width, height);
+    int absorbColor;
+    int deadColor;
+
+    public PHealth(String name, int x, int y, int width, int height, int color, int absorbColor, int deadColor) {
+        super(name, x, y, width, height, color, true);
+        this.absorbColor = absorbColor;
+        this.deadColor = deadColor;
     }
 
     @Override
@@ -48,17 +53,27 @@ public class PHealth extends RenderSelfItem {
         if (id.isDead) {
             rect(i, poseStack, 0, 0, 0xCC080101, 0xCCA11616);
             rect(i, poseStack, 0, 1, 0xFF450202, 0xFF620909);
+            textCentered(i, tX(i), tY(i), gui, poseStack, "Dead", deadColor);
             return;
         }
         renderHealth(i, poseStack, id);
         if (id.health.active)
             renderHealthAnim(i, poseStack, id, partialTicks);
+
+        if (id.health.absorb > 0) {
+            textCentered(i, tX(i), tY(i), gui, poseStack, (int)Math.ceil(id.health.cur+id.health.absorb) + "/" + (int)id.health.max, absorbColor);
+        } else {
+            textCentered(i, tX(i), tY(i), gui, poseStack, (int)Math.ceil(id.health.cur) + "/" + (int)id.health.max, color);
+        }
+
         //Dimmer
         rect(i, poseStack, 0, 0, 255 - id.alphaI << 24, 255 - id.alphaI << 24);
 
         if (notEditing() && withinBounds(l(i), t(i), r(i), b(i), 2)) {
             renderTooltip(poseStack, gui, 10, 0, "Health: " + (id.health.cur + id.health.absorb) + "/" + id.health.max, 0xfc807c, 0x4d110f, 0xffbfbd);
         }
+
+
 
     }
 
@@ -114,4 +129,13 @@ public class PHealth extends RenderSelfItem {
     }
 
 
+    @Override
+    protected int attachedX(int pOffset) {
+        return x(pOffset) + (width>>1);
+    }
+
+    @Override
+    protected int attachedY(int pOffset) {
+        return y(pOffset) + 1;
+    }
 }

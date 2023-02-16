@@ -34,6 +34,7 @@ public class ClientSetup {
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::keyPress);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::guiOpen);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::guiRender);
+        MinecraftForge.EVENT_BUS.addListener(ClientEvent::mouseReleased);
 
         //Icon above all
         items.put("head", new PHead("p_head", 8, 8));
@@ -46,17 +47,12 @@ public class ClientSetup {
         items.put("effects_b", new PEffectsB("p_effects_b", 46, 42, 30, 42));
         items.put("effects_d", new PEffectsD("p_effects_d", 168, 21, 30, 42));
 
-        items.put("armor_i", new PArmor("p_armor_i", 46, 19));
-        items.put("armor_t", new PArmorText("p_armor_t", 57, 20, 0xDDF3FF));
-        items.put("chicken_i", new PChicken("p_chicken_i", 140, 19));
-        items.put("chicken_t", new PChickenText("p_chicken_t", 152, 20, 0xDDF3FF));
-        items.put("lvlbar", new PLevelBar("p_lvlbar", 4, 44, 40, 5));
-        items.put("lvl_t", new PLevelText("p_lvl_t", 25, 43, 0x80FF8B));
-        items.put("health", new PHealth("p_health", 46, 29, 118, 10));
-        items.put("health_t", new PHealthText("p_health_t", 105, 30, 0xFFE3E3, 0xFFF399, 0x530404));
-
-        items.put("offline", new POffline("p_offline", 154, 8));
-        items.put("offline_t", new POfflineText("p_offline_t", 85, 20, 0xDDF3FF));
+        //TODO: Add blinker overlay. Set static size (or try to not create static) and update x and y when elements move.
+        items.put("armor", new PArmor("p_armor", 46, 19, 0xDDF3FF));
+        items.put("chicken", new PChicken("p_chicken", 141, 19, 0xDDF3FF));
+        items.put("lvlbar", new PLevelBar("p_lvlbar", 4, 44, 40, 5, 0x80FF8B));
+        items.put("health", new PHealth("p_health", 46, 29, 118, 10,0xFFE3E3, 0xFFF399, 0x530404));
+        items.put("offline", new POffline("p_offline", 154, 8, 85, 20, 0xDDF3FF));
 
         items.put("dead", new PDead("p_dead", 155, 9));
 

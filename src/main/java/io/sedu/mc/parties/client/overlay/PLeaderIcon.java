@@ -20,7 +20,10 @@ public class PLeaderIcon extends RenderItem {
             useAlpha(id.alpha);
             setup(partyPath);
             RenderSystem.enableDepthTest();
+            poseStack.pushPose();
+            poseStack.translate(0,0, 50);
             blit(poseStack, x(i), y(i), 0, 0, 9, 9);
+            poseStack.popPose();
             resetColor();
             if (notEditing() && withinBounds(x(i), y(i), x(i)+9, y(i)+9, 2)) {
                 renderTooltip(poseStack, gui, 10, 0, "Party Leader", 0xFFF2A9, 0x978B47, 0xFFE554);

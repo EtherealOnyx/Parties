@@ -8,10 +8,20 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
-public class POffline extends RenderSelfItem {
+public class POffline extends RenderIconTextItem {
 
-    public POffline(String name, int x, int y) {
-        super(name, x, y);
+    public POffline(String name, int x, int y, int tX, int tY, int textColor) {
+        super(name, x, y, tX, tY, textColor);
+    }
+
+    @Override
+    protected int attachedX(int pOffset) {
+        return x(pOffset) + 12;
+    }
+
+    @Override
+    protected int attachedY(int pOffset) {
+        return y(pOffset) + 1;
     }
 
     @Override
@@ -37,10 +47,11 @@ public class POffline extends RenderSelfItem {
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        x = 154;
+        textAttached = false;
         if (!id.isOnline) {
             setup(Gui.GUI_ICONS_LOCATION);
             blit(poseStack, x(i), y(i), 0, 216, 10, 8);
+            gui.getFont().drawShadow(poseStack, "§oOffline...", tX(i), tY(i), color);
         }
     }
 }

@@ -3,6 +3,7 @@ package io.sedu.mc.parties.events;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.anim.AnimHandler;
 import io.sedu.mc.parties.client.overlay.gui.HoverScreen;
+import io.sedu.mc.parties.client.overlay.gui.SliderButton;
 import io.sedu.mc.parties.setup.ClientSetup;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ChatScreen;
@@ -57,6 +58,10 @@ public class ClientEvent {
         if (HoverScreen.isActive()) {
             HoverScreen.updateValues(event.getMouseX(), event.getMouseY());
         }
+    }
+
+    public static void mouseReleased(ScreenEvent.MouseReleasedEvent event) {
+        SliderButton.clickReleased = true; //hehe
     }
 
 }

@@ -20,8 +20,10 @@ public class Render {
             private final Component text = new TextComponent(t);
 
             public void onTooltip(Button b, PoseStack p, int mX, int mY) {
-                if (b.active)
+                if (b.active) {
                     s.renderTooltip(p, text, mX, mY+16);
+                }
+
             }
 
             public void narrateTooltip(Consumer<Component> p_169456_) {
@@ -186,6 +188,7 @@ public class Render {
     }
 
     public static void renderBg(int l, int t, int r, int b, int w, int h, int brightness, ResourceLocation loc) {
+        RenderSystem.enableDepthTest();
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferbuilder = tesselator.getBuilder();
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
@@ -211,5 +214,29 @@ public class Render {
         //Render.sizeRect(pose, x - thickness - offset, y + width + offset, width + ((thickness + offset)<<1), thickness, colorEnd, colorEnd);
         Render.sizeRect(pose, x - thickness - offset, y - (offset), thickness, height + offset, colorStart, colorEnd);
         Render.sizeRect(pose, x + width + offset, y - (offset), thickness,  height + offset, colorStart, colorEnd);
+    }
+
+    public static float getR(int color) {
+        return (float)(color >> 16 & 255) / 255.0F;
+    }
+
+    public static float getG(int color) {
+        return (float)(color >> 8 & 255) / 255.0F;
+    }
+
+    public static float getB(int color) {
+        return (float)(color & 255) / 255.0F;
+    }
+
+    public static int getRI(int color) {
+        return (color >> 16 & 255);
+    }
+
+    public static int getGI(int color) {
+        return (color >> 8 & 255);
+    }
+
+    public static int getBI(int color) {
+        return (color & 255);
     }
 }
