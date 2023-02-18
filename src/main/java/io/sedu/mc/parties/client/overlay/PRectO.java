@@ -37,4 +37,5 @@ public class PRectO extends RenderSelfItem {
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         rect(i, poseStack,-5, 0, 0x44002024, 0x44002024);
     }
+
 }

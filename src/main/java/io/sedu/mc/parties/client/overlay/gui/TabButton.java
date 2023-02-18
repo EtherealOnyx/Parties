@@ -53,7 +53,7 @@ public class TabButton extends Button {
         void onRender(PoseStack p, TabButton b);
         void onHover(PoseStack p, TabButton b);
         void onSelect(PoseStack p, TabButton b);
-
         ConfigOptionsList getOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h);
+
     }
 }

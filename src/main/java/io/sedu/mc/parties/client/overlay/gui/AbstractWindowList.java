@@ -152,6 +152,7 @@ public abstract class AbstractWindowList<E extends AbstractWindowList.Entry<E>> 
                 i2 = this.top;
             }
 
+            RenderSystem.enableDepthTest();
             bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             bufferbuilder.vertex((double)i, (double)this.bottom, 5.0D).color(0, 0, 0, 255).endVertex();
             bufferbuilder.vertex((double)j, (double)this.bottom, 5.0D).color(0, 0, 0, 255).endVertex();

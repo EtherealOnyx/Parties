@@ -130,6 +130,32 @@ public class Render {
         RenderSystem.enableTexture();
     }
 
+    public static void offRect(Matrix4f mat, float x, float y, int z, int offset, int width, int height, int color)
+    {
+        float startAlpha = (float)(color >> 24 & 255) / 255.0F;
+        float startRed   = (float)(color >> 16 & 255) / 255.0F;
+        float startGreen = (float)(color >>  8 & 255) / 255.0F;
+        float startBlue  = (float)(color       & 255) / 255.0F;
+
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.enableDepthTest();
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, x+width-offset,    y+offset, z).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  x+offset,    y+offset, z).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  x+offset, y+height-offset, z).color(  startRed,   startGreen,   startBlue,startAlpha).endVertex();
+        buffer.vertex(mat, x+width-offset, y+height-offset, z).color(  startRed,   startGreen,   startBlue,startAlpha).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+
     public static void sizeRect(Matrix4f mat, float x, float y, int width, int height, int startColor, int endColor)
     {
         float startAlpha = (float)(startColor >> 24 & 255) / 255.0F;
@@ -154,6 +180,242 @@ public class Render {
         buffer.vertex(mat,  x,    y, 0).color(startRed, startGreen, startBlue, startAlpha).endVertex();
         buffer.vertex(mat,  x, y+height, 0).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
         buffer.vertex(mat, x+width, y+height, 0).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+
+    public static void completeRect(Matrix4f mat, float x, float y, int z, int offset, int width, int height, int startColor, int endColor)
+    {
+
+
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.enableDepthTest();
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, x+width,    y, 0).color(startColor).endVertex();
+        buffer.vertex(mat,  x,    y, 0).color(startColor).endVertex();
+        buffer.vertex(mat,  x, y+height, 0).color(endColor).endVertex();
+        buffer.vertex(mat, x+width, y+height, 0).color(endColor).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+
+    public static void completeRect(Matrix4f mat, float x, float y, int z, int offset, int width, int height, float r, float g, float b, float a, float r2, float g2, float b2, float a2)
+    {
+
+
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.enableDepthTest();
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, x+width,    y, 0).color(r,g,b,a).endVertex();
+        buffer.vertex(mat,  x,    y, 0).color(r,g,b,a).endVertex();
+        buffer.vertex(mat,  x, y+height, 0).color(r2,g2,b2,a2).endVertex();
+        buffer.vertex(mat, x+width, y+height, 0).color(r2,g2,b2,a2).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+
+    public static void grayRect(Matrix4f mat, float x, float y, int z, int offset, int width, int height, float rgb, float a, float rgb2, float a2)
+    {
+
+
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.enableDepthTest();
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, x+width-offset,    y+offset, z).color(rgb,rgb,rgb,a).endVertex();
+        buffer.vertex(mat,  x+offset,    y+offset, z).color(rgb,rgb,rgb,a).endVertex();
+        buffer.vertex(mat,  x+offset, y+height-offset, z).color(rgb2,rgb2,rgb2,a2).endVertex();
+        buffer.vertex(mat, x+width-offset, y+height-offset, z).color(rgb2,rgb2,rgb2,a2).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+
+    public static void rect(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int startColor, int endColor)
+    {
+        float startAlpha = (float)(startColor >> 24 & 255) / 255.0F;
+        float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
+        float startGreen = (float)(startColor >>  8 & 255) / 255.0F;
+        float startBlue  = (float)(startColor       & 255) / 255.0F;
+        float endAlpha   = (float)(endColor   >> 24 & 255) / 255.0F;
+        float endRed     = (float)(endColor   >> 16 & 255) / 255.0F;
+        float endGreen   = (float)(endColor   >>  8 & 255) / 255.0F;
+        float endBlue    = (float)(endColor         & 255) / 255.0F;
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, right,    top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  left,    top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  left, bottom, zLevel).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
+        buffer.vertex(mat, right, bottom, zLevel).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+
+    public static void rect(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int color)
+    {
+        float startAlpha = (float)(color >> 24 & 255) / 255.0F;
+        float startRed   = (float)(color >> 16 & 255) / 255.0F;
+        float startGreen = (float)(color >>  8 & 255) / 255.0F;
+        float startBlue  = (float)(color       & 255) / 255.0F;
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, right,    top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  left,    top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  left, bottom, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat, right, bottom, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+
+    public static void rectNoA(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int startColor, int endColor)
+    {
+        float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
+        float startGreen = (float)(startColor >>  8 & 255) / 255.0F;
+        float startBlue  = (float)(startColor       & 255) / 255.0F;
+        float endRed     = (float)(endColor   >> 16 & 255) / 255.0F;
+        float endGreen   = (float)(endColor   >>  8 & 255) / 255.0F;
+        float endBlue    = (float)(endColor         & 255) / 255.0F;
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, right,    top, zLevel).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat,  left,    top, zLevel).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat,  left, bottom, zLevel).color(  endRed,   endGreen,   endBlue, 1f).endVertex();
+        buffer.vertex(mat, right, bottom, zLevel).color(  endRed,   endGreen,   endBlue, 1f).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+
+    public static void rectNoA(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int color)
+    {
+        float startRed   = (float)(color >> 16 & 255) / 255.0F;
+        float startGreen = (float)(color >>  8 & 255) / 255.0F;
+        float startBlue  = (float)(color       & 255) / 255.0F;
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, right,    top, zLevel).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat,  left,    top, zLevel).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat,  left, bottom, zLevel).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat, right, bottom, zLevel).color(startRed, startGreen, startBlue, 1f).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+
+    public static void horizRect(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int startColor, int endColor)
+    {
+        float startAlpha = (float)(startColor >> 24 & 255) / 255.0F;
+        float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
+        float startGreen = (float)(startColor >>  8 & 255) / 255.0F;
+        float startBlue  = (float)(startColor       & 255) / 255.0F;
+        float endAlpha   = (float)(endColor   >> 24 & 255) / 255.0F;
+        float endRed     = (float)(endColor   >> 16 & 255) / 255.0F;
+        float endGreen   = (float)(endColor   >>  8 & 255) / 255.0F;
+        float endBlue    = (float)(endColor         & 255) / 255.0F;
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, right,    top, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        buffer.vertex(mat,  left,    top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  left, bottom, zLevel).color(  startRed, startGreen, startBlue,   startAlpha).endVertex();
+        buffer.vertex(mat, right, bottom, zLevel).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+
+    public static void horizRectNoA(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int startColor, int endColor)
+    {
+        float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
+        float startGreen = (float)(startColor >>  8 & 255) / 255.0F;
+        float startBlue  = (float)(startColor       & 255) / 255.0F;
+        float endRed     = (float)(endColor   >> 16 & 255) / 255.0F;
+        float endGreen   = (float)(endColor   >>  8 & 255) / 255.0F;
+        float endBlue    = (float)(endColor         & 255) / 255.0F;
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, right,    top, zLevel).color(  endRed,   endGreen,   endBlue, 1f).endVertex();
+        buffer.vertex(mat,  left,    top, zLevel).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat,  left, bottom, zLevel).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat, right, bottom, zLevel).color(  endRed,   endGreen,   endBlue, 1f).endVertex();
         tessellator.end();
 
         RenderSystem.disableBlend();
@@ -239,4 +501,73 @@ public class Render {
     public static int getBI(int color) {
         return (color & 255);
     }
+
+    public static int getRainbowColor(int speed) {
+        //S = .4F, L = .8F
+        return HSBtoRGB(getHue(speed), 0.5f, 0.75f);
+    }
+
+    /**
+     * HSBtoRGB method from Color.HSBtoRGB(hue, saturation, brightness) without alpha.
+     */
+    private static int HSBtoRGB(float hue, float saturation, float brightness) {
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        if (saturation == 0.0F) {
+            r = g = b = (int)(brightness * 255.0F + 0.5F);
+        } else {
+            float h = (hue - (float)Math.floor((double)hue)) * 6.0F;
+            float f = h - (float)Math.floor((double)h);
+            float p = brightness * (1.0F - saturation);
+            float q = brightness * (1.0F - saturation * f);
+            float t = brightness * (1.0F - saturation * (1.0F - f));
+            switch ((int) h) {
+                case 0 -> {
+                    r = (int) (brightness * 255.0F + 0.5F);
+                    g = (int) (t * 255.0F + 0.5F);
+                    b = (int) (p * 255.0F + 0.5F);
+                }
+                case 1 -> {
+                    r = (int) (q * 255.0F + 0.5F);
+                    g = (int) (brightness * 255.0F + 0.5F);
+                    b = (int) (p * 255.0F + 0.5F);
+                }
+                case 2 -> {
+                    r = (int) (p * 255.0F + 0.5F);
+                    g = (int) (brightness * 255.0F + 0.5F);
+                    b = (int) (t * 255.0F + 0.5F);
+                }
+                case 3 -> {
+                    r = (int) (p * 255.0F + 0.5F);
+                    g = (int) (q * 255.0F + 0.5F);
+                    b = (int) (brightness * 255.0F + 0.5F);
+                }
+                case 4 -> {
+                    r = (int) (t * 255.0F + 0.5F);
+                    g = (int) (p * 255.0F + 0.5F);
+                    b = (int) (brightness * 255.0F + 0.5F);
+                }
+                case 5 -> {
+                    r = (int) (brightness * 255.0F + 0.5F);
+                    g = (int) (p * 255.0F + 0.5F);
+                    b = (int) (q * 255.0F + 0.5F);
+                }
+            }
+        }
+
+        return r << 16 | g << 8 | b;
+    }
+
+    private static float hue;
+
+    private static float getHue(int speed) {
+        return hue*speed % 1f;
+    }
+    public static void tick() {
+        hue += 0.001f;
+        if (hue > 1f)
+            hue = 0f;
+    }
+
 }

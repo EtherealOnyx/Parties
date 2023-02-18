@@ -2,6 +2,9 @@ package io.sedu.mc.parties.client.overlay;
 
 import Util.Render;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
+import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
@@ -30,5 +33,17 @@ public class PRectD extends RenderItem {
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         rect(i, poseStack,-2, 0, 0x44002024, 0x44002024);
+    }
+
+    @Override
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
+        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
+        c.addTitleEntry("config.sedparties.title.display");
+        c.addBooleanEntry("config.sedparties.name.display", isEnabled());
+        c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - width), this.x, true);
+        c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - height), this.y, true);
+        c.addSliderEntry("config.sedparties.name.width", 1, () -> Math.max(clickArea.x + clickArea.w(), frameW) - x, width, true);
+        c.addSliderEntry("config.sedparties.name.height", 1, () -> Math.max(clickArea.y + clickArea.h(), frameH) - y, height, true);
+        return c;
     }
 }

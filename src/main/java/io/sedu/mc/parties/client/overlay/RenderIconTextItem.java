@@ -5,7 +5,8 @@ public abstract class RenderIconTextItem extends RenderSelfItem {
     int textX;
     int textY;
     boolean textAttached;
-    boolean textEnabled;
+    boolean textEnabled = true;
+    boolean iconEnabled = true;
 
 
     public RenderIconTextItem(String name, int x, int y, int textX, int textY, int textColor) {
@@ -14,7 +15,7 @@ public abstract class RenderIconTextItem extends RenderSelfItem {
         this.textY = textY;
         color = textColor;
         textAttached = false;
-        textEnabled = true;
+
     }
 
     public RenderIconTextItem(String name, int x, int y, int textColor) {
@@ -23,7 +24,6 @@ public abstract class RenderIconTextItem extends RenderSelfItem {
         textY = 0;
         color = textColor;
         textAttached = true;
-        textEnabled = true;
     }
 
     public RenderIconTextItem(String name, int x, int y, int width, int height, int textColor, boolean attached) {
@@ -32,18 +32,47 @@ public abstract class RenderIconTextItem extends RenderSelfItem {
         textY = 0;
         color = textColor;
         textAttached = attached;
-        textEnabled = true;
     }
 
     public int tX(int pOffset) {
-        return textAttached ? attachedX(pOffset)  : textX+frameX + wOffset(pOffset);
+        return textAttached ? attachedX(pOffset)  : (int) ((frameX + textX + wOffset(pOffset))/scale);
     }
 
     public int tY(int pOffset) {
-        return textAttached ? attachedY(pOffset)  : textY+frameY + hOffset(pOffset);
+        return textAttached ? attachedY(pOffset)  : (int) ((frameY + textY + hOffset(pOffset))/scale);
     }
 
     protected abstract int attachedX(int pOffset);
     protected abstract int attachedY(int pOffset);
+
+    @Override
+    public void toggleIcon(boolean data) {
+        iconEnabled = data;
+    }
+
+    @Override
+    public void toggleText(boolean data) {
+        textEnabled = data;
+    }
+
+    @Override
+    public void toggleTextAttach(boolean data) {
+        textAttached = data;
+    }
+
+    @Override
+    public void setXTextPos(Integer data) {
+        textX = data;
+    }
+
+    @Override
+    public void setYTextPos(Integer data) {
+        textY = data;
+    }
+
+    @Override
+    public void setColor(int type, int data) {
+        this.color = data;
+    }
 
 }

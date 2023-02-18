@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.setup;
 
+import Util.Render;
 import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.*;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
@@ -25,7 +26,10 @@ public class ClientSetup {
 
     public static final KeyMapping showMouse = new KeyMapping(MODID + ".key.hover", GLFW_KEY_LEFT_ALT, KeyMapping.CATEGORY_INTERFACE);
 
-    private static final IIngameOverlay control = (gui, poseStack, partialTicks, width, height) -> RenderItem.resetPos();
+    private static final IIngameOverlay control = (gui, poseStack, partialTicks, width, height) -> {
+        RenderItem.resetPos();
+        Render.tick();
+    };
 
     public static void init(final FMLClientSetupEvent event) {
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::onClientLeave);
@@ -39,7 +43,7 @@ public class ClientSetup {
         //Icon above all
         items.put("head", new PHead("p_head", 8, 8));
         items.put("name", new PName("p_name", 46, 9, 0xDDF3FF));
-        items.put("leader", new PLeaderIcon("p_leader", 34, 33));
+        items.put("leader", new PLeader("p_leader", 34, 33));
         items.put("dim", new PDimIcon("p_dim", 5, 34)); //Includes text!
 
         //Effects
@@ -63,7 +67,7 @@ public class ClientSetup {
 
 
         items.put("bg1", new PRectD("p_bg1", 44, 7, 122, 34));
-        items.put("bgc", new PRectC("p_bgc", 7, 7, 159, 34));
+        items.put("bgc", new ClickArea("p_bgc", 7, 7, 159, 34));
         //items.add(new ConfigOverlay("config"));
 
         EffectHolder.setValues(2, 5,true); //TODO: Make sure buff + debuff = max - 1;
@@ -81,6 +85,7 @@ public class ClientSetup {
         OverlayRegistry.registerOverlayAbove(HOTBAR_ELEMENT, "ctrl", control);
 
         //DimConfig.init();
+        //TODO: Save preset in folder. read file names in preset folder as valid presets. When loading preset, try to load. Revert to current if failed.
     }
 
     public static void postInit(FMLLoadCompleteEvent event) {

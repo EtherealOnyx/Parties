@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.client.overlay;
 
+import Util.Render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
@@ -176,10 +177,10 @@ public class PEffects extends RenderSelfItem {
 
     void start(PoseStack poseStack, int i, int size, int row, int max) {
         poseStack.pushPose();
-        drawRect(poseStack.last().pose(), -1, x(i) - 2, (y(i) - 2),
-                 x(i) + (width * Math.min(size, row) >> 1),
-                 -1 + y(i) + (height * (int) Math.ceil((double) Math.min(max, size) / row) >> 1),
-                 0x44002024, 0x44002024);
+        Render.rect(poseStack.last().pose(), -1, x(i) - 2, (y(i) - 2),
+                    x(i) + (width * Math.min(size, row) >> 1),
+                    -1 + y(i) + (height * (int) Math.ceil((double) Math.min(max, size) / row) >> 1),
+                    0x44002024, 0x44002024);
         poseStack.scale(.5f, .5f, .5f);
         RenderSystem.enableDepthTest();
     }

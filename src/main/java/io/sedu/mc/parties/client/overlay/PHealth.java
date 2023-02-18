@@ -4,6 +4,9 @@ import Util.Render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
+import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
+import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
@@ -16,10 +19,45 @@ public class PHealth extends RenderIconTextItem {
     int absorbColor;
     int deadColor;
 
+    int colorTop;
+    int colorBot;
+    int colorTopMissing;
+    int colorBotMissing;
+    int colorTopAbsorb;
+    int colorBotAbsorb;
+    
+    int colorIncTop;
+    int colorIncBot;
+    int colorAbsTop;
+    int colorAbsBot;
+    int colorDecTop;
+    int colorDecBot;
+
+    int bColorTop;
+    int bColorBot;
+    int bAColorTop;
+    int bAColorBot;
+
     public PHealth(String name, int x, int y, int width, int height, int color, int absorbColor, int deadColor) {
         super(name, x, y, width, height, color, true);
         this.absorbColor = absorbColor;
         this.deadColor = deadColor;
+        colorTop = 0xC52C27;
+        colorBot = 0x6C0D15;
+        colorTopMissing = 0x450202;
+        colorBotMissing = 0x620909;
+        colorTopAbsorb = 0xFFCD42 | 0xCC << 24;
+        colorBotAbsorb = 0xB08610 | 0xCC << 24;
+        colorAbsTop = 0xFFCD72;
+        colorAbsBot = 0xB08672;
+        colorIncTop = 0xC5FFC5;
+        colorIncBot = 0x6CFF6C;
+        colorDecTop = 0xFFC5C5;
+        colorDecBot = 0xFF6C6C;
+        bAColorTop = 0xfaf098 | 0xCC << 24;
+        bAColorBot = 0xd9cd68 | 0xCC << 24;
+        bColorTop = 0x111111 | 0xCC << 24;
+        bColorBot = 0x555555 | 0xCC << 24;
     }
 
     @Override
@@ -34,8 +72,8 @@ public class PHealth extends RenderIconTextItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        Render.sizeRectNoA(poseStack.last().pose(), b.x+7, b.y+9, 22, 7, 0x111111, 0x555555);
-        Render.sizeRectNoA(poseStack.last().pose(), b.x+8, b.y+10, 20, 5, 0xC52C27, 0x6C0D15);
+        Render.sizeRect(poseStack.last().pose(), b.x+7, b.y+9, 22, 7, bColorTop, bColorBot);
+        Render.sizeRectNoA(poseStack.last().pose(), b.x+8, b.y+10, 20, 5, colorTop, colorBot);
         setup(GUI_ICONS_LOCATION);
         RenderSystem.enableDepthTest();
         blit(poseStack,b.x+3, b.y+8, 16, 0, 9, 9);
@@ -50,55 +88,66 @@ public class PHealth extends RenderIconTextItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+
         if (id.isDead) {
-            rect(i, poseStack, 0, 0, 0xCC080101, 0xCCA11616);
-            rect(i, poseStack, 0, 1, 0xFF450202, 0xFF620909);
+            rect(i, poseStack, 0, 0, bColorTop);
+            rectNoA(i, poseStack, 0, 1, colorTopMissing, colorBotMissing);
             textCentered(i, tX(i), tY(i), gui, poseStack, "Dead", deadColor);
             return;
         }
-        renderHealth(i, poseStack, id);
-        if (id.health.active)
-            renderHealthAnim(i, poseStack, id, partialTicks);
+        if (iconEnabled) {
+            renderHealth(i, poseStack, id);
+            if (id.health.active)
+                renderHealthAnim(i, poseStack, id, partialTicks);
 
-        if (id.health.absorb > 0) {
-            textCentered(i, tX(i), tY(i), gui, poseStack, (int)Math.ceil(id.health.cur+id.health.absorb) + "/" + (int)id.health.max, absorbColor);
-        } else {
-            textCentered(i, tX(i), tY(i), gui, poseStack, (int)Math.ceil(id.health.cur) + "/" + (int)id.health.max, color);
+
+
+            //Dimmer
+            rect(i, poseStack, 0, 0, 255 - id.alphaI << 24, 255 - id.alphaI << 24);
+            if (notEditing() && withinBounds(l(i), t(i), r(i), b(i), 2)) {
+                renderTooltip(poseStack, gui, 10, 0, "Health: " + (id.health.cur + id.health.absorb) + "/" + id.health.max, 0xfc807c, 0x4d110f, 0xffbfbd);
+            }
         }
+        if (textEnabled)
+            if (id.health.absorb > 0) {
+                textCentered(i, tX(i), tY(i), gui, poseStack, (int)Math.ceil(id.health.cur+id.health.absorb) + "/" + (int)id.health.max, absorbColor);
+            } else {
+                textCentered(i, tX(i), tY(i), gui, poseStack, (int)Math.ceil(id.health.cur) + "/" + (int)id.health.max, color);
+            }
 
-        //Dimmer
-        rect(i, poseStack, 0, 0, 255 - id.alphaI << 24, 255 - id.alphaI << 24);
 
-        if (notEditing() && withinBounds(l(i), t(i), r(i), b(i), 2)) {
-            renderTooltip(poseStack, gui, 10, 0, "Health: " + (id.health.cur + id.health.absorb) + "/" + id.health.max, 0xfc807c, 0x4d110f, 0xffbfbd);
-        }
 
 
 
     }
 
     private void renderHealth(int i, PoseStack poseStack, ClientPlayerData id) {
+
         float hB, aB;
         hB = HealthAnim.getPercent(id.health.cur, id.health.max, id.health.absorb);
         if (id.health.absorb > 0) {
-            rect(i, poseStack, 0, 0, 0xCCfaf098, 0xCCd9cd68);
-            rect(i, poseStack, 0, 1, 0xFF450202, 0xFF620909); //Missing
+            rect(i, poseStack, 0, 0, bAColorTop, bAColorBot);
+            rectNoA(i, poseStack, 0, 1, colorTopMissing, colorBotMissing); //Missing
             aB = hB + HealthAnim.getPercentA(id.health.cur, id.health.max, id.health.absorb);
-            rectR(poseStack, i, 0, hB, 0xFFC52C27, 0xFF6C0D15); //Health
-            rectB(poseStack, i, 0, hB, aB, 0xCCFFCD42, 0xCCB08610); //Absorb
+            rectRNoA(poseStack, i, 0, hB, colorTop, colorBot); //Health
+            rectB(poseStack, i, 0, hB, aB, colorTopAbsorb, colorBotAbsorb); //Absorb
         } else {
-            rect(i, poseStack, 0, 0, 0xCC111111, 0xCC555555);
-            rect(i, poseStack, 0, 1, 0xFF450202, 0xFF620909); //Missing
-            rectR(poseStack, i, 0, hB, 0xFFC52C27, 0xFF6C0D15); //Health
+            rect(i, poseStack, 0, 0, bColorTop, bColorBot);
+            rectNoA(i, poseStack, 0, 1, colorTopMissing, colorBotMissing); //Missing
+            rectRNoA(poseStack, i, 0, hB, colorTop, colorBot); //Health
         }
     }
 
-    private void rectR(PoseStack p, int i, int zLevel, float rightPosition, int startColor, int endColor ) {
-        drawRect(p.last().pose(), zLevel, 1+l(i), t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
+    private void rectRNoA(PoseStack p, int i, int zLevel, float rightPosition, int startColor, int endColor ) {
+        Render.rectNoA(p.last().pose(), zLevel, 1+l(i), t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
     }
 
     private void rectB(PoseStack p, int i, int zLevel, float leftPosition, float rightPosition, int startColor, int endColor ) {
-        drawRect(p.last().pose(), zLevel, l(i)+width*leftPosition-1, t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
+        Render.rect(p.last().pose(), zLevel, l(i)+width*leftPosition-1, t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
+    }
+
+    private void rectBNoA(PoseStack p, int i, int zLevel, float leftPosition, float rightPosition, int startColor, int endColor ) {
+        Render.rectNoA(p.last().pose(), zLevel, l(i)+width*leftPosition-1, t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
     }
 
     private void renderHealthAnim(int i, PoseStack poseStack, ClientPlayerData id, float partialTicks) {
@@ -109,22 +158,22 @@ public class PHealth extends RenderIconTextItem {
 
         if (id.health.hInc) {
             if (id.health.effHOld())
-                rectB(poseStack, i, 0, id.health.oldH, id.health.curH, 0xFFFFCD72, 0xFFB08672);
+                rectBNoA(poseStack, i, 0, id.health.oldH, id.health.curH, colorAbsTop, colorAbsBot);
             else
-                rectB(poseStack, i, 0, id.health.oldH, id.health.curH, 0xFFC5FFC5, 0xFF6CFF6C);
+                rectBNoA(poseStack, i, 0, id.health.oldH, id.health.curH, colorIncTop, colorIncBot);
 
         } else {
             if (id.health.effH())
-                rectB(poseStack, i, 0, id.health.curH, id.health.oldH, 0xFFFFCD72, 0xFFB08672);
+                rectBNoA(poseStack, i, 0, id.health.curH, id.health.oldH, colorAbsTop, colorAbsBot);
             else
-                rectB(poseStack, i, 0, id.health.curH, id.health.oldH, 0xFFFFC5C5, 0xFFFF6C6C);
+                rectBNoA(poseStack, i, 0, id.health.curH, id.health.oldH, colorDecTop, colorDecBot);
 
         }
 
         if (id.health.aInc)
-            rectB(poseStack, i, 0, id.health.oldA, id.health.curA, 0xFFFFCD72, 0xFFB08672);
+            rectBNoA(poseStack, i, 0, id.health.oldA, id.health.curA, colorAbsTop, colorAbsBot);
         else
-            rectB(poseStack, i, 0, id.health.curA, id.health.oldA, 0xFFFFCD72, 0xFFB08672);
+            rectBNoA(poseStack, i, 0, id.health.curA, id.health.oldA, colorAbsTop, colorAbsBot);
 
     }
 
@@ -136,6 +185,107 @@ public class PHealth extends RenderIconTextItem {
 
     @Override
     protected int attachedY(int pOffset) {
-        return y(pOffset) + 1;
+        return y(pOffset) + (height>>1) + 1;
+    }
+
+    @Override
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
+        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
+        c.addTitleEntry("config.sedparties.title.general");
+        c.addBooleanEntry("config.sedparties.name.display", isEnabled());
+        c.addSliderEntry("config.sedparties.name.scale", 1, () -> 3, getScale(), true);
+        c.addSliderEntry("config.sedparties.name.zpos", 0, () -> 10, zPos);
+
+        c.addTitleEntry("config.sedparties.title.icon");
+        c.addBooleanEntry("config.sedparties.name.idisplay", iconEnabled);
+        c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - (int)(width*scale)), this.x, true);
+        c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(height*scale)), this.y, true);
+        c.addSliderEntry("config.sedparties.name.width", 1, () -> (int) Math.ceil((Math.max(clickArea.x + clickArea.w(), frameW) - x)/scale), width, true);
+        c.addSliderEntry("config.sedparties.name.height", 1, () -> (int) Math.ceil((Math.max(clickArea.y + clickArea.h(), frameH) - y)/scale), height, true);
+
+        c.addTitleEntry("config.sedparties.title.text");
+        c.addBooleanEntry("config.sedparties.name.tdisplay", textEnabled);
+        c.addBooleanEntry("config.sedparties.name.tshadow", textShadow);
+        c.addBooleanEntry("config.sedparties.name.tattached", textAttached);
+        c.addSliderEntry("config.sedparties.name.xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX);
+        c.addSliderEntry("config.sedparties.name.ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY);
+
+        c.addTitleEntry("config.sedparties.title.textc");
+        c.addColorEntry("config.sedparties.name.tcolor", color);
+        c.addColorEntry("config.sedparties.name.tcabsorb", absorbColor);
+        c.addColorEntry("config.sedparties.name.tcdead", deadColor);
+
+        c.addTitleEntry("config.sedparties.title.barc");
+        c.addSpaceEntry();
+
+        c.addTitleEntry("config.sedparties.title.barb");
+        c.addColorEntry("config.sedparties.name.bbct", bColorTop >> 8);
+        c.addColorEntry("config.sedparties.name.bbcb", bColorBot >> 8);
+        c.addSpaceEntry();
+
+
+        c.addTitleEntry("config.sedparties.title.bara");
+        c.addColorEntry("config.sedparties.name.bbact", bAColorTop >> 8);
+        c.addColorEntry("config.sedparties.name.bbacb", bAColorBot >> 8);
+        c.addSpaceEntry();
+
+        c.addTitleEntry("config.sedparties.title.bc");
+        c.addColorEntry("config.sedparties.name.bct", colorTop);
+        c.addColorEntry("config.sedparties.name.bcb", colorBot);
+        c.addSpaceEntry();
+
+        c.addTitleEntry("config.sedparties.title.bcm");
+        c.addColorEntry("config.sedparties.name.bctm", colorTopMissing);
+        c.addColorEntry("config.sedparties.name.bcbm", colorBotMissing);
+        c.addSpaceEntry();
+
+        c.addTitleEntry("config.sedparties.title.bca");
+        c.addColorEntry("config.sedparties.name.bcta", colorTopAbsorb >> 8);
+        c.addColorEntry("config.sedparties.name.bcba", colorBotAbsorb >> 8);
+        c.addSpaceEntry();
+
+        c.addTitleEntry("config.sedparties.title.baa");
+        c.addColorEntry("config.sedparties.name.bcat", colorAbsTop);
+        c.addColorEntry("config.sedparties.name.bcab", colorAbsBot);
+        c.addSpaceEntry();
+
+        c.addTitleEntry("config.sedparties.title.bai");
+        c.addColorEntry("config.sedparties.name.bcit", colorIncTop);
+        c.addColorEntry("config.sedparties.name.bcib", colorIncBot);
+        c.addSpaceEntry();
+
+
+        c.addTitleEntry("config.sedparties.title.bad");
+        c.addColorEntry("config.sedparties.name.bcdt", colorDecTop);
+        c.addColorEntry("config.sedparties.name.bcdb", colorDecBot);
+        c.addSpaceEntry();
+
+        return c;
+    }
+
+    @Override
+    public void setColor(int type, int data) {
+        switch(type) {
+            case 0 -> color = data;
+            case 1 -> absorbColor = data;
+            case 2 -> deadColor = data;
+            case 3 -> bColorTop = data | 0xCC << 24;
+            case 4 -> bColorBot = data | 0xCC << 24;
+            case 5 -> bAColorTop = data | 0xCC << 24;
+            case 6 -> bAColorBot = data | 0xCC << 24;
+            case 7 -> colorTop = data;
+            case 8 -> colorBot = data;
+            case 9 -> colorTopMissing = data;
+            case 10 -> colorBotMissing = data;
+            case 11 -> colorTopAbsorb = data | 0xCC << 24;
+            case 12 -> colorBotAbsorb = data | 0xCC << 24;
+            case 13 -> colorAbsTop = data;
+            case 14 -> colorAbsBot = data;
+            case 15 -> colorIncTop = data;
+            case 16 -> colorIncBot = data;
+            case 17 -> colorDecTop = data;
+            case 18 -> colorDecBot = data;
+        }
+
     }
 }

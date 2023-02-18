@@ -3,7 +3,6 @@ package io.sedu.mc.parties.client.overlay.gui;
 import Util.Render;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.sedu.mc.parties.client.overlay.RenderItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -11,15 +10,20 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entry> {
     SettingsScreen s;
     int entryColor;
+    HashMap<String, Entry> entries = new HashMap<>();
+    ArrayList<SliderEntry> sliders = new ArrayList<>();
 
     //TODO: Combine entry lists
 
@@ -29,9 +33,40 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         this.s = s;
         //Change x0 and x1
         s.resetTickables();
-        for (int i = 0; i < 5; i++) {
-            this.addEntry(new ConfigOptionsList.TitleEntry("Test"));
-        }
+    }
+
+    public void addTitleEntry(String title) {
+        this.addEntry(new ConfigOptionsList.TitleEntry(title));
+    }
+
+    public void addBooleanEntry(String name, boolean defaultState) {
+        Entry e = new ConfigOptionsList.CheckboxEntry(name, defaultState);
+        this.addEntry(e);
+        entries.put(e.internal, e);
+    }
+
+    public void addSliderEntry(String name, int lowBound, SliderEntry.Bound upBound, int defaultState) {
+        SliderEntry e = new ConfigOptionsList.SliderEntry(name, lowBound, upBound, defaultState);
+        this.addEntry(e);
+        entries.put(e.internal, e);
+        sliders.add(e);
+    }
+
+    public void addSliderEntry(String name, int lowBound, SliderEntry.Bound upBound, int defaultState, boolean doesRefresh) {
+        SliderEntry e = new ConfigOptionsList.SliderEntry(name, lowBound, upBound, defaultState, doesRefresh);
+        this.addEntry(e);
+        entries.put(e.internal, e);
+        sliders.add(e);
+    }
+
+    public void addColorEntry(String name, int defaultState) {
+        Entry e = new ConfigOptionsList.HexBoxEntry(name, defaultState);
+        this.addEntry(e);
+        entries.put(e.internal, e);
+    }
+
+    public void addSpaceEntry() {
+        this.addEntry(new ConfigOptionsList.SpaceEntry());
     }
 
 
@@ -47,7 +82,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
     }
 
     protected void markDirty() {
-        this.children().forEach(entry -> entry.markDirty());
+        this.children().forEach(Entry::markDirty);
     }
 
     @Override
@@ -55,12 +90,26 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
     }
 
+    public void markSlidersDirty() {
+        sliders.forEach(Entry::markDirty);
+    }
+
 
     public abstract class Entry extends ContainerObjectWindowList.Entry<ConfigOptionsList.Entry> {
+        String internal = "";
         Component name;
         boolean isDirty;
+        boolean doesRefresh = false;
 
         abstract void updateValues(int pTop, int pLeft, int pWidth, int pHeight);
+
+        void updateData(Object data) {
+
+        }
+
+        int getType() {
+            return -1;
+        }
 
         public void render(PoseStack pPoseStack, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pIsMouseOver, float pPartialTick) {
             if (isDirty) {
@@ -70,7 +119,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
             if (pIsMouseOver)
             {
-                RenderItem.drawRectHorizontal(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + pWidth, pTop + pHeight, entryColor | 100 << 24, entryColor);
+                Render.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + pWidth, pTop + pHeight, entryColor | 100 << 24, entryColor);
                 ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), entryColor);
                 ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), 0xAAFFFFFF);
             } else {
@@ -80,6 +129,10 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         public void markDirty() {
             this.isDirty = true;
+        }
+
+        protected String getConfigName() {
+            return internal;
         }
     }
     public class CheckboxEntry extends ConfigOptionsList.Entry {
@@ -93,17 +146,18 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         private SmallButton enable;
         private SmallButton disable;
 
-        CheckboxEntry(final Component pName, boolean isEnabled) {
-            this.name = pName;
+        CheckboxEntry(String name, boolean isEnabled) {
+            this.name = new TranslatableComponent(name);
             this.isEnabled = isEnabled;
-            disable = new SmallButton(0, 0, "x", pButton -> updateVal(false), Render.tip(s, "Disable"), 1f, .5f, .5f, .5f);
-            enable = new SmallButton(0, 0, "✓", pButton -> updateVal(true), Render.tip(s, "Enable"), .5f, 1f, .5f, .5f);
+            disable = new SmallButton(0, 0, "✓", pButton -> updateVal(false), Render.tip(s, "Enabled"), .5f, 1f, .5f, .5f);
+            enable = new SmallButton(0, 0, "x", pButton -> updateVal(true), Render.tip(s, "Disabled"), 1f, .5f, .5f, .5f);
             enable.visible = !isEnabled;
             disable.visible = isEnabled;
+            internal = name.substring(23);
         }
 
         private void updateVal(boolean enabled) {
-            s.finalizeUpdate(name.getContents(), 0, enabled);
+            s.finalizeUpdate(getConfigName(), enabled, doesRefresh);
             isEnabled = enabled;
             enable.visible = !isEnabled;
             disable.visible = isEnabled;
@@ -134,6 +188,16 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         }
 
         @Override
+        void updateData(Object data) {
+            updateVal((Boolean) data);
+        }
+
+        @Override
+        int getType() {
+            return 0;
+        }
+
+        @Override
         public void render(PoseStack pPoseStack, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pIsMouseOver, float pPartialTick) {
             super.render(pPoseStack, pIndex, pTop, pLeft, pWidth, pHeight, pMouseX, pMouseY, pIsMouseOver, pPartialTick);
 
@@ -150,29 +214,38 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         private final InputBox input;
         private final SliderButton slider;
         private final int lowBound;
-        private final int upBound;
-        private final int boundWidth;
+        private int upBound;
+        private int boundWidth;
         private int value;
+        private final Bound maxBound;
 
-        SliderEntry(final Component pName, int lowBound, int upBound, int currentValue) {
-            this.name = pName;
+        public interface Bound {
+            int updateMaxBound();
+        }
+
+        SliderEntry(String name, int lowBound, Bound maxBound, int currentValue) {
+            this.name = new TranslatableComponent(name);
             slider = new SliderButton(entryColor,5, this::updateVal, this::finalizeVal, Button.NO_TOOLTIP, 1f);
             this.lowBound = lowBound;
-            this.upBound = upBound;
-            this.boundWidth = upBound - lowBound;
+            this.maxBound = maxBound;
             this.value = currentValue;
-            input = new InputBox(entryColor, minecraft.font, 30, 12, pName, this::updateInputVal, true);
-            input.setValue(String.valueOf(value));
+            this.upBound = maxBound.updateMaxBound();
+            this.boundWidth = upBound - lowBound;
+            input = new InputBox(entryColor, minecraft.font, 30, 12, this.name, this::updateInputVal, true);
             s.addTickableEntry(input);
             this.markDirty();
+            internal = name.substring(23);
+        }
+
+        SliderEntry(String name, int lowBound, Bound maxBound, int currentValue, boolean doesRefresh) {
+            this(name, lowBound, maxBound, currentValue);
+            this.doesRefresh = doesRefresh;
         }
 
         private void updateVal(float percent) {
-            updateActualValue(percent);
-            s.triggerUpdate(name.getContents(), 1, value);
-            //isEnabled = enabled;
-            //enable.visible = !isEnabled;
-            //disable.visible = isEnabled;
+            if (updateActualValue(percent)) {
+                s.triggerUpdate(getConfigName(), value);
+            }
         }
 
         private void updateInputVal(String text) {
@@ -180,19 +253,24 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             if (value != upVal) {
                 value = upVal;
                 slider.updateValue((float) (value - lowBound) / boundWidth);
-                s.finalizeUpdate(name.getContents(), 1, value);
+                s.finalizeUpdate(getConfigName(), value, doesRefresh);
             }
             input.setValue(String.valueOf(upVal));
         }
 
-        private void updateActualValue(float percent) {
-            value = (int) (lowBound + boundWidth*percent);
-            input.setValue(String.valueOf(value));
+        private boolean updateActualValue(float percent) {
+            int upVal = Math.round(lowBound + boundWidth*percent);
+            if (value != upVal) {
+                value = upVal;
+                input.setValue(String.valueOf(value));
+                return true;
+            }
+            return false;
         }
 
         private void finalizeVal(float percent) {
             //updateActualValue(percent); TODO: Figure out if this is needed here.
-            s.finalizeUpdate(name.getContents(), 1, value);
+            s.finalizeUpdate(getConfigName(), value, doesRefresh);
             //isEnabled = enabled;
             //enable.visible = !isEnabled;
             //disable.visible = isEnabled;
@@ -223,7 +301,27 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             slider.rightBound = pLeft + pWidth - 50; //Minus width
             slider.boundWidth = slider.rightBound - slider.leftBound;
             input.x = pLeft + pWidth - 38;
+            this.upBound = maxBound.updateMaxBound();
+            this.boundWidth = upBound - lowBound;
+            slider.visible = this.boundWidth > 0;
+            updateData(value);
             updateSliderPosition();
+        }
+
+        @Override
+        void updateData(Object data) {
+            int upVal = Mth.clamp((int) data, lowBound, upBound);
+            if (value != upVal) {
+                value = upVal;
+                slider.updateValue((float) (value - lowBound) / boundWidth);
+                s.finalizeUpdate(getConfigName(), value, doesRefresh);
+            }
+            input.setValue(String.valueOf(upVal));
+        }
+
+        @Override
+        int getType() {
+            return 1;
         }
 
         private void updateSliderPosition() {
@@ -254,30 +352,31 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         private int gI;
         private int bI;
 
-        HexBoxEntry(final Component pName, int currentValue) {
-            this.name = pName;
+        HexBoxEntry(String pName, int currentValue) {
+            this.name = new TranslatableComponent(pName);
             this.value = currentValue;
-            input = new HexBox(entryColor, minecraft.font, 39, 12, pName, this::updateInputVal);
+            input = new HexBox(entryColor, minecraft.font, 39, 12, name, this::updateInputVal);
             if (currentValue == 0)
                 input.setValue("");
             else
                 input.setValue(Integer.toHexString(currentValue));
             s.addTickableEntry(input);
-            r = new InputBox(0xFF8888, minecraft.font, 15, 12, pName, this::updateRVal, true);
-            g = new InputBox(0x88FF88, minecraft.font, 15, 12, pName, this::updateGVal, true);
-            b = new InputBox(0x8888FF, minecraft.font, 15, 12, pName, this::updateBVal, true);
+            r = new InputBox(0xFF8888, minecraft.font, 15, 12, name, this::updateRVal, true);
+            g = new InputBox(0x88FF88, minecraft.font, 15, 12, name, this::updateGVal, true);
+            b = new InputBox(0x8888FF, minecraft.font, 15, 12, name, this::updateBVal, true);
             updateIndValues();
             s.addTickableEntry(r);
             s.addTickableEntry(g);
             s.addTickableEntry(b);
             this.markDirty();
+            internal = pName.substring(23);
         }
 
         private void updateRVal(String text) {
             int upVal = Mth.clamp(Integer.parseInt(text), 0, 255);
             if (rI != upVal) {
                 rI = upVal;
-                s.finalizeUpdate(name.getContents(), 2, finalizeAndGetValue());
+                s.finalizeUpdate(getConfigName(), finalizeAndGetValue(), doesRefresh);
             }
             r.setValue(String.valueOf(upVal));
         }
@@ -294,7 +393,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             int upVal = Mth.clamp(Integer.parseInt(text), 0, 255);
             if (gI != upVal) {
                 gI = upVal;
-                s.finalizeUpdate(name.getContents(), 2, finalizeAndGetValue());
+                s.finalizeUpdate(getConfigName(), finalizeAndGetValue(), doesRefresh);
             }
             g.setValue(String.valueOf(upVal));
         }
@@ -303,7 +402,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             int upVal = Mth.clamp(Integer.parseInt(text), 0, 255);
             if (bI != upVal) {
                 bI = upVal;
-                s.finalizeUpdate(name.getContents(), 2, finalizeAndGetValue());
+                s.finalizeUpdate(getConfigName(), finalizeAndGetValue(), doesRefresh);
             }
             b.setValue(String.valueOf(upVal));
         }
@@ -315,7 +414,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         private void updateInputVal(int num) {
             if (value != num) {
                 value = num;
-                s.finalizeUpdate(name.getContents(), 2, value);
+                s.finalizeUpdate(getConfigName(), value, doesRefresh);
                 updateIndValues();
             }
         }
@@ -368,6 +467,18 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             b.x = pLeft + pWidth - 24 - inWidth;
             g.x = b.x - inWidth - 6;
             r.x = g.x - inWidth - 6;
+        }
+
+        @Override
+        void updateData(Object data) {
+            value = (int) data;
+            updateIndValues();
+            updateComValue();
+        }
+
+        @Override
+        int getType() {
+            return 2;
         }
 
         @Override
@@ -425,10 +536,44 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
                 isDirty = false;
             }
             minecraft.font.draw(pPoseStack, name, x, pTop + 4, entryColor);
-            RenderItem.drawRectHorizontal(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + (pWidth>>1), pTop + 1, entryColor, entryColor | 255 << 24);
-            RenderItem.drawRectHorizontal(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop, pLeft + pWidth, pTop + 1, entryColor | 255 << 24, entryColor);
-            RenderItem.drawRectHorizontal(pPoseStack.last().pose(), 0, pLeft, pTop+15, pLeft + (pWidth>>1), pTop + 16, entryColor, entryColor | 255 << 24);
-            RenderItem.drawRectHorizontal(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop+15, pLeft + pWidth, pTop + 16, entryColor | 255 << 24, entryColor);
+            Render.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + (pWidth>>1), pTop + 1, entryColor, entryColor | 255 << 24);
+            Render.horizRect(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop, pLeft + pWidth, pTop + 1, entryColor | 255 << 24, entryColor);
+            Render.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop+15, pLeft + (pWidth>>1), pTop + 16, entryColor, entryColor | 255 << 24);
+            Render.horizRect(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop+15, pLeft + pWidth, pTop + 16, entryColor | 255 << 24, entryColor);
+        }
+    }
+
+    public class SpaceEntry extends ConfigOptionsList.Entry { ;
+
+        SpaceEntry() {
+            this.name = new TextComponent("");
+
+        }
+
+        @Override
+        public List<? extends NarratableEntry> narratables() {
+            return ImmutableList.of(new NarratableEntry() {
+                public NarratableEntry.NarrationPriority narrationPriority() {
+                    return NarrationPriority.NONE;
+                }
+
+                public void updateNarration(NarrationElementOutput p_193906_) {
+                }
+            });
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        void updateValues(int pTop, int pLeft, int pWidth, int pHeight) {
+
+        }
+
+        @Override
+        public void render(PoseStack pPoseStack, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pIsMouseOver, float pPartialTick) {
         }
     }
 

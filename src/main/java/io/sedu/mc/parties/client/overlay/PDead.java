@@ -1,7 +1,9 @@
 package io.sedu.mc.parties.client.overlay;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
+import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
@@ -30,7 +32,6 @@ public class PDead extends RenderItem {
         poseStack.scale(2f,2f,0);
         poseStack.translate(-.5f, 1, 0);
         setup(GUI_ICONS_LOCATION);
-        RenderSystem.enableDepthTest();
         blit(poseStack,(b.x>>1)+4, b.y>>1, 16 + (gui.getGuiTicks() >> 4 & 1)*9, 0, 9, 9);
         poseStack.popPose();
     }
@@ -40,8 +41,14 @@ public class PDead extends RenderItem {
         if (id.isDead) {
             setup(Gui.GUI_ICONS_LOCATION);
             blit(poseStack,x(i), y(i), 16 + (gui.getGuiTicks() >> 4 & 1)*9, 0, 9, 9);
-
-
         }
+    }
+
+    @Override
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
+        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
+        addDisplaySettings(c);
+        addPositionalSettings(c, true, true, true);
+        return c;
     }
 }

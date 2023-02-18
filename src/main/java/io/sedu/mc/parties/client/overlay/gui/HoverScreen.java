@@ -2,7 +2,6 @@ package io.sedu.mc.parties.client.overlay.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.client.overlay.PRectC;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static Util.Render.tip;
+import static io.sedu.mc.parties.client.overlay.RenderItem.clickArea;
 
 public class HoverScreen extends Screen {
 
@@ -33,7 +33,6 @@ public class HoverScreen extends Screen {
     private int index = 0;
     private static boolean active = false;
     private static int key;
-    private static RenderItem clickArea;
     private List<Button> moveParty = new ArrayList<>();
     private List<Button> menu = new ArrayList<>();
     private List<Button> moveFrame = new ArrayList<>();
@@ -42,17 +41,13 @@ public class HoverScreen extends Screen {
 
     private static boolean isArranging = false;
     private static boolean isMoving = false;
-    private static boolean notEditing = false;
+    static boolean notEditing = true;
 
     //public boolean rendered;
     public HoverScreen(int value) {
         super(new TextComponent("Mouse Hover"));
         key = value;
 
-    }
-
-    public static void addClickable(PRectC pRectC) {
-        clickArea = pRectC;
     }
 
     public static boolean arranging() {

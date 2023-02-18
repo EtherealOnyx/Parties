@@ -4,6 +4,7 @@ import Util.Render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.PDimIcon;
 import io.sedu.mc.parties.client.overlay.PHead;
 import io.sedu.mc.parties.client.overlay.PName;
@@ -26,6 +27,7 @@ import java.util.Map;
 
 import static Util.Render.renderBg;
 import static Util.Render.tip;
+import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 
 public class SettingsScreen extends Screen {
     private final ResourceLocation MENU_LOC = new ResourceLocation("textures/block/spruce_planks.png");
@@ -70,6 +72,8 @@ public class SettingsScreen extends Screen {
     int searchBoxW;
     int searchBoxH;
 
+    private static boolean active = false;
+
     //TODO: Save changes into a new class that tracks the component and the subtype and the value of the change. Disable clearing until they press X
 
     private final Button left = new ColorButton(0xbb8f44, 0, 0, 20, 20, new TextComponent("◄"), b -> cycleElements(true), tip(this, "Cycle Elements Left"));
@@ -77,10 +81,15 @@ public class SettingsScreen extends Screen {
     private final Button showModBox = new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters"));
     private final Button hideModBox = new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters"));
     private final Button toggleRGBMode = new SmallButton(0, 0, "c", b -> toggleRGB(), tip(this, "Toggle RGB Input Mode"), 1f, 1f, 1f);
+    private final HashMap<String, RenderItem.Update> updater = new HashMap<>();
 
     private void toggleRGB() {
         HexBox.rgbMode = !HexBox.rgbMode;
         options.markDirty();
+    }
+
+    public static boolean isActive() {
+        return active;
     }
 
     private void toggleModBox(boolean show) {
@@ -122,6 +131,8 @@ public class SettingsScreen extends Screen {
 
     @Override
     public void onClose() {
+        active = false;
+        notEditing = true;
         PHead.playerHead = null;
         PName.nameTag = null;
         PDimIcon.dimIcon = null;
@@ -208,22 +219,25 @@ public class SettingsScreen extends Screen {
     private void renderShadows(PoseStack poseStack) {
         //renderBg(screenX + modBoxW, screenY + eleBoxH, screenX + screenW, screenY + screenH, screenW - modBoxW, screenH - eleBoxH, 80);
         //Top Shadow
-        RenderItem.drawRect(poseStack.last().pose(), 0, screenX, screenY + eleBoxH, screenX + screenW, screenY + eleBoxH+10, 0xAA000000, 0x00000000);
+        Render.rect(poseStack.last().pose(), 0, screenX, screenY + eleBoxH, screenX + screenW, screenY + eleBoxH+10, 0xAA000000, 0x00000000);
         //Left Shadow
         if (modVisible) {
-            RenderItem.drawRectHorizontal(poseStack.last().pose(), 0, screenX + modBoxW, screenY + eleBoxH, screenX + modBoxW + 10, screenY + screenH - searchBoxH, 0xAA000000, 0x00000000);
+            Render.horizRect(poseStack.last().pose(), 0, screenX + modBoxW, screenY + eleBoxH, screenX + modBoxW + 10, screenY + screenH - searchBoxH, 0xAA000000, 0x00000000);
         }
         //Bottom Shadow
-        RenderItem.drawRect(poseStack.last().pose(), 0, screenX, screenY + screenH - 10 - searchBoxH, screenX + screenW, screenY + screenH - searchBoxH, 0x00000000, 0xAA000000);
+        Render.rect(poseStack.last().pose(), 0, screenX, screenY + screenH - 10 - searchBoxH, screenX + screenW, screenY + screenH - searchBoxH, 0x00000000, 0xAA000000);
 
 
         //Right Shadow
-        RenderItem.drawRectHorizontal(poseStack.last().pose(), 0, screenX + screenW - 10 - optBoxW, screenY + eleBoxH, screenX + screenW - optBoxW, screenY + screenH - searchBoxH, 0x00000000, 0xAA000000);
+        Render.horizRect(poseStack.last().pose(), 0, screenX + screenW - 10 - optBoxW, screenY + eleBoxH, screenX + screenW - optBoxW, screenY + screenH - searchBoxH, 0x00000000, 0xAA000000);
         //RenderItem.drawRect(poseStack.last().pose(), 0, screenX + modBoxW, screenY + eleBoxH, screenX + screenW - optBoxW, screenY + screenH - searchBoxH, 0x66000000, 0x66000000);
     }
 
 
     protected void init() {
+        RenderItem.initUpdater(updater);
+        active = true;
+        notEditing = false;
         INNER_LOC = new ResourceLocation("textures/block/deepslate_bricks.png");
         PHead.playerHead = new ItemStack(Items.PLAYER_HEAD);
         assert Minecraft.getInstance().player != null;
@@ -392,19 +406,20 @@ public class SettingsScreen extends Screen {
         setBounds(pWidth, pHeight, false);
     }
 
-    public void finalizeUpdate(String name, int type, Object data) {
+    public void finalizeUpdate(String name, Object data, boolean markDirty) {
         Parties.LOGGER.error("TRIGGERED FINALIZATION UPDATE FOR: " + tabsOrder.get(selEle) + " | " + name + " | " + data);
-        switch(type) {
-            case 0:
-                break;
-        }
+        triggerUpdate(name, data);
+        ConfigEntry.setEntry(tabsOrder.get(selEle), name, data);
+        if (markDirty)
+            markDirty();
     }
 
-    public void triggerUpdate(String name, int type, Object data) {
+    public void markDirty() {
+        options.markSlidersDirty();
+    }
+
+    public void triggerUpdate(String name, Object data) {
         Parties.LOGGER.error("TRIGGERED UPDATE FOR: " + tabsOrder.get(selEle) + " | " + name + " | " + data);
-        switch(type) {
-            case 0:
-                break;
-        }
+        updater.get(name).onUpdate(tabsOrder.get(selEle), data);
     }
 }

@@ -33,12 +33,13 @@ public abstract class RenderSelfItem extends RenderItem {
         item = (gui, poseStack, partialTicks, width, height) -> {
             if (ClientPlayerData.playerOrderedList.size() == 0) return;
 
-
             for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++) {
+                startItem(poseStack);
                 if (i == selfIndex)
                     renderSelf(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack, partialTicks);
                 else
                     renderMember(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack, partialTicks);
+                endItem(poseStack);
             }
         };
     }
