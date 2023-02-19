@@ -194,15 +194,15 @@ public class PEffects extends RenderSelfItem {
 
     private void rectInscribed(Matrix4f pose, int radius, int x, int y, int width, int height, int outColor, boolean ben) {
         if (ben)
-            sizeRectNoA(pose, x, y, width, height, Config.cG(), Config.cG());
+            sizeRectNoA(pose, x, y, 0, width, height, Config.cG(), Config.cG());
         else
-            sizeRectNoA(pose, x, y, width, height, Config.cB(), Config.cB());
-        sizeRectNoA(pose, x+radius, y+radius, width-(radius*2), height-(radius*2), 0x212121, (outColor & 0xfefefe) >> 1);
+            sizeRectNoA(pose, x, y, 0, width, height, Config.cB(), Config.cB());
+        sizeRectNoA(pose, x+radius, y+radius, 0, width-(radius*2), height-(radius*2), 0x212121, (outColor & 0xfefefe) >> 1);
     }
 
     private void rectInscribedFlash(Matrix4f pose, int radius, int x, int y, int width, int height, int flashColor, int outColor) {
-        sizeRectNoA(pose, x, y, width, height, Config.cF(), flashColor);
-        sizeRectNoA(pose, x+radius, y+radius, width-(radius*2), height-(radius*2), 0x212121, (outColor & 0xfefefe) >> 1);
+        sizeRectNoA(pose, x, y, 0, width, height, Config.cF(), flashColor);
+        sizeRectNoA(pose, x+radius, y+radius, 0, width-(radius*2), height-(radius*2), 0x212121, (outColor & 0xfefefe) >> 1);
     }
 
     private int sX(int pI, int bI) {

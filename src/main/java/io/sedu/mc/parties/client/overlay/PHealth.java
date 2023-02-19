@@ -8,6 +8,7 @@ import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
@@ -37,6 +38,7 @@ public class PHealth extends RenderIconTextItem {
     int bColorBot;
     int bAColorTop;
     int bAColorBot;
+    int healthType;
 
     public PHealth(String name, int x, int y, int width, int height, int color, int absorbColor, int deadColor) {
         super(name, x, y, width, height, color, true);
@@ -72,8 +74,8 @@ public class PHealth extends RenderIconTextItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        Render.sizeRect(poseStack.last().pose(), b.x+7, b.y+9, 22, 7, bColorTop, bColorBot);
-        Render.sizeRectNoA(poseStack.last().pose(), b.x+8, b.y+10, 20, 5, colorTop, colorBot);
+        Render.sizeRect(poseStack.last().pose(), b.x+7, b.y+9, 0, 22, 7, bColorTop, bColorBot);
+        Render.sizeRectNoA(poseStack.last().pose(), b.x+8, b.y+10, 0, 20, 5, colorTop, colorBot);
         setup(GUI_ICONS_LOCATION);
         RenderSystem.enableDepthTest();
         blit(poseStack,b.x+3, b.y+8, 16, 0, 9, 9);
@@ -90,8 +92,9 @@ public class PHealth extends RenderIconTextItem {
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
 
         if (id.isDead) {
-            rect(i, poseStack, 0, 0, bColorTop);
-            rectNoA(i, poseStack, 0, 1, colorTopMissing, colorBotMissing);
+            Render.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorBot);
+            Render.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing);
+
             textCentered(i, tX(i), tY(i), gui, poseStack, "Dead", deadColor);
             return;
         }
@@ -103,7 +106,7 @@ public class PHealth extends RenderIconTextItem {
 
 
             //Dimmer
-            rect(i, poseStack, 0, 0, 255 - id.alphaI << 24, 255 - id.alphaI << 24);
+            Render.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 255 - id.alphaI << 24);
             if (notEditing() && withinBounds(l(i), t(i), r(i), b(i), 2)) {
                 renderTooltip(poseStack, gui, 10, 0, "Health: " + (id.health.cur + id.health.absorb) + "/" + id.health.max, 0xfc807c, 0x4d110f, 0xffbfbd);
             }
@@ -126,28 +129,35 @@ public class PHealth extends RenderIconTextItem {
         float hB, aB;
         hB = HealthAnim.getPercent(id.health.cur, id.health.max, id.health.absorb);
         if (id.health.absorb > 0) {
-            rect(i, poseStack, 0, 0, bAColorTop, bAColorBot);
-            rectNoA(i, poseStack, 0, 1, colorTopMissing, colorBotMissing); //Missing
+            Render.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, bAColorTop, bAColorBot);
+            Render.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
             aB = hB + HealthAnim.getPercentA(id.health.cur, id.health.max, id.health.absorb);
-            rectRNoA(poseStack, i, 0, hB, colorTop, colorBot); //Health
-            rectB(poseStack, i, 0, hB, aB, colorTopAbsorb, colorBotAbsorb); //Absorb
+            rectRNoA(poseStack, i, zPos, hB, colorTop, colorBot); //Health
+            rectB(poseStack, i, zPos, hB, aB, colorTopAbsorb, colorBotAbsorb); //Absorb
         } else {
-            rect(i, poseStack, 0, 0, bColorTop, bColorBot);
-            rectNoA(i, poseStack, 0, 1, colorTopMissing, colorBotMissing); //Missing
-            rectRNoA(poseStack, i, 0, hB, colorTop, colorBot); //Health
+            Render.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorTop, bColorBot);
+            Render.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
+            rectRNoA(poseStack, i, zPos, hB, colorTop, colorBot); //Health
         }
     }
 
     private void rectRNoA(PoseStack p, int i, int zLevel, float rightPosition, int startColor, int endColor ) {
-        Render.rectNoA(p.last().pose(), zLevel, 1+l(i), t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
+        Render.sizeRectNoA(p.last().pose(), x(i)+1, y(i)+1, zLevel, Math.min(width - 2, ((width-2)*rightPosition)), height-2, startColor, endColor);
     }
 
     private void rectB(PoseStack p, int i, int zLevel, float leftPosition, float rightPosition, int startColor, int endColor ) {
-        Render.rect(p.last().pose(), zLevel, l(i)+width*leftPosition-1, t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
+        Render.sizeRect(p.last().pose(), x(i) + width*leftPosition, y(i) + 1, zLevel, Mth.clamp(width*(rightPosition-leftPosition), 0,width-2), height-2, startColor, endColor);
+        //Render.rect(p.last().pose(), zLevel, l(i)+width*leftPosition-1, t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
     }
 
-    private void rectBNoA(PoseStack p, int i, int zLevel, float leftPosition, float rightPosition, int startColor, int endColor ) {
-        Render.rectNoA(p.last().pose(), zLevel, l(i)+width*leftPosition-1, t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
+    private void rectAnim(PoseStack p, int i, int zLevel, float leftPosition, float rightPosition, int startColor, int endColor ) {
+        //TODO: Use a left top right bot rect. Width stays untouched. Left pos must be + 1.
+        //TODO: width-2 * (rightpos-leftpos) ???
+        //TODO: X Bound: x + 1 + (width-2)*leftPos??? IS THIS ALL I NEEDED OMG
+        //TODO: Switch to left, top, right, bottom and use Math.max(x+1, val) etc to clamp values.
+        //Left Pos: x + offset + (width - offset*2)*leftPos | Right Pos: x + offset + (
+        Render.rectNoA(p.last().pose(), zPos, Math.max(x(i),x(i) + (width-2)*leftPosition)+1, y(i)+1,Math.min(x(i)+width-1,x(i)+1 + (width-2)*rightPosition), y(i)+height-1, startColor, endColor);
+        //Render.rectNoA(p.last().pose(), zLevel, l(i)+width*leftPosition-1, t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
     }
 
     private void renderHealthAnim(int i, PoseStack poseStack, ClientPlayerData id, float partialTicks) {
@@ -158,22 +168,22 @@ public class PHealth extends RenderIconTextItem {
 
         if (id.health.hInc) {
             if (id.health.effHOld())
-                rectBNoA(poseStack, i, 0, id.health.oldH, id.health.curH, colorAbsTop, colorAbsBot);
+                rectAnim(poseStack, i, zPos, id.health.oldH, id.health.curH, colorAbsTop, colorAbsBot);
             else
-                rectBNoA(poseStack, i, 0, id.health.oldH, id.health.curH, colorIncTop, colorIncBot);
+                rectAnim(poseStack, i, zPos, id.health.oldH, id.health.curH, colorIncTop, colorIncBot);
 
         } else {
             if (id.health.effH())
-                rectBNoA(poseStack, i, 0, id.health.curH, id.health.oldH, colorAbsTop, colorAbsBot);
+                rectAnim(poseStack, i, zPos, id.health.curH, id.health.oldH, colorAbsTop, colorAbsBot);
             else
-                rectBNoA(poseStack, i, 0, id.health.curH, id.health.oldH, colorDecTop, colorDecBot);
+                rectAnim(poseStack, i, zPos, id.health.curH, id.health.oldH, colorDecTop, colorDecBot);
 
         }
 
         if (id.health.aInc)
-            rectBNoA(poseStack, i, 0, id.health.oldA, id.health.curA, colorAbsTop, colorAbsBot);
+            rectAnim(poseStack, i, zPos, id.health.oldA, id.health.curA, colorAbsTop, colorAbsBot);
         else
-            rectBNoA(poseStack, i, 0, id.health.curA, id.health.oldA, colorAbsTop, colorAbsBot);
+            rectAnim(poseStack, i, zPos, id.health.curA, id.health.oldA, colorAbsTop, colorAbsBot);
 
     }
 
@@ -215,18 +225,19 @@ public class PHealth extends RenderIconTextItem {
         c.addColorEntry("config.sedparties.name.tcabsorb", absorbColor);
         c.addColorEntry("config.sedparties.name.tcdead", deadColor);
 
+        c.addSpaceEntry();
         c.addTitleEntry("config.sedparties.title.barc");
         c.addSpaceEntry();
 
         c.addTitleEntry("config.sedparties.title.barb");
-        c.addColorEntry("config.sedparties.name.bbct", bColorTop >> 8);
-        c.addColorEntry("config.sedparties.name.bbcb", bColorBot >> 8);
+        c.addColorEntry("config.sedparties.name.bbct", bColorTop);
+        c.addColorEntry("config.sedparties.name.bbcb", bColorBot);
         c.addSpaceEntry();
 
 
         c.addTitleEntry("config.sedparties.title.bara");
-        c.addColorEntry("config.sedparties.name.bbact", bAColorTop >> 8);
-        c.addColorEntry("config.sedparties.name.bbacb", bAColorBot >> 8);
+        c.addColorEntry("config.sedparties.name.bbact", bAColorTop);
+        c.addColorEntry("config.sedparties.name.bbacb", bAColorBot);
         c.addSpaceEntry();
 
         c.addTitleEntry("config.sedparties.title.bc");
@@ -240,8 +251,8 @@ public class PHealth extends RenderIconTextItem {
         c.addSpaceEntry();
 
         c.addTitleEntry("config.sedparties.title.bca");
-        c.addColorEntry("config.sedparties.name.bcta", colorTopAbsorb >> 8);
-        c.addColorEntry("config.sedparties.name.bcba", colorBotAbsorb >> 8);
+        c.addColorEntry("config.sedparties.name.bcta", colorTopAbsorb);
+        c.addColorEntry("config.sedparties.name.bcba", colorBotAbsorb);
         c.addSpaceEntry();
 
         c.addTitleEntry("config.sedparties.title.baa");

@@ -48,13 +48,11 @@ public class Render {
     }
 
 
-    public static void sizeRectNoA(Matrix4f mat, float x, float y, int width, int height, int startColor, int endColor)
+    public static void sizeRectNoA(Matrix4f mat, float x, float y, int z, float width, int height, int startColor, int endColor)
     {
-        float startAlpha = 1f;
         float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
         float startGreen = (float)(startColor >>  8 & 255) / 255.0F;
         float startBlue  = (float)(startColor       & 255) / 255.0F;
-        float endAlpha   = 1f;
         float endRed     = (float)(endColor   >> 16 & 255) / 255.0F;
         float endGreen   = (float)(endColor   >>  8 & 255) / 255.0F;
         float endBlue    = (float)(endColor         & 255) / 255.0F;
@@ -68,14 +66,19 @@ public class Render {
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
         buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(mat, x+width,    y, 0).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat,  x,    y, 0).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat,  x, y+height, 0).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
-        buffer.vertex(mat, x+width, y+height, 0).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
+        buffer.vertex(mat, x+width,    y, z).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat,  x,    y, z).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat,  x, y+height, z).color(  endRed,   endGreen,   endBlue, 1f).endVertex();
+        buffer.vertex(mat, x+width, y+height, z).color(  endRed,   endGreen,   endBlue,1f).endVertex();
         tessellator.end();
 
         RenderSystem.disableBlend();
         RenderSystem.enableTexture();
+    }
+
+    public static void trueRectNoA(Matrix4f mat, float x, float y, int z, int offset, float width, int height, int startColor, int endColor)
+    {
+        rectNoA(mat, z, x + offset, y + offset, x - offset + width, y - offset + height, startColor, endColor);
     }
 
     public static void sizeRectNoA(Matrix4f mat, float x, float y, int width, int height, int color)
@@ -104,7 +107,7 @@ public class Render {
         RenderSystem.enableTexture();
     }
 
-    public static void sizeRect(Matrix4f mat, float x, float y, int width, int height, int color)
+    public static void sizeRect(Matrix4f mat, float x, float y, int z, int width, int height, int color)
     {
         float startAlpha = (float)(color >> 24 & 255) / 255.0F;
         float startRed   = (float)(color >> 16 & 255) / 255.0F;
@@ -130,12 +133,15 @@ public class Render {
         RenderSystem.enableTexture();
     }
 
-    public static void offRect(Matrix4f mat, float x, float y, int z, int offset, int width, int height, int color)
+    public static void offRectNoA(Matrix4f mat, float x, float y, int z, int offset, float width, float height, int startColor, int endColor)
     {
-        float startAlpha = (float)(color >> 24 & 255) / 255.0F;
-        float startRed   = (float)(color >> 16 & 255) / 255.0F;
-        float startGreen = (float)(color >>  8 & 255) / 255.0F;
-        float startBlue  = (float)(color       & 255) / 255.0F;
+        float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
+        float startGreen = (float)(startColor >>  8 & 255) / 255.0F;
+        float startBlue  = (float)(startColor       & 255) / 255.0F;
+
+        float endRed   = (float)(endColor >> 16 & 255) / 255.0F;
+        float endGreen = (float)(endColor >>  8 & 255) / 255.0F;
+        float endBlue  = (float)(endColor       & 255) / 255.0F;
 
         RenderSystem.disableTexture();
         RenderSystem.enableBlend();
@@ -146,17 +152,17 @@ public class Render {
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
         buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(mat, x+width-offset,    y+offset, z).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat,  x+offset,    y+offset, z).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat,  x+offset, y+height-offset, z).color(  startRed,   startGreen,   startBlue,startAlpha).endVertex();
-        buffer.vertex(mat, x+width-offset, y+height-offset, z).color(  startRed,   startGreen,   startBlue,startAlpha).endVertex();
+        buffer.vertex(mat, x+width-offset,    y+offset, z).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat,  x+offset,    y+offset, z).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat,  x+offset, y+height-offset, z).color(  endRed,   endGreen,   endBlue,1f).endVertex();
+        buffer.vertex(mat, x+width-offset, y+height-offset, z).color(  endRed,   endGreen,   endBlue,1f).endVertex();
         tessellator.end();
 
         RenderSystem.disableBlend();
         RenderSystem.enableTexture();
     }
 
-    public static void sizeRect(Matrix4f mat, float x, float y, int width, int height, int startColor, int endColor)
+    public static void sizeRect(Matrix4f mat, float x, float y, int z, float width, float height, int startColor, int endColor)
     {
         float startAlpha = (float)(startColor >> 24 & 255) / 255.0F;
         float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
@@ -176,17 +182,17 @@ public class Render {
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
         buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(mat, x+width,    y, 0).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat,  x,    y, 0).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat,  x, y+height, 0).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
-        buffer.vertex(mat, x+width, y+height, 0).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
+        buffer.vertex(mat, x+width,    y, z).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  x,    y, z).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  x, y+height, z).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
+        buffer.vertex(mat, x+width, y+height, z).color(  endRed,   endGreen,   endBlue,   endAlpha).endVertex();
         tessellator.end();
 
         RenderSystem.disableBlend();
         RenderSystem.enableTexture();
     }
 
-    public static void completeRect(Matrix4f mat, float x, float y, int z, int offset, int width, int height, int startColor, int endColor)
+    public static void completeRect(Matrix4f mat, float x, float y, int z, int offset, float width, float height, int startColor, int endColor)
     {
 
 
@@ -199,17 +205,39 @@ public class Render {
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
         buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(mat, x+width,    y, 0).color(startColor).endVertex();
-        buffer.vertex(mat,  x,    y, 0).color(startColor).endVertex();
-        buffer.vertex(mat,  x, y+height, 0).color(endColor).endVertex();
-        buffer.vertex(mat, x+width, y+height, 0).color(endColor).endVertex();
+        buffer.vertex(mat, x+width-offset,    y+offset, z).color(startColor).endVertex();
+        buffer.vertex(mat,  x+offset,    y+offset, z).color(startColor).endVertex();
+        buffer.vertex(mat,  x+offset, y+height-offset, z).color(endColor).endVertex();
+        buffer.vertex(mat, x+width-offset, y+height-offset, z).color(endColor).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+    public static void completeRect(Matrix4f mat, float x, float y, int z, int offset, int width, int height, int startColor)
+    {
+
+
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.enableDepthTest();
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, x+width-offset,    y+offset, z).color(startColor).endVertex();
+        buffer.vertex(mat,  x+offset,    y+offset, z).color(startColor).endVertex();
+        buffer.vertex(mat,  x+offset, y+height-offset, z).color(startColor).endVertex();
+        buffer.vertex(mat, x+width-offset, y+height-offset, z).color(startColor).endVertex();
         tessellator.end();
 
         RenderSystem.disableBlend();
         RenderSystem.enableTexture();
     }
 
-    public static void completeRect(Matrix4f mat, float x, float y, int z, int offset, int width, int height, float r, float g, float b, float a, float r2, float g2, float b2, float a2)
+    public static void completeRect(Matrix4f mat, float x, float y, int z, int offset, float width, float height, float r, float g, float b, float a, float r2, float g2, float b2, float a2)
     {
 
 
@@ -339,31 +367,6 @@ public class Render {
         RenderSystem.enableTexture();
     }
 
-    public static void rectNoA(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int color)
-    {
-        float startRed   = (float)(color >> 16 & 255) / 255.0F;
-        float startGreen = (float)(color >>  8 & 255) / 255.0F;
-        float startBlue  = (float)(color       & 255) / 255.0F;
-
-        RenderSystem.enableDepthTest();
-        RenderSystem.disableTexture();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(mat, right,    top, zLevel).color(startRed, startGreen, startBlue, 1f).endVertex();
-        buffer.vertex(mat,  left,    top, zLevel).color(startRed, startGreen, startBlue, 1f).endVertex();
-        buffer.vertex(mat,  left, bottom, zLevel).color(startRed, startGreen, startBlue, 1f).endVertex();
-        buffer.vertex(mat, right, bottom, zLevel).color(startRed, startGreen, startBlue, 1f).endVertex();
-        tessellator.end();
-
-        RenderSystem.disableBlend();
-        RenderSystem.enableTexture();
-    }
-
     public static void horizRect(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int startColor, int endColor)
     {
         float startAlpha = (float)(startColor >> 24 & 255) / 255.0F;
@@ -423,10 +426,10 @@ public class Render {
     }
 
     public static void borderRectNoA(Matrix4f pose, int offset, int thickness, int x, int y, int width, int height, int colorStart, int colorEnd) {
-        Render.sizeRectNoA(pose, x - thickness - offset, y - thickness - offset, width + ((thickness + offset)<<1), thickness, colorStart, colorStart);
-        Render.sizeRectNoA(pose, x - thickness - offset, y + height + offset, width + ((thickness + offset)<<1), thickness, colorEnd, colorEnd);
-        Render.sizeRectNoA(pose, x - thickness - offset, y - (offset), thickness, height+(offset<<1), colorStart, colorEnd);
-        Render.sizeRectNoA(pose, x + width + offset, y - (offset), thickness, height+(offset<<1), colorStart, colorEnd);
+        Render.sizeRectNoA(pose, x - thickness - offset, y - thickness - offset, 0, width + ((thickness + offset)<<1), thickness, colorStart, colorStart);
+        Render.sizeRectNoA(pose, x - thickness - offset, y + height + offset, 0, width + ((thickness + offset)<<1), thickness, colorEnd, colorEnd);
+        Render.sizeRectNoA(pose, x - thickness - offset, y - (offset), 0, thickness, height+(offset<<1), colorStart, colorEnd);
+        Render.sizeRectNoA(pose, x + width + offset, y - (offset), 0, thickness, height+(offset<<1), colorStart, colorEnd);
     }
 
     public static void borderRectNoA(Matrix4f pose, int offset, int thickness, int x, int y, int width, int height, int color) {
@@ -437,16 +440,16 @@ public class Render {
     }
 
     public static void borderRect(Matrix4f pose, int offset, int thickness, int x, int y, int width, int height, int color) {
-        Render.sizeRect(pose, x - thickness - offset, y - thickness - offset, width + ((thickness + offset)<<1), thickness, color);
-        Render.sizeRect(pose, x - thickness - offset, y + height + offset, width + ((thickness + offset)<<1), thickness, color);
-        Render.sizeRect(pose, x - thickness - offset, y - (offset), thickness, height+(offset<<1), color);
-        Render.sizeRect(pose, x + width + offset, y - (offset), thickness, height+(offset<<1), color);
+        Render.sizeRect(pose, x - thickness - offset, y - thickness - offset, 0, width + ((thickness + offset)<<1), thickness, color);
+        Render.sizeRect(pose, x - thickness - offset, y + height + offset, 0, width + ((thickness + offset)<<1), thickness, color);
+        Render.sizeRect(pose, x - thickness - offset, y - (offset), 0, thickness, height+(offset<<1), color);
+        Render.sizeRect(pose, x + width + offset, y - (offset), 0, thickness, height+(offset<<1), color);
     }
     public static void borderRect(Matrix4f pose, int offset, int thickness, int x, int y, int width, int height, int colorStart, int colorEnd) {
-        Render.sizeRect(pose, x - thickness - offset, y - thickness - offset, width + ((thickness + offset)<<1), thickness, colorStart, colorStart);
-        Render.sizeRect(pose, x - thickness - offset, y + height + offset, width + ((thickness + offset)<<1), thickness, colorEnd, colorEnd);
-        Render.sizeRect(pose, x - thickness - offset, y - (offset), thickness, height+(offset<<1), colorStart, colorEnd);
-        Render.sizeRect(pose, x + width + offset, y - (offset), thickness, height+(offset<<1), colorStart, colorEnd);
+        Render.sizeRect(pose, x - thickness - offset, y - thickness - offset, 0, width + ((thickness + offset)<<1), thickness, colorStart, colorStart);
+        Render.sizeRect(pose, x - thickness - offset, y + height + offset, 0,  width + ((thickness + offset)<<1), thickness, colorEnd, colorEnd);
+        Render.sizeRect(pose, x - thickness - offset, y - (offset), 0, thickness, height+(offset<<1), colorStart, colorEnd);
+        Render.sizeRect(pose, x + width + offset, y - (offset), 0, thickness, height+(offset<<1), colorStart, colorEnd);
     }
 
     public static void renderBg(int l, int t, int r, int b, int w, int h, int brightness, ResourceLocation loc) {
@@ -455,7 +458,6 @@ public class Render {
         BufferBuilder bufferbuilder = tesselator.getBuilder();
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.setShaderTexture(0, loc);
-        //RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         bufferbuilder.vertex(l, b, 0.0D).uv(0.0F, (float)h / 32.0F).color(brightness,brightness,brightness, 255).endVertex();
         bufferbuilder.vertex(r, b, 0.0D).uv((float)w / 32.0F, (float)h / 32.0F).color(brightness,brightness,brightness, 255).endVertex();
@@ -472,10 +474,9 @@ public class Render {
     }
 
     public static void borderRectNoBottom(Matrix4f pose, int offset, int thickness, int x, int y, int width, int height, int colorStart, int colorEnd) {
-        Render.sizeRect(pose, x - thickness - offset, y - thickness - offset, width + ((thickness + offset)<<1), thickness, colorStart, colorStart);
-        //Render.sizeRect(pose, x - thickness - offset, y + width + offset, width + ((thickness + offset)<<1), thickness, colorEnd, colorEnd);
-        Render.sizeRect(pose, x - thickness - offset, y - (offset), thickness, height + offset, colorStart, colorEnd);
-        Render.sizeRect(pose, x + width + offset, y - (offset), thickness,  height + offset, colorStart, colorEnd);
+        Render.sizeRect(pose, x - thickness - offset, y - thickness - offset, 0, width + ((thickness + offset)<<1), thickness, colorStart, colorStart);
+        Render.sizeRect(pose, x - thickness - offset, y - (offset), 0, thickness, height + offset, colorStart, colorEnd);
+        Render.sizeRect(pose, x + width + offset, y - (offset), 0, thickness,  height + offset, colorStart, colorEnd);
     }
 
     public static float getR(int color) {

@@ -428,7 +428,7 @@ public class InputBox extends AbstractWidget implements Widget, GuiEventListener
         if (this.isVisible()) {
             //Modified Background
             borderRectNoA(pPoseStack.last().pose(), 1, 1, this.x, this.y-1, this.width, 10, (color  & 0xfefefe) >> 1, color);
-            sizeRect(pPoseStack.last().pose(), this.x-1, this.y-2, this.width+2, 12,0, color | 64 << 24);
+            sizeRect(pPoseStack.last().pose(), this.x-1, this.y-2, 0, this.width+2, 12,0, color | 64 << 24);
 
             int i2 = this.isEditable ? this.isFocused() ? 0xFFFF55 : this.color : 0xAAAAAA;
             int j = this.cursorPos - this.displayPos;

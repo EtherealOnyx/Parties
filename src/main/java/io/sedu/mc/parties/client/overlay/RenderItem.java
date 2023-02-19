@@ -218,7 +218,7 @@ public abstract class RenderItem {
         RenderSystem.enableDepthTest();
         Render.setColor(getColor());
         Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 150, new ResourceLocation("textures/block/glass.png"));
-        Render.sizeRect(p.last().pose(), b.x, b.y, b.getWidth(), b.getHeight(), 0x44FFFFFF, 0x88000000);
+        Render.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x44FFFFFF, 0x88000000);
         resetColor();
         Render.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 100 << 24,getColor() | 100 << 24);
 
@@ -229,7 +229,7 @@ public abstract class RenderItem {
         RenderSystem.enableDepthTest();
         Render.setColor(getColor());
         Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 255, new ResourceLocation("textures/block/glass.png"));
-        Render.sizeRect(p.last().pose(), b.x, b.y, b.getWidth(), b.getHeight(), 0x66FFFFFF, 0x22FFFFFF);
+        Render.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x66FFFFFF, 0x22FFFFFF);
         resetColor();
         Render.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 200 << 24, getColor());
     }
@@ -238,7 +238,7 @@ public abstract class RenderItem {
         RenderSystem.enableDepthTest();
         Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 110, INNER_LOC);
         Render.setColor(getColor());
-        Render.sizeRect(p.last().pose(), b.x, b.y, b.getWidth(), b.getHeight(), 0x77FFFFFF, 0x00FFFFFF);
+        Render.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x77FFFFFF, 0x00FFFFFF);
         resetColor();
         p.translate(0,0,5);
         Render.borderRectNoBottom(p.last().pose(), -1, 2, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 255 << 24, getColor() | 150 << 24);
@@ -256,11 +256,13 @@ public abstract class RenderItem {
     }
 
     void text(ForgeIngameGui gui, PoseStack p, String s, int x, int y, int color) {
+        p.translate(0,0,zPos);
         if (textShadow) {
             textS(gui,p,s,x,y,color);
             return;
         }
         gui.getFont().draw(p, s, x, y, color);
+        p.translate(0,0,-zPos);
     }
 
     private void textS(ForgeIngameGui gui, PoseStack p, String text, int x, int y, int color) {

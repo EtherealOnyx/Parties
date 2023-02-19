@@ -91,7 +91,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
     }
 
     public void markSlidersDirty() {
-        sliders.forEach(Entry::markDirty);
+        sliders.forEach(Entry::updateValues);
     }
 
 
@@ -102,6 +102,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         boolean doesRefresh = false;
 
         abstract void updateValues(int pTop, int pLeft, int pWidth, int pHeight);
+        abstract void updateValues();
 
         void updateData(Object data) {
 
@@ -184,6 +185,11 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         @Override
         void updateValues(int pTop, int pLeft, int pWidth, int pHeight) {
+
+        }
+
+        @Override
+        void updateValues() {
 
         }
 
@@ -301,6 +307,11 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             slider.rightBound = pLeft + pWidth - 50; //Minus width
             slider.boundWidth = slider.rightBound - slider.leftBound;
             input.x = pLeft + pWidth - 38;
+            updateValues();
+        }
+
+        @Override
+        void updateValues() {
             this.upBound = maxBound.updateMaxBound();
             this.boundWidth = upBound - lowBound;
             slider.visible = this.boundWidth > 0;
@@ -354,17 +365,17 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         HexBoxEntry(String pName, int currentValue) {
             this.name = new TranslatableComponent(pName);
+            r = new InputBox(0xFF8888, minecraft.font, 15, 12, name, this::updateRVal, true);
+            g = new InputBox(0x88FF88, minecraft.font, 15, 12, name, this::updateGVal, true);
+            b = new InputBox(0x8888FF, minecraft.font, 15, 12, name, this::updateBVal, true);
             this.value = currentValue;
+            updateIndValues();
             input = new HexBox(entryColor, minecraft.font, 39, 12, name, this::updateInputVal);
             if (currentValue == 0)
                 input.setValue("");
             else
-                input.setValue(Integer.toHexString(currentValue));
+                finalizeAndGetValue();
             s.addTickableEntry(input);
-            r = new InputBox(0xFF8888, minecraft.font, 15, 12, name, this::updateRVal, true);
-            g = new InputBox(0x88FF88, minecraft.font, 15, 12, name, this::updateGVal, true);
-            b = new InputBox(0x8888FF, minecraft.font, 15, 12, name, this::updateBVal, true);
-            updateIndValues();
             s.addTickableEntry(r);
             s.addTickableEntry(g);
             s.addTickableEntry(b);
@@ -470,6 +481,11 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         }
 
         @Override
+        void updateValues() {
+
+        }
+
+        @Override
         void updateData(Object data) {
             value = (int) data;
             updateIndValues();
@@ -492,7 +508,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             this.r.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
             this.g.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
             this.b.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-            Render.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 20, pTop + 3, 10,10, (entryColor  & 0xfefefe) >> 1, entryColor);
+            Render.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 20, pTop + 3, 0, 10,10, (entryColor  & 0xfefefe) >> 1, entryColor);
             Render.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 19, pTop + 4, 8, 8, value);
         }
     }
@@ -527,6 +543,11 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         @Override
         void updateValues(int pTop, int pLeft, int pWidth, int pHeight) {
             x = pLeft + ((pWidth - minecraft.font.width(name))>>1);
+        }
+
+        @Override
+        void updateValues() {
+
         }
 
         @Override
@@ -569,6 +590,11 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         @Override
         void updateValues(int pTop, int pLeft, int pWidth, int pHeight) {
+
+        }
+
+        @Override
+        void updateValues() {
 
         }
 

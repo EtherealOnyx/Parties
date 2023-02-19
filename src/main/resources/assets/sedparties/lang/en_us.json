@@ -39,36 +39,36 @@
 
   "config.sedparties.title.barc":"Bar Color Settings",
 
-  "config.sedparties.title.barb":"Border Color",
-  "config.sedparties.name.bbct": "Gradient Top",
-  "config.sedparties.name.bbcb": "Gradient Bottom",
+  "config.sedparties.title.barb":"Border Gradient",
+  "config.sedparties.name.bbct": "Top",
+  "config.sedparties.name.bbcb": "Bottom",
 
-  "config.sedparties.title.bara":"Absorb Border Color",
-  "config.sedparties.name.bbact": "Gradient Top",
-  "config.sedparties.name.bbacb": "Gradient Bottom",
+  "config.sedparties.title.bara":"Absorb Border Gradient",
+  "config.sedparties.name.bbact": "Top",
+  "config.sedparties.name.bbacb": "Bottom",
 
-  "config.sedparties.title.bc":"Normal Health Color",
-  "config.sedparties.name.bct": "Gradient Top",
-  "config.sedparties.name.bcb": "Gradient Bottom",
+  "config.sedparties.title.bc":"Normal Health Gradient",
+  "config.sedparties.name.bct": "Top",
+  "config.sedparties.name.bcb": "Bottom",
 
-  "config.sedparties.title.bcm":"Missing Health Color",
-  "config.sedparties.name.bctm": "Gradient Top",
-  "config.sedparties.name.bcbm": "Gradient Bottom",
+  "config.sedparties.title.bcm":"Missing Health Gradient",
+  "config.sedparties.name.bctm": "Top",
+  "config.sedparties.name.bcbm": "Bottom",
 
-  "config.sedparties.title.bca":"Absorb Health Color",
-  "config.sedparties.name.bcta": "Gradient Top",
-  "config.sedparties.name.bcba": "Gradient Bottom",
+  "config.sedparties.title.bca":"Absorb Health Gradient",
+  "config.sedparties.name.bcta": "Top",
+  "config.sedparties.name.bcba": "Bottom",
 
-  "config.sedparties.title.baa": "Absorb Animation Color",
-  "config.sedparties.name.bcat": "Gradient Top",
-  "config.sedparties.name.bcab": "Gradient Bottom",
+  "config.sedparties.title.baa": "Absorb Anim Gradient",
+  "config.sedparties.name.bcat": "Top",
+  "config.sedparties.name.bcab": "Bottom",
 
-  "config.sedparties.title.bai": "Health Increase Animation Color",
-  "config.sedparties.name.bcit": "Gradient Top",
-  "config.sedparties.name.bcib": "Gradient Bottom",
+  "config.sedparties.title.bai": "Gain Anim Gradient",
+  "config.sedparties.name.bcit": "Top",
+  "config.sedparties.name.bcib": "Bottom",
 
-  "config.sedparties.title.bad": "Health Decrease Animation Color",
-  "config.sedparties.name.bcdt": "Gradient Top",
-  "config.sedparties.name.bcdb": "Gradient Bottom"
+  "config.sedparties.title.bad": "Lose Anim Gradient",
+  "config.sedparties.name.bcdt": "Top",
+  "config.sedparties.name.bcdb": "Bottom"
 }
 

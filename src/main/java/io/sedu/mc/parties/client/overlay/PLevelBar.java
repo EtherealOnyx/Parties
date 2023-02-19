@@ -163,5 +163,10 @@ public class PLevelBar extends RenderIconTextItem {
         return c;
     }
 
+    //TODO: Modify getConfigOptions to send a variable too.
+    //TODO: When true, add only refresh sliders to config options.
+    //TODO: Grab sliders when in general config tab.
+    //TODO: Call the update on sliders when width/height changes.
+
 
 }
