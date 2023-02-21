@@ -69,7 +69,7 @@ public class PDimIcon extends RenderSelfItem {
             poseStack.popPose();
 
             //Tooltip Render
-            if (notEditing() && withinBounds(x(pI), y(pI), x(pI)+8, y(pI)+8, 4)) {
+            if (notEditing() && withinBounds(xNormal(pI), yNormal(pI), 8, 8, 4, scale)) {
                 renderTooltip(poseStack, gui, 10, 0, id.dim.dimNorm, (color & 0xfefefe) >> 1, color, 0, (color & 0xfefefe) >> 1, color);
             }
         });

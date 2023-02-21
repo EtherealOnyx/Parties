@@ -19,6 +19,7 @@
   "config.sedparties.title.icon":"Icon Settings",
   "config.sedparties.title.text":"Text Settings",
   "config.sedparties.title.textc":"Text Color Settings",
+  "config.sedparties.title.sepe":"Separate Entry Settings",
   "config.sedparties.name.display": "Enabled",
   "config.sedparties.name.xpos": "X Pos",
   "config.sedparties.name.xtpos": "X Pos",
@@ -36,8 +37,34 @@
   "config.sedparties.name.tdisplay": "Enabled",
   "config.sedparties.name.width": "Width",
   "config.sedparties.name.height": "Height",
+  "config.sedparties.name.spacex": "X Offset",
+  "config.sedparties.name.spacey": "Y Offset",
+  "config.sedparties.name.rowmax": "Buffs per Row",
+  "config.sedparties.name.totalmax": "Total Buffs",
+  "config.sedparties.name.buffg": "Buff",
+  "config.sedparties.name.buffb": "Debuff",
+  "config.sedparties.name.flash": "Flash",
+  "config.sedparties.name.blim": "Buff Limit",
+  "config.sedparties.name.dlim": "Debuff Limit",
+  "config.sedparties.name.dfirst": "Prioritize Debuffs",
+  "config.sedparties.name.bsep": "Prioritize Duration",
+  "config.sedparties.name.bsize": "Border Size",
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   "config.sedparties.title.barc":"Bar Color Settings",
+  "config.sedparties.title.color":"Color Settings",
 
   "config.sedparties.title.barb":"Border Gradient",
   "config.sedparties.name.bbct": "Top",
@@ -69,6 +96,7 @@
 
   "config.sedparties.title.bad": "Lose Anim Gradient",
   "config.sedparties.name.bcdt": "Top",
-  "config.sedparties.name.bcdb": "Bottom"
+  "config.sedparties.name.bcdb": "Bottom",
+  "config.sedparties.name.ttype": "Text Type"
 }
 

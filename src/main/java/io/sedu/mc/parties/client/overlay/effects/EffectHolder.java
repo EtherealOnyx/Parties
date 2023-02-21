@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.client.overlay.effects;
 
-import io.sedu.mc.parties.client.config.Config;
+import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import net.minecraft.world.effect.MobEffect;
 
 import java.util.*;
@@ -10,15 +10,16 @@ import java.util.function.Predicate;
 public class EffectHolder {
 
     //TODO: Add config
-    boolean seperate = true;
     HashMap<Integer, ClientEffect> effects = new HashMap<>();
     List<Integer> sortedEffectAll = new ArrayList<>();
     List<Integer> sortedEffectBene = new ArrayList<>();
     List<Integer> sortedEffectBad = new ArrayList<>();
 
-    static int dLim;
-    static int bLim;
-    static boolean debuffFirst = true;
+    public static boolean prioDur = false;
+    public static int maxAll;
+    public static int dLim;
+    public static int bLim;
+    public static boolean debuffFirst = true;
 
     public static void setValues(int buff, int debuff, boolean dFirst) {
         bLim = buff;
@@ -27,43 +28,52 @@ public class EffectHolder {
     }
 
     public EffectHolder() {
+    }
 
+    public static void updatebLim(int data) {
+        bLim = data;
+        dLim = maxAll - 1 - data;
+        ClientPlayerData.markEffectsDirty();
+    }
+
+    public static void updatedLim(int data) {
+        dLim = data;
+        bLim = maxAll - 1 - data;
+        ClientPlayerData.markEffectsDirty();
     }
 
 
     public void forEachAll(Consumer<ClientEffect> action) {
-        Objects.requireNonNull(action);
-        for (int i = 0; i < Math.min(Config.mA(), sortedEffectAll.size()); i++)
-            sortedEffectAll.forEach(integer -> action.accept(effects.get(integer)));
+        sortedEffectAll.forEach(integer -> action.accept(effects.get(integer)));
     }
 
-    public void forEachAllLim(Consumer<ClientEffect> action) {
-        for (int i = 0; i < Config.mA()-1; i++)
+    public void forEachAllLim(int max, Consumer<ClientEffect> action) {
+        for (int i = 0; i < max-1; i++)
             action.accept(effects.get(sortedEffectAll.get(i)));
     }
 
-    public void forEachBeneLim(Consumer<ClientEffect> action) {
-        for (int i = 0; i < Config.mG()-1; i++)
+    public void forEachBeneLim(int max, Consumer<ClientEffect> action) {
+        for (int i = 0; i < max-1; i++)
             action.accept(effects.get(sortedEffectBene.get(i)));
     }
 
-    public void forEachBadLim(Consumer<ClientEffect> action) {
-        for (int i = 0; i < Config.mB()-1; i++)
+    public void forEachBadLim(int max, Consumer<ClientEffect> action) {
+        for (int i = 0; i < max-1; i++)
             action.accept(effects.get(sortedEffectBad.get(i)));
     }
 
-    public void forAllRemainder(Consumer<ClientEffect> action) {
-        for (int i = Config.mA()-1; i < sortedEffectAll.size(); i++)
+    public void forAllRemainder(int max, Consumer<ClientEffect> action) {
+        for (int i = max-1; i < sortedEffectAll.size(); i++)
             action.accept(effects.get(sortedEffectAll.get(i)));
     }
 
-    public void forBeneRemainder(Consumer<ClientEffect> action) {
-        for (int i = Config.mG()-1; i < sortedEffectBene.size(); i++)
+    public void forBeneRemainder(int max, Consumer<ClientEffect> action) {
+        for (int i = max-1; i < sortedEffectBene.size(); i++)
             action.accept(effects.get(sortedEffectBene.get(i)));
     }
 
-    public void forBadRemainder(Consumer<ClientEffect> action) {
-        for (int i = Config.mB()-1; i < sortedEffectBad.size(); i++)
+    public void forBadRemainder(int max, Consumer<ClientEffect> action) {
+        for (int i = max-1; i < sortedEffectBad.size(); i++)
             action.accept(effects.get(sortedEffectBad.get(i)));
     }
 
@@ -102,55 +112,61 @@ public class EffectHolder {
 
     }
 
-    private void sort() {
-        sortBene();
-        sortBad();
-        if(seperate) {
-            sortedEffectAll.clear();
-            if (sortedEffectBad.size() + sortedEffectBene.size() > Config.mA()) {
-                int mx;
-                if (debuffFirst) {
-                    mx = Math.max(dLim, (Config.mA() - sortedEffectBene.size())-1);
-                    for(int i = 0; i < mx && i < sortedEffectBad.size(); i++) {
-                        sortedEffectAll.add(sortedEffectBad.get(i));
-                    }
-                    for(int i = 0; i < bLim && i < sortedEffectBene.size(); i++) {
-                        sortedEffectAll.add(sortedEffectBene.get(i));
-                    }
-                    for(int i = mx; i < sortedEffectBad.size(); i++) {
-                        sortedEffectAll.add(sortedEffectBad.get(i));
-                    }
-                    for(int i = bLim; i < sortedEffectBene.size(); i++) {
-                        sortedEffectAll.add(sortedEffectBene.get(i));
-                    }
-                } else {
-                    mx = Math.max(bLim, (Config.mA() - sortedEffectBad.size())-1);
-                    for(int i = 0; i < mx && i < sortedEffectBene.size(); i++) {
-                        sortedEffectAll.add(sortedEffectBene.get(i));
-                    }
-                    for(int i = 0; i < dLim && i < sortedEffectBad.size(); i++) {
-                        sortedEffectAll.add(sortedEffectBad.get(i));
-                    }
-                    for(int i = mx; i < sortedEffectBene.size(); i++) {
-                        sortedEffectAll.add(sortedEffectBene.get(i));
-                    }
-                    for(int i = dLim; i < sortedEffectBad.size(); i++) {
-                        sortedEffectAll.add(sortedEffectBad.get(i));
-                    }
+    public void refresh() {
+        if (prioDur)
+            sortAll();
+        else
+            sortRefresh();
+    }
+
+    private void sortRefresh() {
+        sortedEffectAll.clear();
+        if (sortedEffectBad.size() + sortedEffectBene.size() > maxAll) {
+            int mx;
+            if (debuffFirst) {
+                mx = Math.max(dLim, (maxAll - sortedEffectBene.size())-1);
+                for(int i = 0; i < mx && i < sortedEffectBad.size(); i++) {
+                    sortedEffectAll.add(sortedEffectBad.get(i));
+                }
+                for(int i = 0; i < bLim && i < sortedEffectBene.size(); i++) {
+                    sortedEffectAll.add(sortedEffectBene.get(i));
+                }
+                for(int i = mx; i < sortedEffectBad.size(); i++) {
+                    sortedEffectAll.add(sortedEffectBad.get(i));
+                }
+                for(int i = bLim; i < sortedEffectBene.size(); i++) {
+                    sortedEffectAll.add(sortedEffectBene.get(i));
                 }
             } else {
-                if (debuffFirst) {
-                    sortedEffectAll.addAll(sortedEffectBad);
-                    sortedEffectAll.addAll(sortedEffectBene);
-                } else {
-                    sortedEffectAll.addAll(sortedEffectBene);
-                    sortedEffectAll.addAll(sortedEffectBad);
+                mx = Math.max(bLim, (maxAll - sortedEffectBad.size())-1);
+                for(int i = 0; i < mx && i < sortedEffectBene.size(); i++) {
+                    sortedEffectAll.add(sortedEffectBene.get(i));
+                }
+                for(int i = 0; i < dLim && i < sortedEffectBad.size(); i++) {
+                    sortedEffectAll.add(sortedEffectBad.get(i));
+                }
+                for(int i = mx; i < sortedEffectBene.size(); i++) {
+                    sortedEffectAll.add(sortedEffectBene.get(i));
+                }
+                for(int i = dLim; i < sortedEffectBad.size(); i++) {
+                    sortedEffectAll.add(sortedEffectBad.get(i));
                 }
             }
         } else {
-            sortAll();
+            if (debuffFirst) {
+                sortedEffectAll.addAll(sortedEffectBad);
+                sortedEffectAll.addAll(sortedEffectBene);
+            } else {
+                sortedEffectAll.addAll(sortedEffectBene);
+                sortedEffectAll.addAll(sortedEffectBad);
+            }
         }
+    }
 
+    private void sort() {
+        sortBene();
+        sortBad();
+        refresh();
     }
 
     private void addVal(int type) {
@@ -243,17 +259,15 @@ public class EffectHolder {
         effects.values().forEach(ClientEffect::markForRemoval);
     }
 
-    public boolean largerAll() {
-        return sortedEffectAll.size() > Config.mA();
+    public boolean largerAll(int max) {
+        return sortedEffectAll.size() > max;
     }
 
-    public boolean largerBene() {
-        return sortedEffectAll.size() > Config.mG();
+    public boolean largerBene(int max) {
+        return sortedEffectAll.size() > max;
     }
 
-    public boolean largerBad() {
-        return sortedEffectAll.size() > Config.mB();
+    public boolean largerBad(int max) {
+        return sortedEffectAll.size() > max;
     }
-
-
 }

@@ -1,5 +1,9 @@
 package io.sedu.mc.parties.client.overlay;
 
+import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
+
+import java.util.ArrayList;
+
 public abstract class RenderIconTextItem extends RenderSelfItem {
     int color;
     int textX;
@@ -73,6 +77,10 @@ public abstract class RenderIconTextItem extends RenderSelfItem {
     @Override
     public void setColor(int type, int data) {
         this.color = data;
+    }
+
+    protected void toggleTextAttach(ArrayList<ConfigOptionsList.Entry> entries) {
+        entries.forEach(entry -> entry.setVisible(!textAttached));
     }
 
 }

@@ -133,6 +133,10 @@ public class ClientPlayerData {
         RenderSelfItem.updateSelfIndex();
     }
 
+    public static void markEffectsDirty() {
+        ClientPlayerData.playerList.values().forEach(c -> c.effects.refresh());
+    }
+
 
     public void setId(UUID uuid) {
         trackedOnClient = false;

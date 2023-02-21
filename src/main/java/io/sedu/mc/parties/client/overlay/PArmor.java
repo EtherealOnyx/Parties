@@ -8,6 +8,8 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.ArrayList;
+
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
@@ -57,7 +59,7 @@ public class PArmor extends RenderIconTextItem {
             setup(Gui.GUI_ICONS_LOCATION);
             blit(poseStack, x(i), y(i), 34, 9, 9, 9);
             resetColor();
-            if (notEditing() && withinBounds(x(i), y(i), x(i)+9, y(i)+9, 2)) {
+            if (notEditing() && withinBounds(xNormal(i), yNormal(i), 9, 9, 2, scale)) {
                 renderTooltip(poseStack, gui, 10, 0, "Armor: " + armor, 0xabfcff, 0x629b9e, 0xd1d1d1);
             }
         }
@@ -90,9 +92,11 @@ public class PArmor extends RenderIconTextItem {
         c.addBooleanEntry("config.sedparties.name.tdisplay", textEnabled);
         c.addBooleanEntry("config.sedparties.name.tshadow", textShadow);
         c.addColorEntry("config.sedparties.name.tcolor", color);
-        c.addBooleanEntry("config.sedparties.name.tattached", textAttached);
-        c.addSliderEntry("config.sedparties.name.xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX);
-        c.addSliderEntry("config.sedparties.name.ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY);
+        final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
+        c.addBooleanEntry("config.sedparties.name.tattached", textAttached, () -> toggleTextAttach(entries));
+        entries.add(c.addSliderEntry("config.sedparties.name.xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX));
+        entries.add(c.addSliderEntry("config.sedparties.name.ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY));
+        toggleTextAttach(entries);
         return c;
     }
 

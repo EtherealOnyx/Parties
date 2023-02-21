@@ -4,55 +4,52 @@ import Util.Render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
-import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
+import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
+import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static Util.Render.sizeRectNoA;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
-public class PEffects extends RenderSelfItem {
+public abstract class PEffects extends RenderSelfItem {
 
     //Potion Effects
+    protected int maxSize;
+    protected int maxPerRow;
+    int borderSize = 1;
+
+    static int beneColor = 0xA9E5FF;
+    static int badColor = 0xFFA9A9;
+    static int flashColor = 0xFFFFFF;
 
 
-
-    public PEffects(String name, int x, int y, int width, int height) {
+    public PEffects(String name, int x, int y, int width, int height, int max, int row) {
         super(name, x, y, width, height);
+        maxSize = max;
+        maxPerRow = row;
     }
 
     @Override
     int getColor() {
-        return Config.cG();
+        return beneColor;
     }
 
     @Override
     public String getType() {
         return "Bar";
-    }
-
-    @Override
-    void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        RenderSystem.enableDepthTest();
-        TextureAtlasSprite sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.BAD_OMEN);
-        RenderSystem.setShaderTexture(0, sprite.atlas().location());
-        Gui.blit(poseStack, b.x + 11, b.y+2,0, 18, 18, sprite);
-        sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.DAMAGE_RESISTANCE);
-        RenderSystem.setShaderTexture(0, sprite.atlas().location());
-        Gui.blit(poseStack, b.x + 3, b.y +3,0, 18, 18, sprite);
     }
 
     @Override
@@ -62,75 +59,32 @@ public class PEffects extends RenderSelfItem {
         }
     }
 
-    @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.effects.sizeAll() > 0) {
-            start(poseStack, i, id.effects.sizeAll(), Config.rA(), Config.mA());
-            AtomicInteger iX = new AtomicInteger();
-            AtomicInteger iY = new AtomicInteger();
-            if (id.effects.largerAll()) {
-                id.effects.forEachAllLim((effect) -> {
-                    //If we reached max per row
-                    if (checkRow(iX.get())) {
-                        iX.set(0);
-                        iY.getAndIncrement();
-                    }
-                    renderEffect(effect, gui, poseStack, i, iX.get(), iY.get(), partialTicks);
-                    iX.getAndIncrement();
-                    resetColor();
-                });
-                poseStack.pushPose();
-                poseStack.scale(2f,2f,2f);
-                if (renderOverflow(gui, poseStack, i, iX.get(), iY.get(), partialTicks)) {
+    boolean renderOverflow(ForgeIngameGui gui, PoseStack poseStack, int i, int iX, int iY, float partialTicks) {
 
-                    List<ColorComponent> lC = new ArrayList<>();
-                    //poseStack.translate((mouseX()+10), (mouseY()), 0);
-                    id.effects.forAllRemainder((effect) -> {
-
-                        lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.colorType()));
-                        //renderTooltip(poseStack, gui, 10, 0, new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.getEffect().getColor(), (effect.getEffect().getColor() & 0xfefefe) >> 1, effect.colorType());
-                    });
-                    renderGroupEffectTooltip(poseStack, gui, 10, 0, lC, 0x3101b8, 0x24015b, 0x150615, 0x150615);
-
-                }
-                poseStack.popPose();
-            } else {
-                id.effects.forEachAll((effect) -> {
-                    //If we reached max per row
-                    if (checkRow(iX.get())) {
-                        iX.set(0);
-                        iY.getAndIncrement();
-                    }
-                    renderEffect(effect, gui, poseStack, i, iX.get(), iY.get(), partialTicks);
-                    iX.getAndIncrement();
-                    resetColor();
-                });
-            }
-
-            end(poseStack);
-        }
+        drawOverflowText(gui, poseStack,
+                         (int) ((rX(i, iX)+2)/scale), (int) ((rY(i, iY)+4)/scale),
+                         (int) Mth.clamp((255*(float) (.5f + Math.sin((gui.getGuiTicks() + partialTicks) / 4f) / 2f)), 10, 245));
+        return (notEditing() && withinBounds(rX(i, iX), rY(i, iY),13, 13, 1, scale));
     }
 
-    boolean renderOverflow(ForgeIngameGui gui, PoseStack poseStack, int i, int iX, int iY, float partialTicks) {
-        gui.getFont().drawShadow(poseStack, "▪▪▪", rX(i, iX)+2, rY(i, iY)+3, Config.cG());
-        int alpha = (int) Mth.clamp((255*(float) (.5f + Math.sin((gui.getGuiTicks() + partialTicks) / 4f) / 2f)), 10, 245);
-        //TODO: Remove width hardcoding for all values here. Maybe.
-        gui.getFont().drawShadow(poseStack, "▫▫▫", rX(i, iX)+2, rY(i, iY)+3, Config.cB() | alpha << 24);
-        return (notEditing() && withinBounds(rX(i, iX), rY(i, iY), rX(i, iX)+13, rY(i, iY)+13, 1));
+    void drawOverflowText(ForgeIngameGui gui, PoseStack p, int x, int y, int alpha) {
+
+        gui.getFont().draw(p, "▪▪▪", x, y, beneColor);
+        gui.getFont().draw(p, "▫▫▫", x, y, badColor | alpha << 24);
     }
 
     boolean checkRow(int x) {
-        return x+1 > Config.rA();
+        return x+1 >maxPerRow;
     }
 
     void renderEffect(ClientEffect effect, ForgeIngameGui gui, PoseStack poseStack, int i, int iX, int iY, float partialTicks) {
         //BG Border
         if (effect.isInstant() && (gui.getGuiTicks() >> 3 & 1) == 0) {
             //TODO: Remove width hardcoding for all values here. Maybe.
-            rectInscribedFlash(poseStack.last().pose(), 1, sX(i, iX), sY(i, iY), 26, 26, 0xFFFFFF, effect.getEffect()
+            rectInscribedFlash(poseStack.last().pose(), borderSize, sX(i, iX), sY(i, iY), 26, 26, 0xFFFFFF, effect.getEffect()
                                                                                                            .getColor());
         } else {
-            rectInscribed(poseStack.last().pose(), 1, sX(i, iX), sY(i, iY), 26, 26, effect.getEffect().getColor(), effect.bene());
+            rectInscribed(poseStack.last().pose(), borderSize, sX(i, iX), sY(i, iY), 26, 26, effect.getEffect().getColor(), effect.bene());
         }
 
         //Texture
@@ -161,11 +115,11 @@ public class PEffects extends RenderSelfItem {
             scol = 0xFFFFFF;
         }
 
-        if (notEditing() && withinBounds(rX(i, iX), rY(i, iY), rX(i, iX)+13, rY(i, iY)+13, 1)) {
+        if (notEditing() && withinBounds(rX(i, iX), rY(i, iY), 13, 13, 1, scale)) {
             poseStack.pushPose();
-            poseStack.scale(2f,2f,2f);
+            poseStack.scale(2f,2f,1f);
             List<ColorComponent> list = new ArrayList<>();
-            list.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.colorType()));
+            list.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.getEffect().isBeneficial() ? beneColor : badColor));
             //TODO: Support descriptions via datapacks :)
             list.add(new ColorComponent(new TextComponent(secs), scol));
             renderSingleEffectTooltip(poseStack, gui, 10, 0, list,
@@ -175,13 +129,13 @@ public class PEffects extends RenderSelfItem {
     }
 
 
-    void start(PoseStack poseStack, int i, int size, int row, int max) {
+    void start(PoseStack poseStack, int i, int size) {
         poseStack.pushPose();
-        Render.rect(poseStack.last().pose(), -1, x(i) - 2, (y(i) - 2),
-                    x(i) + (width * Math.min(size, row) >> 1),
-                    -1 + y(i) + (height * (int) Math.ceil((double) Math.min(max, size) / row) >> 1),
+        Render.rect(poseStack.last().pose(), -zPos - 1, x(i) - 2, (y(i) - 2),
+                    x(i) + (width * Math.min(size, maxPerRow) >> 1),
+                    -1 + y(i) + (height * (int) Math.ceil((double) Math.min(maxSize, size) / maxPerRow) >> 1),
                     0x44002024, 0x44002024);
-        poseStack.scale(.5f, .5f, .5f);
+        poseStack.scale(.5f, .5f, 1f);
         RenderSystem.enableDepthTest();
     }
 
@@ -194,32 +148,86 @@ public class PEffects extends RenderSelfItem {
 
     private void rectInscribed(Matrix4f pose, int radius, int x, int y, int width, int height, int outColor, boolean ben) {
         if (ben)
-            sizeRectNoA(pose, x, y, 0, width, height, Config.cG(), Config.cG());
+            sizeRectNoA(pose, x, y, 0, width, height, beneColor, beneColor);
         else
-            sizeRectNoA(pose, x, y, 0, width, height, Config.cB(), Config.cB());
+            sizeRectNoA(pose, x, y, 0, width, height, badColor, badColor);
         sizeRectNoA(pose, x+radius, y+radius, 0, width-(radius*2), height-(radius*2), 0x212121, (outColor & 0xfefefe) >> 1);
     }
 
     private void rectInscribedFlash(Matrix4f pose, int radius, int x, int y, int width, int height, int flashColor, int outColor) {
-        sizeRectNoA(pose, x, y, 0, width, height, Config.cF(), flashColor);
+        sizeRectNoA(pose, x, y, 0, width, height, flashColor, flashColor);
         sizeRectNoA(pose, x+radius, y+radius, 0, width-(radius*2), height-(radius*2), 0x212121, (outColor & 0xfefefe) >> 1);
     }
 
     private int sX(int pI, int bI) {
-        return (frameW<<1)*pI+((x+frameX)<<1)+width*bI;
+        return (int) (((frameW<<1)*pI+((x+frameX)<<1))/scale +width*bI);
     }
 
     private int rX(int pI, int bI) {
-        return frameW*pI+x+frameX+(width>>1)*bI;
+        return (int) (frameW*pI+x+frameX + (width/2*scale)*bI);
     }
 
     private int sY(int pI, int bI) {
-        return (frameH<<1)*pI+((y+frameY)<<1)+height*bI;
+        return (int) (((frameH<<1)*pI+((y+frameY)<<1))/scale +height*bI);
     }
 
     private int rY(int pI, int bI) {
-        return frameH*pI+(y+frameY)+(height>>1)*bI;
+        return (int) (frameH*pI+(y+frameY)+(height/2*scale)*bI);
     }
 
+    @Override
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
+        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
+        c.addTitleEntry("config.sedparties.title.display");
+        c.addBooleanEntry("config.sedparties.name.display", isEnabled());
+        c.addSliderEntry("config.sedparties.name.bsize", 1, () -> 4, borderSize);
+        getColorEntry(c);
+        c.addTitleEntry("config.sedparties.title.position");
+        c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(clickArea.r(0), frameX + frameW) - frameW + 32, this.x);
+        c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(clickArea.b(0), frameY + frameH) - frameY + 32, this.y);
+        c.addSliderEntry("config.sedparties.name.zpos", 0, () -> 10, zPos);
+        c.addSliderEntry("config.sedparties.name.scale", 1, () -> 3, getScale());
 
+        c.addTitleEntry("config.sedparties.title.icon");
+        c.addSliderEntry("config.sedparties.name.spacex", 20, () -> 64, width);
+        c.addSliderEntry("config.sedparties.name.spacey", 20, () -> 64, height);
+        getLimitEntries(c);
+
+        return c;
+    }
+
+    protected void updateAffectedSliders(HashMap<String, ConfigOptionsList.SliderEntry> sliders) {
+        sliders.computeIfPresent("totalmax", ((s, sliderEntry) -> sliderEntry.forceUpdate(Math.max(maxPerRow, maxSize))));
+        sliders.computeIfPresent("rowmax", ((s, sliderEntry) -> sliderEntry.forceUpdate(Math.min(maxPerRow, maxSize))));
+    }
+
+    protected void getLimitEntries(ConfigOptionsList c) {
+        final HashMap<String, ConfigOptionsList.SliderEntry> entries = new HashMap<>();
+        entries.put("rowmax", c.addSliderWithUpdater("config.sedparties.name.rowmax", 1, () -> maxSize, maxPerRow, () -> updateAffectedSliders(entries), false));
+        entries.put("totalmax", c.addSliderWithUpdater("config.sedparties.name.totalmax", maxPerRow, Registry.MOB_EFFECT::size, maxSize, () -> updateAffectedSliders(entries), false));
+    }
+
+    protected void getColorEntry(ConfigOptionsList c) {
+    }
+
+    @Override
+    public void setColor(int type, int data) {
+        switch(type) {
+            case 0 -> beneColor = data;
+            case 1 -> badColor = data;
+            case 2 -> flashColor = data;
+        }
+    }
+
+    public void setBorderSize(int data) {
+        this.borderSize = data;
+    }
+
+    public void setMaxSize(int data) {
+        this.maxSize = data;
+    }
+
+    public void setMaxPerRow(int data) {
+        this.maxPerRow = data;
+    }
 }

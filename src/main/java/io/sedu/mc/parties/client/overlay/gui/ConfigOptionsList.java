@@ -16,13 +16,11 @@ import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entry> {
     SettingsScreen s;
     int entryColor;
-    HashMap<String, Entry> entries = new HashMap<>();
     ArrayList<SliderEntry> sliders = new ArrayList<>();
 
     //TODO: Combine entry lists
@@ -35,34 +33,48 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         s.resetTickables();
     }
 
-    public void addTitleEntry(String title) {
-        this.addEntry(new ConfigOptionsList.TitleEntry(title));
+    public Entry addTitleEntry(String title) {
+        Entry e = new ConfigOptionsList.TitleEntry(title);
+        this.addEntry(e);
+        return e;
     }
 
-    public void addBooleanEntry(String name, boolean defaultState) {
+    public Entry addBooleanEntry(String name, boolean defaultState) {
         Entry e = new ConfigOptionsList.CheckboxEntry(name, defaultState);
         this.addEntry(e);
-        entries.put(e.internal, e);
+        return e;
     }
 
-    public void addSliderEntry(String name, int lowBound, SliderEntry.Bound upBound, int defaultState) {
+    public Entry addBooleanEntry(String name, boolean defaultState, Entry.OuterUpdate toggleLimSliders) {
+        Entry e = new ConfigOptionsList.CheckboxEntry(name, defaultState);
+        e.outerUpdate = toggleLimSliders;
+        this.addEntry(e);
+        return e;
+    }
+
+    public Entry addSliderEntry(String name, int lowBound, SliderEntry.Bound upBound, int defaultState) {
         SliderEntry e = new ConfigOptionsList.SliderEntry(name, lowBound, upBound, defaultState);
         this.addEntry(e);
-        entries.put(e.internal, e);
         sliders.add(e);
+        return e;
     }
 
     public void addSliderEntry(String name, int lowBound, SliderEntry.Bound upBound, int defaultState, boolean doesRefresh) {
         SliderEntry e = new ConfigOptionsList.SliderEntry(name, lowBound, upBound, defaultState, doesRefresh);
         this.addEntry(e);
-        entries.put(e.internal, e);
         sliders.add(e);
+    }
+
+    public SliderEntry addSliderWithUpdater(String name, int lowBound, SliderEntry.Bound upBound, int defaultState, Entry.OuterUpdate sliderUpdate, boolean refresh) {
+        SliderEntry e = new ConfigOptionsList.SliderEntry(name, lowBound, upBound, defaultState, refresh);
+        e.outerUpdate = sliderUpdate;
+        this.addEntry(e);
+        return e;
     }
 
     public void addColorEntry(String name, int defaultState) {
         Entry e = new ConfigOptionsList.HexBoxEntry(name, defaultState);
         this.addEntry(e);
-        entries.put(e.internal, e);
     }
 
     public void addSpaceEntry() {
@@ -100,16 +112,23 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         Component name;
         boolean isDirty;
         boolean doesRefresh = false;
+        OuterUpdate outerUpdate;
+
+        public void setVisible(boolean separate) {
+            toggle(separate);
+        }
+
+        abstract void toggle(boolean enabled);
+
+        public interface OuterUpdate {
+            void outerUpdate();
+        }
 
         abstract void updateValues(int pTop, int pLeft, int pWidth, int pHeight);
         abstract void updateValues();
 
         void updateData(Object data) {
 
-        }
-
-        int getType() {
-            return -1;
         }
 
         public void render(PoseStack pPoseStack, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pIsMouseOver, float pPartialTick) {
@@ -144,8 +163,8 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         /**
          * The localized key description for entry.
          */
-        private SmallButton enable;
-        private SmallButton disable;
+        private final SmallButton enable;
+        private final SmallButton disable;
 
         CheckboxEntry(String name, boolean isEnabled) {
             this.name = new TranslatableComponent(name);
@@ -157,8 +176,15 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             internal = name.substring(23);
         }
 
+        @Override
+        void toggle(boolean enabled) {
+            enable.active = enabled;
+            disable.active = enabled;
+        }
+
         private void updateVal(boolean enabled) {
             s.finalizeUpdate(getConfigName(), enabled, doesRefresh);
+            if (outerUpdate != null) outerUpdate.outerUpdate();
             isEnabled = enabled;
             enable.visible = !isEnabled;
             disable.visible = isEnabled;
@@ -183,6 +209,8 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         }
 
 
+
+
         @Override
         void updateValues(int pTop, int pLeft, int pWidth, int pHeight) {
 
@@ -199,15 +227,10 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         }
 
         @Override
-        int getType() {
-            return 0;
-        }
-
-        @Override
         public void render(PoseStack pPoseStack, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pIsMouseOver, float pPartialTick) {
             super.render(pPoseStack, pIndex, pTop, pLeft, pWidth, pHeight, pMouseX, pMouseY, pIsMouseOver, pPartialTick);
 
-            this.enable.x = pLeft + pWidth - 20;
+            this.enable.x = pLeft + pWidth - 16;
             this.enable.y = pTop + 3;
             this.disable.x = this.enable.x;
             this.disable.y = pTop + 3;
@@ -226,7 +249,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         private final Bound maxBound;
 
         public interface Bound {
-            int updateMaxBound();
+            int updateBound();
         }
 
         SliderEntry(String name, int lowBound, Bound maxBound, int currentValue) {
@@ -235,7 +258,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             this.lowBound = lowBound;
             this.maxBound = maxBound;
             this.value = currentValue;
-            this.upBound = maxBound.updateMaxBound();
+            this.upBound = maxBound.updateBound();
             this.boundWidth = upBound - lowBound;
             input = new InputBox(entryColor, minecraft.font, 30, 12, this.name, this::updateInputVal, true);
             s.addTickableEntry(input);
@@ -243,14 +266,23 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             internal = name.substring(23);
         }
 
+
         SliderEntry(String name, int lowBound, Bound maxBound, int currentValue, boolean doesRefresh) {
             this(name, lowBound, maxBound, currentValue);
             this.doesRefresh = doesRefresh;
         }
 
+        @Override
+        void toggle(boolean enabled) {
+            input.visible = enabled;
+            slider.active = enabled;
+        }
+
         private void updateVal(float percent) {
             if (updateActualValue(percent)) {
                 s.triggerUpdate(getConfigName(), value);
+                if (outerUpdate != null)
+                    outerUpdate.outerUpdate();
             }
         }
 
@@ -301,6 +333,8 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             return ImmutableList.of(this.slider, this.input);
         }
 
+
+
         @Override
         void updateValues(int pTop, int pLeft, int pWidth, int pHeight) {
             slider.leftBound = pLeft + Math.max((pWidth>>1) - 50, minecraft.font.width(name)+15);
@@ -312,11 +346,21 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         @Override
         void updateValues() {
-            this.upBound = maxBound.updateMaxBound();
+            this.upBound = maxBound.updateBound();
             this.boundWidth = upBound - lowBound;
             slider.visible = this.boundWidth > 0;
             updateData(value);
             updateSliderPosition();
+        }
+
+        public SliderEntry forceUpdate(int data) {
+            this.upBound = maxBound.updateBound();
+            this.boundWidth = upBound - lowBound;
+            slider.visible = this.boundWidth > 0;
+            this.value = data;
+            input.setValue(String.valueOf(data));
+            updateSliderPosition();
+            return this;
         }
 
         @Override
@@ -328,11 +372,6 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
                 s.finalizeUpdate(getConfigName(), value, doesRefresh);
             }
             input.setValue(String.valueOf(upVal));
-        }
-
-        @Override
-        int getType() {
-            return 1;
         }
 
         private void updateSliderPosition() {
@@ -458,6 +497,14 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         }
 
         @Override
+        void toggle(boolean enabled) {
+            input.visible = enabled;
+            r.visible = enabled;
+            g.visible = enabled;
+            b.visible = enabled;
+        }
+
+        @Override
         void updateValues(int pTop, int pLeft, int pWidth, int pHeight) {
             if (HexBox.rgbMode) {
                 input.visible = false;
@@ -470,12 +517,12 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
                 g.visible = false;
                 b.visible = false;
             }
-            input.x = pLeft + pWidth - 63;
+            input.x = pLeft + pWidth - 60;
             int inWidth = Math.max(15, pWidth>>3);
             r.setWidth(inWidth);
             g.setWidth(inWidth);
             b.setWidth(inWidth);
-            b.x = pLeft + pWidth - 24 - inWidth;
+            b.x = pLeft + pWidth - 21 - inWidth;
             g.x = b.x - inWidth - 6;
             r.x = g.x - inWidth - 6;
         }
@@ -493,11 +540,6 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         }
 
         @Override
-        int getType() {
-            return 2;
-        }
-
-        @Override
         public void render(PoseStack pPoseStack, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pIsMouseOver, float pPartialTick) {
             super.render(pPoseStack, pIndex, pTop, pLeft, pWidth, pHeight, pMouseX, pMouseY, pIsMouseOver, pPartialTick);
 
@@ -508,8 +550,8 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             this.r.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
             this.g.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
             this.b.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-            Render.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 20, pTop + 3, 0, 10,10, (entryColor  & 0xfefefe) >> 1, entryColor);
-            Render.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 19, pTop + 4, 8, 8, value);
+            Render.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 16, pTop + 3, 0, 10,10, (entryColor  & 0xfefefe) >> 1, entryColor);
+            Render.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 15, pTop + 4, 8, 8, value);
         }
     }
 
@@ -538,6 +580,11 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         @Override
         public List<? extends GuiEventListener> children() {
             return Collections.emptyList();
+        }
+
+        @Override
+        void toggle(boolean enabled) {
+
         }
 
         @Override
@@ -586,6 +633,11 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         @Override
         public List<? extends GuiEventListener> children() {
             return Collections.emptyList();
+        }
+
+        @Override
+        void toggle(boolean enabled) {
+
         }
 
         @Override

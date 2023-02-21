@@ -329,8 +329,9 @@ public class HoverScreen extends Screen {
         moveParty.clear();
     }
 
-    public static boolean withinBounds(int left, int top, int right, int bottom, int expand) {
-        return mouseX > left - expand && mouseX < right + expand && mouseY > top - expand && mouseY < bottom + expand;
+    public static boolean withinBounds(int x, int y, int width, int height, int expand, float scale) {
+        return mouseX > x - expand && mouseY > y - expand
+                && mouseX < x + expand + width*scale && mouseY < y + expand + height*scale;
     }
 
     public static int mouseX() {

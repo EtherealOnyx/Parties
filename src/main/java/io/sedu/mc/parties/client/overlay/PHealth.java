@@ -8,8 +8,9 @@ import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+
+import java.util.ArrayList;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
@@ -38,7 +39,6 @@ public class PHealth extends RenderIconTextItem {
     int bColorBot;
     int bAColorTop;
     int bAColorBot;
-    int healthType;
 
     public PHealth(String name, int x, int y, int width, int height, int color, int absorbColor, int deadColor) {
         super(name, x, y, width, height, color, true);
@@ -107,15 +107,15 @@ public class PHealth extends RenderIconTextItem {
 
             //Dimmer
             Render.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 255 - id.alphaI << 24);
-            if (notEditing() && withinBounds(l(i), t(i), r(i), b(i), 2)) {
+            if (notEditing() && withinBounds(x(i), y(i), width, height, 2, scale)) {
                 renderTooltip(poseStack, gui, 10, 0, "Health: " + (id.health.cur + id.health.absorb) + "/" + id.health.max, 0xfc807c, 0x4d110f, 0xffbfbd);
             }
         }
         if (textEnabled)
             if (id.health.absorb > 0) {
-                textCentered(i, tX(i), tY(i), gui, poseStack, (int)Math.ceil(id.health.cur+id.health.absorb) + "/" + (int)id.health.max, absorbColor);
+                textCentered(i, tX(i), tY(i), gui, poseStack, id.health.healthText, absorbColor);
             } else {
-                textCentered(i, tX(i), tY(i), gui, poseStack, (int)Math.ceil(id.health.cur) + "/" + (int)id.health.max, color);
+                textCentered(i, tX(i), tY(i), gui, poseStack, id.health.healthText, color);
             }
 
 
@@ -142,11 +142,11 @@ public class PHealth extends RenderIconTextItem {
     }
 
     private void rectRNoA(PoseStack p, int i, int zLevel, float rightPosition, int startColor, int endColor ) {
-        Render.sizeRectNoA(p.last().pose(), x(i)+1, y(i)+1, zLevel, Math.min(width - 2, ((width-2)*rightPosition)), height-2, startColor, endColor);
+        Render.sizeRectNoA(p.last().pose(), x(i)+1, y(i)+1, zLevel, Math.min(width - 1, ((width-2)*rightPosition)), height-2, startColor, endColor);
     }
 
     private void rectB(PoseStack p, int i, int zLevel, float leftPosition, float rightPosition, int startColor, int endColor ) {
-        Render.sizeRect(p.last().pose(), x(i) + width*leftPosition, y(i) + 1, zLevel, Mth.clamp(width*(rightPosition-leftPosition), 0,width-2), height-2, startColor, endColor);
+        Render.rect(p.last().pose(), zPos, Math.max(x(i),x(i) + (width-2)*leftPosition)+1, y(i)+1,Math.min(x(i)+width-1,x(i)+1 + (width-2)*rightPosition), y(i)+height-1, startColor, endColor);
         //Render.rect(p.last().pose(), zLevel, l(i)+width*leftPosition-1, t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
     }
 
@@ -216,9 +216,12 @@ public class PHealth extends RenderIconTextItem {
         c.addTitleEntry("config.sedparties.title.text");
         c.addBooleanEntry("config.sedparties.name.tdisplay", textEnabled);
         c.addBooleanEntry("config.sedparties.name.tshadow", textShadow);
-        c.addBooleanEntry("config.sedparties.name.tattached", textAttached);
-        c.addSliderEntry("config.sedparties.name.xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX);
-        c.addSliderEntry("config.sedparties.name.ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY);
+        c.addSliderEntry("config.sedparties.name.ttype", 0, () -> 2, HealthAnim.type);
+        final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
+        c.addBooleanEntry("config.sedparties.name.tattached", textAttached, () -> toggleTextAttach(entries));
+        entries.add(c.addSliderEntry("config.sedparties.name.xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX));
+        entries.add(c.addSliderEntry("config.sedparties.name.ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY));
+        toggleTextAttach(entries);
 
         c.addTitleEntry("config.sedparties.title.textc");
         c.addColorEntry("config.sedparties.name.tcolor", color);
@@ -297,6 +300,5 @@ public class PHealth extends RenderIconTextItem {
             case 17 -> colorDecTop = data;
             case 18 -> colorDecBot = data;
         }
-
     }
 }

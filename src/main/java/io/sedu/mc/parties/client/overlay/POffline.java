@@ -8,6 +8,8 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.ArrayList;
+
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
 public class POffline extends RenderIconTextItem {
@@ -75,9 +77,11 @@ public class POffline extends RenderIconTextItem {
         c.addBooleanEntry("config.sedparties.name.tdisplay", textEnabled);
         c.addBooleanEntry("config.sedparties.name.tshadow", textShadow);
         c.addColorEntry("config.sedparties.name.tcolor", color);
-        c.addBooleanEntry("config.sedparties.name.tattached", textAttached);
-        c.addSliderEntry("config.sedparties.name.xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX);
-        c.addSliderEntry("config.sedparties.name.ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int) (minecraft.font.lineHeight * scale)), textY);
+        final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
+        c.addBooleanEntry("config.sedparties.name.tattached", textAttached, () -> toggleTextAttach(entries));
+        entries.add(c.addSliderEntry("config.sedparties.name.xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX));
+        entries.add(c.addSliderEntry("config.sedparties.name.ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY));
+        toggleTextAttach(entries);
         return c;
     }
 }

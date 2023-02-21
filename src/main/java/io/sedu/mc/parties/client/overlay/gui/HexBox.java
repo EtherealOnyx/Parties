@@ -5,7 +5,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 
 public class HexBox extends InputBox {
-    protected static boolean rgbMode = true;
+    protected static boolean rgbMode = false;
     int hex;
     HexBox.OnTextInput onNumInput;
     public HexBox(int color, Font pFont, int pWidth, int pHeight, Component pMessage, OnTextInput onInput) {

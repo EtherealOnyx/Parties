@@ -1,10 +1,14 @@
 package io.sedu.mc.parties.client.overlay.anim;
 
+import io.sedu.mc.parties.client.overlay.ClientPlayerData;
+
 public class HealthAnim extends AnimHandler {
 
     public float cur = 0f;
     public float max = 20f;
     public float absorb = 0f;
+    public String healthText = "";
+    public static int type;
 
     public float oldH, curH, oldA, curA = 0f;
     public float oldCur = 0f;
@@ -16,6 +20,12 @@ public class HealthAnim extends AnimHandler {
 
     public HealthAnim(int length, boolean enabled) {
         super(length, enabled);
+        updateText();
+    }
+
+    public static void setTextType(int d) {
+        type = d;
+        ClientPlayerData.playerList.values().forEach(c -> c.health.updateText());
     }
 
     @Override
@@ -70,6 +80,20 @@ public class HealthAnim extends AnimHandler {
             cur = pCur;
             max = pMax;
             absorb = pAbsorb;
+            updateText();
+        }
+    }
+
+    private void updateText() {
+        switch (type) {
+            case 0 -> healthText = (int) Math.ceil(cur + absorb) + "/" + (int) max;
+            case 1 -> {
+                if (absorb > 0)
+                    healthText = (int) Math.ceil(cur) + " (" + (int) Math.ceil(absorb) + ")";
+                else
+                    healthText = String.valueOf((int) Math.ceil(cur));
+            }
+            case 2 -> healthText = (int) Math.ceil(((cur + absorb) / max) * 100) + "%";
         }
     }
 

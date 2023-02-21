@@ -47,9 +47,9 @@ public class ClientSetup {
         items.put("dim", new PDimIcon("p_dim", 5, 34)); //Includes text!
 
         //Effects
-        items.put("effects", new PEffects("p_effects", 46, 42, 30, 42));
-        items.put("effects_b", new PEffectsB("p_effects_b", 46, 42, 30, 42));
-        items.put("effects_d", new PEffectsD("p_effects_d", 168, 21, 30, 42));
+        items.put("effects", new PEffectsBoth("p_effects", 46, 42, 30, 42, 8, 8));
+        items.put("effects_b", new PEffectsB("p_effects_b", 46, 42, 30, 42, 8, 8));
+        items.put("effects_d", new PEffectsD("p_effects_d", 168, 21, 30, 42,8, 4));
 
         //TODO: Add blinker overlay. Set static size (or try to not create static) and update x and y when elements move.
         items.put("armor", new PArmor("p_armor", 46, 19, 0xDDF3FF));

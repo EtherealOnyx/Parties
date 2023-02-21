@@ -4,6 +4,8 @@ import Util.Render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
+import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.client.overlay.gui.TabButton;
@@ -30,6 +32,8 @@ import static io.sedu.mc.parties.client.overlay.gui.SettingsScreen.INNER_LOC;
 import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 
 public abstract class RenderItem {
+
+    //TODO: Go through each poseStack.scale() method and ensure the last element is 1f, not zero or zPos.
 
     public static RenderItem clickArea;
 
@@ -84,6 +88,14 @@ public abstract class RenderItem {
         return (int) ((frameY + y + hOffset(pOffset))/scale);
     }
 
+    public int xNormal(int pOffset) {
+        return frameX + x + wOffset(pOffset);
+    }
+
+    public int yNormal(int pOffset) {
+        return frameY + y + hOffset(pOffset);
+    }
+
     public int l(int pOffset) {
         return x+frameX + wOffset(pOffset);
     }
@@ -108,21 +120,29 @@ public abstract class RenderItem {
     public void initItem() {
         item = (gui, poseStack, partialTicks, width, height) -> {
             for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++) {
-                startItem(poseStack);
+                itemStart(poseStack);
                 renderMember(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack, partialTicks);
-                endItem(poseStack);
+                itemEnd(poseStack);
             }
         };
     }
 
-    protected void startItem(PoseStack poseStack) {
+    protected void itemStart(PoseStack poseStack) {
         poseStack.pushPose();
-        poseStack.scale(scale, scale, zPos);
+        poseStack.scale(scale, scale, 1);
         poseStack.translate(0,0,zPos);
     }
 
-    protected void endItem(PoseStack poseStack) {
+    protected void itemEnd(PoseStack poseStack) {
         poseStack.popPose();
+    }
+
+    protected void tooltipStart(PoseStack poseStack) {
+        poseStack.scale(1/scale, 1/scale, 1);
+    }
+
+    protected void tooltipEnd(PoseStack poseStack) {
+        poseStack.scale(scale, scale, 1);
     }
 
     public boolean isTabRendered() {
@@ -217,7 +237,7 @@ public abstract class RenderItem {
     void renderTab(PoseStack p, TabButton b) {
         RenderSystem.enableDepthTest();
         Render.setColor(getColor());
-        Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 150, new ResourceLocation("textures/block/glass.png"));
+        Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 150, TAB_LOC);
         Render.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x44FFFFFF, 0x88000000);
         resetColor();
         Render.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 100 << 24,getColor() | 100 << 24);
@@ -228,7 +248,7 @@ public abstract class RenderItem {
     void renderTabHover(PoseStack p, TabButton b) {
         RenderSystem.enableDepthTest();
         Render.setColor(getColor());
-        Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 255, new ResourceLocation("textures/block/glass.png"));
+        Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 255, TAB_LOC);
         Render.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x66FFFFFF, 0x22FFFFFF);
         resetColor();
         Render.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 200 << 24, getColor());
@@ -248,24 +268,28 @@ public abstract class RenderItem {
     abstract int getColor();
 
     void text(int i, ForgeIngameGui gui, PoseStack p, String text, int color) {
+        p.translate(0,0,.5);
         if (textShadow) {
             textS(gui,p,text,x(i), y(i),color);
+            p.translate(0,0,-.5);
             return;
         }
         text(gui,p,text,x(i), y(i),color);
+        p.translate(0,0,-.5);
     }
 
     void text(ForgeIngameGui gui, PoseStack p, String s, int x, int y, int color) {
         p.translate(0,0,zPos);
         if (textShadow) {
             textS(gui,p,s,x,y,color);
+            p.translate(0,0,-zPos);
             return;
         }
         gui.getFont().draw(p, s, x, y, color);
         p.translate(0,0,-zPos);
     }
 
-    private void textS(ForgeIngameGui gui, PoseStack p, String text, int x, int y, int color) {
+    void textS(ForgeIngameGui gui, PoseStack p, String text, int x, int y, int color) {
         gui.getFont().draw(p, text, x+1, y+1, 0);
         gui.getFont().draw(p, text, x+1, y+1, color | 75 << 24);
         gui.getFont().draw(p, text, x, y, color);
@@ -288,13 +312,16 @@ public abstract class RenderItem {
     }
 
     protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, MutableComponent text, int outStart, int outEnd, int inStart, int inEnd, int textColor) {
-
-        poseStack.pushPose();
-        poseStack.translate(0, 0, 400);
+        tooltipStart(poseStack);
+        //gui.setBlitOffset(400);
+        //poseStack.pushPose();
+        poseStack.translate(0, 0, 100);
         rectCO(poseStack, 0, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+gui.getFont().width(text)+offsetX, currentY+mouseY()+(gui.getFont().lineHeight)+offsetY, outStart, outEnd);
         rectCO(poseStack, 0, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+gui.getFont().width(text)+offsetX, currentY+mouseY()+(gui.getFont().lineHeight)+offsetY, inStart, inEnd);
         gui.getFont().drawShadow(poseStack, text, mouseX()+offsetX, currentY+mouseY()+1, textColor);
-        poseStack.popPose();
+        poseStack.translate(0,0,-100);
+        tooltipEnd(poseStack);
+        //poseStack.popPose();
 
         currentY += gui.getFont().lineHeight+offsetY+8;
 
@@ -318,9 +345,10 @@ public abstract class RenderItem {
 
     protected void renderGroupEffectTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, List<ColorComponent> text, int outStart, int outEnd, int inStart, int inEnd) {
         poseStack.pushPose();
+        tooltipStart(poseStack);
         int max = 0;
         int y = offsetY;
-        poseStack.translate(0,0,400);
+        poseStack.translate(0,0,100);
         for (ColorComponent c : text) {
             gui.getFont().drawShadow(poseStack, c.c, mouseX()+offsetX, currentY+mouseY()+1+y, c.color);
             max = Math.max(max, gui.getFont().width(c.c));
@@ -334,7 +362,8 @@ public abstract class RenderItem {
 
     protected void renderSingleEffectTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, List<ColorComponent> text, int color) {
         poseStack.pushPose();
-        poseStack.translate(0, 0, 400);
+        tooltipStart(poseStack);
+        poseStack.translate(0, 0, 100);
         int max = 0;
         int y = 0;
 
@@ -396,7 +425,6 @@ public abstract class RenderItem {
     protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
         return new ConfigOptionsList(getColor(), s, minecraft, x, y, w, h);
     }
-
 
 
     abstract void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b);
@@ -512,55 +540,74 @@ public abstract class RenderItem {
 
 
     public static void initUpdater(HashMap<String, Update> updater) {
+        //Make this be per item instead.
         updater.put("display", (n, d) -> items.get(n).changeVisibility((Boolean) d));
         updater.put("tshadow", (n, d) -> items.get(n).setTextShadow((Boolean) d));
         updater.put("idisplay", (n, d) -> items.get(n).toggleIcon((Boolean) d));
         updater.put("tdisplay", (n, d) -> items.get(n).toggleText((Boolean) d));
         updater.put("tattached", (n, d) -> items.get(n).toggleTextAttach((Boolean) d));
-        updater.put("xpos", (n, d) -> items.get(n).setXPos((Integer) d));
-        updater.put("ypos", (n, d) -> items.get(n).setYPos((Integer) d));
-        updater.put("scale", (n, d) -> items.get(n).setScale((Integer) d));
-        updater.put("zpos", (n, d) -> items.get(n).setZPos((Integer) d));
-        updater.put("xtpos", (n, d) -> items.get(n).setXTextPos((Integer) d));
-        updater.put("ytpos", (n, d) -> items.get(n).setYTextPos((Integer) d));
-        updater.put("tmax", (n, d) -> items.get(n).setMaxTextSize((Integer) d));
-        updater.put("width", (n, d) -> items.get(n).setWidth((Integer)d));
-        updater.put("height", (n, d) -> items.get(n).setHeight((Integer)d));
-
-        updater.put("tcolor", (n, d) -> items.get(n).setColor(0, (Integer)d));
-        updater.put("tcabsorb", (n, d) -> items.get(n).setColor(1, (Integer)d));
-        updater.put("tcdead", (n, d) -> items.get(n).setColor(2, (Integer)d));
-
-        updater.put("bbct", (n, d) -> items.get(n).setColor(3, (Integer)d));
-        updater.put("bbcb", (n, d) -> items.get(n).setColor(4, (Integer)d));
-
-        updater.put("bbact", (n, d) -> items.get(n).setColor(5, (Integer)d));
-        updater.put("bbacb", (n, d) -> items.get(n).setColor(6, (Integer)d));
-
-
-        updater.put("bct", (n, d) -> items.get(n).setColor(7, (Integer)d));
-        updater.put("bcb", (n, d) -> items.get(n).setColor(8, (Integer)d));
-
-        updater.put("bctm", (n, d) -> items.get(n).setColor(9, (Integer)d));
-        updater.put("bcbm", (n, d) -> items.get(n).setColor(10, (Integer)d));
-
-        updater.put("bcta", (n, d) -> items.get(n).setColor(11, (Integer)d));
-        updater.put("bcba", (n, d) -> items.get(n).setColor(12, (Integer)d));
-
-        updater.put("bcat", (n, d) -> items.get(n).setColor(13, (Integer)d));
-        updater.put("bcab", (n, d) -> items.get(n).setColor(14, (Integer)d));
-
-        updater.put("bcit", (n, d) -> items.get(n).setColor(15, (Integer)d));
-        updater.put("bcib", (n, d) -> items.get(n).setColor(16, (Integer)d));
-
-        updater.put("bcdt", (n, d) -> items.get(n).setColor(17, (Integer)d));
-        updater.put("bcdb", (n, d) -> items.get(n).setColor(18, (Integer)d));
+        updater.put("xpos", (n, d) -> items.get(n).setXPos((int) d));
+        updater.put("ypos", (n, d) -> items.get(n).setYPos((int) d));
+        updater.put("scale", (n, d) -> items.get(n).setScale((int) d));
+        updater.put("zpos", (n, d) -> items.get(n).setZPos((int) d));
+        updater.put("xtpos", (n, d) -> items.get(n).setXTextPos((int) d));
+        updater.put("ytpos", (n, d) -> items.get(n).setYTextPos((int) d));
+        updater.put("tmax", (n, d) -> items.get(n).setMaxTextSize((int) d));
+        updater.put("width", (n, d) -> items.get(n).setWidth((int)d));
+        updater.put("height", (n, d) -> items.get(n).setHeight((int)d));
+        updater.put("ttype", (n,d) -> HealthAnim.setTextType((int)d));
 
 
 
+
+
+        updater.put("tcolor", (n, d) -> items.get(n).setColor(0, (int)d));
+        updater.put("tcabsorb", (n, d) -> items.get(n).setColor(1, (int)d));
+        updater.put("tcdead", (n, d) -> items.get(n).setColor(2, (int)d));
+
+        updater.put("bbct", (n, d) -> items.get(n).setColor(3, (int)d));
+        updater.put("bbcb", (n, d) -> items.get(n).setColor(4, (int)d));
+
+        updater.put("bbact", (n, d) -> items.get(n).setColor(5, (int)d));
+        updater.put("bbacb", (n, d) -> items.get(n).setColor(6, (int)d));
+
+
+        updater.put("bct", (n, d) -> items.get(n).setColor(7, (int)d));
+        updater.put("bcb", (n, d) -> items.get(n).setColor(8, (int)d));
+
+        updater.put("bctm", (n, d) -> items.get(n).setColor(9, (int)d));
+        updater.put("bcbm", (n, d) -> items.get(n).setColor(10, (int)d));
+
+        updater.put("bcta", (n, d) -> items.get(n).setColor(11, (int)d));
+        updater.put("bcba", (n, d) -> items.get(n).setColor(12, (int)d));
+
+        updater.put("bcat", (n, d) -> items.get(n).setColor(13, (int)d));
+        updater.put("bcab", (n, d) -> items.get(n).setColor(14, (int)d));
+
+        updater.put("bcit", (n, d) -> items.get(n).setColor(15, (int)d));
+        updater.put("bcib", (n, d) -> items.get(n).setColor(16, (int)d));
+
+        updater.put("bcdt", (n, d) -> items.get(n).setColor(17, (int)d));
+        updater.put("bcdb", (n, d) -> items.get(n).setColor(18, (int)d));
+
+        updater.put("buffg", (n, d) -> items.get(n).setColor(0, (int)d));
+        updater.put("buffb", (n, d) -> items.get(n).setColor(1, (int)d));
+        updater.put("flash", (n, d) -> items.get(n).setColor(2, (int)d));
+
+        updater.put("blim", (n,d) -> EffectHolder.updatebLim((int) d));
+        updater.put("dlim", (n,d) -> EffectHolder.updatedLim((int) d));
+        updater.put("dfirst", (n,d) -> {EffectHolder.debuffFirst = (boolean) d; ClientPlayerData.markEffectsDirty();});
+        updater.put("bsep", (n,d) -> {EffectHolder.prioDur = (boolean) d; ClientPlayerData.markEffectsDirty();});
+
+
+        updater.put("spacex", (n, d) -> items.get(n).setWidth((int)d));
+        updater.put("spacey", (n, d) -> items.get(n).setHeight((int)d));
+        updater.put("bsize", (n,d) -> ((PEffects) items.get(n)).setBorderSize((int) d));
+        updater.put("rowmax", (n,d) -> ((PEffects) items.get(n)).setMaxPerRow((int) d));
+        updater.put("totalmax", (n,d) -> {((PEffects) items.get(n)).setMaxSize((int) d);  ClientPlayerData.markEffectsDirty();});
+
+        //TODO: implement maxX maxY, maxWidth, maxHeight function base renderItem. reference that when in general width/height tab instead of iterating over getconfigoptions.
     }
-
-
 
 
     public interface Update {

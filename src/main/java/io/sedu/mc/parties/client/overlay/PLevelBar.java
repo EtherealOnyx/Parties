@@ -10,6 +10,8 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.ArrayList;
+
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.*;
 
 public class PLevelBar extends RenderIconTextItem {
@@ -110,7 +112,7 @@ public class PLevelBar extends RenderIconTextItem {
         }
         g.getFont().draw(poseStack, s, (float)x, (float)y, 8453920);
         poseStack.translate(0,0,-zPos);
-        if (notEditing() && withinBounds(x, y, x+g.getFont().width(s), y + g.getFont().lineHeight, 2)) {
+        if (notEditing() && withinBounds(x, y, g.getFont().width(s), g.getFont().lineHeight, 2, scale)) {
             renderXpTooltip(poseStack, g, 10, 0, level);
         }
     }
@@ -118,7 +120,7 @@ public class PLevelBar extends RenderIconTextItem {
     protected void renderXpTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, float level) {
 
         poseStack.pushPose();
-        poseStack.translate(0, 0, 400);
+        poseStack.translate(0, 0, 100);
         rectCO(poseStack, 0, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+offsetX+182, currentY+mouseY()+5+offsetY, 0x8ec265, 0x385e1a);
         rectCO(poseStack, 0, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+offsetX+182, currentY+mouseY()+5+offsetY, 0x140514, 0x140514);
         setup(Gui.GUI_ICONS_LOCATION);
@@ -157,9 +159,11 @@ public class PLevelBar extends RenderIconTextItem {
         c.addBooleanEntry("config.sedparties.name.tdisplay", textEnabled);
         c.addBooleanEntry("config.sedparties.name.tshadow", textShadow);
         c.addColorEntry("config.sedparties.name.tcolor", color);
-        c.addBooleanEntry("config.sedparties.name.tattached", textAttached);
-        c.addSliderEntry("config.sedparties.name.xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX);
-        c.addSliderEntry("config.sedparties.name.ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY);
+        final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
+        c.addBooleanEntry("config.sedparties.name.tattached", textAttached, () -> toggleTextAttach(entries));
+        entries.add(c.addSliderEntry("config.sedparties.name.xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX));
+        entries.add(c.addSliderEntry("config.sedparties.name.ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY));
+        toggleTextAttach(entries);
         return c;
     }
 

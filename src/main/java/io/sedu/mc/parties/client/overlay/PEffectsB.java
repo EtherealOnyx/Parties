@@ -2,7 +2,7 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.sedu.mc.parties.client.config.Config;
+import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
@@ -18,6 +18,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PEffectsB extends PEffects{
 
     @Override
+    protected void getColorEntry(ConfigOptionsList c) {
+        c.addColorEntry("config.sedparties.name.buffg", beneColor);
+        c.addColorEntry("config.sedparties.name.flash", flashColor);
+    }
+
+
+
+    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         RenderSystem.enableDepthTest();
         TextureAtlasSprite sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.JUMP);
@@ -25,18 +33,18 @@ public class PEffectsB extends PEffects{
         Gui.blit(poseStack, b.x + 7, b.y+2, 0, 18, 18, sprite);
     }
 
-    public PEffectsB(String name, int x, int y, int width, int height) {
-        super(name, x, y, width, height);
+    public PEffectsB(String name, int x, int y, int width, int height, int max, int row) {
+        super(name, x, y, width, height, max, row);
     }
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.effects.sizeBene() > 0) {
-            start(poseStack, i, id.effects.sizeBene(), Config.rG(), Config.mG());
+            start(poseStack, i, id.effects.sizeBene());
             AtomicInteger iX = new AtomicInteger();
             AtomicInteger iY = new AtomicInteger();
-            if (id.effects.largerBene()) {
-                id.effects.forEachBeneLim((effect) -> {
+            if (id.effects.largerBene(maxSize)) {
+                id.effects.forEachBeneLim(maxSize, (effect) -> {
                     //If we reached max per row
                     if (checkRow(iX.get())) {
                         iX.set(0);
@@ -50,7 +58,7 @@ public class PEffectsB extends PEffects{
                 poseStack.scale(2f,2f,2f);
                 if (renderOverflow(gui, poseStack, i, iX.get(), iY.get(), partialTicks)) {
                     List<ColorComponent> lC = new ArrayList<>();
-                    id.effects.forBeneRemainder((effect) -> lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.colorType())));
+                    id.effects.forBeneRemainder(maxSize, (effect) -> lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), beneColor)));
                     renderGroupEffectTooltip(poseStack, gui, 10, 0, lC, 0x3101b8, 0x24015b, 0x150615, 0x150615);
 
                 }
@@ -71,8 +79,4 @@ public class PEffectsB extends PEffects{
         }
     }
 
-    @Override
-    boolean checkRow(int x) {
-        return x+1 > Config.rG();
-    }
 }

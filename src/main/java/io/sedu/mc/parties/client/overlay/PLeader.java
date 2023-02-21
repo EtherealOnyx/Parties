@@ -24,7 +24,7 @@ public class PLeader extends RenderItem {
             setup(partyPath);
             blit(poseStack, x(i), y(i), 0, 0, 9, 9);
             resetColor();
-            if (notEditing() && withinBounds(x(i), y(i), x(i)+9, y(i)+9, 2)) {
+            if (notEditing() && withinBounds(x(i), y(i), 9, 9,2, scale)) {
                 renderTooltip(poseStack, gui, 10, 0, "Party Leader", 0xFFF2A9, 0x978B47, 0xFFE554);
             }
         }
