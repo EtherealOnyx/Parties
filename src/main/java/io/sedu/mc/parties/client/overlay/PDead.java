@@ -45,8 +45,8 @@ public class PDead extends RenderItem {
     }
 
     @Override
-    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
-        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
+        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
         addDisplaySettings(c);
         addPositionalSettings(c, true, true, true);
         return c;

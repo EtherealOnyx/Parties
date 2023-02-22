@@ -198,16 +198,16 @@ public class PDimIcon extends RenderSelfItem {
     }
 
     @Override
-    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
-        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
-        c.addTitleEntry("config.sedparties.title.display");
-        c.addBooleanEntry("config.sedparties.name.display", isEnabled());
-        c.addBooleanEntry("config.sedparties.name.tdisplay", renderText);
-        c.addBooleanEntry("config.sedparties.name.danim", DimAnim.animActive);
-        c.addTitleEntry("config.sedparties.title.position");
-        c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(clickArea.r(0), frameX + frameW) - frameW + 32, this.x);
-        c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(clickArea.b(0), frameY + frameH) - frameY + 32, this.y);
-        c.addSliderEntry("config.sedparties.name.zpos", 0, () -> 10, zPos);
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
+        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
+        c.addTitleEntry("display");
+        c.addBooleanEntry("display", isEnabled());
+        c.addBooleanEntry("tdisplay", renderText);
+        c.addBooleanEntry("danim", DimAnim.animActive);
+        c.addTitleEntry("position");
+        c.addSliderEntry("xpos", 0, () -> Math.max(clickArea.r(0), frameX + frameW) - frameW + 32, this.x);
+        c.addSliderEntry("ypos", 0, () -> Math.max(clickArea.b(0), frameY + frameH) - frameY + 32, this.y);
+        c.addSliderEntry("zpos", 0, () -> 10, zPos);
 
 
         return c;

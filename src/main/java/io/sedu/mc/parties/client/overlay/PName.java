@@ -44,12 +44,12 @@ public class PName extends RenderItem {
     }
 
     @Override
-    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
-        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
+        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
         addDisplaySettings(c);
-        c.addBooleanEntry("config.sedparties.name.tshadow", textShadow);
-        c.addColorEntry("config.sedparties.name.tcolor", color);
-        c.addSliderEntry("config.sedparties.name.tmax", 1, () -> 16, length);
+        c.addBooleanEntry("tshadow", textShadow);
+        c.addColorEntry("tcolor", color);
+        c.addSliderEntry("tmax", 1, () -> 16, length);
         addPositionalSettings(c, true, true, true);
         return c;
     }

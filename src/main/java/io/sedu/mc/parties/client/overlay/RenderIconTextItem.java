@@ -80,6 +80,6 @@ public abstract class RenderIconTextItem extends RenderSelfItem {
     }
 
     protected void toggleTextAttach(ArrayList<ConfigOptionsList.Entry> entries) {
-        entries.forEach(entry -> entry.setVisible(!textAttached));
+            entries.forEach(entry -> entry.setVisible(!textAttached));
     }
 }

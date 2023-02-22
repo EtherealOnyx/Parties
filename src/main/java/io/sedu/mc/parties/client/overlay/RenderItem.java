@@ -24,6 +24,7 @@ import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import net.minecraftforge.client.gui.OverlayRegistry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ public abstract class RenderItem {
     public static RenderItem clickArea;
 
     public static final LinkedHashMap<String, RenderItem> items = new LinkedHashMap<>();
+    public static ArrayList<String> parser = new ArrayList<>();
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
     static final ResourceLocation TAB_LOC = new ResourceLocation("textures/block/glass.png");
 
@@ -414,13 +416,13 @@ public abstract class RenderItem {
 
             @Override
             public ConfigOptionsList getOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
-                return getConfigOptions(s, minecraft, x, y, w, h);
+                return getConfigOptions(s, minecraft, x, y, w, h, false);
             }
         };
     }
 
-    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
-        return new ConfigOptionsList(this::getColor, s, minecraft, x, y, w, h);
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
+        return new ConfigOptionsList(this::getColor, s, minecraft, x, y, w, h, parse);
     }
 
 
@@ -533,21 +535,21 @@ public abstract class RenderItem {
     }
 
     void addDisplaySettings(ConfigOptionsList c) {
-        c.addTitleEntry("config.sedparties.title.display");
-        c.addBooleanEntry("config.sedparties.name.display", isEnabled());
+        c.addTitleEntry("display");
+        c.addBooleanEntry("display", isEnabled());
     }
 
     void addPositionalSettings(ConfigOptionsList c, boolean bStandardPos, boolean bZPos, boolean bScale) {
-        c.addTitleEntry("config.sedparties.title.position");
+        c.addTitleEntry("position");
         if (bStandardPos) {
-            c.addSliderEntry("config.sedparties.name.xpos", 0, this::maxX, this.x);
-            c.addSliderEntry("config.sedparties.name.ypos", 0, this::maxY, this.y);
+            c.addSliderEntry("xpos", 0, this::maxX, this.x);
+            c.addSliderEntry("ypos", 0, this::maxY, this.y);
         }
         if (bZPos)
-            c.addSliderEntry("config.sedparties.name.zpos", 0, () -> 10, zPos);
+            c.addSliderEntry("zpos", 0, () -> 10, zPos);
 
         if (bScale)
-            c.addSliderEntry("config.sedparties.name.scale", 1, () -> 3, getScale(), true);
+            c.addSliderEntry("scale", 1, () -> 3, getScale(), true);
     }
 
 

@@ -49,14 +49,14 @@ public class PHead extends RenderItem {
     }
 
     @Override
-    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
-        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
-        c.addTitleEntry("config.sedparties.title.display");
-        c.addBooleanEntry("config.sedparties.name.display", isEnabled());
-        c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - (int)(width*scale)), this.x);
-        c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(height*scale)), this.y);
-        c.addSliderEntry("config.sedparties.name.zpos", 0, () -> 10, zPos);
-        c.addSliderEntry("config.sedparties.name.scale", 1, () -> 3, getScale(), true);
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
+        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
+        c.addTitleEntry("display");
+        c.addBooleanEntry("display", isEnabled());
+        c.addSliderEntry("xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - (int)(width*scale)), this.x);
+        c.addSliderEntry("ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(height*scale)), this.y);
+        c.addSliderEntry("zpos", 0, () -> 10, zPos);
+        c.addSliderEntry("scale", 1, () -> 3, getScale(), true);
         return c;
     }
 

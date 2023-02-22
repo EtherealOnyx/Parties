@@ -37,14 +37,14 @@ public class PRectD extends RenderItem {
     }
 
     @Override
-    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
-        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
-        c.addTitleEntry("config.sedparties.title.display");
-        c.addBooleanEntry("config.sedparties.name.display", isEnabled());
-        c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - width), this.x, true);
-        c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - height), this.y, true);
-        c.addSliderEntry("config.sedparties.name.width", 1, this::maxW, width, true);
-        c.addSliderEntry("config.sedparties.name.height", 1, this::maxH, height, true);
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
+        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
+        c.addTitleEntry("display");
+        c.addBooleanEntry("display", isEnabled());
+        c.addSliderEntry("xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - width), this.x, true);
+        c.addSliderEntry("ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - height), this.y, true);
+        c.addSliderEntry("width", 1, this::maxW, width, true);
+        c.addSliderEntry("height", 1, this::maxH, height, true);
         return c;
     }
 

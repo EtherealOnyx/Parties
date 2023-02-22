@@ -182,23 +182,23 @@ public abstract class PEffects extends RenderSelfItem {
     }
 
     @Override
-    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
-        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
-        c.addTitleEntry("config.sedparties.title.display");
-        c.addBooleanEntry("config.sedparties.name.display", isEnabled());
-        c.addBooleanEntry("config.sedparties.name.tdisplay", renderText);
-        c.addSliderEntry("config.sedparties.name.bsize", 1, () -> 4, borderSize);
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
+        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
+        c.addTitleEntry("display");
+        c.addBooleanEntry("display", isEnabled());
+        c.addBooleanEntry("tdisplay", renderText);
+        c.addSliderEntry("bsize", 1, () -> 4, borderSize);
         getColorEntry(c);
-        c.addTitleEntry("config.sedparties.title.position");
-        c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(clickArea.r(0), frameX + frameW) - frameW + 32, this.x);
-        c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(clickArea.b(0), frameY + frameH) - frameY + 32, this.y);
-        c.addSliderEntry("config.sedparties.name.zpos", 0, () -> 10, zPos);
-        c.addSliderEntry("config.sedparties.name.scale", 1, () -> 3, getScale());
+        c.addTitleEntry("position");
+        c.addSliderEntry("xpos", 0, () -> Math.max(clickArea.r(0), frameX + frameW) - frameW + 32, this.x);
+        c.addSliderEntry("ypos", 0, () -> Math.max(clickArea.b(0), frameY + frameH) - frameY + 32, this.y);
+        c.addSliderEntry("zpos", 0, () -> 10, zPos);
+        c.addSliderEntry("scale", 1, () -> 3, getScale());
 
-        c.addTitleEntry("config.sedparties.title.icon");
-        c.addBooleanEntry("config.sedparties.name.bgdisplay", renderBg);
-        c.addSliderEntry("config.sedparties.name.spacex", 1, () -> 64, width);
-        c.addSliderEntry("config.sedparties.name.spacey", 1, () -> 64, height);
+        c.addTitleEntry("icon");
+        c.addBooleanEntry("bgdisplay", renderBg);
+        c.addSliderEntry("spacex", 1, () -> 64, width);
+        c.addSliderEntry("spacey", 1, () -> 64, height);
         getLimitEntries(c);
 
         return c;
@@ -211,8 +211,8 @@ public abstract class PEffects extends RenderSelfItem {
 
     protected void getLimitEntries(ConfigOptionsList c) {
         final HashMap<String, ConfigOptionsList.SliderEntry> entries = new HashMap<>();
-        entries.put("rowmax", c.addSliderWithUpdater("config.sedparties.name.rowmax", 1, () -> maxSize, maxPerRow, () -> updateAffectedSliders(entries), false));
-        entries.put("totalmax", c.addSliderWithUpdater("config.sedparties.name.totalmax", maxPerRow, Registry.MOB_EFFECT::size, maxSize, () -> updateAffectedSliders(entries), false));
+        entries.put("rowmax", c.addSliderWithUpdater("rowmax", 1, () -> maxSize, maxPerRow, () -> updateAffectedSliders(entries), false));
+        entries.put("totalmax", c.addSliderWithUpdater("totalmax", maxPerRow, Registry.MOB_EFFECT::size, maxSize, () -> updateAffectedSliders(entries), false));
     }
 
     protected void getColorEntry(ConfigOptionsList c) {

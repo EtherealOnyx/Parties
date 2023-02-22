@@ -19,8 +19,8 @@ public class PEffectsB extends PEffects {
 
     @Override
     protected void getColorEntry(ConfigOptionsList c) {
-        c.addColorEntry("config.sedparties.name.buffg", beneColor);
-        c.addColorEntry("config.sedparties.name.flash", flashColor);
+        c.addColorEntry("buffg", beneColor);
+        c.addColorEntry("flash", flashColor);
     }
 
 

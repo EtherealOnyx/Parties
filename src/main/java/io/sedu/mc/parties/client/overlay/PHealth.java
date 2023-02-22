@@ -200,79 +200,65 @@ public class PHealth extends RenderIconTextItem {
     }
 
     @Override
-    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
-        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
-        c.addTitleEntry("config.sedparties.title.general");
-        c.addBooleanEntry("config.sedparties.name.display", isEnabled());
-        c.addSliderEntry("config.sedparties.name.scale", 1, () -> 3, getScale(), true);
-        c.addSliderEntry("config.sedparties.name.zpos", 0, () -> 10, zPos);
-
-        c.addTitleEntry("config.sedparties.title.icon");
-        c.addBooleanEntry("config.sedparties.name.idisplay", iconEnabled);
-        c.addSliderEntry("config.sedparties.name.xpos", 0, this::maxX, this.x, true);
-        c.addSliderEntry("config.sedparties.name.ypos", 0, this::maxY, this.y, true);
-        c.addSliderEntry("config.sedparties.name.width", 1, this::maxW, width, true);
-        c.addSliderEntry("config.sedparties.name.height", 1, this::maxH, height, true);
-
-        c.addTitleEntry("config.sedparties.title.text");
-        c.addBooleanEntry("config.sedparties.name.tdisplay", textEnabled);
-        c.addBooleanEntry("config.sedparties.name.tshadow", textShadow);
-        c.addSliderEntry("config.sedparties.name.ttype", 0, () -> 2, HealthAnim.type);
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
+        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
+        c.addTitleEntry("general");
+        c.addBooleanEntry("display", isEnabled());
+        c.addSliderEntry("scale", 1, () -> 3, getScale(), true);
+        c.addSliderEntry("zpos", 0, () -> 10, zPos);
+        c.addTitleEntry("icon");
+        c.addBooleanEntry("idisplay", iconEnabled);
+        c.addSliderEntry("xpos", 0, this::maxX, this.x, true);
+        c.addSliderEntry("ypos", 0, this::maxY, this.y, true);
+        c.addSliderEntry("width", 1, this::maxW, width, true);
+        c.addSliderEntry("height", 1, this::maxH, height, true);
+        c.addTitleEntry("text");
+        c.addBooleanEntry("tdisplay", textEnabled);
+        c.addBooleanEntry("tshadow", textShadow);
+        c.addSliderEntry("ttype", 0, () -> 2, HealthAnim.type);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
-        c.addBooleanEntry("config.sedparties.name.tattached", textAttached, () -> toggleTextAttach(entries));
-        entries.add(c.addSliderEntry("config.sedparties.name.xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX));
-        entries.add(c.addSliderEntry("config.sedparties.name.ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY));
+        c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
+        entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX));
+        entries.add(c.addSliderEntry("ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY));
         toggleTextAttach(entries);
-
-        c.addTitleEntry("config.sedparties.title.textc");
-        c.addColorEntry("config.sedparties.name.tcolor", color);
-        c.addColorEntry("config.sedparties.name.tcabsorb", absorbColor);
-        c.addColorEntry("config.sedparties.name.tcdead", deadColor);
-
+        c.addTitleEntry("textc");
+        c.addColorEntry("tcolor", color);
+        c.addColorEntry("tcabsorb", absorbColor);
+        c.addColorEntry("tcdead", deadColor);
         c.addSpaceEntry();
-        c.addTitleEntry("config.sedparties.title.barc");
+        c.addTitleEntry("barc");
         c.addSpaceEntry();
-
-        c.addTitleEntry("config.sedparties.title.barb");
-        c.addColorEntry("config.sedparties.name.bbct", bColorTop);
-        c.addColorEntry("config.sedparties.name.bbcb", bColorBot);
+        c.addTitleEntry("barb");
+        c.addColorEntry("bbct", bColorTop);
+        c.addColorEntry("bbcb", bColorBot);
         c.addSpaceEntry();
-
-
-        c.addTitleEntry("config.sedparties.title.bara");
-        c.addColorEntry("config.sedparties.name.bbact", bAColorTop);
-        c.addColorEntry("config.sedparties.name.bbacb", bAColorBot);
+        c.addTitleEntry("bara");
+        c.addColorEntry("bbact", bAColorTop);
+        c.addColorEntry("bbacb", bAColorBot);
         c.addSpaceEntry();
-
-        c.addTitleEntry("config.sedparties.title.bc");
-        c.addColorEntry("config.sedparties.name.bct", colorTop);
-        c.addColorEntry("config.sedparties.name.bcb", colorBot);
+        c.addTitleEntry("bc");
+        c.addColorEntry("bct", colorTop);
+        c.addColorEntry("bcb", colorBot);
         c.addSpaceEntry();
-
-        c.addTitleEntry("config.sedparties.title.bcm");
-        c.addColorEntry("config.sedparties.name.bctm", colorTopMissing);
-        c.addColorEntry("config.sedparties.name.bcbm", colorBotMissing);
+        c.addTitleEntry("bcm");
+        c.addColorEntry("bctm", colorTopMissing);
+        c.addColorEntry("bcbm", colorBotMissing);
         c.addSpaceEntry();
-
-        c.addTitleEntry("config.sedparties.title.bca");
-        c.addColorEntry("config.sedparties.name.bcta", colorTopAbsorb);
-        c.addColorEntry("config.sedparties.name.bcba", colorBotAbsorb);
+        c.addTitleEntry("bca");
+        c.addColorEntry("bcta", colorTopAbsorb);
+        c.addColorEntry("bcba", colorBotAbsorb);
         c.addSpaceEntry();
-
-        c.addTitleEntry("config.sedparties.title.baa");
-        c.addColorEntry("config.sedparties.name.bcat", colorAbsTop);
-        c.addColorEntry("config.sedparties.name.bcab", colorAbsBot);
+        c.addTitleEntry("baa");
+        c.addColorEntry("bcat", colorAbsTop);
+        c.addColorEntry("bcab", colorAbsBot);
         c.addSpaceEntry();
-
-        c.addTitleEntry("config.sedparties.title.bai");
-        c.addColorEntry("config.sedparties.name.bcit", colorIncTop);
-        c.addColorEntry("config.sedparties.name.bcib", colorIncBot);
+        c.addTitleEntry("bai");
+        c.addColorEntry("bcit", colorIncTop);
+        c.addColorEntry("bcib", colorIncBot);
         c.addSpaceEntry();
-
-
-        c.addTitleEntry("config.sedparties.title.bad");
-        c.addColorEntry("config.sedparties.name.bcdt", colorDecTop);
-        c.addColorEntry("config.sedparties.name.bcdb", colorDecBot);
+        c.addTitleEntry("bad");
+        c.addColorEntry("bcdt", colorDecTop);
+        c.addColorEntry("bcdb", colorDecBot);
         c.addSpaceEntry();
 
         return c;

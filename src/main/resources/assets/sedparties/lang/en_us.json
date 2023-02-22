@@ -42,8 +42,8 @@
   "config.sedparties.name.danim": "Enable Animation",
   "config.sedparties.name.width": "Width",
   "config.sedparties.name.height": "Height",
-  "config.sedparties.name.spacex": "X Offset",
-  "config.sedparties.name.spacey": "Y Offset",
+  "config.sedparties.name.spacex": "⬆⬇ Spacing",
+  "config.sedparties.name.spacey": "↔ Spacing",
   "config.sedparties.name.rowmax": "Buffs per Row",
   "config.sedparties.name.totalmax": "Total Buffs",
   "config.sedparties.name.buffg": "Buff",
@@ -58,26 +58,12 @@
 
   "config.sedparties.name.gen_x": "X Pos",
   "config.sedparties.name.gen_y": "Y Pos",
-  "config.sedparties.name.gen_w": "X Offset",
-  "config.sedparties.name.gen_h": "Y Offset",
+  "config.sedparties.name.gen_w": "⬆⬇ Spacing",
+  "config.sedparties.name.gen_h": "↔ Spacing",
   "config.sedparties.name.genc_w": "Width",
   "config.sedparties.name.genc_h": "Height",
   "config.sedparties.name.genc_x": "X Pos",
   "config.sedparties.name.genc_y": "Y Pos",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   "config.sedparties.title.barc":"Bar Color Settings",
   "config.sedparties.title.color":"Color Settings",

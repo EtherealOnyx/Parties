@@ -98,18 +98,18 @@ public class PEffectsBoth extends PEffects {
     protected void getLimitEntries(ConfigOptionsList c) {
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         final HashMap<String, ConfigOptionsList.SliderEntry> sliders = new HashMap<>();
-        sliders.put("rowmax", c.addSliderWithUpdater("config.sedparties.name.rowmax", 1, () -> maxSize, maxPerRow, () -> updateAffectedSliders(sliders), false));
-        sliders.put("totalmax", c.addSliderWithUpdater("config.sedparties.name.totalmax", maxPerRow, Registry.MOB_EFFECT::size, maxSize, () -> updateAffectedSliders(sliders), false));
+        sliders.put("rowmax", c.addSliderWithUpdater("rowmax", 1, () -> maxSize, maxPerRow, () -> updateAffectedSliders(sliders), false));
+        sliders.put("totalmax", c.addSliderWithUpdater("totalmax", maxPerRow, Registry.MOB_EFFECT::size, maxSize, () -> updateAffectedSliders(sliders), false));
 
-        c.addBooleanEntry("config.sedparties.name.bsep", EffectHolder.prioDur, () -> toggleLimSliders(entries));
+        c.addBooleanEntry("bsep", EffectHolder.prioDur, () -> toggleLimSliders(entries));
         c.addSpaceEntry();
-        c.addTitleEntry("config.sedparties.title.sepe");
-        entries.add(c.addBooleanEntry("config.sedparties.name.dfirst", EffectHolder.debuffFirst));
+        c.addTitleEntry("sepe");
+        entries.add(c.addBooleanEntry("dfirst", EffectHolder.debuffFirst));
 
-        ConfigOptionsList.SliderEntry sE = c.addSliderWithUpdater("config.sedparties.name.blim", 0, () -> Math.max(0, maxSize - 1), EffectHolder.bLim, () -> updateLimSliders(sliders), false);
+        ConfigOptionsList.SliderEntry sE = c.addSliderWithUpdater("blim", 0, () -> Math.max(0, maxSize - 1), EffectHolder.bLim, () -> updateLimSliders(sliders), false);
         entries.add(sE);
         sliders.put("blim", sE);
-        sE = c.addSliderWithUpdater("config.sedparties.name.dlim", 0, () -> Math.max(0, maxSize - 1), EffectHolder.dLim, () -> updateLimSliders(sliders), false);
+        sE = c.addSliderWithUpdater("dlim", 0, () -> Math.max(0, maxSize - 1), EffectHolder.dLim, () -> updateLimSliders(sliders), false);
         entries.add(sE);
         sliders.put("dlim", sE);
     }
@@ -133,9 +133,9 @@ public class PEffectsBoth extends PEffects {
 
     @Override
     protected void getColorEntry(ConfigOptionsList c) {
-        c.addColorEntry("config.sedparties.name.buffg", beneColor);
-        c.addColorEntry("config.sedparties.name.buffb", badColor);
-        c.addColorEntry("config.sedparties.name.flash", flashColor);
+        c.addColorEntry("buffg", beneColor);
+        c.addColorEntry("buffb", badColor);
+        c.addColorEntry("flash", flashColor);
     }
 
     @Override

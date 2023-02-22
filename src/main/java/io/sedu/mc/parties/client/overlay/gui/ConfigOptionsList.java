@@ -3,6 +3,7 @@ package io.sedu.mc.parties.client.overlay.gui;
 import Util.Render;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.overlay.RenderItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -22,6 +23,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
     SettingsScreen s;
     EntryColor entryColor;
     ArrayList<SliderEntry> sliders = new ArrayList<>();
+    private boolean parsing;
 
     public interface EntryColor {
         int getColor();
@@ -29,12 +31,13 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
     //TODO: Combine entry lists
 
-    public ConfigOptionsList(EntryColor color, SettingsScreen s, Minecraft pMinecraft, int x, int y, int w, int h) {
+    public ConfigOptionsList(EntryColor color, SettingsScreen s, Minecraft pMinecraft, int x, int y, int w, int h, boolean parsing) {
         super(pMinecraft, w, h, x, y, 20);
         this.entryColor = color;
         this.s = s;
         //Change x0 and x1
         s.resetTickables();
+        this.parsing = parsing;
     }
 
     public Entry addTitleEntry(String title) {
@@ -118,8 +121,9 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         boolean doesRefresh = false;
         OuterUpdate outerUpdate;
 
-        public void setVisible(boolean separate) {
-            toggle(separate);
+        public void setVisible(boolean enabled) {
+            if (parsing) return;
+            toggle(enabled);
         }
 
         abstract void toggle(boolean enabled);
@@ -167,17 +171,21 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         /**
          * The localized key description for entry.
          */
-        private final SmallButton enable;
-        private final SmallButton disable;
+        private SmallButton enable;
+        private SmallButton disable;
 
         CheckboxEntry(String name, boolean isEnabled) {
-            this.name = new TranslatableComponent(name);
+            if (parsing) {
+                RenderItem.parser.add(name);
+                return;
+            }
+            this.name = new TranslatableComponent("config.sedparties.name." + name);
             this.isEnabled = isEnabled;
             disable = new SmallButton(0, 0, "✓", pButton -> updateVal(false), Render.tip(s, "Enabled"), .5f, 1f, .5f, .5f);
             enable = new SmallButton(0, 0, "x", pButton -> updateVal(true), Render.tip(s, "Disabled"), 1f, .5f, .5f, .5f);
             enable.visible = !isEnabled;
             disable.visible = isEnabled;
-            internal = name.substring(23);
+            internal = name;
         }
 
         @Override
@@ -244,20 +252,24 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
     }
 
     public class SliderEntry extends ConfigOptionsList.Entry {
-        private final InputBox input;
-        private final SliderButton slider;
-        private final int lowBound;
+        private InputBox input;
+        private SliderButton slider;
+        private int lowBound;
         private int upBound;
         private int boundWidth;
         private int value;
-        private final Bound maxBound;
+        private Bound maxBound;
 
         public interface Bound {
             int updateBound();
         }
 
         SliderEntry(String name, int lowBound, Bound maxBound, int currentValue) {
-            this.name = new TranslatableComponent(name);
+            if (parsing) {
+                RenderItem.parser.add(name);
+                return;
+            }
+            this.name = new TranslatableComponent("config.sedparties.name." + name);
             slider = new SliderButton(0xFFFFFF,5, this::updateVal, this::finalizeVal, Button.NO_TOOLTIP, 1f);
             this.lowBound = lowBound;
             this.maxBound = maxBound;
@@ -267,7 +279,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             input = new InputBox(0xFFFFFF, minecraft.font, 30, 12, this.name, this::updateInputVal, true);
             s.addTickableEntry(input);
             this.markDirty();
-            internal = name.substring(23);
+            internal = name;
         }
 
 
@@ -398,17 +410,21 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
     }
 
     public class HexBoxEntry extends ConfigOptionsList.Entry {
-        private final HexBox input;
-        private final InputBox r;
-        private final InputBox g;
-        private final InputBox b;
+        private HexBox input;
+        private InputBox r;
+        private InputBox g;
+        private InputBox b;
         private int value;
         private int rI;
         private int gI;
         private int bI;
 
         HexBoxEntry(String pName, int currentValue) {
-            this.name = new TranslatableComponent(pName);
+            if (parsing) {
+                RenderItem.parser.add(pName);
+                return;
+            }
+            this.name = new TranslatableComponent("config.sedparties.name." + pName);
             r = new InputBox(0xFF8888, minecraft.font, 15, 12, name, this::updateRVal, true);
             g = new InputBox(0x88FF88, minecraft.font, 15, 12, name, this::updateGVal, true);
             b = new InputBox(0x8888FF, minecraft.font, 15, 12, name, this::updateBVal, true);
@@ -424,7 +440,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             s.addTickableEntry(g);
             s.addTickableEntry(b);
             this.markDirty();
-            internal = pName.substring(23);
+            internal = pName;
         }
 
         private void updateRVal(String text) {
@@ -566,7 +582,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         private int x;
 
         TitleEntry(String title) {
-            this.name = new TranslatableComponent(title);
+            this.name = new TranslatableComponent("config.sedparties.title." + title);
             this.markDirty();
         }
 
