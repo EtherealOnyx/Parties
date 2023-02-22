@@ -4,6 +4,7 @@ import Util.Render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
@@ -17,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.gui.IIngameOverlay;
@@ -173,13 +175,12 @@ public abstract class RenderItem {
         OverlayRegistry.registerOverlayAbove(HOTBAR_ELEMENT, name, item);
     }
 
-    public void enable() {
-        OverlayRegistry.enableOverlay(item, true);
+
+    public RenderItem setEnabled(boolean enabled) {
+        OverlayRegistry.enableOverlay(item, enabled);
+        return this;
     }
 
-    public void disable() {
-        OverlayRegistry.enableOverlay(item, false);
-    }
 
     private static void setup(float alpha) {
         setup(alpha, Gui.GUI_ICONS_LOCATION);
@@ -224,10 +225,6 @@ public abstract class RenderItem {
 
     public static void rectCO(PoseStack pose, int z, int offset, int l, int t, int r, int b, int startColor, int endColor) {
         Render.rectNoA(pose.last().pose(), z, l+offset, t+offset, r-offset, b-offset, startColor, endColor);
-    }
-
-    void rectScaled(int i, PoseStack pose, int z, int offset, int startColor, int endColor, float scale) {
-        Render.rect(pose.last().pose(), z, (int) ((l(i)+offset)*scale), (int) ((t(i)+offset)*scale), (int) ((l(i)-offset)*scale)+width, (int)((t(i)-offset)*scale)+height, startColor, endColor);
     }
 
     void renderTypeText(PoseStack p, ForgeIngameGui gui, Component type, int x, int y) {
@@ -423,7 +420,7 @@ public abstract class RenderItem {
     }
 
     protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
-        return new ConfigOptionsList(getColor(), s, minecraft, x, y, w, h);
+        return new ConfigOptionsList(this::getColor, s, minecraft, x, y, w, h);
     }
 
 
@@ -508,6 +505,21 @@ public abstract class RenderItem {
         this.height = d;
     }
 
+    protected void updateValues() {
+        x = Mth.clamp(x, 0, maxX());
+        y = Mth.clamp(y, 0, maxY());
+        //width = Mth.clamp(width, 0, maxW());
+        //height = Mth.clamp(width, 0, maxH());
+    }
+
+    protected int maxX() {
+        return Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - (int)(width*scale));
+    }
+
+    protected int maxY() {
+        return Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(height*scale));
+    }
+
 
     static class ColorComponent {
         static final ColorComponent EMPTY = new ColorComponent(new TextComponent(""), 0);
@@ -528,8 +540,8 @@ public abstract class RenderItem {
     void addPositionalSettings(ConfigOptionsList c, boolean bStandardPos, boolean bZPos, boolean bScale) {
         c.addTitleEntry("config.sedparties.title.position");
         if (bStandardPos) {
-            c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - (int)(width*scale)), this.x);
-            c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(height*scale)), this.y);
+            c.addSliderEntry("config.sedparties.name.xpos", 0, this::maxX, this.x);
+            c.addSliderEntry("config.sedparties.name.ypos", 0, this::maxY, this.y);
         }
         if (bZPos)
             c.addSliderEntry("config.sedparties.name.zpos", 0, () -> 10, zPos);
@@ -545,6 +557,7 @@ public abstract class RenderItem {
         updater.put("tshadow", (n, d) -> items.get(n).setTextShadow((Boolean) d));
         updater.put("idisplay", (n, d) -> items.get(n).toggleIcon((Boolean) d));
         updater.put("tdisplay", (n, d) -> items.get(n).toggleText((Boolean) d));
+        updater.put("bgdisplay", (n, d) -> items.get(n).toggleIcon((Boolean) d));
         updater.put("tattached", (n, d) -> items.get(n).toggleTextAttach((Boolean) d));
         updater.put("xpos", (n, d) -> items.get(n).setXPos((int) d));
         updater.put("ypos", (n, d) -> items.get(n).setYPos((int) d));
@@ -556,11 +569,6 @@ public abstract class RenderItem {
         updater.put("width", (n, d) -> items.get(n).setWidth((int)d));
         updater.put("height", (n, d) -> items.get(n).setHeight((int)d));
         updater.put("ttype", (n,d) -> HealthAnim.setTextType((int)d));
-
-
-
-
-
         updater.put("tcolor", (n, d) -> items.get(n).setColor(0, (int)d));
         updater.put("tcabsorb", (n, d) -> items.get(n).setColor(1, (int)d));
         updater.put("tcdead", (n, d) -> items.get(n).setColor(2, (int)d));
@@ -606,7 +614,17 @@ public abstract class RenderItem {
         updater.put("rowmax", (n,d) -> ((PEffects) items.get(n)).setMaxPerRow((int) d));
         updater.put("totalmax", (n,d) -> {((PEffects) items.get(n)).setMaxSize((int) d);  ClientPlayerData.markEffectsDirty();});
 
-        //TODO: implement maxX maxY, maxWidth, maxHeight function base renderItem. reference that when in general width/height tab instead of iterating over getconfigoptions.
+        updater.put("danim", (n,d) -> DimAnim.animActive = (boolean)d);
+        updater.put("gen_x", (n,d) -> frameX = (int) d);
+        updater.put("gen_y", (n,d) -> frameY = (int) d);
+        updater.put("gen_w", (n,d) -> frameW = (int) d);
+        updater.put("gen_h", (n,d) -> frameH = (int) d);
+        updater.put("genc_w", (n,d) -> clickArea.width = (int) d);
+        updater.put("genc_h", (n,d) -> clickArea.height = (int) d);
+        updater.put("genc_x", (n,d) -> clickArea.x = (int) d);
+        updater.put("genc_y", (n,d) -> clickArea.y = (int) d);
+
+        //TODO: implement maxX, maxY, maxWidth, maxHeight function base renderItem. reference that when in general width/height tab instead of iterating over getconfigoptions.
     }
 
 

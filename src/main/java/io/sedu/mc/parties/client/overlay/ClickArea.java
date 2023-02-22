@@ -31,6 +31,7 @@ public class ClickArea extends RenderItem {
 
     }
 
+
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         //Clickable
@@ -53,6 +54,7 @@ public class ClickArea extends RenderItem {
                 }
                 if (HoverScreen.moving()) {
                     renderFrame(poseStack, gui, partialTicks);
+                    frameOutline(poseStack);
                     return;
                 }
             }
@@ -68,19 +70,17 @@ public class ClickArea extends RenderItem {
     }
 
     private void renderClickableArea(PoseStack poseStack, ForgeIngameGui gui, float partialTicks) {
-        this.x = 7;
-        this.y = 7;
+
         for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
-            rect(i, poseStack,-2, -2, Render.getRainbowColor(2) | 150 << 24);
+            rect(i, poseStack,-2, -2, Render.getRainbowColor() | 150 << 24);
     }
 
     private void renderFrame(PoseStack poseStack, ForgeIngameGui gui, float partialTicks) {
         int index = ClientPlayerData.playerOrderedList.size()-1;
 
-        Render.rect(poseStack.last().pose(), -2, frameX, frameY,
-                 frameW == 0 ? r(index) : l(0)+(frameW*ClientPlayerData.playerOrderedList.size()),
-                 frameH == 0 ? b(index) : t(0)+(frameH*ClientPlayerData.playerOrderedList.size()),
-                    Render.getRainbowColor(1) | 150 << 24);
+        Render.rect(poseStack.last().pose(), -2, frameX, frameY, r(index),
+                    b(index),
+                    Render.getRainbowColor() | 150 << 24);
     }
 
     private void clickableOutline(PoseStack poseStack) {
@@ -91,16 +91,18 @@ public class ClickArea extends RenderItem {
     private void fullOutline(PoseStack poseStack) {
         for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++) {
             poseStack.translate(0,0,-5);
-            Render.borderRect(poseStack.last().pose(), 0, 1, frameX + frameW*i, frameY + frameH*i,
-                              frameW == 0 ? width + l(0) - frameX : frameW,
-                              frameH == 0 ? height + t(0) - frameY: frameH, 0xFFFFFFFF);
-            rect(i, poseStack,0, -1, Render.getRainbowColor(2) | 150 << 24);
+            Render.borderRect(poseStack.last().pose(), -1, 1, frameX + frameW*i, frameY + frameH*i,
+                              r(0) - frameX, b(0) - frameY,
+                              0xFFFFFFFF);
+            rect(i, poseStack,0, -1, Render.getRainbowColor() | 150 << 24);
             poseStack.translate(0,0,5);
         }
 
     }
     private void frameOutline(PoseStack poseStack) {
         for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
-            Render.borderRect(poseStack.last().pose(), -1, 2, l(i), t(i), width, height, 0x66AAFFFF);
+            Render.borderRect(poseStack.last().pose(), -1, 1, frameX + frameW*i, frameY + frameH*i,
+                              frameW == 0 ? width + l(0) - frameX : r(0) - frameX,
+                              frameH == 0 ? height + t(0) - frameY: b(0) - frameY, 0xFFFFFFFF);
     }
 }

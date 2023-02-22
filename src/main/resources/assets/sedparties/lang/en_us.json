@@ -1,4 +1,5 @@
 {
+  "gui.sedparties.name.general": "General Settings",
   "gui.sedparties.name.p_leader":"Leader Icon",
   "gui.sedparties.name.p_name":"Name Text",
   "gui.sedparties.name.p_dim":"Dimension Element",
@@ -20,6 +21,8 @@
   "config.sedparties.title.text":"Text Settings",
   "config.sedparties.title.textc":"Text Color Settings",
   "config.sedparties.title.sepe":"Separate Entry Settings",
+  "config.sedparties.title.gen_f":"Frame Position Settings",
+  "config.sedparties.title.gen_c":"Clickable Frame Settings",
   "config.sedparties.name.display": "Enabled",
   "config.sedparties.name.xpos": "X Pos",
   "config.sedparties.name.xtpos": "X Pos",
@@ -33,8 +36,10 @@
   "config.sedparties.name.tshadow": "Display Shadow",
   "config.sedparties.name.tmax": "Max Length",
   "config.sedparties.name.tattached": "Attach to Icon",
-  "config.sedparties.name.idisplay": "Enabled",
-  "config.sedparties.name.tdisplay": "Enabled",
+  "config.sedparties.name.idisplay": "Enable Icon",
+  "config.sedparties.name.bgdisplay": "Enable Bg",
+  "config.sedparties.name.tdisplay": "Enable Text",
+  "config.sedparties.name.danim": "Enable Animation",
   "config.sedparties.name.width": "Width",
   "config.sedparties.name.height": "Height",
   "config.sedparties.name.spacex": "X Offset",
@@ -49,6 +54,17 @@
   "config.sedparties.name.dfirst": "Prioritize Debuffs",
   "config.sedparties.name.bsep": "Prioritize Duration",
   "config.sedparties.name.bsize": "Border Size",
+
+
+  "config.sedparties.name.gen_x": "X Pos",
+  "config.sedparties.name.gen_y": "Y Pos",
+  "config.sedparties.name.gen_w": "X Offset",
+  "config.sedparties.name.gen_h": "Y Offset",
+  "config.sedparties.name.genc_w": "Width",
+  "config.sedparties.name.genc_h": "Height",
+  "config.sedparties.name.genc_x": "X Pos",
+  "config.sedparties.name.genc_y": "Y Pos",
+
 
 
 

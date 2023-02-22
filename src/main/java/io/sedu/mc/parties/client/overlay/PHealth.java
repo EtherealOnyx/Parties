@@ -8,6 +8,7 @@ import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
@@ -208,10 +209,10 @@ public class PHealth extends RenderIconTextItem {
 
         c.addTitleEntry("config.sedparties.title.icon");
         c.addBooleanEntry("config.sedparties.name.idisplay", iconEnabled);
-        c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - (int)(width*scale)), this.x, true);
-        c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(height*scale)), this.y, true);
-        c.addSliderEntry("config.sedparties.name.width", 1, () -> (int) Math.ceil((Math.max(clickArea.x + clickArea.w(), frameW) - x)/scale), width, true);
-        c.addSliderEntry("config.sedparties.name.height", 1, () -> (int) Math.ceil((Math.max(clickArea.y + clickArea.h(), frameH) - y)/scale), height, true);
+        c.addSliderEntry("config.sedparties.name.xpos", 0, this::maxX, this.x, true);
+        c.addSliderEntry("config.sedparties.name.ypos", 0, this::maxY, this.y, true);
+        c.addSliderEntry("config.sedparties.name.width", 1, this::maxW, width, true);
+        c.addSliderEntry("config.sedparties.name.height", 1, this::maxH, height, true);
 
         c.addTitleEntry("config.sedparties.title.text");
         c.addBooleanEntry("config.sedparties.name.tdisplay", textEnabled);
@@ -275,6 +276,22 @@ public class PHealth extends RenderIconTextItem {
         c.addSpaceEntry();
 
         return c;
+    }
+
+    @Override
+    protected void updateValues() {
+        x = Mth.clamp(x, 0, maxX());
+        y = Mth.clamp(y, 0, maxY());
+        width = Mth.clamp(width, 0, maxW());
+        height = Mth.clamp(height, 0, maxH());
+    }
+
+    protected int maxW() {
+        return (int) Math.ceil((Math.max(clickArea.x + clickArea.w(), frameW) - x)/scale);
+    }
+
+    protected int maxH() {
+        return (int) Math.ceil((Math.max(clickArea.y + clickArea.h(), frameH) - y)/scale);
     }
 
     @Override

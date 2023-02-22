@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PEffectsB extends PEffects{
+public class PEffectsB extends PEffects {
 
     @Override
     protected void getColorEntry(ConfigOptionsList c) {
@@ -55,7 +55,7 @@ public class PEffectsB extends PEffects{
                     resetColor();
                 });
                 poseStack.pushPose();
-                poseStack.scale(2f,2f,2f);
+                poseStack.scale(2f,2f,1f);
                 if (renderOverflow(gui, poseStack, i, iX.get(), iY.get(), partialTicks)) {
                     List<ColorComponent> lC = new ArrayList<>();
                     id.effects.forBeneRemainder(maxSize, (effect) -> lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), beneColor)));

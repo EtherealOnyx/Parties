@@ -2,6 +2,7 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 public class PRectO extends RenderSelfItem {
@@ -37,5 +38,20 @@ public class PRectO extends RenderSelfItem {
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         rect(i, poseStack,-5, 0, 0x44002024, 0x44002024);
     }
+
+    @Override
+    protected void updateValues() {
+        x = Mth.clamp(x, 0, maxX());
+        y = Mth.clamp(y, 0, maxY());
+        width = Mth.clamp(width, 0, maxW());
+        height = Mth.clamp(height, 0, maxH());
+    }
+    protected int maxH() {
+        return Math.max(clickArea.y + clickArea.h(), frameH) - y;
+    }
+    protected int maxW() {
+        return Math.max(clickArea.x + clickArea.w(), frameW) - x;
+    }
+
 
 }

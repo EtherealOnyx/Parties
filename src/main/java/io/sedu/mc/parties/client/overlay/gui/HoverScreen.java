@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
+import Util.Render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
@@ -60,6 +61,7 @@ public class HoverScreen extends Screen {
 
     @Override
     protected void init() {
+        Render.colorCycle = true;
         //TODO: Add 'rearranging' boolean to know when config is in this state or not. helps with 2nd todo.
         int y = Math.max(0, clickArea.t(0) - 10);
         settingsButton = addRenderableWidget(new SmallButton(clickArea.l(0), y, "⚙", p -> doTask(1), tip(this, "Open Party Settings"), .5f, .5f, 1f, .5f));
@@ -277,8 +279,8 @@ public class HoverScreen extends Screen {
                 fX.add(revertX);
                 fY.add(revertY);
                 notEditing = false;
-                botLim = RenderItem.frameH == 0 ? clickArea.b(ClientPlayerData.playerOrderedList.size()-1) - RenderItem.frameY: clickArea.t(0)+(RenderItem.frameH*ClientPlayerData.playerOrderedList.size()) - RenderItem.frameY;
-                rightLim = RenderItem.frameW == 0 ? clickArea.r(ClientPlayerData.playerOrderedList.size()-1)  - RenderItem.frameX: clickArea.l(0)+(RenderItem.frameW*ClientPlayerData.playerOrderedList.size()) - RenderItem.frameX;
+                botLim = clickArea.b(ClientPlayerData.playerOrderedList.size()-1) - RenderItem.frameY;
+                rightLim = clickArea.r(ClientPlayerData.playerOrderedList.size()-1)  - RenderItem.frameX;
             }
             case 4 -> {
                 //Still technically active?
@@ -371,17 +373,23 @@ public class HoverScreen extends Screen {
 
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
         if (pKeyCode != key) {
-            active = false;
-            notEditing = false;
-            if (isMoving) {
-                revertPos();
-                isMoving = false;
-            }
-            isArranging = false;
             //TODO: Fix when you press escape.
 
             Minecraft.getInstance().setScreen(null);
         }
         return true;
+    }
+
+    @Override
+    public void onClose() {
+        Render.colorCycle = false;
+        active = false;
+        notEditing = false;
+        if (isMoving) {
+            revertPos();
+            isMoving = false;
+        }
+        isArranging = false;
+        super.onClose();
     }
 }

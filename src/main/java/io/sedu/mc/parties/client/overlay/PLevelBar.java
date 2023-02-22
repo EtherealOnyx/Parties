@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
@@ -153,7 +154,7 @@ public class PLevelBar extends RenderIconTextItem {
         c.addBooleanEntry("config.sedparties.name.idisplay", iconEnabled);
         c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - (int)(width*scale)), this.x, true);
         c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(height*scale)), this.y, true);
-        c.addSliderEntry("config.sedparties.name.width", 1, () -> (int) Math.ceil((Math.max(clickArea.x + clickArea.w(), frameW) - x)/scale), width, true);
+        c.addSliderEntry("config.sedparties.name.width", 1, this::maxW, width, true);
 
         c.addTitleEntry("config.sedparties.title.text");
         c.addBooleanEntry("config.sedparties.name.tdisplay", textEnabled);
@@ -166,6 +167,19 @@ public class PLevelBar extends RenderIconTextItem {
         toggleTextAttach(entries);
         return c;
     }
+
+    //@Override
+    protected int maxW() {
+        return (int) Math.ceil((Math.max(clickArea.x + clickArea.w(), frameW) - x)/scale);
+    }
+
+    @Override
+    protected void updateValues() {
+        x = Mth.clamp(x, 0, maxX());
+        y = Mth.clamp(y, 0, maxY());
+        width = Mth.clamp(width, 0, maxW());
+    }
+
 
     //TODO: Modify getConfigOptions to send a variable too.
     //TODO: When true, add only refresh sliders to config options.

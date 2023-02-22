@@ -5,10 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.config.ConfigEntry;
-import io.sedu.mc.parties.client.overlay.PDimIcon;
-import io.sedu.mc.parties.client.overlay.PHead;
-import io.sedu.mc.parties.client.overlay.PName;
-import io.sedu.mc.parties.client.overlay.RenderItem;
+import io.sedu.mc.parties.client.overlay.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -32,7 +29,7 @@ import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 public class SettingsScreen extends Screen {
     private final ResourceLocation MENU_LOC = new ResourceLocation("textures/block/spruce_planks.png");
     private final ResourceLocation MOD_LOC = new ResourceLocation("textures/block/polished_basalt_side.png");
-    public static ResourceLocation INNER_LOC = new ResourceLocation("textures/block/deepslate_bricks.png");
+    public static ResourceLocation INNER_LOC = new ResourceLocation("textures/block/deepslate_bricks");
     private final ResourceLocation OPTIONS_LOC = new ResourceLocation("textures/block/polished_basalt_side.png");
     private final ResourceLocation SEARCH_LOC = new ResourceLocation("textures/block/deepslate_tiles.png");
 
@@ -81,6 +78,15 @@ public class SettingsScreen extends Screen {
     private final Button showModBox = new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters"));
     private final Button hideModBox = new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters"));
     private final Button toggleRGBMode = new SmallButton(0, 0, "c", b -> toggleRGB(), tip(this, "Toggle RGB Input Mode"), 1f, 1f, 1f);
+    private final Button allElesOff = new SmallButton(0, 0, "x", b -> toggleEles(false), tip(this, "Turn All Other Elements Off"), 1f, 0.5f, 0.5f);
+    private final Button allElesOn = new SmallButton(0, 0, "✓", b -> toggleEles(true), tip(this, "Turn All Other Elements On"), 0.5f, 1f, 0.5f);
+
+    private void toggleEles(boolean b) {
+        RenderItem.items.values().forEach(i -> i.setEnabled(b));
+        RenderItem.clickArea.setEnabled(true);
+        RenderItem.items.computeIfPresent(tabsOrder.get(selEle), (s, renderItem) -> renderItem.setEnabled(true));
+    }
+
     private final HashMap<String, RenderItem.Update> updater = new HashMap<>();
 
     private void toggleRGB() {
@@ -131,11 +137,13 @@ public class SettingsScreen extends Screen {
 
     @Override
     public void onClose() {
+        Render.colorCycle = false;
         active = false;
         notEditing = true;
-        PHead.playerHead = null;
+        PHead.icon = null;
         PName.nameTag = null;
-        PDimIcon.dimIcon = null;
+        PDimIcon.icon = null;
+        GeneralOptions.icon = null;
         INNER_LOC = null;
         super.onClose();
     }
@@ -235,15 +243,17 @@ public class SettingsScreen extends Screen {
 
 
     protected void init() {
+        Render.colorCycle = true;
         RenderItem.initUpdater(updater);
         active = true;
         notEditing = false;
         INNER_LOC = new ResourceLocation("textures/block/deepslate_bricks.png");
-        PHead.playerHead = new ItemStack(Items.PLAYER_HEAD);
+        PHead.icon = new ItemStack(Items.PLAYER_HEAD);
+        GeneralOptions.icon = new ItemStack(Items.COMPARATOR);
         assert Minecraft.getInstance().player != null;
-        PHead.playerHead.addTagElement("SkullOwner", StringTag.valueOf(Minecraft.getInstance().player.getName().getContents()));
+        PHead.icon.addTagElement("SkullOwner", StringTag.valueOf(Minecraft.getInstance().player.getName().getContents()));
         PName.nameTag = Items.NAME_TAG.getDefaultInstance();
-        PDimIcon.dimIcon = Items.END_PORTAL_FRAME.getDefaultInstance();
+        PDimIcon.icon = Items.END_PORTAL_FRAME.getDefaultInstance();
 
         //Setup Data.
         initTabButtons();
@@ -252,14 +262,21 @@ public class SettingsScreen extends Screen {
     }
 
     private void initTabButtons() {
-        int i = 0;
+        int i = 1;
         Iterator<Map.Entry<String, RenderItem>> iter = RenderItem.items.entrySet().iterator();
         Map.Entry<String, RenderItem> item;
+        assert minecraft != null;
+        //General Settings
+        tabsOrder.add("general");
+        tabs.put("general", new TabButton(0,0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
+                                          Render.tip(this, new TranslatableComponent("gui.sedparties.name.general")),
+                                          new GeneralOptions("general").render((ForgeIngameGui) minecraft.gui),
+                                            "Main"
+                                          ));
         while (iter.hasNext()) {
             item = iter.next();
             if (item.getValue().isTabRendered()) {
                 tabsOrder.add(item.getKey());
-                assert minecraft != null;
                 tabs.put(item.getKey(), new TabButton(i, 0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
                                                       Render.tip(this, new TranslatableComponent(item.getValue().translateName())),
                                                       item.getValue().render((ForgeIngameGui) minecraft.gui),
@@ -368,8 +385,14 @@ public class SettingsScreen extends Screen {
         optBoxW = Math.min(32, screenW);
         optBoxX = screenX + screenW - optBoxW;
         optBoxY = screenY + eleBoxH;
+
         toggleRGBMode.x = optBoxX + 11;
         toggleRGBMode.y = optBoxY + 8;
+        allElesOff.x = toggleRGBMode.x;
+        allElesOff.y = optBoxY + 24;
+        allElesOn.x = toggleRGBMode.x;
+        allElesOn.y = optBoxY + 36;
+
 
         searchBoxH = Math.min(24, screenH);
         searchBoxW = screenW;
@@ -383,6 +406,8 @@ public class SettingsScreen extends Screen {
             addRenderableWidget(left);
             addRenderableWidget(right);
             addRenderableWidget(toggleRGBMode);
+            addRenderableWidget(allElesOn);
+            addRenderableWidget(allElesOff);
             tabs.values().forEach(this::addRenderableWidget);
         }
         updateOptionsBounds();
@@ -404,10 +429,12 @@ public class SettingsScreen extends Screen {
 
     public void resize(Minecraft pMinecraft, int pWidth, int pHeight) {
         setBounds(pWidth, pHeight, false);
+        this.width = pWidth;
+        this.height = pHeight;
     }
 
     public void finalizeUpdate(String name, Object data, boolean markDirty) {
-        Parties.LOGGER.error("TRIGGERED FINALIZATION UPDATE FOR: " + tabsOrder.get(selEle) + " | " + name + " | " + data);
+        Parties.LOGGER.debug("TRIGGERED FINALIZATION UPDATE FOR: " + tabsOrder.get(selEle) + " | " + name + " | " + data);
         triggerUpdate(name, data);
         ConfigEntry.setEntry(tabsOrder.get(selEle), name, data);
         if (markDirty)
@@ -419,7 +446,7 @@ public class SettingsScreen extends Screen {
     }
 
     public void triggerUpdate(String name, Object data) {
-        Parties.LOGGER.error("TRIGGERED UPDATE FOR: " + tabsOrder.get(selEle) + " | " + name + " | " + data);
+        Parties.LOGGER.debug("TRIGGERED UPDATE FOR: " + tabsOrder.get(selEle) + " | " + name + " | " + data);
         updater.get(name).onUpdate(tabsOrder.get(selEle), data);
     }
 }

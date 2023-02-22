@@ -15,6 +15,7 @@ public class PLeader extends RenderItem {
 
     public PLeader(String name, int x, int y) {
         super(name, x, y, 9, 9);
+        zPos = 1;
     }
 
     @Override

@@ -47,7 +47,7 @@ public class InputBox extends AbstractWidget implements Widget, GuiEventListener
     private int cursorPos;
     /** other selection position, may be the same as the cursor */
     private int highlightPos;
-    protected final int color;
+    protected int color;
     /** Called to check if the text is valid */
     protected Predicate<String> filter = Objects::nonNull;
     @Nullable
@@ -628,6 +628,10 @@ public class InputBox extends AbstractWidget implements Widget, GuiEventListener
 
     public void updateNarration(NarrationElementOutput pNarrationElementOutput) {
         pNarrationElementOutput.add(NarratedElementType.TITLE, new TranslatableComponent("narration.edit_box", this.getValue()));
+    }
+
+    public void setColor(int color) {
+        this.color = color;
     }
 
     public interface OnTextInput {

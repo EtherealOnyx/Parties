@@ -12,11 +12,12 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 public class PHead extends RenderItem {
 
-    public static ItemStack playerHead = null;
+    public static ItemStack icon = null;
 
 
     public PHead(String name, int x, int y) {
         super(name, x, y, 32, 32);
+        PDimIcon.head = this;
     }
 
     @Override
@@ -31,7 +32,7 @@ public class PHead extends RenderItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(playerHead, b.x+8, b.y+3, 0);
+        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+8, b.y+3, 0);
     }
 
     @Override

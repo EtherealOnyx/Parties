@@ -86,8 +86,8 @@ public class PArmor extends RenderIconTextItem {
         c.addSliderEntry("config.sedparties.name.zpos", 0, () -> 10, zPos);
         c.addTitleEntry("config.sedparties.title.icon");
         c.addBooleanEntry("config.sedparties.name.idisplay", iconEnabled);
-        c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - (int)(width*scale)), this.x);
-        c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(height*scale)), this.y);
+        c.addSliderEntry("config.sedparties.name.xpos", 0, this::maxX, this.x);
+        c.addSliderEntry("config.sedparties.name.ypos", 0, this::maxY, this.y);
         c.addTitleEntry("config.sedparties.title.text");
         c.addBooleanEntry("config.sedparties.name.tdisplay", textEnabled);
         c.addBooleanEntry("config.sedparties.name.tshadow", textShadow);

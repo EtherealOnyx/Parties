@@ -46,7 +46,7 @@ public class PEffectsD extends PEffects{
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.effects.sizeBad() > 0) {
-            start(poseStack, i, id.effects.sizeBene());
+            start(poseStack, i, id.effects.sizeBad());
             AtomicInteger iX = new AtomicInteger();
             AtomicInteger iY = new AtomicInteger();
             if (id.effects.largerBad(maxSize)) {
@@ -61,7 +61,7 @@ public class PEffectsD extends PEffects{
                     resetColor();
                 });
                 poseStack.pushPose();
-                poseStack.scale(2f,2f,2f);
+                poseStack.scale(2f,2f,1f);
                 if (renderOverflow(gui, poseStack, i, iX.get(), iY.get(), partialTicks)) {
                     List<ColorComponent> lC = new ArrayList<>();
                     id.effects.forBadRemainder(maxSize, (effect) -> lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), badColor)));

@@ -12,7 +12,6 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -24,10 +23,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import static io.sedu.mc.parties.client.overlay.gui.SettingsScreen.INNER_LOC;
+
 @OnlyIn(Dist.CLIENT)
 public abstract class AbstractWindowList<E extends AbstractWindowList.Entry<E>> extends AbstractContainerEventHandler implements Widget, NarratableEntry {
     protected final Minecraft minecraft;
-    private final ResourceLocation loc = new ResourceLocation("textures/block/deepslate_bricks.png");
     protected final int itemHeight;
     private final List<E> children = new AbstractWindowList.TrackedList();
     protected int width;
@@ -128,7 +128,7 @@ public abstract class AbstractWindowList<E extends AbstractWindowList.Entry<E>> 
         this.hovered = this.isMouseOver((double)pMouseX, (double)pMouseY) ? this.getEntryAtPosition((double)pMouseX, (double)pMouseY) : null;
         //Background
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        RenderSystem.setShaderTexture(0, loc);
+        RenderSystem.setShaderTexture(0, INNER_LOC);
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         bufferbuilder.vertex((double)this.left, (double)this.bottom, 0.0D).uv((float)this.left / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F).color(100, 100, 100, 255).endVertex();
         bufferbuilder.vertex((double)this.right, (double)this.bottom, 0.0D).uv((float)this.right / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F).color(100, 100, 100, 255).endVertex();

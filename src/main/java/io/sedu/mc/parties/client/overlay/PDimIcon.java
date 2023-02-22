@@ -1,14 +1,16 @@
 package io.sedu.mc.parties.client.overlay;
 
+import Util.Render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
+import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
+import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
@@ -17,7 +19,9 @@ import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
 public class PDimIcon extends RenderSelfItem {
 
-    public static ItemStack dimIcon = null;
+    public static ItemStack icon = null;
+    protected static PHead head = null;
+    private boolean renderText = true;
 
     public PDimIcon(String name, int x, int y) {
         super(name, x, y, 32, 32);
@@ -35,7 +39,7 @@ public class PDimIcon extends RenderSelfItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(dimIcon, b.x+8, b.y+3, 0);
+        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+8, b.y+3, 0);
     }
 
     @Override
@@ -60,11 +64,11 @@ public class PDimIcon extends RenderSelfItem {
             poseStack.scale(.25f, .25f, 1f);
             poseStack.translate(0,0,10f);
 
-            rectScaled(pI, poseStack, 0, -1, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 4f);
+            rectScaled(pI, poseStack, 0, -1, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 4f/head.scale);
 
             RenderSystem.setShaderTexture(0, sprite.atlas().location());
             RenderSystem.enableBlend();
-            Gui.blit(poseStack, x(pI)<<2, y(pI)<<2, 0, 32, 32, sprite);
+            Gui.blit(poseStack, (int) ((x(pI)<<2)/head.scale), (int) ((y(pI)<<2)/head.scale), 0, 32, 32, sprite);
 
             poseStack.popPose();
 
@@ -76,15 +80,18 @@ public class PDimIcon extends RenderSelfItem {
 
     }
 
+    void rectScaled(int i, PoseStack pose, int z, int offset, int startColor, int endColor, float scale) {
+        Render.rect(pose.last().pose(), z, ((x(i)+offset)*scale), ((y(i)+offset)*scale), ((x(i)-offset)*scale)+width, ((y(i)-offset)*scale)+height, startColor, endColor);
+    }
+
 
 
     private void worldAnim(PoseStack poseStack, int pI, ForgeIngameGui gui, ClientPlayerData id, float partialTicks) {
-        //Parties.LOGGER.debug(gui.getGuiTicks());
         int currTick = 0;
         float scale = 3f;
         float scaleSlow = .75f;
-        float translateX = 3;
-        float translateY = -26;
+        float translateX = (head.x - x)/head.scale;
+        float translateY = (head.y - y)/head.scale;
         float alphaOld = 1f;
         float alphaNew = 0f;
         boolean renderText = false;
@@ -92,8 +99,8 @@ public class PDimIcon extends RenderSelfItem {
             currTick = 10 - (id.dim.animTime - 90); //0-10
             scale = 3f*animPos(currTick, partialTicks, true, 10, 1);
             scaleSlow = .75f*animPos(currTick, partialTicks, true, 10, 1.5f);
-            translateX = 3*(currTick+partialTicks)/10;
-            translateY =-26*(currTick+partialTicks)/10;
+            translateX = (head.x - x)/head.scale*(currTick+partialTicks)/10;
+            translateY = (head.y - y)/head.scale*(currTick+partialTicks)/10;
 
         } else if (id.dim.animTime > 10) {
             currTick = id.dim.animTime - 10; //80 - 0
@@ -103,8 +110,8 @@ public class PDimIcon extends RenderSelfItem {
         } else { //10 - 0
             scale = 3f*animPos(id.dim.animTime, partialTicks, false, 10, 1);
             scaleSlow = .75f*animPos(id.dim.animTime, partialTicks, false, 10, 1.5f);
-            translateX = 3*(id.dim.animTime-partialTicks)/10;
-            translateY = -26*(id.dim.animTime-partialTicks)/10;
+            translateX = (head.x - x)*(id.dim.animTime-partialTicks)/10;
+            translateY = (head.y - y)*(id.dim.animTime-partialTicks)/10;
             alphaOld = 0f;
             alphaNew = 1f;
         }
@@ -114,14 +121,14 @@ public class PDimIcon extends RenderSelfItem {
         poseStack.translate(translateX, translateY, 10);
         int color, x, y;
         TextureAtlasSprite sprite;
-        x = (int) (x(pI)*(4-scale));
-        y = (int) (y(pI)*(4-scale));
+        x = (int) (x(pI)*(4-scale)/head.scale);
+        y = (int) (y(pI)*(4-scale)/head.scale);
         if (alphaOld > 0f) {
 
             sprite = DimConfig.sprite(id.dim.oldDimension);
             color = DimConfig.color(id.dim.oldDimension);
             setColor(1f,1f,1f,alphaOld);
-            rectScaled(pI, poseStack, 0, -1, ((color & 0xfefefe) >> 1) | (int)(255*alphaOld) << 24, color | (int)(255*alphaOld) << 24 , 4 - scale);
+            rectScaled(pI, poseStack, 0, (int) (-head.scale), ((color & 0xfefefe) >> 1) | (int)(255*alphaOld) << 24, color | (int)(255*alphaOld) << 24 , (4 - scale)/head.scale);
 
             RenderSystem.setShaderTexture(0, sprite.atlas().location());
             RenderSystem.enableBlend();
@@ -133,7 +140,7 @@ public class PDimIcon extends RenderSelfItem {
         if (alphaNew > 0f) {
             sprite = DimConfig.sprite(id.dim.dimension);
             setColor(1f,1f,1f,alphaNew);
-            rectScaled(pI, poseStack, 0, -1, ((color & 0xfefefe) >> 1) | (int)(255*alphaNew) << 24, color | (int)(255*alphaNew) << 24 , 4 - scale);
+            rectScaled(pI, poseStack, 0, (int) (-head.scale), ((color & 0xfefefe) >> 1) | (int)(255*alphaNew) << 24, color | (int)(255*alphaNew) << 24 , (4 - scale)/head.scale);
 
 
             RenderSystem.setShaderTexture(0, sprite.atlas().location());
@@ -152,15 +159,12 @@ public class PDimIcon extends RenderSelfItem {
 
 
     private void doTextRender(int partyIndex, ForgeIngameGui gui, PoseStack poseStack, int currTick, float partialTicks, DimAnim dim, int color) {
+        if (!renderText) return;
         int x, y;
         float transX;
         transX = 0;
         float alphaPercent = 0f;
         if (currTick > 75) {
-            if (!dim.soundPlayed) {
-                dim.soundPlayed = true;
-                Minecraft.getInstance().player.playSound(SoundEvents.UI_TOAST_IN, 1.5f, 1f);
-            }
 
         } else if (currTick > 70) {
             currTick = (currTick-70); // 5 - 0
@@ -171,11 +175,6 @@ public class PDimIcon extends RenderSelfItem {
             alphaPercent = 1f;
             transX = 20*((currTick-partialTicks)/60f) - 10;
         } else if (currTick > 5) {
-            // 5 - 0
-            if (dim.soundPlayed) {
-                dim.soundPlayed = false;
-                Minecraft.getInstance().player.playSound(SoundEvents.UI_TOAST_OUT, 1.5f, 1f);
-            }
             alphaPercent = (currTick - partialTicks)/5f;
             transX = -10-(10-(currTick-partialTicks))*4f;
         } else {
@@ -188,14 +187,51 @@ public class PDimIcon extends RenderSelfItem {
                 poseStack.translate(-transX, 0, 10);
             else
                 poseStack.translate(transX, 0, 10);
-            x = (int) (x(partyIndex)-gui.getFont().width(dim.dimName.get(j))/2f)+18;
+            x = (int) (head.x(partyIndex)-gui.getFont().width(dim.dimName.get(j))/2f)+16;
             //TODO: Remove hardcoding of 11 for when scaling is allowed.
-            y = y(partyIndex) - 11 + (j*gui.getFont().lineHeight) - ((gui.getFont().lineHeight*dim.dimName.size()-1)>>1);
+            y = head.y(partyIndex) + 16 + (j*gui.getFont().lineHeight) - ((gui.getFont().lineHeight*dim.dimName.size()-1)>>1);
            if (alphaPercent > 0f) {
                 gui.getFont().drawShadow(poseStack, dim.dimName.get(j), x, y, color | ((int)(255*alphaPercent) << 24));
             }
             poseStack.popPose();
         }
+    }
+
+    @Override
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
+        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
+        c.addTitleEntry("config.sedparties.title.display");
+        c.addBooleanEntry("config.sedparties.name.display", isEnabled());
+        c.addBooleanEntry("config.sedparties.name.tdisplay", renderText);
+        c.addBooleanEntry("config.sedparties.name.danim", DimAnim.animActive);
+        c.addTitleEntry("config.sedparties.title.position");
+        c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(clickArea.r(0), frameX + frameW) - frameW + 32, this.x);
+        c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(clickArea.b(0), frameY + frameH) - frameY + 32, this.y);
+        c.addSliderEntry("config.sedparties.name.zpos", 0, () -> 10, zPos);
+
+
+        return c;
+    }
+
+    @Override
+    protected void itemStart(PoseStack poseStack) {
+        poseStack.pushPose();
+        if (head != null)
+            poseStack.scale(head.scale, head.scale, 1);
+        poseStack.translate(0,0, zPos);
+    }
+    @Override
+    protected void tooltipStart(PoseStack poseStack) {
+        poseStack.scale(1/head.scale, 1/head.scale, 1);
+    }
+    @Override
+    public void toggleText(boolean data) {
+        renderText = data;
+    }
+
+
+    @Override
+    protected void updateValues() {
     }
 
 }

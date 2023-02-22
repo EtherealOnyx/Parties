@@ -20,12 +20,16 @@ import java.util.List;
 
 public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entry> {
     SettingsScreen s;
-    int entryColor;
+    EntryColor entryColor;
     ArrayList<SliderEntry> sliders = new ArrayList<>();
+
+    public interface EntryColor {
+        int getColor();
+    }
 
     //TODO: Combine entry lists
 
-    public ConfigOptionsList(int color, SettingsScreen s, Minecraft pMinecraft, int x, int y, int w, int h) {
+    public ConfigOptionsList(EntryColor color, SettingsScreen s, Minecraft pMinecraft, int x, int y, int w, int h) {
         super(pMinecraft, w, h, x, y, 20);
         this.entryColor = color;
         this.s = s;
@@ -139,11 +143,11 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
             if (pIsMouseOver)
             {
-                Render.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + pWidth, pTop + pHeight, entryColor | 100 << 24, entryColor);
-                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), entryColor);
+                Render.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + pWidth, pTop + pHeight, entryColor.getColor() | 100 << 24, entryColor.getColor());
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), entryColor.getColor());
                 ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), 0xAAFFFFFF);
             } else {
-                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), entryColor);
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), entryColor.getColor());
             }
         }
 
@@ -254,13 +258,13 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         SliderEntry(String name, int lowBound, Bound maxBound, int currentValue) {
             this.name = new TranslatableComponent(name);
-            slider = new SliderButton(entryColor,5, this::updateVal, this::finalizeVal, Button.NO_TOOLTIP, 1f);
+            slider = new SliderButton(0xFFFFFF,5, this::updateVal, this::finalizeVal, Button.NO_TOOLTIP, 1f);
             this.lowBound = lowBound;
             this.maxBound = maxBound;
             this.value = currentValue;
             this.upBound = maxBound.updateBound();
             this.boundWidth = upBound - lowBound;
-            input = new InputBox(entryColor, minecraft.font, 30, 12, this.name, this::updateInputVal, true);
+            input = new InputBox(0xFFFFFF, minecraft.font, 30, 12, this.name, this::updateInputVal, true);
             s.addTickableEntry(input);
             this.markDirty();
             internal = name.substring(23);
@@ -385,6 +389,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             //Render Slider BG
 
             this.slider.updateX();
+            this.slider.color = entryColor.getColor();
             this.slider.y = pTop + 3;
             this.input.y = pTop + 4;
             this.slider.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
@@ -409,7 +414,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             b = new InputBox(0x8888FF, minecraft.font, 15, 12, name, this::updateBVal, true);
             this.value = currentValue;
             updateIndValues();
-            input = new HexBox(entryColor, minecraft.font, 39, 12, name, this::updateInputVal);
+            input = new HexBox(0xFFFFFF, minecraft.font, 39, 12, name, this::updateInputVal);
             if (currentValue == 0)
                 input.setValue("");
             else
@@ -544,13 +549,14 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             super.render(pPoseStack, pIndex, pTop, pLeft, pWidth, pHeight, pMouseX, pMouseY, pIsMouseOver, pPartialTick);
 
             //Render Slider BG
+            int color = entryColor.getColor();
             this.input.y = pTop + 4;
             this.input.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
             this.r.y = this.g.y = this.b.y = this.input.y;
             this.r.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
             this.g.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
             this.b.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-            Render.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 16, pTop + 3, 0, 10,10, (entryColor  & 0xfefefe) >> 1, entryColor);
+            Render.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 16, pTop + 3, 0, 10,10, (color  & 0xfefefe) >> 1, color);
             Render.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 15, pTop + 4, 8, 8, value);
         }
     }
@@ -603,11 +609,11 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
                 updateValues(pTop, pLeft, pWidth, pHeight);
                 isDirty = false;
             }
-            minecraft.font.draw(pPoseStack, name, x, pTop + 4, entryColor);
-            Render.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + (pWidth>>1), pTop + 1, entryColor, entryColor | 255 << 24);
-            Render.horizRect(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop, pLeft + pWidth, pTop + 1, entryColor | 255 << 24, entryColor);
-            Render.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop+15, pLeft + (pWidth>>1), pTop + 16, entryColor, entryColor | 255 << 24);
-            Render.horizRect(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop+15, pLeft + pWidth, pTop + 16, entryColor | 255 << 24, entryColor);
+            minecraft.font.draw(pPoseStack, name, x, pTop + 4, entryColor.getColor());
+            Render.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + (pWidth>>1), pTop + 1, entryColor.getColor(), entryColor.getColor() | 255 << 24);
+            Render.horizRect(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop, pLeft + pWidth, pTop + 1, entryColor.getColor() | 255 << 24, entryColor.getColor());
+            Render.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop+15, pLeft + (pWidth>>1), pTop + 16, entryColor.getColor(), entryColor.getColor() | 255 << 24);
+            Render.horizRect(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop+15, pLeft + pWidth, pTop + 16, entryColor.getColor() | 255 << 24, entryColor.getColor());
         }
     }
 

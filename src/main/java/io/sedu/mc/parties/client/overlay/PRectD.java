@@ -6,6 +6,7 @@ import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 public class PRectD extends RenderItem {
@@ -42,8 +43,30 @@ public class PRectD extends RenderItem {
         c.addBooleanEntry("config.sedparties.name.display", isEnabled());
         c.addSliderEntry("config.sedparties.name.xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - width), this.x, true);
         c.addSliderEntry("config.sedparties.name.ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - height), this.y, true);
-        c.addSliderEntry("config.sedparties.name.width", 1, () -> Math.max(clickArea.x + clickArea.w(), frameW) - x, width, true);
-        c.addSliderEntry("config.sedparties.name.height", 1, () -> Math.max(clickArea.y + clickArea.h(), frameH) - y, height, true);
+        c.addSliderEntry("config.sedparties.name.width", 1, this::maxW, width, true);
+        c.addSliderEntry("config.sedparties.name.height", 1, this::maxH, height, true);
         return c;
+    }
+
+    @Override
+    protected void itemStart(PoseStack poseStack) {
+    }
+
+    @Override
+    protected void itemEnd(PoseStack poseStack) {
+    }
+    @Override
+    protected void updateValues() {
+        x = Mth.clamp(x, 0, maxX());
+        y = Mth.clamp(y, 0, maxY());
+        width = Mth.clamp(width, 0, maxW());
+        height = Mth.clamp(height, 0, maxH());
+    }
+
+    protected int maxH() {
+        return Math.max(clickArea.y + clickArea.h(), frameH) - y;
+    }
+    protected int maxW() {
+        return Math.max(clickArea.x + clickArea.w(), frameW) - x;
     }
 }

@@ -503,9 +503,10 @@ public class Render {
         return (color & 255);
     }
 
-    public static int getRainbowColor(int speed) {
+    private static int color;
+    public static int getRainbowColor() {
         //S = .4F, L = .8F
-        return HSBtoRGB(getHue(speed), 0.5f, 0.75f);
+        return color;
     }
 
     /**
@@ -561,14 +562,13 @@ public class Render {
     }
 
     private static float hue;
-
-    private static float getHue(int speed) {
-        return hue*speed % 1f;
-    }
+    public static boolean colorCycle = true;
     public static void tick() {
+        if (!colorCycle) return;
         hue += 0.001f;
         if (hue > 1f)
-            hue = 0f;
+            hue -= 1f;
+        color = HSBtoRGB(hue, 0.5f, 0.75f);
     }
 
 }

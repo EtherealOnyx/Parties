@@ -14,7 +14,7 @@ public class DimAnim extends AnimHandler {
     public String dimension = "";
     public List<String> dimName = new ArrayList<>();
     public String dimNorm = "";
-    public boolean soundPlayed = false;
+    public static boolean animActive = true;
 
 
     public DimAnim(int length, boolean enabled) {
@@ -27,10 +27,15 @@ public class DimAnim extends AnimHandler {
     void activateValues(Object... data) {
         setOld();
         setupDim((String) data[0]);
-        soundPlayed = false;
         if ((Boolean) data[1] || oldDimension.equals("")) {
             setOld();
         }
+    }
+
+    @Override
+    public void activate(Object... data) {
+        if (animActive) super.activate(data);
+        else setupDim((String) data[0]);
     }
 
     void setOld() {
@@ -40,7 +45,7 @@ public class DimAnim extends AnimHandler {
     private void setupDim(String data) {
         dimension = data;
         data = data.substring(data.indexOf(':')+1).toLowerCase();
-        String[] split = data.split("[-_]");
+        String[] split = data.split("[-_ ]");
         List<String> dim = Arrays.asList(split);
         List<String> fString = new ArrayList<>();
         if (!dim.contains("the")) {

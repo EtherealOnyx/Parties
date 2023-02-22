@@ -35,11 +35,16 @@ public abstract class PEffects extends RenderSelfItem {
     static int badColor = 0xFFA9A9;
     static int flashColor = 0xFFFFFF;
 
+    boolean renderText;
+    boolean renderBg;
+
 
     public PEffects(String name, int x, int y, int width, int height, int max, int row) {
         super(name, x, y, width, height);
         maxSize = max;
         maxPerRow = row;
+        renderText = true;
+        renderBg = true;
     }
 
     @Override
@@ -107,8 +112,8 @@ public abstract class PEffects extends RenderSelfItem {
 
         String secs = "§oInstant";
         int scol = 0x88888888;
-        if (!effect.isInstant()) {
-            x = sX(i, iX) + effect.getOffset() + 8;
+        if (renderText && !effect.isInstant()) {
+            x = sX(i, iX) + effect.getOffset() + 7;
             y = sY(i, iY) + 29;
             gui.getFont().drawShadow(poseStack, effect.getDisplay(), x, y, 0xFFFFFF);
             secs = effect.getDur() + "s";
@@ -131,10 +136,11 @@ public abstract class PEffects extends RenderSelfItem {
 
     void start(PoseStack poseStack, int i, int size) {
         poseStack.pushPose();
-        Render.rect(poseStack.last().pose(), -zPos - 1, x(i) - 2, (y(i) - 2),
-                    x(i) + (width * Math.min(size, maxPerRow) >> 1),
-                    -1 + y(i) + (height * (int) Math.ceil((double) Math.min(maxSize, size) / maxPerRow) >> 1),
-                    0x44002024, 0x44002024);
+        if (renderBg)
+            Render.rect(poseStack.last().pose(), -zPos - 1, x(i) - 2, (y(i) - 2),
+                        x(i) + (width * Math.min(size, maxPerRow) >> 1),
+                        -1 + y(i) + (height * (int) Math.ceil((double) Math.min(maxSize, size) / maxPerRow) >> 1),
+                        0x44002024, 0x44002024);
         poseStack.scale(.5f, .5f, 1f);
         RenderSystem.enableDepthTest();
     }
@@ -180,6 +186,7 @@ public abstract class PEffects extends RenderSelfItem {
         ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h);
         c.addTitleEntry("config.sedparties.title.display");
         c.addBooleanEntry("config.sedparties.name.display", isEnabled());
+        c.addBooleanEntry("config.sedparties.name.tdisplay", renderText);
         c.addSliderEntry("config.sedparties.name.bsize", 1, () -> 4, borderSize);
         getColorEntry(c);
         c.addTitleEntry("config.sedparties.title.position");
@@ -189,8 +196,9 @@ public abstract class PEffects extends RenderSelfItem {
         c.addSliderEntry("config.sedparties.name.scale", 1, () -> 3, getScale());
 
         c.addTitleEntry("config.sedparties.title.icon");
-        c.addSliderEntry("config.sedparties.name.spacex", 20, () -> 64, width);
-        c.addSliderEntry("config.sedparties.name.spacey", 20, () -> 64, height);
+        c.addBooleanEntry("config.sedparties.name.bgdisplay", renderBg);
+        c.addSliderEntry("config.sedparties.name.spacex", 1, () -> 64, width);
+        c.addSliderEntry("config.sedparties.name.spacey", 1, () -> 64, height);
         getLimitEntries(c);
 
         return c;
@@ -229,5 +237,15 @@ public abstract class PEffects extends RenderSelfItem {
 
     public void setMaxPerRow(int data) {
         this.maxPerRow = data;
+    }
+
+    @Override
+    public void toggleText(boolean data) {
+        renderText = data;
+    }
+
+    @Override
+    public void toggleIcon(boolean data) {
+        renderBg = data;
     }
 }
