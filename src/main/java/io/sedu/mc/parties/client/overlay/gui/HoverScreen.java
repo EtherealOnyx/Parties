@@ -322,6 +322,8 @@ public class HoverScreen extends Screen {
         if (Minecraft.getInstance().screen instanceof HoverScreen hS) {
             hS.clearPartyButtons();
             hS.initPartyButtons();
+            if (!isArranging)
+                hS.moveParty.forEach(button -> button.visible = false);
         }
     }
 

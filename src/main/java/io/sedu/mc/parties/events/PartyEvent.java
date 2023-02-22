@@ -73,7 +73,7 @@ public class PartyEvent {
     }
 
     private static final short playerUpdateInterval = 10;
-    public static final short playerAcceptTimer = 15;
+    public static final short playerAcceptTimer = 30;
 
     @SubscribeEvent
     public static void onEntityTick(TickEvent.PlayerTickEvent e) {

@@ -5,7 +5,10 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class PlayerData {
 
@@ -29,7 +32,7 @@ public class PlayerData {
     private String name;
 
     //Invite tracker
-    private HashMap<UUID, Short> inviters = new HashMap<>();
+    private LinkedHashMap<UUID, Short> inviters = new LinkedHashMap<>();
     //Player old hunger;
     private int oldHunger;
 
@@ -124,7 +127,7 @@ public class PlayerData {
     }
 
     public void tickInviters() {
-        HashMap<UUID, Short> invNew = new HashMap<>();
+        LinkedHashMap<UUID, Short> invNew = new LinkedHashMap<>();
         inviters.forEach((uuid, aShort) -> {
             if (aShort-- <= 0) {
                 PartyHelper.dismissInvite(this, uuid);
@@ -148,5 +151,14 @@ public class PlayerData {
             return true;
         }
         return false;
+    }
+
+    public void ifInviterExists(Consumer<UUID> action) {
+        Iterator<UUID> iter = inviters.keySet().iterator();
+        UUID id = null;
+        while (iter.hasNext()) {
+            id = iter.next();
+        }
+        if (id != null) action.accept(id);
     }
 }

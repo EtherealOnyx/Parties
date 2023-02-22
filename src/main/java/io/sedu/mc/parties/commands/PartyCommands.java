@@ -19,7 +19,7 @@ public class PartyCommands {
                         return Command.SINGLE_SUCCESS;})
                 )
             ).then(Commands.literal("accept").then(Commands.argument("initiator", new NotSelfArgument(false)).executes(ctx -> {
-                if (PartyHelper.invitePlayer(EntityArgument.getPlayer(ctx, "initiator").getUUID(), ctx.getSource().getPlayerOrException().getUUID())) {
+                if (PartyHelper.acceptInvite(EntityArgument.getPlayer(ctx, "initiator").getUUID(), ctx.getSource().getPlayerOrException().getUUID())) {
                     
                     return Command.SINGLE_SUCCESS;
                 }
@@ -27,6 +27,15 @@ public class PartyCommands {
                     return 0;
                 }
             })))
+            .then(Commands.literal("accept").executes(ctx -> {
+                if (PartyHelper.acceptInvite(ctx.getSource().getPlayerOrException().getUUID())) {
+
+                    return Command.SINGLE_SUCCESS;
+                }
+                else {
+                    return 0;
+                }
+            }))
             .then(Commands.literal("decline").then(Commands.argument("initiator", new NotSelfArgument(false)).executes(ctx -> {
                 if (PartyHelper.declineInvite(EntityArgument.getPlayer(ctx, "initiator").getUUID(), ctx.getSource().getPlayerOrException().getUUID())) {
                     return Command.SINGLE_SUCCESS;
@@ -35,6 +44,14 @@ public class PartyCommands {
                     return 0;
                 }
             })))
+            .then(Commands.literal("decline").executes(ctx -> {
+                if (PartyHelper.declineInvite(ctx.getSource().getPlayerOrException().getUUID())) {
+                    return Command.SINGLE_SUCCESS;
+                }
+                else {
+                    return 0;
+                }
+            }))
             .then(Commands.literal("kick").then(Commands.argument("member", new NotSelfArgument(true)).executes(ctx -> {
                 if (isLeader(ctx.getSource().getPlayerOrException().getUUID()) && PartyHelper.kickPlayer(ctx.getSource().getPlayerOrException().getUUID(), EntityArgument.getPlayer(ctx, "member").getUUID())) {
                     

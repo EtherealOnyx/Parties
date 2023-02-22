@@ -7,6 +7,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.sedu.mc.parties.data.Util.*;
 
@@ -23,13 +24,42 @@ public class PartyHelper {
         return addPlayerToParty(futureMember, getPartyFromMember(initiator));
     }
 
-    public static boolean invitePlayer(UUID initiator, UUID futureMember) {
+    public static boolean acceptInvite(UUID initiator, UUID futureMember) {
         if (getPlayer(futureMember).isInviter(initiator)) {
             getPlayer(futureMember).removeInviter(initiator);
             return invitePlayerForced(initiator, futureMember);
         }
 
         return false;
+    }
+
+    public static boolean acceptInvite(UUID futureMember) {
+        AtomicBoolean ret = new AtomicBoolean(false);
+        getPlayer(futureMember).ifInviterExists((inviter) -> ret.set(acceptInvite(inviter, futureMember)));
+        return ret.get();
+    }
+
+    public static boolean declineInvite(UUID initiator, UUID futureMember) {
+        if (!getPlayer(futureMember).isInviter(initiator))
+            return false;
+        ServerPlayer p;
+        if ((p = getPlayer(initiator).getPlayer()) != null) {
+            p.sendMessage(new TextComponent(getName(futureMember)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(
+                    " has declined your party invite.").withStyle(ChatFormatting.DARK_AQUA)), initiator);
+        }
+        if ((p = getPlayer(futureMember).getPlayer()) != null) {
+            p.sendMessage(new TextComponent("You have declined a party invite from ").withStyle(ChatFormatting.DARK_AQUA)
+                                                                                     .append(new TextComponent(getName(initiator)).withStyle(ChatFormatting.YELLOW
+                                                                                     )).append(new TextComponent(".").withStyle(ChatFormatting.DARK_AQUA)), futureMember);
+        }
+        getPlayer(futureMember).removeInviter(initiator);
+        return true;
+    }
+
+    public static boolean declineInvite(UUID futureMember) {
+        AtomicBoolean ret = new AtomicBoolean(false);
+        getPlayer(futureMember).ifInviterExists((inviter) -> ret.set(declineInvite(inviter, futureMember)));
+        return ret.get();
     }
 
     //This adds the player to the given party.
@@ -76,8 +106,12 @@ public class PartyHelper {
             //Sends message to futureMember.
             getPlayer(futureMember).getPlayer().sendMessage(
                     new TextComponent(getName(initiator)).withStyle(ChatFormatting.YELLOW
-                    ).append(new TextComponent(" invites you to a party: ").withStyle(ChatFormatting.DARK_AQUA)
-                    ).append(new TextComponent("Accept").withStyle(
+                    ).append(new TextComponent(" invites you to a party!").withStyle(ChatFormatting.DARK_AQUA)
+                    ), futureMember);
+
+            getPlayer(futureMember).getPlayer().sendMessage(
+                    new TextComponent("You can click the following to respond: ").withStyle(ChatFormatting.DARK_AQUA)
+                                                                                 .append(new TextComponent("Accept").withStyle(
                             style -> style.withColor(ChatFormatting.GREEN)
                                           .withUnderlined(true)
                                           .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
@@ -94,8 +128,19 @@ public class PartyHelper {
                                                   .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                                                                  new TextComponent("Decline Party Invite")))
                             )
-                    ), futureMember
-            );
+                    )
+                    , futureMember);
+
+            //TODO: Support changing /party to /p, etc
+            getPlayer(futureMember).getPlayer().sendMessage(
+                    new TextComponent("You can also type ").withStyle(ChatFormatting.DARK_AQUA)
+                            .append(new TextComponent("/party accept").withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(true)))
+                            .append(new TextComponent(" or ").withStyle(ChatFormatting.DARK_AQUA))
+                            .append(new TextComponent("/party decline").withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(true)))
+                            .append(new TextComponent(".").withStyle(ChatFormatting.DARK_AQUA))
+                    , futureMember);
+
+
 
             getPlayer(initiator).getPlayer().sendMessage(new TextComponent("You have sent a party invite to ").withStyle(ChatFormatting.DARK_AQUA)
                                                                                      .append(new TextComponent(getName(futureMember)).withStyle(ChatFormatting.YELLOW
@@ -124,23 +169,6 @@ public class PartyHelper {
         }
 
 
-        return true;
-    }
-
-    public static boolean declineInvite(UUID initiator, UUID futureMember) {
-        if (!getPlayer(futureMember).isInviter(initiator))
-            return false;
-        ServerPlayer p;
-        if ((p = getPlayer(initiator).getPlayer()) != null) {
-            p.sendMessage(new TextComponent(getName(futureMember)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(
-                    " has declined your party invite.").withStyle(ChatFormatting.DARK_AQUA)), initiator);
-        }
-        if ((p = getPlayer(futureMember).getPlayer()) != null) {
-            p.sendMessage(new TextComponent("You have declined a party invite from ").withStyle(ChatFormatting.DARK_AQUA)
-                 .append(new TextComponent(getName(initiator)).withStyle(ChatFormatting.YELLOW
-                         )).append(new TextComponent(".").withStyle(ChatFormatting.DARK_AQUA)), futureMember);
-        }
-        getPlayer(futureMember).removeInviter(initiator);
         return true;
     }
 
