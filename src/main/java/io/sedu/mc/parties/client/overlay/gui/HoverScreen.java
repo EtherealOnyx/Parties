@@ -4,12 +4,19 @@ import Util.Render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
+import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 
+import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +46,7 @@ public class HoverScreen extends Screen {
     private List<Button> moveFrame = new ArrayList<>();
     private Button settingsButton;
     private Button goBackButton;
+    private List<GuiMessage<FormattedCharSequence>> trimmedMessages;
 
     private static boolean isArranging = false;
     private static boolean isMoving = false;
@@ -48,7 +56,6 @@ public class HoverScreen extends Screen {
     public HoverScreen(int value) {
         super(new TextComponent("Mouse Hover"));
         key = value;
-
     }
 
     public static boolean arranging() {
@@ -61,6 +68,12 @@ public class HoverScreen extends Screen {
 
     @Override
     protected void init() {
+        try {
+            Field f = ChatComponent.class.getDeclaredField("trimmedMessages");
+            f.setAccessible(true);
+            trimmedMessages = (List<GuiMessage<FormattedCharSequence>>) f.get(minecraft.gui.getChat());
+        } catch(NoSuchFieldException | IllegalAccessException ignored) {}
+
         Render.colorCycle = true;
         //TODO: Add 'rearranging' boolean to know when config is in this state or not. helps with 2nd todo.
         int y = Math.max(0, clickArea.t(0) - 10);
@@ -292,14 +305,49 @@ public class HoverScreen extends Screen {
 
     public void render(PoseStack poseStack, int mX, int mY, float partialTick) {
         super.render(poseStack, mX, mY, partialTick);
-
         if (isDragging()) {
             move(mX, mY);
+            return;
         } else if (oldMX != null) {
             save();
+            return;
         }
-            //RenderItem.rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
+        Style style = getClickedText(mX, mY);
+        if (style != null && style.getHoverEvent() != null) {
+            this.renderComponentHoverEffect(poseStack, style, mX, mY);
+        }
+        //RenderItem.rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
 
+    }
+
+    @Nullable
+    public Style getClickedText(double pMouseX, double pMouseY) {
+        if (trimmedMessages == null) return null;
+        assert minecraft != null;
+        ChatComponent chat = minecraft.gui.getChat();
+            if (!minecraft.options.hideGui) {
+                double d0 = pMouseX - 2.0D;
+                double d1 = (double) this.minecraft.getWindow().getGuiScaledHeight() - pMouseY - 40.0D;
+                d0 = Mth.floor(d0 / chat.getScale());
+                d1 = Mth.floor(d1 / (chat.getScale() * (this.minecraft.options.chatLineSpacing + 1.0D)));
+                if (!(d0 < 0.0D) && !(d1 < 0.0D)) {
+                    int i = Math.min(chat.getLinesPerPage(), trimmedMessages.size());
+                    if (d0 <= (double) Mth.floor((double) chat.getWidth() / chat.getScale()) && d1 < (double) (9 * i + i)) {
+                        int j = (int) (d1 / 9.0D);
+                        if (j >= 0 && j < trimmedMessages.size()) {
+                            GuiMessage<FormattedCharSequence> guimessage = trimmedMessages.get(j);
+                            return this.minecraft.font.getSplitter().componentStyleAtWidth(guimessage.getMessage(),
+                                                                                           (int) d0);
+                        }
+                    }
+
+                    return null;
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
     }
 
     @Override
@@ -312,6 +360,11 @@ public class HoverScreen extends Screen {
         }
 
         if (pButton == 0) {
+            Style style = getClickedText(pMouseX, pMouseY);
+            if (style != null && this.handleComponentClicked(style)) {
+                return true;
+            }
+
             this.setDragging(isMoving);
         }
 
