@@ -100,7 +100,6 @@ public class PDimIcon extends RenderSelfItem {
             offY = (currTick + partialTicks - 5);
             offY *= -offY;
             offY += 25;
-            System.out.println("Size: " + size);
         } else if (id.dim.animTime > 10) {
             currTick = id.dim.animTime - 10; //80 - 0
             renderText = true;

@@ -16,7 +16,6 @@ public class HealthAnim extends AnimHandler {
     public float oldAbsorb = 0f;
     public boolean hInc = true;
     public boolean aInc = true;
-    public boolean reset = false;
 
     public HealthAnim(int length, boolean enabled) {
         super(length, enabled);
@@ -48,6 +47,7 @@ public class HealthAnim extends AnimHandler {
         cur = (Float) data[0];
         max = (Float) data[1];
         absorb = (Float) data[2];
+        updateText();
     }
 
     @Override
@@ -76,6 +76,7 @@ public class HealthAnim extends AnimHandler {
                 reset(pCur, pMax, pAbsorb);
             } else {
                 activate(pCur, pMax, pAbsorb);
+                return;
             }
             cur = pCur;
             max = pMax;
@@ -85,6 +86,7 @@ public class HealthAnim extends AnimHandler {
     }
 
     private void updateText() {
+        System.out.println("Text Updated: " + cur);
         switch (type) {
             case 0 -> healthText = (int) Math.ceil(cur + absorb) + "/" + (int) max;
             case 1 -> {
@@ -121,11 +123,23 @@ public class HealthAnim extends AnimHandler {
 
 
 
-        //Slow: animTime = 15. TODO: Add setting.
+        //Slow: animTime = 15.
         if (animTime < 11) {
             animTime = 10;
         }
 
+    }
+
+    public float getPercent() {
+        return cur / Math.max(absorb+cur, max);
+    }
+
+    public float getPercentE() {
+        return (cur+absorb) / Math.max(absorb+cur, max);
+    }
+
+    public float getPercentA() {
+        return absorb / Math.max(absorb+cur, max);
     }
 
     public static float getPercent(float cur, float max, float absorb) {
@@ -154,8 +168,10 @@ public class HealthAnim extends AnimHandler {
                 reset(data, max, absorb);
             } else {
                 activate(data, max, absorb);
+                return;
             }
             cur = data;
+            updateText();
         }
     }
 
@@ -165,8 +181,10 @@ public class HealthAnim extends AnimHandler {
                 reset(cur, max, data);
             } else {
                 activate(cur, max, data);
+                return;
             }
             absorb = data;
+            updateText();
         }
     }
 
@@ -176,8 +194,10 @@ public class HealthAnim extends AnimHandler {
                 reset(cur, data, absorb);
             } else {
                 activate(cur, data, absorb);
+                return;
             }
             max = data;
+            updateText();
         }
     }
 

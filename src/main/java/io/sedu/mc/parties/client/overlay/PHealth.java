@@ -129,11 +129,11 @@ public class PHealth extends RenderIconTextItem {
     private void renderHealth(int i, PoseStack poseStack, ClientPlayerData id) {
 
         float hB, aB;
-        hB = HealthAnim.getPercent(id.health.cur, id.health.max, id.health.absorb);
+        hB = id.health.getPercent();
         if (id.health.absorb > 0) {
             RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, bAColorTop, bAColorBot);
             RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
-            aB = hB + HealthAnim.getPercentA(id.health.cur, id.health.max, id.health.absorb);
+            aB = hB + id.health.getPercentA();
             rectRNoA(poseStack, i, zPos, hB, colorTop, colorBot); //Health
             rectB(poseStack, i, zPos, hB, aB, colorTopAbsorb, colorBotAbsorb); //Absorb
         } else {
