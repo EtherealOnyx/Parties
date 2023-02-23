@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.setup;
 
-import Util.Render;
+import io.sedu.mc.parties.util.ColorUtils;
 import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.*;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
@@ -28,7 +28,7 @@ public class ClientSetup {
 
     private static final IIngameOverlay control = (gui, poseStack, partialTicks, width, height) -> {
         RenderItem.resetPos();
-        Render.tick();
+        ColorUtils.tick();
     };
 
     public static void init(final FMLClientSetupEvent event) {

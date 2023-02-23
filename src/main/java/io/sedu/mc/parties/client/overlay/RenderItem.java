@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.client.overlay;
 
-import Util.Render;
+import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
@@ -211,22 +211,22 @@ public abstract class RenderItem {
     }
 
     void rect(int i, PoseStack pose, int z, int offset, int startColor, int endColor, int alpha) {
-        Render.rect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor | (alpha << 24), endColor | (alpha << 24));
+        RenderUtils.rect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor | (alpha << 24), endColor | (alpha << 24));
     }
 
     void rect(int i, PoseStack pose, int z, int offset, int startColor, int endColor) {
-        Render.rect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor, endColor);
+        RenderUtils.rect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor, endColor);
     }
     void rectNoA(int i, PoseStack pose, int z, int offset, int startColor, int endColor) {
-        Render.rectNoA(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor, endColor);
+        RenderUtils.rectNoA(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor, endColor);
     }
 
     void rect(int i, PoseStack pose, int z, int offset, int startColor) {
-        Render.rect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor);
+        RenderUtils.rect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor);
     }
 
     public static void rectCO(PoseStack pose, int z, int offset, int l, int t, int r, int b, int startColor, int endColor) {
-        Render.rectNoA(pose.last().pose(), z, l+offset, t+offset, r-offset, b-offset, startColor, endColor);
+        RenderUtils.rectNoA(pose.last().pose(), z, l+offset, t+offset, r-offset, b-offset, startColor, endColor);
     }
 
     void renderTypeText(PoseStack p, ForgeIngameGui gui, Component type, int x, int y) {
@@ -235,32 +235,32 @@ public abstract class RenderItem {
 
     void renderTab(PoseStack p, TabButton b) {
         RenderSystem.enableDepthTest();
-        Render.setColor(getColor());
-        Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 150, TAB_LOC);
-        Render.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x44FFFFFF, 0x88000000);
+        RenderUtils.setRenderColor(getColor());
+        RenderUtils.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 150, TAB_LOC);
+        RenderUtils.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x44FFFFFF, 0x88000000);
         resetColor();
-        Render.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 100 << 24,getColor() | 100 << 24);
+        RenderUtils.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 100 << 24, getColor() | 100 << 24);
 
     }
 
 
     void renderTabHover(PoseStack p, TabButton b) {
         RenderSystem.enableDepthTest();
-        Render.setColor(getColor());
-        Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 255, TAB_LOC);
-        Render.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x66FFFFFF, 0x22FFFFFF);
+        RenderUtils.setRenderColor(getColor());
+        RenderUtils.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 255, TAB_LOC);
+        RenderUtils.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x66FFFFFF, 0x22FFFFFF);
         resetColor();
-        Render.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 200 << 24, getColor());
+        RenderUtils.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 200 << 24, getColor());
     }
 
     void renderTabClicked(PoseStack p, TabButton b) {
         RenderSystem.enableDepthTest();
-        Render.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 110, INNER_LOC);
-        Render.setColor(getColor());
-        Render.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x77FFFFFF, 0x00FFFFFF);
+        RenderUtils.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 110, INNER_LOC);
+        RenderUtils.setRenderColor(getColor());
+        RenderUtils.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x77FFFFFF, 0x00FFFFFF);
         resetColor();
         p.translate(0,0,5);
-        Render.borderRectNoBottom(p.last().pose(), -1, 2, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 255 << 24, getColor() | 150 << 24);
+        RenderUtils.borderRectNoBottom(p.last().pose(), -1, 2, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 255 << 24, getColor() | 150 << 24);
         p.translate(0,0,-5);
     }
 
@@ -304,10 +304,6 @@ public abstract class RenderItem {
 
     static void resetColor() {
         setColor(1f,1f,1f,1f);
-    }
-
-    static float animPos(int currTick, float partialTicks, boolean countingUp, int animLength, float scaleFactor) {
-        return (float) (countingUp ? Math.pow((currTick+partialTicks)/animLength, scaleFactor) : Math.pow((currTick-partialTicks)/animLength, scaleFactor));
     }
 
     protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, MutableComponent text, int outStart, int outEnd, int inStart, int inEnd, int textColor) {

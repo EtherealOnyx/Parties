@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
-import Util.Render;
+import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import net.minecraft.util.Mth;
@@ -22,7 +23,7 @@ public class SliderButton extends SmallButton {
     SliderButton.OnRelease onReleaseAction;
 
     public SliderButton(int color, int w, SliderButton.OnDrag onDrag, SliderButton.OnRelease onRelease, OnTooltip pOnTooltip, float alpha) {
-        super(0, 0, w, "", pButton -> {}, pOnTooltip, 0, 0, Render.getR(color), Render.getG(color), Render.getB(color), alpha);
+        super(0, 0, w, "", pButton -> {}, pOnTooltip, 0, 0, ColorUtils.getR(color), ColorUtils.getG(color), ColorUtils.getB(color), alpha);
         this.onDragAction = onDrag;
         this.onReleaseAction = onRelease;
         this.color = color;
@@ -42,7 +43,7 @@ public class SliderButton extends SmallButton {
     }
 
     public void renderBounds(Matrix4f pose) {
-        Render.sizeRectNoA(pose, leftBound, y+4, boundWidth+width, 1, (color  & 0xfefefe) >> 1);
+        RenderUtils.sizeRectNoA(pose, leftBound, y+4, boundWidth+width, 1, (color  & 0xfefefe) >> 1);
     }
 
     @Override

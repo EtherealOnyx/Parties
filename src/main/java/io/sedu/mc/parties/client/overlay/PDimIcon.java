@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.client.overlay;
 
-import Util.Render;
+import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.config.DimConfig;
@@ -16,6 +16,7 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
+import static io.sedu.mc.parties.util.AnimUtils.animPos;
 
 public class PDimIcon extends RenderSelfItem {
 
@@ -60,17 +61,12 @@ public class PDimIcon extends RenderSelfItem {
 
     private void world(PoseStack poseStack, int pI, ForgeIngameGui gui, ClientPlayerData id) {
         DimConfig.entry(id.dim.dimension, (sprite, color) -> {
-            poseStack.pushPose();
-            poseStack.scale(.25f, .25f, 1f);
-            poseStack.translate(0,0,10f);
 
-            rectScaled(pI, poseStack, 0, -1, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 4f/head.scale);
+            rectScaled(pI, poseStack, zPos, -head.scale, 8, 8, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 1/head.scale);
 
             RenderSystem.setShaderTexture(0, sprite.atlas().location());
             RenderSystem.enableBlend();
-            Gui.blit(poseStack, (int) ((x(pI)<<2)/head.scale), (int) ((y(pI)<<2)/head.scale), 0, 32, 32, sprite);
-
-            poseStack.popPose();
+            Gui.blit(poseStack, (int) ((x(pI))/head.scale), (int) ((y(pI))/head.scale), zPos, 8, 8, sprite);
 
             //Tooltip Render
             if (notEditing() && withinBounds(xNormal(pI), yNormal(pI), 8, 8, 4, scale)) {
@@ -80,59 +76,63 @@ public class PDimIcon extends RenderSelfItem {
 
     }
 
-    void rectScaled(int i, PoseStack pose, int z, int offset, int startColor, int endColor, float scale) {
-        Render.rect(pose.last().pose(), z, ((x(i)+offset)*scale), ((y(i)+offset)*scale), ((x(i)-offset)*scale)+width, ((y(i)-offset)*scale)+height, startColor, endColor);
+    void rectScaled(int i, PoseStack pose, int z, float offset, int width, int height, int startColor, int endColor, float scale) {
+        RenderUtils.rect(pose.last().pose(), z, ((x(i)+offset)*scale), ((y(i)+offset)*scale), ((x(i)-offset)*scale)+width, ((y(i)-offset)*scale)+height, startColor, endColor);
     }
 
 
 
     private void worldAnim(PoseStack poseStack, int pI, ForgeIngameGui gui, ClientPlayerData id, float partialTicks) {
         int currTick = 0;
-        float scale = 3f;
-        float scaleSlow = .75f;
         float translateX = (head.x - x)/head.scale;
         float translateY = (head.y - y)/head.scale;
+        int size;
         float alphaOld = 1f;
         float alphaNew = 0f;
         boolean renderText = false;
+        float offY = 0;
         if (id.dim.animTime > 90) {
             currTick = 10 - (id.dim.animTime - 90); //0-10
-            scale = 3f*animPos(currTick, partialTicks, true, 10, 1);
-            scaleSlow = .75f*animPos(currTick, partialTicks, true, 10, 1.5f);
-            translateX = (head.x - x)/head.scale*(currTick+partialTicks)/10;
-            translateY = (head.y - y)/head.scale*(currTick+partialTicks)/10;
-
+            float curPos = animPos(currTick, partialTicks, true, 10, 2);
+            translateX = (head.x - x)/head.scale*curPos;
+            translateY = (head.y - y)/head.scale*curPos;
+            size = (int) (8 + (24*curPos));
+            offY = (currTick + partialTicks - 5);
+            offY *= -offY;
+            offY += 25;
+            System.out.println("Size: " + size);
         } else if (id.dim.animTime > 10) {
             currTick = id.dim.animTime - 10; //80 - 0
             renderText = true;
             alphaOld = animPos(currTick, partialTicks, false, 80, 1);
             alphaNew = 1f - alphaOld;
+            size = 32;
         } else { //10 - 0
-            scale = 3f*animPos(id.dim.animTime, partialTicks, false, 10, 1);
-            scaleSlow = .75f*animPos(id.dim.animTime, partialTicks, false, 10, 1.5f);
-            translateX = (head.x - x)*(id.dim.animTime-partialTicks)/10;
-            translateY = (head.y - y)*(id.dim.animTime-partialTicks)/10;
+            float curPos = animPos(id.dim.animTime, partialTicks, false, 10, 2);
+            translateX = (head.x - x)/head.scale*curPos;
+            translateY = (head.y - y)/head.scale*curPos;
             alphaOld = 0f;
             alphaNew = 1f;
+            size = (int) (8 + (24*curPos));
         }
+        translateY += offY;
 
         poseStack.pushPose();
-        poseStack.scale(.25f+scaleSlow, .25f+scaleSlow, 1f);
-        poseStack.translate(translateX, translateY, 10);
+        poseStack.translate(translateX, translateY, 0);
         int color, x, y;
         TextureAtlasSprite sprite;
-        x = (int) (x(pI)*(4-scale)/head.scale);
-        y = (int) (y(pI)*(4-scale)/head.scale);
+        x = (int) (x(pI)/head.scale);
+        y = (int) (y(pI)/head.scale);
         if (alphaOld > 0f) {
 
             sprite = DimConfig.sprite(id.dim.oldDimension);
             color = DimConfig.color(id.dim.oldDimension);
             setColor(1f,1f,1f,alphaOld);
-            rectScaled(pI, poseStack, 0, (int) (-head.scale), ((color & 0xfefefe) >> 1) | (int)(255*alphaOld) << 24, color | (int)(255*alphaOld) << 24 , (4 - scale)/head.scale);
+            rectScaled(pI, poseStack, zPos, -head.scale, size,size, ((color & 0xfefefe) >> 1) | (int)(255*alphaOld) << 24, color | (int)(255*alphaOld) << 24 , 1/head.scale);
 
             RenderSystem.setShaderTexture(0, sprite.atlas().location());
             RenderSystem.enableBlend();
-            Gui.blit(poseStack, x, y, 0, 32, 32, sprite);
+            Gui.blit(poseStack, x, y, zPos, size,size, sprite);
 
         }
 
@@ -140,12 +140,12 @@ public class PDimIcon extends RenderSelfItem {
         if (alphaNew > 0f) {
             sprite = DimConfig.sprite(id.dim.dimension);
             setColor(1f,1f,1f,alphaNew);
-            rectScaled(pI, poseStack, 0, (int) (-head.scale), ((color & 0xfefefe) >> 1) | (int)(255*alphaNew) << 24, color | (int)(255*alphaNew) << 24 , (4 - scale)/head.scale);
+            rectScaled(pI, poseStack, zPos, -head.scale, size,size, ((color & 0xfefefe) >> 1) | (int)(255*alphaNew) << 24, color | (int)(255*alphaNew) << 24 , 1/head.scale);
 
 
             RenderSystem.setShaderTexture(0, sprite.atlas().location());
             RenderSystem.enableBlend();
-            Gui.blit(poseStack, x, y, 0, 32, 32, sprite);
+            Gui.blit(poseStack, x, y, zPos, size,size, sprite);
 
         }
         poseStack.popPose();
@@ -181,14 +181,14 @@ public class PDimIcon extends RenderSelfItem {
             transX = -10-(10-(currTick-partialTicks))*4f;
         }
 
+        RenderSystem.enableDepthTest();
         for (int j = 0; j < dim.dimName.size(); j++) {
             poseStack.pushPose();
             if (j % 2 == 1)
-                poseStack.translate(-transX, 0, 10);
+                poseStack.translate(-transX, 0, zPos+10);
             else
-                poseStack.translate(transX, 0, 10);
+                poseStack.translate(transX, 0, zPos+10);
             x = (int) (head.x(partyIndex)-gui.getFont().width(dim.dimName.get(j))/2f)+16;
-            //TODO: Remove hardcoding of 11 for when scaling is allowed.
             y = head.y(partyIndex) + 16 + (j*gui.getFont().lineHeight) - ((gui.getFont().lineHeight*dim.dimName.size()-1)>>1);
            if (alphaPercent > 0f) {
                 gui.getFont().drawShadow(poseStack, dim.dimName.get(j), x, y, color | ((int)(255*alphaPercent) << 24));

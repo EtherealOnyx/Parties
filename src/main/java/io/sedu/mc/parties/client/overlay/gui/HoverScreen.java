@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
-import Util.Render;
+import io.sedu.mc.parties.util.ColorUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
@@ -20,7 +20,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import static Util.Render.tip;
+import static io.sedu.mc.parties.util.RenderUtils.tip;
 import static io.sedu.mc.parties.client.overlay.RenderItem.clickArea;
 
 public class HoverScreen extends Screen {
@@ -74,7 +74,7 @@ public class HoverScreen extends Screen {
             trimmedMessages = (List<GuiMessage<FormattedCharSequence>>) f.get(minecraft.gui.getChat());
         } catch(NoSuchFieldException | IllegalAccessException ignored) {}
 
-        Render.colorCycle = true;
+        ColorUtils.colorCycle = true;
         //TODO: Add 'rearranging' boolean to know when config is in this state or not. helps with 2nd todo.
         int y = Math.max(0, clickArea.t(0) - 10);
         settingsButton = addRenderableWidget(new SmallButton(clickArea.l(0), y, "⚙", p -> doTask(1), tip(this, "Open Party Settings"), .5f, .5f, 1f, .5f));
@@ -341,13 +341,9 @@ public class HoverScreen extends Screen {
                         }
                     }
 
-                    return null;
-                } else {
-                    return null;
                 }
-            } else {
-                return null;
             }
+        return null;
     }
 
     @Override
@@ -437,7 +433,7 @@ public class HoverScreen extends Screen {
 
     @Override
     public void onClose() {
-        Render.colorCycle = false;
+        ColorUtils.colorCycle = false;
         active = false;
         notEditing = false;
         if (isMoving) {

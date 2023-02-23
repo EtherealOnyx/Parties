@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.client.overlay;
 
-import Util.Render;
+import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
@@ -42,7 +42,7 @@ public class PHead extends RenderItem {
             setColor(1f, .5f, .5f, .5f);
         else
             setColor(1f, 1f, 1f, id.alpha);
-        Render.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, id.alpha, 0.5f, id.alpha);
+        RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, id.alpha, 0.5f, id.alpha);
         setup(id.getHead());
         blit(poseStack, x(i), y(i), 32, 32, 32, 32);
         resetColor();

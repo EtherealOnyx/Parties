@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.client.overlay;
 
-import Util.Render;
+import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
@@ -28,7 +28,7 @@ public class PRectD extends RenderItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        Render.sizeRectNoA(poseStack.last().pose(), b.x+9, b.y+5, 0, 14, 14, 0xd3ffff, 0x779fa9);
+        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+9, b.y+5, 0, 14, 14, 0xd3ffff, 0x779fa9);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.client.overlay;
 
-import Util.Render;
+import io.sedu.mc.parties.util.ColorUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
@@ -25,7 +25,7 @@ public class GeneralOptions extends RenderItem {
 
     @Override
     int getColor() {
-        return Render.getRainbowColor();
+        return ColorUtils.getRainbowColor();
     }
 
     @Override

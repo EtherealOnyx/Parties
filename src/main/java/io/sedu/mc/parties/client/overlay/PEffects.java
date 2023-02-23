@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.client.overlay;
 
-import Util.Render;
+import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static Util.Render.sizeRectNoA;
+import static io.sedu.mc.parties.util.RenderUtils.sizeRectNoA;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
@@ -137,10 +137,10 @@ public abstract class PEffects extends RenderSelfItem {
     void start(PoseStack poseStack, int i, int size) {
         poseStack.pushPose();
         if (renderBg)
-            Render.rect(poseStack.last().pose(), -zPos - 1, x(i) - 2, (y(i) - 2),
-                        x(i) + (width * Math.min(size, maxPerRow) >> 1),
-                        -1 + y(i) + (height * (int) Math.ceil((double) Math.min(maxSize, size) / maxPerRow) >> 1),
-                        0x44002024, 0x44002024);
+            RenderUtils.rect(poseStack.last().pose(), -zPos - 1, x(i) - 2, (y(i) - 2),
+                             x(i) + (width * Math.min(size, maxPerRow) >> 1),
+                             -1 + y(i) + (height * (int) Math.ceil((double) Math.min(maxSize, size) / maxPerRow) >> 1),
+                             0x44002024, 0x44002024);
         poseStack.scale(.5f, .5f, 1f);
         RenderSystem.enableDepthTest();
     }

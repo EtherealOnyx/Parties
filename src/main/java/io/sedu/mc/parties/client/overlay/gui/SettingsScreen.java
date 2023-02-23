@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
-import Util.Render;
+import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
@@ -22,8 +23,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static Util.Render.renderBg;
-import static Util.Render.tip;
+import static io.sedu.mc.parties.util.RenderUtils.renderBg;
+import static io.sedu.mc.parties.util.RenderUtils.tip;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 
 public class SettingsScreen extends Screen {
@@ -137,7 +138,7 @@ public class SettingsScreen extends Screen {
 
     @Override
     public void onClose() {
-        Render.colorCycle = false;
+        ColorUtils.colorCycle = false;
         active = false;
         notEditing = true;
         PHead.icon = null;
@@ -227,23 +228,23 @@ public class SettingsScreen extends Screen {
     private void renderShadows(PoseStack poseStack) {
         //renderBg(screenX + modBoxW, screenY + eleBoxH, screenX + screenW, screenY + screenH, screenW - modBoxW, screenH - eleBoxH, 80);
         //Top Shadow
-        Render.rect(poseStack.last().pose(), 0, screenX, screenY + eleBoxH, screenX + screenW, screenY + eleBoxH+10, 0xAA000000, 0x00000000);
+        RenderUtils.rect(poseStack.last().pose(), 0, screenX, screenY + eleBoxH, screenX + screenW, screenY + eleBoxH+10, 0xAA000000, 0x00000000);
         //Left Shadow
         if (modVisible) {
-            Render.horizRect(poseStack.last().pose(), 0, screenX + modBoxW, screenY + eleBoxH, screenX + modBoxW + 10, screenY + screenH - searchBoxH, 0xAA000000, 0x00000000);
+            RenderUtils.horizRect(poseStack.last().pose(), 0, screenX + modBoxW, screenY + eleBoxH, screenX + modBoxW + 10, screenY + screenH - searchBoxH, 0xAA000000, 0x00000000);
         }
         //Bottom Shadow
-        Render.rect(poseStack.last().pose(), 0, screenX, screenY + screenH - 10 - searchBoxH, screenX + screenW, screenY + screenH - searchBoxH, 0x00000000, 0xAA000000);
+        RenderUtils.rect(poseStack.last().pose(), 0, screenX, screenY + screenH - 10 - searchBoxH, screenX + screenW, screenY + screenH - searchBoxH, 0x00000000, 0xAA000000);
 
 
         //Right Shadow
-        Render.horizRect(poseStack.last().pose(), 0, screenX + screenW - 10 - optBoxW, screenY + eleBoxH, screenX + screenW - optBoxW, screenY + screenH - searchBoxH, 0x00000000, 0xAA000000);
+        RenderUtils.horizRect(poseStack.last().pose(), 0, screenX + screenW - 10 - optBoxW, screenY + eleBoxH, screenX + screenW - optBoxW, screenY + screenH - searchBoxH, 0x00000000, 0xAA000000);
         //RenderItem.drawRect(poseStack.last().pose(), 0, screenX + modBoxW, screenY + eleBoxH, screenX + screenW - optBoxW, screenY + screenH - searchBoxH, 0x66000000, 0x66000000);
     }
 
 
     protected void init() {
-        Render.colorCycle = true;
+        ColorUtils.colorCycle = true;
         RenderItem.initUpdater(updater);
         active = true;
         notEditing = false;
@@ -268,17 +269,17 @@ public class SettingsScreen extends Screen {
         assert minecraft != null;
         //General Settings
         tabsOrder.add("general");
-        tabs.put("general", new TabButton(0,0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
-                                          Render.tip(this, new TranslatableComponent("gui.sedparties.name.general")),
+        tabs.put("general", new TabButton(0, 0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
+                                          RenderUtils.tip(this, new TranslatableComponent("gui.sedparties.name.general")),
                                           new GeneralOptions("general").render((ForgeIngameGui) minecraft.gui),
-                                            "Main"
+                                          "Main"
                                           ));
         while (iter.hasNext()) {
             item = iter.next();
             if (item.getValue().isTabRendered()) {
                 tabsOrder.add(item.getKey());
                 tabs.put(item.getKey(), new TabButton(i, 0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
-                                                      Render.tip(this, new TranslatableComponent(item.getValue().translateName())),
+                                                      RenderUtils.tip(this, new TranslatableComponent(item.getValue().translateName())),
                                                       item.getValue().render((ForgeIngameGui) minecraft.gui),
                                                       item.getValue().getType()
 

@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
-import Util.Render;
+import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.util.RenderUtils;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.RenderItem;
@@ -147,7 +148,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
             if (pIsMouseOver)
             {
-                Render.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + pWidth, pTop + pHeight, entryColor.getColor() | 100 << 24, entryColor.getColor());
+                RenderUtils.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + pWidth, pTop + pHeight, entryColor.getColor() | 100 << 24, entryColor.getColor());
                 ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), entryColor.getColor());
                 ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), 0xAAFFFFFF);
             } else {
@@ -181,8 +182,8 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             }
             this.name = new TranslatableComponent("config.sedparties.name." + name);
             this.isEnabled = isEnabled;
-            disable = new SmallButton(0, 0, "✓", pButton -> updateVal(false), Render.tip(s, "Enabled"), .5f, 1f, .5f, .5f);
-            enable = new SmallButton(0, 0, "x", pButton -> updateVal(true), Render.tip(s, "Disabled"), 1f, .5f, .5f, .5f);
+            disable = new SmallButton(0, 0, "✓", pButton -> updateVal(false), RenderUtils.tip(s, "Enabled"), .5f, 1f, .5f, .5f);
+            enable = new SmallButton(0, 0, "x", pButton -> updateVal(true), RenderUtils.tip(s, "Disabled"), 1f, .5f, .5f, .5f);
             enable.visible = !isEnabled;
             disable.visible = isEnabled;
             internal = name;
@@ -491,9 +492,9 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         }
 
         private void updateIndValues() {
-            rI = Render.getRI(value);
-            gI = Render.getGI(value);
-            bI = Render.getBI(value);
+            rI = ColorUtils.getRI(value);
+            gI = ColorUtils.getGI(value);
+            bI = ColorUtils.getBI(value);
             r.setValue(String.valueOf(rI));
             g.setValue(String.valueOf(gI));
             b.setValue(String.valueOf(bI));
@@ -572,8 +573,8 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             this.r.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
             this.g.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
             this.b.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-            Render.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 16, pTop + 3, 0, 10,10, (color  & 0xfefefe) >> 1, color);
-            Render.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 15, pTop + 4, 8, 8, value);
+            RenderUtils.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 16, pTop + 3, 0, 10, 10, (color  & 0xfefefe) >> 1, color);
+            RenderUtils.sizeRectNoA(pPoseStack.last().pose(), pLeft + pWidth - 15, pTop + 4, 8, 8, value);
         }
     }
 
@@ -626,10 +627,10 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
                 isDirty = false;
             }
             minecraft.font.draw(pPoseStack, name, x, pTop + 4, entryColor.getColor());
-            Render.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + (pWidth>>1), pTop + 1, entryColor.getColor(), entryColor.getColor() | 255 << 24);
-            Render.horizRect(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop, pLeft + pWidth, pTop + 1, entryColor.getColor() | 255 << 24, entryColor.getColor());
-            Render.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop+15, pLeft + (pWidth>>1), pTop + 16, entryColor.getColor(), entryColor.getColor() | 255 << 24);
-            Render.horizRect(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop+15, pLeft + pWidth, pTop + 16, entryColor.getColor() | 255 << 24, entryColor.getColor());
+            RenderUtils.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + (pWidth>>1), pTop + 1, entryColor.getColor(), entryColor.getColor() | 255 << 24);
+            RenderUtils.horizRect(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop, pLeft + pWidth, pTop + 1, entryColor.getColor() | 255 << 24, entryColor.getColor());
+            RenderUtils.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop+15, pLeft + (pWidth>>1), pTop + 16, entryColor.getColor(), entryColor.getColor() | 255 << 24);
+            RenderUtils.horizRect(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop+15, pLeft + pWidth, pTop + 16, entryColor.getColor() | 255 << 24, entryColor.getColor());
         }
     }
 

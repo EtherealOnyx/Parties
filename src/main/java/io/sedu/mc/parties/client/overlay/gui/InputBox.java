@@ -29,8 +29,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static Util.Render.borderRectNoA;
-import static Util.Render.sizeRect;
+import static io.sedu.mc.parties.util.RenderUtils.borderRectNoA;
+import static io.sedu.mc.parties.util.RenderUtils.sizeRect;
 
 public class InputBox extends AbstractWidget implements Widget, GuiEventListener {
 
