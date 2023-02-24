@@ -8,8 +8,8 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 public class PRectO extends RenderSelfItem {
 
 
-    public PRectO(String name, int x, int y, int w, int h) {
-        super(name, x, y, w, h);
+    public PRectO(String name) {
+        super(name);
 
     }
 
@@ -46,11 +46,17 @@ public class PRectO extends RenderSelfItem {
         width = Mth.clamp(width, 0, maxW());
         height = Mth.clamp(height, 0, maxH());
     }
+
+    @Override
+    void setDefaults() {
+
+    }
+
     protected int maxH() {
-        return Math.max(clickArea.y + clickArea.h(), frameH) - y;
+        return frameEleH - y;
     }
     protected int maxW() {
-        return Math.max(clickArea.x + clickArea.w(), frameW) - x;
+        return frameEleW - x;
     }
 
 

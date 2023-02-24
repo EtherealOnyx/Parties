@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.client.overlay.effects;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
+import io.sedu.mc.parties.client.overlay.PEffectsBoth;
 import net.minecraft.world.effect.MobEffect;
 
 import java.util.*;
@@ -15,30 +16,24 @@ public class EffectHolder {
     List<Integer> sortedEffectBene = new ArrayList<>();
     List<Integer> sortedEffectBad = new ArrayList<>();
 
-    public static boolean prioDur = false;
-    public static int maxAll;
-    public static int dLim;
-    public static int bLim;
-    public static boolean debuffFirst = true;
-
     public static void setValues(int buff, int debuff, boolean dFirst) {
-        bLim = buff;
-        dLim = debuff;
-        debuffFirst = dFirst;
+        PEffectsBoth.bLim = buff;
+        PEffectsBoth.dLim = debuff;
+        PEffectsBoth.debuffFirst = dFirst;
     }
 
     public EffectHolder() {
     }
 
     public static void updatebLim(int data) {
-        bLim = data;
-        dLim = maxAll - 1 - data;
+        PEffectsBoth.bLim = data;
+        PEffectsBoth.dLim = PEffectsBoth.maxAll - 1 - data;
         ClientPlayerData.markEffectsDirty();
     }
 
     public static void updatedLim(int data) {
-        dLim = data;
-        bLim = maxAll - 1 - data;
+        PEffectsBoth.dLim = data;
+        PEffectsBoth.bLim = PEffectsBoth.maxAll - 1 - data;
         ClientPlayerData.markEffectsDirty();
     }
 
@@ -113,7 +108,7 @@ public class EffectHolder {
     }
 
     public void refresh() {
-        if (prioDur)
+        if (PEffectsBoth.prioDur)
             sortAll();
         else
             sortRefresh();
@@ -121,39 +116,39 @@ public class EffectHolder {
 
     private void sortRefresh() {
         sortedEffectAll.clear();
-        if (sortedEffectBad.size() + sortedEffectBene.size() > maxAll) {
+        if (sortedEffectBad.size() + sortedEffectBene.size() > PEffectsBoth.maxAll) {
             int mx;
-            if (debuffFirst) {
-                mx = Math.max(dLim, (maxAll - sortedEffectBene.size())-1);
+            if (PEffectsBoth.debuffFirst) {
+                mx = Math.max(PEffectsBoth.dLim, (PEffectsBoth.maxAll - sortedEffectBene.size())-1);
                 for(int i = 0; i < mx && i < sortedEffectBad.size(); i++) {
                     sortedEffectAll.add(sortedEffectBad.get(i));
                 }
-                for(int i = 0; i < bLim && i < sortedEffectBene.size(); i++) {
+                for(int i = 0; i < PEffectsBoth.bLim && i < sortedEffectBene.size(); i++) {
                     sortedEffectAll.add(sortedEffectBene.get(i));
                 }
                 for(int i = mx; i < sortedEffectBad.size(); i++) {
                     sortedEffectAll.add(sortedEffectBad.get(i));
                 }
-                for(int i = bLim; i < sortedEffectBene.size(); i++) {
+                for(int i = PEffectsBoth.bLim; i < sortedEffectBene.size(); i++) {
                     sortedEffectAll.add(sortedEffectBene.get(i));
                 }
             } else {
-                mx = Math.max(bLim, (maxAll - sortedEffectBad.size())-1);
+                mx = Math.max(PEffectsBoth.bLim, (PEffectsBoth.maxAll - sortedEffectBad.size())-1);
                 for(int i = 0; i < mx && i < sortedEffectBene.size(); i++) {
                     sortedEffectAll.add(sortedEffectBene.get(i));
                 }
-                for(int i = 0; i < dLim && i < sortedEffectBad.size(); i++) {
+                for(int i = 0; i < PEffectsBoth.dLim && i < sortedEffectBad.size(); i++) {
                     sortedEffectAll.add(sortedEffectBad.get(i));
                 }
                 for(int i = mx; i < sortedEffectBene.size(); i++) {
                     sortedEffectAll.add(sortedEffectBene.get(i));
                 }
-                for(int i = dLim; i < sortedEffectBad.size(); i++) {
+                for(int i = PEffectsBoth.dLim; i < sortedEffectBad.size(); i++) {
                     sortedEffectAll.add(sortedEffectBad.get(i));
                 }
             }
         } else {
-            if (debuffFirst) {
+            if (PEffectsBoth.debuffFirst) {
                 sortedEffectAll.addAll(sortedEffectBad);
                 sortedEffectAll.addAll(sortedEffectBene);
             } else {

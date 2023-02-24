@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 public class PName extends RenderItem {
     public static ItemStack nameTag = null;
@@ -14,9 +15,10 @@ public class PName extends RenderItem {
     int color;
     private int length = 16;
 
-    public PName(String name, int x, int y, int color) {
-        super(name, x, y, 0, 9);//Minecraft font is height of 9.
-        this.color = color;
+    public PName(String name) {
+        super(name);
+        width = 0;
+        height = 9;//Minecraft font is height of 9.
     }
 
     @Override
@@ -62,6 +64,18 @@ public class PName extends RenderItem {
     @Override
     public void setMaxTextSize(int data) {
         this.length = data;
+    }
+
+    @Override
+    void setDefaults() {
+        OverlayRegistry.enableOverlay(item, true);
+        textShadow = true;
+        this.color = 0xddf3ff;
+        this.length = 16;
+        x = 46;
+        y = 9;
+        zPos = 0;
+        scale = 1f;
     }
 
 }

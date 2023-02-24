@@ -13,14 +13,6 @@ public abstract class RenderSelfItem extends RenderItem {
         super(name);
     }
 
-    public RenderSelfItem(String name, int x, int y) {
-        super(name, x, y);
-    }
-
-    public RenderSelfItem(String name, int x, int y, int width, int height) {
-        super(name, x, y, width, height);
-    }
-
     abstract void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
 
     abstract void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,

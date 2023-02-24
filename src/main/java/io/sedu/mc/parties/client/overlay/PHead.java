@@ -9,15 +9,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 public class PHead extends RenderItem {
 
     public static ItemStack icon = null;
 
 
-    public PHead(String name, int x, int y) {
-        super(name, x, y, 32, 32);
+    public PHead(String name) {
+        super(name);
         PDimIcon.head = this;
+        width = 32;
+        height = 32;
     }
 
     @Override
@@ -33,6 +36,15 @@ public class PHead extends RenderItem {
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+8, b.y+3, 0);
+    }
+
+    @Override
+    void setDefaults() {
+        OverlayRegistry.enableOverlay(item, true);
+        x = 8;
+        y = 8;
+        zPos = 0;
+        scale = 1f;
     }
 
     @Override
@@ -53,8 +65,8 @@ public class PHead extends RenderItem {
         ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
         c.addTitleEntry("display");
         c.addBooleanEntry("display", isEnabled());
-        c.addSliderEntry("xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - (int)(width*scale)), this.x);
-        c.addSliderEntry("ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(height*scale)), this.y);
+        c.addSliderEntry("xpos", 0, () -> Math.max(0, frameEleW - frameX - (int)(width*scale)), this.x);
+        c.addSliderEntry("ypos", 0, () -> Math.max(0, frameEleH - frameY - (int)(height*scale)), this.y);
         c.addSliderEntry("zpos", 0, () -> 10, zPos);
         c.addSliderEntry("scale", 1, () -> 3, getScale(), true);
         return c;

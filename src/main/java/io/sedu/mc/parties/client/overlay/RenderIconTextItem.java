@@ -9,33 +9,14 @@ public abstract class RenderIconTextItem extends RenderSelfItem {
     int textX;
     int textY;
     boolean textAttached;
-    boolean textEnabled = true;
-    boolean iconEnabled = true;
+    boolean textEnabled;
+    boolean iconEnabled;
 
 
-    public RenderIconTextItem(String name, int x, int y, int textX, int textY, int textColor) {
-        super(name, x, y);
-        this.textX = textX;
-        this.textY = textY;
-        color = textColor;
-        textAttached = false;
 
-    }
 
-    public RenderIconTextItem(String name, int x, int y, int textColor) {
-        super(name, x, y);
-        textX = 0;
-        textY = 0;
-        color = textColor;
-        textAttached = true;
-    }
-
-    public RenderIconTextItem(String name, int x, int y, int width, int height, int textColor, boolean attached) {
-        super(name, x, y, width, height);
-        textX = 0;
-        textY = 0;
-        color = textColor;
-        textAttached = attached;
+    public RenderIconTextItem(String name) {
+        super(name);
     }
 
     public int tX(int pOffset) {

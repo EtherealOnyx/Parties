@@ -13,6 +13,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
@@ -24,8 +25,11 @@ public class PDimIcon extends RenderSelfItem {
     protected static PHead head = null;
     private boolean renderText = true;
 
-    public PDimIcon(String name, int x, int y) {
-        super(name, x, y, 32, 32);
+    public PDimIcon(String name) {
+        super(name);
+        width = 8;
+        height = 8;
+        scale = 1f;
     }
 
     @Override
@@ -62,14 +66,14 @@ public class PDimIcon extends RenderSelfItem {
     private void world(PoseStack poseStack, int pI, ForgeIngameGui gui, ClientPlayerData id) {
         DimConfig.entry(id.dim.dimension, (sprite, color) -> {
 
-            rectScaled(pI, poseStack, zPos, -head.scale, 8, 8, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 1/head.scale);
+            rectScaled(pI, poseStack, zPos, -head.scale, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 1/head.scale);
 
             RenderSystem.setShaderTexture(0, sprite.atlas().location());
             RenderSystem.enableBlend();
-            Gui.blit(poseStack, (int) ((x(pI))/head.scale), (int) ((y(pI))/head.scale), zPos, 8, 8, sprite);
+            Gui.blit(poseStack, (int) ((x(pI))/head.scale), (int) ((y(pI))/head.scale), zPos, width, height, sprite);
 
             //Tooltip Render
-            if (notEditing() && withinBounds(xNormal(pI), yNormal(pI), 8, 8, 4, scale)) {
+            if (notEditing() && withinBounds(xNormal(pI), yNormal(pI), width, height, 4, scale)) {
                 renderTooltip(poseStack, gui, 10, 0, id.dim.dimNorm, (color & 0xfefefe) >> 1, color, 0, (color & 0xfefefe) >> 1, color);
             }
         });
@@ -77,6 +81,10 @@ public class PDimIcon extends RenderSelfItem {
     }
 
     void rectScaled(int i, PoseStack pose, int z, float offset, int width, int height, int startColor, int endColor, float scale) {
+        RenderUtils.rect(pose.last().pose(), z, ((x(i)+offset)*scale), ((y(i)+offset)*scale), ((x(i)-offset)*scale)+width, ((y(i)-offset)*scale)+height, startColor, endColor);
+    }
+
+    void rectScaled(int i, PoseStack pose, int z, float offset, int startColor, int endColor, float scale) {
         RenderUtils.rect(pose.last().pose(), z, ((x(i)+offset)*scale), ((y(i)+offset)*scale), ((x(i)-offset)*scale)+width, ((y(i)-offset)*scale)+height, startColor, endColor);
     }
 
@@ -204,8 +212,8 @@ public class PDimIcon extends RenderSelfItem {
         c.addBooleanEntry("tdisplay", renderText);
         c.addBooleanEntry("danim", DimAnim.animActive);
         c.addTitleEntry("position");
-        c.addSliderEntry("xpos", 0, () -> Math.max(clickArea.r(0), frameX + frameW) - frameW + 32, this.x);
-        c.addSliderEntry("ypos", 0, () -> Math.max(clickArea.b(0), frameY + frameH) - frameY + 32, this.y);
+        c.addSliderEntry("xpos", 0, () -> frameEleW - frameX - 8, this.x);
+        c.addSliderEntry("ypos", 0, () -> frameEleH - frameY - 8, this.y);
         c.addSliderEntry("zpos", 0, () -> 10, zPos);
 
 
@@ -231,6 +239,17 @@ public class PDimIcon extends RenderSelfItem {
 
     @Override
     protected void updateValues() {
+        //TODO: Add to here.
+    }
+
+    @Override
+    void setDefaults() {
+        OverlayRegistry.enableOverlay(item, true);
+        renderText = true;
+        DimAnim.animActive = true;
+        x = 5;
+        y = 33;
+        zPos = 1;
     }
 
 }

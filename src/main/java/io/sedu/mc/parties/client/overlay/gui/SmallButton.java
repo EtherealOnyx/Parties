@@ -25,6 +25,12 @@ public class SmallButton extends Button {
 
     }
 
+    public void setColor(float r, float g, float b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+
     public SmallButton(int pX, int pY, String m, OnPress pOnPress, OnTooltip pOnTooltip, float r, float g, float b, float a) {
         super(pX, pY, 10,10, new TextComponent(m), pOnPress, pOnTooltip);
         this.r = r;

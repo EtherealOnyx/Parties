@@ -3,16 +3,20 @@ package io.sedu.mc.parties.util;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
+import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
+
+import static io.sedu.mc.parties.client.overlay.RenderItem.*;
 
 public class RenderUtils {
     public static Button.OnTooltip tip(Screen s, String t) {
@@ -33,6 +37,20 @@ public class RenderUtils {
     }
 
     public static Button.OnTooltip tip(SettingsScreen s, TranslatableComponent tC) {
+        return new Button.OnTooltip() {
+            private final Component text = tC;
+
+            public void onTooltip(Button b, PoseStack p, int mX, int mY) {
+                if (b.active)
+                    s.renderTooltip(p, text, mX, mY+16);
+            }
+
+            public void narrateTooltip(Consumer<Component> p_169456_) {
+                p_169456_.accept(this.text);
+            }
+        };
+    }
+    public static Button.OnTooltip tip(SettingsScreen s, MutableComponent tC) {
         return new Button.OnTooltip() {
             private final Component text = tC;
 
@@ -123,10 +141,10 @@ public class RenderUtils {
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
         buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(mat, x+width,    y, 0).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat,  x,    y, 0).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat,  x, y+height, 0).color(  startRed,   startGreen,   startBlue,startAlpha).endVertex();
-        buffer.vertex(mat, x+width, y+height, 0).color(  startRed,   startGreen,   startBlue,startAlpha).endVertex();
+        buffer.vertex(mat, x+width,    y, z).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  x,    y, z).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.vertex(mat,  x, y+height, z).color(  startRed,   startGreen,   startBlue,startAlpha).endVertex();
+        buffer.vertex(mat, x+width, y+height, z).color(  startRed,   startGreen,   startBlue,startAlpha).endVertex();
         tessellator.end();
 
         RenderSystem.disableBlend();
@@ -156,6 +174,27 @@ public class RenderUtils {
         buffer.vertex(mat,  x+offset,    y+offset, z).color(startRed, startGreen, startBlue, 1f).endVertex();
         buffer.vertex(mat,  x+offset, y+height-offset, z).color(  endRed,   endGreen,   endBlue,1f).endVertex();
         buffer.vertex(mat, x+width-offset, y+height-offset, z).color(  endRed,   endGreen,   endBlue,1f).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+
+    public static void offRect(Matrix4f mat, float x, float y, int z, int offset, float width, float height, int color)
+    {
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.enableDepthTest();
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, x+width-offset,    y+offset, z).color(color).endVertex();
+        buffer.vertex(mat,  x+offset,    y+offset, z).color(color).endVertex();
+        buffer.vertex(mat,  x+offset, y+height-offset, z).color(color).endVertex();
+        buffer.vertex(mat, x+width-offset, y+height-offset, z).color(color).endVertex();
         tessellator.end();
 
         RenderSystem.disableBlend();
@@ -477,6 +516,37 @@ public class RenderUtils {
         RenderUtils.sizeRect(pose, x - thickness - offset, y - thickness - offset, 0, width + ((thickness + offset)<<1), thickness, colorStart, colorStart);
         RenderUtils.sizeRect(pose, x - thickness - offset, y - (offset), 0, thickness, height + offset, colorStart, colorEnd);
         RenderUtils.sizeRect(pose, x + width + offset, y - (offset), 0, thickness, height + offset, colorStart, colorEnd);
+    }
+
+
+    public static void renderClickableArea(PoseStack poseStack) {
+
+        for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
+            clickArea.rect(i, poseStack, -2, -2, ColorUtils.getRainbowColor() | 150 << 24);
+    }
+
+    public static void renderFrame(PoseStack poseStack) {
+        int index = ClientPlayerData.playerOrderedList.size()-1;
+        RenderUtils.sizeRect(poseStack.last().pose(),  frameX, frameY, -2, frameEleW + framePosW*index,
+                             frameEleH + framePosH*index,
+                             ColorUtils.getRainbowColor() | 75 << 24);
+    }
+
+    public static void renderFrameOutline(PoseStack poseStack) {
+        for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
+            RenderUtils.borderRect(poseStack.last().pose(), -1, 1, frameX + framePosW*i, frameY + framePosH*i,
+                                   frameEleW,
+                                   frameEleH, 0xFFFFFFFF);
+    }
+
+    public static void renderFullArea(PoseStack poseStack, boolean b) {
+        for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++) {
+            RenderUtils.borderRect(poseStack.last().pose(), -1, 1, frameX + framePosW*i, frameY + framePosH*i,
+                                   frameEleW, frameEleH,
+                                   0xFFFFFFFF);
+            if (b) clickArea.rect(i, poseStack, 0, -1, ColorUtils.getRainbowColor() | 150 << 24);
+        }
+
     }
 
 }

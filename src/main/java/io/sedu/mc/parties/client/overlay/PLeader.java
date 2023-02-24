@@ -7,15 +7,17 @@ import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
 public class PLeader extends RenderItem {
 
-    public PLeader(String name, int x, int y) {
-        super(name, x, y, 9, 9);
-        zPos = 1;
+    public PLeader(String name) {
+        super(name);
+        width = 9;
+        height = 9;
     }
 
     @Override
@@ -58,5 +60,14 @@ public class PLeader extends RenderItem {
         addDisplaySettings(c);
         addPositionalSettings(c, true, true, true);
         return c;
+    }
+
+    @Override
+    void setDefaults() {
+        OverlayRegistry.enableOverlay(item, true);
+        x = 34;
+        y = 33;
+        zPos = 2;
+        scale = 1f;
     }
 }

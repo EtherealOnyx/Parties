@@ -10,6 +10,7 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.ArrayList;
 
@@ -18,8 +19,9 @@ import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.*;
 public class PLevelBar extends RenderIconTextItem {
 
 
-    public PLevelBar(String name, int x, int y, int width, int height, int textColor) {
-        super(name, x, y, width, height, textColor, true);
+    public PLevelBar(String name) {
+        super(name);
+        height = 5;
     }
 
 
@@ -152,8 +154,8 @@ public class PLevelBar extends RenderIconTextItem {
 
         c.addTitleEntry("icon");
         c.addBooleanEntry("idisplay", iconEnabled);
-        c.addSliderEntry("xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - (int)(width*scale)), this.x, true);
-        c.addSliderEntry("ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(height*scale)), this.y, true);
+        c.addSliderEntry("xpos", 0, () -> Math.max(0, frameEleW - (int)(width*scale)), this.x, true);
+        c.addSliderEntry("ypos", 0, () -> Math.max(0, frameEleH - (int)(height*scale)), this.y, true);
         c.addSliderEntry("width", 1, this::maxW, width, true);
 
         c.addTitleEntry("text");
@@ -162,14 +164,14 @@ public class PLevelBar extends RenderIconTextItem {
         c.addColorEntry("tcolor", color);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
-        entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX));
-        entries.add(c.addSliderEntry("ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY));
+        entries.add(c.addSliderEntry("xtpos", 0, () -> frameEleW, textX));
+        entries.add(c.addSliderEntry("ytpos", 0, () -> frameEleH - (int)(minecraft.font.lineHeight*scale), textY));
         toggleTextAttach(entries);
         return c;
     }
 
     protected int maxW() {
-        return (int) Math.min(Math.ceil((Math.max(clickArea.x + clickArea.w(), frameW) - x)/scale), 364);
+        return (int) Math.min(Math.ceil(frameEleW/scale), 364);
     }
 
     @Override
@@ -179,6 +181,22 @@ public class PLevelBar extends RenderIconTextItem {
         width = Mth.clamp(width, 0, maxW());
     }
 
+    @Override
+    void setDefaults() {
+        OverlayRegistry.enableOverlay(item, true);
+        scale = 1f;
+        zPos = 0;
+        iconEnabled = true;
+        x = 4;
+        y = 44;
+        width = 40;
+        textEnabled = true;
+        textShadow = true;
+        color = 0x80ff8b;
+        textAttached = true;
+        textX = 0;
+        textY = 0;
+    }
 
     //TODO: Modify getConfigOptions to send a variable too.
     //TODO: When true, add only refresh sliders to config options.

@@ -38,13 +38,12 @@ public abstract class PEffects extends RenderSelfItem {
     boolean renderText;
     boolean renderBg;
 
+    private int xOff;
+    private int yOff;
 
-    public PEffects(String name, int x, int y, int width, int height, int max, int row) {
-        super(name, x, y, width, height);
-        maxSize = max;
-        maxPerRow = row;
-        renderText = true;
-        renderBg = true;
+
+    public PEffects(String name) {
+        super(name);
     }
 
     @Override
@@ -67,9 +66,9 @@ public abstract class PEffects extends RenderSelfItem {
     boolean renderOverflow(ForgeIngameGui gui, PoseStack poseStack, int i, int iX, int iY, float partialTicks) {
 
         drawOverflowText(gui, poseStack,
-                         (int) ((rX(i, iX)+2)/scale), (int) ((rY(i, iY)+4)/scale),
+                         (int) ((rX(i, iX))/scale)+3, (int) ((rY(i, iY))/scale)+3,
                          (int) Mth.clamp((255*(float) (.5f + Math.sin((gui.getGuiTicks() + partialTicks) / 4f) / 2f)), 10, 245));
-        return (notEditing() && withinBounds(rX(i, iX), rY(i, iY),13, 13, 1, scale));
+        return (notEditing() && withinBounds((int) rX(i, iX), (int) rY(i, iY), 13, 13, 1, scale));
     }
 
     void drawOverflowText(ForgeIngameGui gui, PoseStack p, int x, int y, int alpha) {
@@ -120,7 +119,7 @@ public abstract class PEffects extends RenderSelfItem {
             scol = 0xFFFFFF;
         }
 
-        if (notEditing() && withinBounds(rX(i, iX), rY(i, iY), 13, 13, 1, scale)) {
+        if (notEditing() && withinBounds((int) rX(i, iX), (int) rY(i, iY), 13, 13, 1, scale)) {
             poseStack.pushPose();
             poseStack.scale(2f,2f,1f);
             List<ColorComponent> list = new ArrayList<>();
@@ -137,9 +136,9 @@ public abstract class PEffects extends RenderSelfItem {
     void start(PoseStack poseStack, int i, int size) {
         poseStack.pushPose();
         if (renderBg)
-            RenderUtils.rect(poseStack.last().pose(), -zPos - 1, x(i) - 2, (y(i) - 2),
-                             x(i) + (width * Math.min(size, maxPerRow) >> 1),
-                             -1 + y(i) + (height * (int) Math.ceil((double) Math.min(maxSize, size) / maxPerRow) >> 1),
+            RenderUtils.rect(poseStack.last().pose(), -zPos - 1, x(i) - 2, y(i),
+                             x(i) + (width * Math.min(size, maxPerRow) >> 1) + 2,
+                             y(i) + (height * (int) Math.ceil((double) Math.min(maxSize, size) / maxPerRow) >> 1),
                              0x44002024, 0x44002024);
         poseStack.scale(.5f, .5f, 1f);
         RenderSystem.enableDepthTest();
@@ -166,19 +165,32 @@ public abstract class PEffects extends RenderSelfItem {
     }
 
     private int sX(int pI, int bI) {
-        return (int) (((frameW<<1)*pI+((x+frameX)<<1))/scale +width*bI);
+        return (int) (((framePosW<<1)*pI+((x+frameX)<<1))/scale +width*bI) + xOff/2;
     }
 
-    private int rX(int pI, int bI) {
-        return (int) (frameW*pI+x+frameX + (width/2*scale)*bI);
+    private float rX(int pI, int bI) {
+        return (framePosW*pI+x+frameX + (width/2f*scale)*bI);
     }
 
     private int sY(int pI, int bI) {
-        return (int) (((frameH<<1)*pI+((y+frameY)<<1))/scale +height*bI);
+        return (int) (((framePosH<<1)*pI+((y+frameY)<<1))/scale +height*bI) + yOff/2;
     }
 
-    private int rY(int pI, int bI) {
-        return (int) (frameH*pI+(y+frameY)+(height/2*scale)*bI);
+    private float rY(int pI, int bI) {
+        return framePosH*pI+(y+frameY)+(height/2f*scale)*bI;
+    }
+
+
+    protected void setWidth(Integer d) {
+        this.width = d;
+        this.xOff = (width-26)/2;
+
+    }
+
+
+    protected void setHeight(Integer d) {
+        this.height = d;
+        this.yOff = (height-26)/2;
     }
 
     @Override
@@ -190,8 +202,8 @@ public abstract class PEffects extends RenderSelfItem {
         c.addSliderEntry("bsize", 1, () -> 4, borderSize);
         getColorEntry(c);
         c.addTitleEntry("position");
-        c.addSliderEntry("xpos", 0, () -> Math.max(clickArea.r(0), frameX + frameW) - frameW + 32, this.x);
-        c.addSliderEntry("ypos", 0, () -> Math.max(clickArea.b(0), frameY + frameH) - frameY + 32, this.y);
+        c.addSliderEntry("xpos", 0, () -> frameEleW + 32, this.x);
+        c.addSliderEntry("ypos", 0, () -> frameEleH + 32, this.y);
         c.addSliderEntry("zpos", 0, () -> 10, zPos);
         c.addSliderEntry("scale", 1, () -> 3, getScale());
 

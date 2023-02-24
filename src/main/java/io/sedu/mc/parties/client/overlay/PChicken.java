@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.ArrayList;
 
@@ -18,8 +19,10 @@ import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 public class PChicken extends RenderIconTextItem {
 
 
-    public PChicken(String name, int x, int y, int textColor) {
-        super(name, x, y, 9, 9, textColor, true);
+    public PChicken(String name) {
+        super(name);
+        width = 9;
+        height = 9;
     }
 
     @Override
@@ -130,6 +133,22 @@ public class PChicken extends RenderIconTextItem {
         entries.add(c.addSliderEntry("ytpos", 0, () -> this.maxY() - minecraft.font.lineHeight, textY));
         toggleTextAttach(entries);
         return c;
+    }
+
+    @Override
+    void setDefaults() {
+        OverlayRegistry.enableOverlay(item, true);
+        scale = 1f;
+        zPos = 0;
+        iconEnabled = true;
+        x = 143;
+        y = 19;
+        textEnabled = true;
+        textShadow = false;
+        color = 0xddf3ff;
+        textAttached = true;
+        textX = 0;
+        textY = 0;
     }
 
 }

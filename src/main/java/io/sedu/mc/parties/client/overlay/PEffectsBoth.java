@@ -2,7 +2,6 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -12,6 +11,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,14 +21,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PEffectsBoth extends PEffects {
 
 
+    public static int maxAll;
+    public static boolean prioDur = false;
+    public static int dLim;
+    public static int bLim;
+    public static boolean debuffFirst = true;
 
-    public PEffectsBoth(String name, int x, int y, int width, int height, int max, int row) {
-        super(name, x, y, width, height, max, row);
+    public PEffectsBoth(String name) {
+        super(name);
         updateMax();
     }
 
     private void updateMax() {
-        EffectHolder.maxAll = maxSize;
+        maxAll = maxSize;
     }
 
     @Override
@@ -101,28 +106,28 @@ public class PEffectsBoth extends PEffects {
         sliders.put("rowmax", c.addSliderWithUpdater("rowmax", 1, () -> maxSize, maxPerRow, () -> updateAffectedSliders(sliders), false));
         sliders.put("totalmax", c.addSliderWithUpdater("totalmax", maxPerRow, Registry.MOB_EFFECT::size, maxSize, () -> updateAffectedSliders(sliders), false));
 
-        c.addBooleanEntry("bsep", EffectHolder.prioDur, () -> toggleLimSliders(entries));
+        c.addBooleanEntry("bsep", prioDur, () -> toggleLimSliders(entries));
         c.addSpaceEntry();
         c.addTitleEntry("sepe");
-        entries.add(c.addBooleanEntry("dfirst", EffectHolder.debuffFirst));
+        entries.add(c.addBooleanEntry("dfirst", debuffFirst));
 
-        ConfigOptionsList.SliderEntry sE = c.addSliderWithUpdater("blim", 0, () -> Math.max(0, maxSize - 1), EffectHolder.bLim, () -> updateLimSliders(sliders), false);
+        ConfigOptionsList.SliderEntry sE = c.addSliderWithUpdater("blim", 0, () -> Math.max(0, maxSize - 1), bLim, () -> updateLimSliders(sliders), false);
         entries.add(sE);
         sliders.put("blim", sE);
-        sE = c.addSliderWithUpdater("dlim", 0, () -> Math.max(0, maxSize - 1), EffectHolder.dLim, () -> updateLimSliders(sliders), false);
+        sE = c.addSliderWithUpdater("dlim", 0, () -> Math.max(0, maxSize - 1), dLim, () -> updateLimSliders(sliders), false);
         entries.add(sE);
         sliders.put("dlim", sE);
     }
 
     private void toggleLimSliders(ArrayList<ConfigOptionsList.Entry> entries) {
-        entries.forEach(entry -> entry.setVisible(!EffectHolder.prioDur));
+        entries.forEach(entry -> entry.setVisible(!prioDur));
     }
 
     private void updateLimSliders(HashMap<String, ConfigOptionsList.SliderEntry> sliders) {
-        EffectHolder.bLim = Math.max(0, EffectHolder.bLim);
-        EffectHolder.dLim = Math.max(0, maxSize - 1 - EffectHolder.bLim);
-        sliders.computeIfPresent("dlim", ((s, sliderEntry) -> sliderEntry.forceUpdate(EffectHolder.dLim)));
-        sliders.computeIfPresent("blim", ((s, sliderEntry) -> sliderEntry.forceUpdate(EffectHolder.bLim)));
+        bLim = Math.max(0, bLim);
+        dLim = Math.max(0, maxSize - 1 - bLim);
+        sliders.computeIfPresent("dlim", ((s, sliderEntry) -> sliderEntry.forceUpdate(dLim)));
+        sliders.computeIfPresent("blim", ((s, sliderEntry) -> sliderEntry.forceUpdate(bLim)));
     }
 
     @Override
@@ -143,4 +148,28 @@ public class PEffectsBoth extends PEffects {
         this.maxSize = data;
         updateMax();
     }
+
+    @Override
+    void setDefaults() {
+        OverlayRegistry.enableOverlay(item, true);
+        renderText = true;
+        borderSize = 1;
+        beneColor = 0xa9e5ff;
+        badColor = 0xffa9a9;
+        flashColor = 0xffffff;
+        x = 46;
+        y = 41;
+        zPos = 0;
+        scale = 1f;
+        renderBg = true;
+        width = 30;
+        height = 44;
+        maxPerRow = 8;
+        maxSize = 8;
+        prioDur = false;
+        debuffFirst = true;
+        bLim = 3;
+        dLim = 4;
+    }
+
 }

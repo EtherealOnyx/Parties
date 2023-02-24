@@ -1,16 +1,18 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
-import io.sedu.mc.parties.util.ColorUtils;
-import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.*;
+import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.util.RenderUtils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -23,9 +25,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static io.sedu.mc.parties.util.RenderUtils.renderBg;
-import static io.sedu.mc.parties.util.RenderUtils.tip;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
+import static io.sedu.mc.parties.util.RenderUtils.*;
 
 public class SettingsScreen extends Screen {
     private final ResourceLocation MENU_LOC = new ResourceLocation("textures/block/spruce_planks.png");
@@ -76,11 +77,52 @@ public class SettingsScreen extends Screen {
 
     private final Button left = new ColorButton(0xbb8f44, 0, 0, 20, 20, new TextComponent("◄"), b -> cycleElements(true), tip(this, "Cycle Elements Left"));
     private final Button right = new ColorButton(0xbb8f44, 0, 0, 20, 20, new TextComponent("►"), b -> cycleElements(false), tip(this, "Cycle Elements Right"));
-    private final Button showModBox = new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters"));
-    private final Button hideModBox = new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters"));
-    private final Button toggleRGBMode = new SmallButton(0, 0, "c", b -> toggleRGB(), tip(this, "Toggle RGB Input Mode"), 1f, 1f, 1f);
-    private final Button allElesOff = new SmallButton(0, 0, "x", b -> toggleEles(false), tip(this, "Turn All Other Elements Off"), 1f, 0.5f, 0.5f);
-    private final Button allElesOn = new SmallButton(0, 0, "✓", b -> toggleEles(true), tip(this, "Turn All Other Elements On"), 0.5f, 1f, 0.5f);
+    private final ArrayList<Button> miscButtons;
+
+    private final MutableComponent confirmPrompt;
+    private boolean isConfirmed = false;
+    public int buttonCooldown = 0;
+    public int revertCooldown = 0;
+    private boolean triggeredPrompt = false;
+
+
+
+
+    protected SettingsScreen() {
+        super(new TextComponent("Party Advanced Settings"));
+        miscButtons = new ArrayList<>();
+        miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters")));
+        miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters")));
+        miscButtons.add(new SmallButton(0, 0, "c", b -> toggleRGB(), tip(this, "Toggle RGB Input Mode"), 1f, 1f, 1f));
+        miscButtons.add(new SmallButton(0, 0, "x", b -> toggleEles(false), tip(this, "Turn All Other Elements Off"), 1f, 0.5f, 0.5f));
+        miscButtons.add(new SmallButton(0, 0, "✓", b -> toggleEles(true), tip(this, "Turn All Other Elements On"), 0.5f, 1f, 0.5f));
+        miscButtons.add(new SmallButton(0,0, "↺", b -> resetEle(), tip(this, "Reset Current Element to Default"), .5f, 1f, 1f));
+        miscButtons.add(new SmallButton(0,0, "↺", b -> resetAll(), tip(this, "Reset Everything to Default"), 1f, 1f, 0.5f));
+        confirmPrompt = new TextComponent("Are you sure? Click again to confirm").withStyle(ChatFormatting.DARK_RED);
+    }
+
+    private void resetAll() {
+        if (isConfirmed) {
+            RenderItem.setDefaultValues();
+            isConfirmed = false;
+            revertCooldown = 0;
+            ((SmallButton)miscButtons.get(6)).setColor(1f, 1f, .5f);
+            miscButtons.get(6).setMessage(new TextComponent("↺"));
+        } else {
+            miscButtons.get(6).active = false;
+            triggeredPrompt = true;
+            buttonCooldown = 100;
+            revertCooldown = 100;
+            SmallButton b = (SmallButton) miscButtons.get(6);
+            b.setMessage(new TextComponent("↺").withStyle(ChatFormatting.OBFUSCATED));
+            b.setColor(1f, 0.5f, 0.5f);
+        }
+
+    }
+
+    private void resetEle() {
+        RenderItem.resetElement(tabsOrder.get(selEle));
+    }
 
     private void toggleEles(boolean b) {
         RenderItem.items.values().forEach(i -> i.setEnabled(b));
@@ -102,12 +144,12 @@ public class SettingsScreen extends Screen {
     private void toggleModBox(boolean show) {
         if (show) {
             modVisible = true;
-            hideModBox.visible = true;
-            showModBox.visible = false;
+            miscButtons.get(1).visible = true;
+            miscButtons.get(0).visible = false;
         } else {
             modVisible = false;
-            hideModBox.visible = false;
-            showModBox.visible = true;
+            miscButtons.get(1).visible = false;
+            miscButtons.get(0).visible = true;
         }
         updateOptionsBounds();
     }
@@ -131,6 +173,20 @@ public class SettingsScreen extends Screen {
 
     public void tick() {
         tickables.forEach(InputBox::tick);
+        if (triggeredPrompt && buttonCooldown > 0) {
+            if (--buttonCooldown == 0) {
+                triggeredPrompt = false;
+                isConfirmed = true;
+                miscButtons.get(6).active = true;
+            }
+        }
+        if (isConfirmed && revertCooldown > 0) {
+            if (--revertCooldown == 0) {
+                isConfirmed = false;
+                ((SmallButton)miscButtons.get(6)).setColor(1f, 1f, .5f);
+                miscButtons.get(6).setMessage(new TextComponent("↺"));
+            }
+        }
     }
 
 
@@ -159,18 +215,16 @@ public class SettingsScreen extends Screen {
 
     private void removeRenderButtons() {
         tabs.values().forEach(tabButton -> tabButton.visible = false);
-        //for (int i = offEle; i < offEle + maxEles - 2; i++)
-            //removeWidget(tabs.get(tabsOrder.get(i)));
-    }
-
-    protected SettingsScreen() {
-        super(new TextComponent("Party Advanced Settings"));
     }
 
     public void render(PoseStack poseStack, int pMouseX, int pMouseY, float pPartialTick) {
-        //this.renderBackground(poseStack);
-        //renderBg();
 
+        if (triggeredPrompt) {
+            poseStack.translate(0,0,1);
+            this.renderTooltip(poseStack, confirmPrompt, pMouseX, pMouseY + 16);
+            poseStack.translate(0,0,-1);
+        }
+        renderFullArea(poseStack, selEle == 0);
         renderConfig();
         RenderSystem.enableDepthTest();
         this.options.render(poseStack, pMouseX, pMouseY, pPartialTick);
@@ -374,12 +428,12 @@ public class SettingsScreen extends Screen {
         modBoxH = screenH - 32;
 
         //Show/Hide Mod Box Buttons
-        showModBox.x = screenX + 6;
-        hideModBox.x = showModBox.x;
-        showModBox.y = screenY + screenH - 22;
-        hideModBox.y = showModBox.y;
-        showModBox.visible = !modVisible;
-        hideModBox.visible = modVisible;
+        miscButtons.get(0).x = screenX + 6;
+        miscButtons.get(1).x = miscButtons.get(0).x;
+        miscButtons.get(0).y = screenY + screenH - 22;
+        miscButtons.get(1).y = miscButtons.get(0).y;
+        miscButtons.get(0).visible = !modVisible;
+        miscButtons.get(1).visible = modVisible;
 
 
         optBoxH = screenH - eleBoxH;
@@ -387,12 +441,16 @@ public class SettingsScreen extends Screen {
         optBoxX = screenX + screenW - optBoxW;
         optBoxY = screenY + eleBoxH;
 
-        toggleRGBMode.x = optBoxX + 11;
-        toggleRGBMode.y = optBoxY + 8;
-        allElesOff.x = toggleRGBMode.x;
-        allElesOff.y = optBoxY + 24;
-        allElesOn.x = toggleRGBMode.x;
-        allElesOn.y = optBoxY + 36;
+        miscButtons.get(2).x = optBoxX + 11;
+        miscButtons.get(2).y = optBoxY + 8;
+        miscButtons.get(3).x = miscButtons.get(2).x;
+        miscButtons.get(3).y = optBoxY + 24;
+        miscButtons.get(4).x = miscButtons.get(2).x;
+        miscButtons.get(4).y = optBoxY + 36;
+        miscButtons.get(5).x = miscButtons.get(2).x;
+        miscButtons.get(5).y = optBoxY + 52;
+        miscButtons.get(6).x = miscButtons.get(2).x;
+        miscButtons.get(6).y = optBoxY + 64;
 
 
         searchBoxH = Math.min(24, screenH);
@@ -402,13 +460,9 @@ public class SettingsScreen extends Screen {
 
 
         if (init) {
-            addRenderableWidget(showModBox);
-            addRenderableWidget(hideModBox);
             addRenderableWidget(left);
             addRenderableWidget(right);
-            addRenderableWidget(toggleRGBMode);
-            addRenderableWidget(allElesOn);
-            addRenderableWidget(allElesOff);
+            miscButtons.forEach(this::addRenderableWidget);
             tabs.values().forEach(this::addRenderableWidget);
         }
         updateOptionsBounds();

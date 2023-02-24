@@ -1,10 +1,9 @@
 package io.sedu.mc.parties.setup;
 
-import io.sedu.mc.parties.util.ColorUtils;
 import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.*;
-import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.events.ClientEvent;
+import io.sedu.mc.parties.util.ColorUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ClientRegistry;
@@ -41,24 +40,24 @@ public class ClientSetup {
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::mouseReleased);
 
         //Icon above all
-        items.put("head", new PHead("p_head", 8, 8));
-        items.put("name", new PName("p_name", 46, 9, 0xDDF3FF));
-        items.put("leader", new PLeader("p_leader", 34, 33));
-        items.put("dim", new PDimIcon("p_dim", 5, 34)); //Includes text!
+        items.put("head", new PHead("p_head"));
+        items.put("name", new PName("p_name"));
+        items.put("leader", new PLeader("p_leader"));
+        items.put("dim", new PDimIcon("p_dim")); //Includes text!
 
         //Effects
-        items.put("effects", new PEffectsBoth("p_effects", 46, 42, 30, 42, 8, 8));
-        items.put("effects_b", new PEffectsB("p_effects_b", 46, 42, 30, 42, 8, 8));
-        items.put("effects_d", new PEffectsD("p_effects_d", 168, 21, 30, 42,8, 4));
+        items.put("effects", new PEffectsBoth("p_effects"));
+        items.put("effects_b", new PEffectsBene("p_effects_b"));
+        items.put("effects_d", new PEffectsBad("p_effects_d"));
 
         //TODO: Add blinker overlay. Set static size (or try to not create static) and update x and y when elements move.
-        items.put("armor", new PArmor("p_armor", 46, 19, 0xDDF3FF));
-        items.put("chicken", new PChicken("p_chicken", 141, 19, 0xDDF3FF));
-        items.put("lvlbar", new PLevelBar("p_lvlbar", 4, 44, 40, 5, 0x80FF8B));
-        items.put("health", new PHealth("p_health", 46, 29, 118, 10,0xFFE3E3, 0xFFF399, 0x530404));
-        items.put("offline", new POffline("p_offline", 154, 8, 85, 20, 0xDDF3FF));
+        items.put("armor", new PArmor("p_armor"));
+        items.put("chicken", new PChicken("p_chicken"));
+        items.put("lvlbar", new PLevelBar("p_lvlbar"));
+        items.put("health", new PHealth("p_health"));
+        items.put("offline", new POffline("p_offline"));
 
-        items.put("dead", new PDead("p_dead", 155, 9));
+        items.put("dead", new PDead("p_dead"));
 
 
 
@@ -66,13 +65,10 @@ public class ClientSetup {
 
 
 
-        items.put("bg1", new PRectD("p_bg1", 44, 7, 122, 34));
-        items.put("bgc", new ClickArea("p_bgc", 7, 7, 159, 34));
-        //items.add(new ConfigOverlay("config"));
-
-        EffectHolder.setValues(2, 5,true); //TODO: Make sure buff + debuff = max - 1;
-
+        items.put("bg1", new PRectD("p_bg1"));
+        items.put("bgc", new ClickArea("p_bgc"));
         items.values().forEach(RenderItem::register);
+        RenderItem.setDefaultValues();
 
         //Disable Overlays
         OverlayRegistry.enableOverlay(ForgeIngameGui.POTION_ICONS_ELEMENT, false);

@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.ArrayList;
 
@@ -42,26 +43,8 @@ public class PHealth extends RenderIconTextItem {
     int bAColorTop;
     int bAColorBot;
 
-    public PHealth(String name, int x, int y, int width, int height, int color, int absorbColor, int deadColor) {
-        super(name, x, y, width, height, color, true);
-        this.absorbColor = absorbColor;
-        this.deadColor = deadColor;
-        colorTop = 0xC52C27;
-        colorBot = 0x6C0D15;
-        colorTopMissing = 0x450202;
-        colorBotMissing = 0x620909;
-        colorTopAbsorb = 0xFFCD42 | 0xCC << 24;
-        colorBotAbsorb = 0xB08610 | 0xCC << 24;
-        colorAbsTop = 0xFFCD72;
-        colorAbsBot = 0xB08672;
-        colorIncTop = 0xC5FFC5;
-        colorIncBot = 0x6CFF6C;
-        colorDecTop = 0xFFC5C5;
-        colorDecBot = 0xFF6C6C;
-        bAColorTop = 0xfaf098 | 0xCC << 24;
-        bAColorBot = 0xd9cd68 | 0xCC << 24;
-        bColorTop = 0x111111 | 0xCC << 24;
-        bColorBot = 0x555555 | 0xCC << 24;
+    public PHealth(String name) {
+        super(name);
     }
 
     @Override
@@ -219,8 +202,8 @@ public class PHealth extends RenderIconTextItem {
         c.addSliderEntry("ttype", 0, () -> 2, HealthAnim.type);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
-        entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX));
-        entries.add(c.addSliderEntry("ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY));
+        entries.add(c.addSliderEntry("xtpos", 0, () -> frameEleW, textX));
+        entries.add(c.addSliderEntry("ytpos", 0, () -> frameEleH, textY));
         toggleTextAttach(entries);
         c.addTitleEntry("textc");
         c.addColorEntry("tcolor", color);
@@ -274,12 +257,14 @@ public class PHealth extends RenderIconTextItem {
     }
 
     protected int maxW() {
-        return (int) Math.ceil((Math.max(clickArea.x + clickArea.w(), frameW) - x)/scale);
+        return (int) Math.ceil(frameEleW/scale);
     }
 
     protected int maxH() {
-        return (int) Math.ceil((Math.max(clickArea.y + clickArea.h(), frameH) - y)/scale);
+        return (int) Math.ceil(frameEleH/scale);
     }
+
+
 
     @Override
     public void setColor(int type, int data) {
@@ -304,5 +289,50 @@ public class PHealth extends RenderIconTextItem {
             case 17 -> colorDecTop = data;
             case 18 -> colorDecBot = data;
         }
+    }
+
+    @Override
+    void setDefaults() {
+        OverlayRegistry.enableOverlay(item, true);
+        scale = 1f;
+        zPos = 0;
+        iconEnabled = true;
+        x = 46;
+        y = 29;
+        width = 120;
+        height = 10;
+        textEnabled = true;
+        textShadow = true;
+        HealthAnim.type = 0;
+        textAttached = true;
+        textX = 0;
+        textY = 0;
+        color = 0xffe3e3;
+        absorbColor = 0xfff399;
+        deadColor = 0x530404;
+
+        bColorTop = 0x111111 | 0xCC << 24;
+        bColorBot = 0x555555 | 0xCC << 24;
+
+        bAColorTop = 0xfaf098 | 0xCC << 24;
+        bAColorBot = 0xd9cd68 | 0xCC << 24;
+
+        colorTop = 0xC52C27;
+        colorBot = 0x6C0D15;
+
+        colorTopMissing = 0x450202;
+        colorBotMissing = 0x620909;
+
+        colorTopAbsorb = 0xFFCD42 | 0xCC << 24;
+        colorBotAbsorb = 0xB08610 | 0xCC << 24;
+
+        colorAbsTop = 0xFFCD72;
+        colorAbsBot = 0xB08672;
+
+        colorIncTop = 0xC5FFC5;
+        colorIncBot = 0x6CFF6C;
+
+        colorDecTop = 0xFFC5C5;
+        colorDecBot = 0xFF6C6C;
     }
 }

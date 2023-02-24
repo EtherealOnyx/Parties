@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.ArrayList;
 
@@ -16,8 +17,10 @@ import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
 public class PArmor extends RenderIconTextItem {
 
-    public PArmor(String name, int x, int y, int textColor) {
-        super(name, x, y, 9, 9, textColor, true);
+    public PArmor(String name) {
+        super(name);
+        width = 9;
+        height = 9;
     }
 
 
@@ -94,10 +97,26 @@ public class PArmor extends RenderIconTextItem {
         c.addColorEntry("tcolor", color);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
-        entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX), textX));
-        entries.add(c.addSliderEntry("ytpos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(minecraft.font.lineHeight*scale)), textY));
+        entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW - frameX), textX));
+        entries.add(c.addSliderEntry("ytpos", 0, () -> Math.max(0, frameEleH - frameY - (int)(minecraft.font.lineHeight*scale)), textY));
         toggleTextAttach(entries);
         return c;
+    }
+
+    @Override
+    void setDefaults() {
+        OverlayRegistry.enableOverlay(item, true);
+        scale = 1f;
+        zPos = 0;
+        iconEnabled = true;
+        x = 46;
+        y = 19;
+        textEnabled = true;
+        textShadow = false;
+        color = 0xddf3ff;
+        textAttached = true;
+        textX = 0;
+        textY = 0;
     }
 
 }

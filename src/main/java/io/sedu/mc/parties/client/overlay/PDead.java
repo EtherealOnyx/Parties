@@ -7,13 +7,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
 public class PDead extends RenderItem {
 
-    public PDead(String name, int x, int y) {
-        super(name, x, y);
+    public PDead(String name) {
+        super(name);
+        width = 9;
+        height = 9;
     }
 
     @Override
@@ -34,6 +37,15 @@ public class PDead extends RenderItem {
         setup(GUI_ICONS_LOCATION);
         blit(poseStack,(b.x>>1)+4, b.y>>1, 16 + (gui.getGuiTicks() >> 4 & 1)*9, 0, 9, 9);
         poseStack.popPose();
+    }
+
+    @Override
+    void setDefaults() {
+        OverlayRegistry.enableOverlay(item, true);
+        x = 157;
+        y = 9;
+        zPos = 0;
+        scale = 1f;
     }
 
     @Override

@@ -8,12 +8,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 public class PRectD extends RenderItem {
 
 
-    public PRectD(String n, int x, int y, int w, int h) {
-        super(n, x, y, w, h);
+    public PRectD(String n) {
+        super(n);
+        zPos = 0;
+        scale = 1f;
     }
 
     @Override
@@ -41,8 +44,8 @@ public class PRectD extends RenderItem {
         ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
         c.addTitleEntry("display");
         c.addBooleanEntry("display", isEnabled());
-        c.addSliderEntry("xpos", 0, () -> Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - width), this.x, true);
-        c.addSliderEntry("ypos", 0, () -> Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - height), this.y, true);
+        c.addSliderEntry("xpos", 0, () -> Math.max(0, frameEleW - width), this.x, true);
+        c.addSliderEntry("ypos", 0, () -> Math.max(0, frameEleH - height), this.y, true);
         c.addSliderEntry("width", 1, this::maxW, width, true);
         c.addSliderEntry("height", 1, this::maxH, height, true);
         return c;
@@ -64,9 +67,18 @@ public class PRectD extends RenderItem {
     }
 
     protected int maxH() {
-        return Math.max(clickArea.y + clickArea.h(), frameH) - y;
+        return frameEleH - y;
     }
     protected int maxW() {
-        return Math.max(clickArea.x + clickArea.w(), frameW) - x;
+        return frameEleW - x;
+    }
+
+    @Override
+    void setDefaults() {
+        OverlayRegistry.enableOverlay(item, true);
+        x = 44;
+        y = 7;
+        width = 124;
+        height = 34;
     }
 }

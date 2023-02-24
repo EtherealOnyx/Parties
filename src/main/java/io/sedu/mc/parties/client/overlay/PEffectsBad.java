@@ -10,41 +10,48 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PEffectsB extends PEffects {
+public class PEffectsBad extends PEffects{
+
+    public PEffectsBad(String name) {
+        super(name);
+    }
+
+    @Override
+    int getColor() {
+        return badColor;
+    }
+
+
 
     @Override
     protected void getColorEntry(ConfigOptionsList c) {
-        c.addColorEntry("buffg", beneColor);
+        c.addColorEntry("buffb", badColor);
         c.addColorEntry("flash", flashColor);
     }
-
 
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         RenderSystem.enableDepthTest();
-        TextureAtlasSprite sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.JUMP);
+        TextureAtlasSprite sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.WITHER);
         RenderSystem.setShaderTexture(0, sprite.atlas().location());
         Gui.blit(poseStack, b.x + 7, b.y+2, 0, 18, 18, sprite);
     }
 
-    public PEffectsB(String name, int x, int y, int width, int height, int max, int row) {
-        super(name, x, y, width, height, max, row);
-    }
-
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.effects.sizeBene() > 0) {
-            start(poseStack, i, id.effects.sizeBene());
+        if (id.effects.sizeBad() > 0) {
+            start(poseStack, i, id.effects.sizeBad());
             AtomicInteger iX = new AtomicInteger();
             AtomicInteger iY = new AtomicInteger();
-            if (id.effects.largerBene(maxSize)) {
-                id.effects.forEachBeneLim(maxSize, (effect) -> {
+            if (id.effects.largerBad(maxSize)) {
+                id.effects.forEachBadLim(maxSize, (effect) -> {
                     //If we reached max per row
                     if (checkRow(iX.get())) {
                         iX.set(0);
@@ -56,15 +63,19 @@ public class PEffectsB extends PEffects {
                 });
                 poseStack.pushPose();
                 poseStack.scale(2f,2f,1f);
+                if (checkRow(iX.get())) {
+                    iX.set(0);
+                    iY.getAndIncrement();
+                }
                 if (renderOverflow(gui, poseStack, i, iX.get(), iY.get(), partialTicks)) {
                     List<ColorComponent> lC = new ArrayList<>();
-                    id.effects.forBeneRemainder(maxSize, (effect) -> lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), beneColor)));
+                    id.effects.forBadRemainder(maxSize, (effect) -> lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), badColor)));
                     renderGroupEffectTooltip(poseStack, gui, 10, 0, lC, 0x3101b8, 0x24015b, 0x150615, 0x150615);
 
                 }
                 poseStack.popPose();
             } else {
-                id.effects.forEachBene((effect) -> {
+                id.effects.forEachBad((effect) -> {
                     //If we reached max per row
                     if (checkRow(iX.get())) {
                         iX.set(0);
@@ -78,5 +89,25 @@ public class PEffectsB extends PEffects {
             end(poseStack);
         }
     }
+
+    @Override
+    void setDefaults() {
+        OverlayRegistry.enableOverlay(item, false);
+        renderText = true;
+        borderSize = 1;
+        badColor = 0xffa9a9;
+        flashColor = 0xffffff;
+        x = 170;
+        y = 19;
+        zPos = 0;
+        scale = 1f;
+        renderBg = true;
+        width = 30;
+        height = 44;
+        maxPerRow = 4;
+        maxSize = 8;
+    }
+
+
 
 }

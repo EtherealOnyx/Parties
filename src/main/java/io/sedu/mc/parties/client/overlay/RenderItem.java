@@ -36,7 +36,6 @@ import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 
 public abstract class RenderItem {
 
-    //TODO: Go through each poseStack.scale() method and ensure the last element is 1f, not zero or zPos.
 
     public static RenderItem clickArea;
 
@@ -47,17 +46,16 @@ public abstract class RenderItem {
 
     public static int frameX = 16;
     public static int frameY = 16;
-    public static int frameH = 56;
-    public static int frameW = 0;
-
+    public static int framePosW = 0;
+    public static int framePosH = 0;
+    public static int frameEleH = 56;
+    public static int frameEleW = 0;
     public static int currentY = 0;
 
-    int x, y, width, height;
+    protected int x, y, width, height;
     float scale = 1f;
     float scalePos = 0f;
     int zPos = 0;
-    //TODO: Allow alpha changes in config per item?
-    float alpha;
     boolean textShadow = true;
 
 
@@ -65,23 +63,18 @@ public abstract class RenderItem {
         currentY = 0;
     }
 
-    void setDefaults(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public static void resetElement(String s) {
+        RenderItem.items.computeIfPresent(s, (name, renderItem) -> {renderItem.setDefaults(); return renderItem;});
     }
 
-    void setDefaults(int x, int y, int width, int height) {
-        setDefaults(x, y);
-        this.width = width;
-        this.height = height;
-    }
+    //abstract void resetElement();
 
     int hOffset(int pOffset) {
-        return pOffset*frameH;
+        return pOffset*framePosH;
     }
 
     int wOffset(int pOffset) {
-        return pOffset*frameW;
+        return pOffset*framePosW;
     }
 
     public int x(int pOffset) {
@@ -162,16 +155,6 @@ public abstract class RenderItem {
         this.name = name;
     }
 
-    public RenderItem(String name, int x, int y) {
-        this.name = name;
-        setDefaults(x, y);
-    }
-
-    public RenderItem(String name, int x, int y, int width, int height) {
-        this.name = name;
-        setDefaults(x, y, width, height);
-    }
-
     public void register() {
         initItem();
         OverlayRegistry.registerOverlayAbove(HOTBAR_ELEMENT, name, item);
@@ -221,7 +204,7 @@ public abstract class RenderItem {
         RenderUtils.rectNoA(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor, endColor);
     }
 
-    void rect(int i, PoseStack pose, int z, int offset, int startColor) {
+    public void rect(int i, PoseStack pose, int z, int offset, int startColor) {
         RenderUtils.rect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor);
     }
 
@@ -494,12 +477,12 @@ public abstract class RenderItem {
     public void setYTextPos(Integer data) {
     }
 
-    private void setWidth(Integer d) {
+    protected void setWidth(Integer d) {
         this.width = d;
 
     }
 
-    private void setHeight(Integer d) {
+    protected void setHeight(Integer d) {
         this.height = d;
     }
 
@@ -511,11 +494,11 @@ public abstract class RenderItem {
     }
 
     protected int maxX() {
-        return Math.max(0, Math.max(clickArea.r(0), frameX + frameW) - frameX - (int)(width*scale));
+        return Math.max(0, frameEleW - (int)(width*scale));
     }
 
     protected int maxY() {
-        return Math.max(0, Math.max(clickArea.b(0), frameY + frameH) - frameY - (int)(height*scale));
+        return Math.max(0, frameEleH - (int)(height*scale));
     }
 
 
@@ -602,8 +585,8 @@ public abstract class RenderItem {
 
         updater.put("blim", (n,d) -> EffectHolder.updatebLim((int) d));
         updater.put("dlim", (n,d) -> EffectHolder.updatedLim((int) d));
-        updater.put("dfirst", (n,d) -> {EffectHolder.debuffFirst = (boolean) d; ClientPlayerData.markEffectsDirty();});
-        updater.put("bsep", (n,d) -> {EffectHolder.prioDur = (boolean) d; ClientPlayerData.markEffectsDirty();});
+        updater.put("dfirst", (n,d) -> {PEffectsBoth.debuffFirst = (boolean) d; ClientPlayerData.markEffectsDirty();});
+        updater.put("bsep", (n,d) -> {PEffectsBoth.prioDur = (boolean) d; ClientPlayerData.markEffectsDirty();});
 
 
         updater.put("spacex", (n, d) -> items.get(n).setWidth((int)d));
@@ -615,8 +598,10 @@ public abstract class RenderItem {
         updater.put("danim", (n,d) -> DimAnim.animActive = (boolean)d);
         updater.put("gen_x", (n,d) -> frameX = (int) d);
         updater.put("gen_y", (n,d) -> frameY = (int) d);
-        updater.put("gen_w", (n,d) -> frameW = (int) d);
-        updater.put("gen_h", (n,d) -> frameH = (int) d);
+        updater.put("gen_w", (n,d) -> frameEleW = (int) d);
+        updater.put("gen_h", (n,d) -> frameEleH = (int) d);
+        updater.put("gen_pw", (n,d) -> framePosW = (int) d);
+        updater.put("gen_ph", (n,d) -> framePosH = (int) d);
         updater.put("genc_w", (n,d) -> clickArea.width = (int) d);
         updater.put("genc_h", (n,d) -> clickArea.height = (int) d);
         updater.put("genc_x", (n,d) -> clickArea.x = (int) d);
@@ -629,6 +614,22 @@ public abstract class RenderItem {
     public interface Update {
         void onUpdate(String name, Object data);
     }
+
+    public static void setDefaultValues() {
+        defaultPos();
+        frameEleW = 168;
+        frameEleH = 64;
+        framePosW = 0;
+        framePosH = 63;
+        items.values().forEach(RenderItem::setDefaults);
+    }
+
+    public static void defaultPos() {
+        frameX = 16;
+        frameY = 16;
+    }
+
+    abstract void setDefaults();
 
 
 }
