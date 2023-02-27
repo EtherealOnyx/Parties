@@ -1,12 +1,12 @@
 package io.sedu.mc.parties.client.overlay;
 
-import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
+import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static io.sedu.mc.parties.util.RenderUtils.sizeRectNoA;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
+import static io.sedu.mc.parties.util.RenderUtils.sizeRectNoA;
 
 public abstract class PEffects extends RenderSelfItem {
 
@@ -35,8 +35,6 @@ public abstract class PEffects extends RenderSelfItem {
     static int badColor = 0xFFA9A9;
     static int flashColor = 0xFFFFFF;
 
-    boolean renderText;
-    boolean renderBg;
 
     private int xOff;
     private int yOff;
@@ -111,7 +109,7 @@ public abstract class PEffects extends RenderSelfItem {
 
         String secs = "§oInstant";
         int scol = 0x88888888;
-        if (renderText && !effect.isInstant()) {
+        if (textEnabled && !effect.isInstant()) {
             x = sX(i, iX) + effect.getOffset() + 7;
             y = sY(i, iY) + 29;
             gui.getFont().drawShadow(poseStack, effect.getDisplay(), x, y, 0xFFFFFF);
@@ -135,7 +133,7 @@ public abstract class PEffects extends RenderSelfItem {
 
     void start(PoseStack poseStack, int i, int size) {
         poseStack.pushPose();
-        if (renderBg)
+        if (iconEnabled)
             RenderUtils.rect(poseStack.last().pose(), -zPos - 1, x(i) - 2, y(i),
                              x(i) + (width * Math.min(size, maxPerRow) >> 1) + 2,
                              y(i) + (height * (int) Math.ceil((double) Math.min(maxSize, size) / maxPerRow) >> 1),
@@ -198,7 +196,7 @@ public abstract class PEffects extends RenderSelfItem {
         ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
         c.addTitleEntry("display");
         c.addBooleanEntry("display", isEnabled());
-        c.addBooleanEntry("tdisplay", renderText);
+        c.addBooleanEntry("tdisplay", textEnabled);
         c.addSliderEntry("bsize", 1, () -> 4, borderSize);
         getColorEntry(c);
         c.addTitleEntry("position");
@@ -208,7 +206,7 @@ public abstract class PEffects extends RenderSelfItem {
         c.addSliderEntry("scale", 1, () -> 3, getScale());
 
         c.addTitleEntry("icon");
-        c.addBooleanEntry("bgdisplay", renderBg);
+        c.addBooleanEntry("bgdisplay", iconEnabled);
         c.addSliderEntry("spacex", 1, () -> 64, width);
         c.addSliderEntry("spacey", 1, () -> 64, height);
         getLimitEntries(c);
@@ -239,6 +237,16 @@ public abstract class PEffects extends RenderSelfItem {
         }
     }
 
+    @Override
+    public int getColor(int type) {
+        switch(type) {
+            case 0 -> {return beneColor;}
+            case 1 -> {return badColor;}
+            case 2 -> {return flashColor;}
+        }
+        return 0;
+    }
+
     public void setBorderSize(int data) {
         this.borderSize = data;
     }
@@ -251,13 +259,6 @@ public abstract class PEffects extends RenderSelfItem {
         this.maxPerRow = data;
     }
 
-    @Override
-    public void toggleText(boolean data) {
-        renderText = data;
-    }
 
-    @Override
-    public void toggleIcon(boolean data) {
-        renderBg = data;
-    }
+
 }

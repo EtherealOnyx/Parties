@@ -2,6 +2,7 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
@@ -10,7 +11,6 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.ArrayList;
 
@@ -182,26 +182,23 @@ public class PLevelBar extends RenderIconTextItem {
     }
 
     @Override
-    void setDefaults() {
-        OverlayRegistry.enableOverlay(item, true);
-        scale = 1f;
-        zPos = 0;
-        iconEnabled = true;
-        x = 4;
-        y = 44;
-        width = 40;
-        textEnabled = true;
-        textShadow = true;
-        color = 0x80ff8b;
-        textAttached = true;
-        textX = 0;
-        textY = 0;
+    ConfigEntry getDefaults() {
+        ConfigEntry e = new ConfigEntry();
+        e.addEntry("display", true);
+        e.addEntry("scale", 2);
+        e.addEntry("zpos", 0);
+        e.addEntry("idisplay", true);
+        e.addEntry("xpos", 4);
+        e.addEntry("ypos", 44);
+        e.addEntry("width", 40);
+        e.addEntry("tdisplay", true);
+        e.addEntry("tshadow", false);
+        e.addEntry("tcolor", 0x80ff8b);
+        e.addEntry("tattached", true);
+        e.addEntry("xtpos", 0);
+        e.addEntry("ytpos", 0);
+        return e;
     }
-
-    //TODO: Modify getConfigOptions to send a variable too.
-    //TODO: When true, add only refresh sliders to config options.
-    //TODO: Grab sliders when in general config tab.
-    //TODO: Call the update on sliders when width/height changes.
 
 
 }

@@ -9,8 +9,6 @@ public abstract class RenderIconTextItem extends RenderSelfItem {
     int textX;
     int textY;
     boolean textAttached;
-    boolean textEnabled;
-    boolean iconEnabled;
 
 
 
@@ -30,27 +28,18 @@ public abstract class RenderIconTextItem extends RenderSelfItem {
     protected abstract int attachedX(int pOffset);
     protected abstract int attachedY(int pOffset);
 
-    @Override
-    public void toggleIcon(boolean data) {
-        iconEnabled = data;
-    }
 
-    @Override
-    public void toggleText(boolean data) {
-        textEnabled = data;
-    }
 
-    @Override
     public void toggleTextAttach(boolean data) {
         textAttached = data;
     }
 
-    @Override
+
     public void setXTextPos(Integer data) {
         textX = data;
     }
 
-    @Override
+
     public void setYTextPos(Integer data) {
         textY = data;
     }
@@ -59,6 +48,9 @@ public abstract class RenderIconTextItem extends RenderSelfItem {
     public void setColor(int type, int data) {
         this.color = data;
     }
+
+    @Override
+    public int getColor(int type) {return color;}
 
     protected void toggleTextAttach(ArrayList<ConfigOptionsList.Entry> entries) {
             entries.forEach(entry -> entry.setVisible(!textAttached));

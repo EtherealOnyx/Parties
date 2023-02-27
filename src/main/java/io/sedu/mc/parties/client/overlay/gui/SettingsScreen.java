@@ -3,7 +3,6 @@ package io.sedu.mc.parties.client.overlay.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.*;
 import io.sedu.mc.parties.util.ColorUtils;
 import io.sedu.mc.parties.util.RenderUtils;
@@ -98,7 +97,15 @@ public class SettingsScreen extends Screen {
         miscButtons.add(new SmallButton(0, 0, "✓", b -> toggleEles(true), tip(this, "Turn All Other Elements On"), 0.5f, 1f, 0.5f));
         miscButtons.add(new SmallButton(0,0, "↺", b -> resetEle(), tip(this, "Reset Current Element to Default"), .5f, 1f, 1f));
         miscButtons.add(new SmallButton(0,0, "↺", b -> resetAll(), tip(this, "Reset Everything to Default"), 1f, 1f, 0.5f));
+        miscButtons.add(new SmallButton(0,0, "s", b -> savePreset(), tip(this, "Save Preset"), 0.5f, 1f, 0.5f));
         confirmPrompt = new TextComponent("Are you sure? Click again to confirm").withStyle(ChatFormatting.DARK_RED);
+    }
+
+    private void savePreset() {
+        RenderItem.items.values().forEach(item -> {
+            //Setting parsing to true fills out an arraylist called parser in RenderItem.
+            //item.getConfigOptions(s, minecraft, 0,0,0,0, true);
+        });
     }
 
     private void resetAll() {
@@ -121,7 +128,7 @@ public class SettingsScreen extends Screen {
     }
 
     private void resetEle() {
-        RenderItem.resetElement(tabsOrder.get(selEle));
+        RenderItem.setElementDefaults(RenderItem.items.get(tabsOrder.get(selEle)), updater);
     }
 
     private void toggleEles(boolean b) {
@@ -231,7 +238,7 @@ public class SettingsScreen extends Screen {
         assert minecraft != null;
         //TODO: Store tab data in a variable in screen instead of constantly calling render
         //TODO: Or implement another interface that is stored as a variable - the interface draws the config.
-        //TODO: If second method, also store config index and value in a new object class, and then store that in HashMap<String, configEntry>
+        //TODO: If second method, also store config index and value in a new object class, and then store that in HashMap<String, ConfigEntry>
         renderElementBox(poseStack);
         if (modVisible)
             renderModBox();
@@ -451,6 +458,8 @@ public class SettingsScreen extends Screen {
         miscButtons.get(5).y = optBoxY + 52;
         miscButtons.get(6).x = miscButtons.get(2).x;
         miscButtons.get(6).y = optBoxY + 64;
+        miscButtons.get(7).x = miscButtons.get(2).x;
+        miscButtons.get(7).y = optBoxY + 80;
 
 
         searchBoxH = Math.min(24, screenH);
@@ -491,7 +500,6 @@ public class SettingsScreen extends Screen {
     public void finalizeUpdate(String name, Object data, boolean markDirty) {
         Parties.LOGGER.debug("TRIGGERED FINALIZATION UPDATE FOR: " + tabsOrder.get(selEle) + " | " + name + " | " + data);
         triggerUpdate(name, data);
-        ConfigEntry.setEntry(tabsOrder.get(selEle), name, data);
         if (markDirty)
             markDirty();
     }
@@ -502,6 +510,6 @@ public class SettingsScreen extends Screen {
 
     public void triggerUpdate(String name, Object data) {
         Parties.LOGGER.debug("TRIGGERED UPDATE FOR: " + tabsOrder.get(selEle) + " | " + name + " | " + data);
-        updater.get(name).onUpdate(tabsOrder.get(selEle), data);
+        updater.get(name).onUpdate(RenderItem.items.get(tabsOrder.get(selEle)), data);
     }
 }

@@ -1,14 +1,14 @@
 package io.sedu.mc.parties.client.overlay;
 
-import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
+import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.OverlayRegistry;
 
 public class PRectD extends RenderItem {
 
@@ -74,11 +74,13 @@ public class PRectD extends RenderItem {
     }
 
     @Override
-    void setDefaults() {
-        OverlayRegistry.enableOverlay(item, true);
-        x = 44;
-        y = 7;
-        width = 124;
-        height = 34;
+    ConfigEntry getDefaults() {
+        ConfigEntry e = new ConfigEntry();
+        e.addEntry("display", true);
+        e.addEntry("xpos", 44);
+        e.addEntry("ypos", 7);
+        e.addEntry("width", 124);
+        e.addEntry("height", 34);
+        return e;
     }
 }

@@ -14,6 +14,7 @@
   "gui.sedparties.name.p_effects_b":"Buff Bar Element",
   "gui.sedparties.name.p_effects_d":"Debuff Bar Element",
   "gui.sedparties.name.p_effects":"Combined Buff/Debuff Bar Element",
+  "gui.sedparties.name.p_bgc":"Clickable Frame Area",
   "config.sedparties.title.display":"Display Settings",
   "config.sedparties.title.position":"Position Settings",
   "config.sedparties.title.general": "General Settings",

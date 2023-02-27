@@ -1,15 +1,16 @@
 package io.sedu.mc.parties.client.overlay;
 
-import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.client.overlay.gui.TabButton;
+import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
@@ -24,10 +25,7 @@ import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import net.minecraftforge.client.gui.OverlayRegistry;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseX;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseY;
@@ -57,14 +55,20 @@ public abstract class RenderItem {
     float scalePos = 0f;
     int zPos = 0;
     boolean textShadow = true;
+    boolean textEnabled;
+    boolean iconEnabled;
+
+
+    public void toggleIcon(boolean data) {
+        iconEnabled = data;
+    }
+    public void toggleText(boolean data) {
+        textEnabled = data;
+    }
 
 
     public static void resetPos() {
         currentY = 0;
-    }
-
-    public static void resetElement(String s) {
-        RenderItem.items.computeIfPresent(s, (name, renderItem) -> {renderItem.setDefaults(); return renderItem;});
     }
 
     //abstract void resetElement();
@@ -248,6 +252,10 @@ public abstract class RenderItem {
     }
 
     abstract int getColor();
+
+    protected int getColor(int type) {
+        return 0;
+    }
 
     void text(int i, ForgeIngameGui gui, PoseStack p, String text, int color) {
         p.translate(0,0,.5);
@@ -459,23 +467,6 @@ public abstract class RenderItem {
         this.textShadow = data;
     }
 
-    public void setMaxTextSize(int data) {
-    }
-
-    public void toggleIcon(boolean data) {
-    }
-
-    public void toggleText(boolean data) {
-    }
-
-    public void toggleTextAttach(boolean data) {
-
-    }
-    public void setXTextPos(Integer data) {
-    }
-
-    public void setYTextPos(Integer data) {
-    }
 
     protected void setWidth(Integer d) {
         this.width = d;
@@ -531,57 +522,60 @@ public abstract class RenderItem {
             c.addSliderEntry("scale", 1, () -> 3, getScale(), true);
     }
 
+    public interface Update {
+        void onUpdate(RenderItem item, Object data);
+    }
 
     public static void initUpdater(HashMap<String, Update> updater) {
         //Make this be per item instead.
-        updater.put("display", (n, d) -> items.get(n).changeVisibility((Boolean) d));
-        updater.put("tshadow", (n, d) -> items.get(n).setTextShadow((Boolean) d));
-        updater.put("idisplay", (n, d) -> items.get(n).toggleIcon((Boolean) d));
-        updater.put("tdisplay", (n, d) -> items.get(n).toggleText((Boolean) d));
-        updater.put("bgdisplay", (n, d) -> items.get(n).toggleIcon((Boolean) d));
-        updater.put("tattached", (n, d) -> items.get(n).toggleTextAttach((Boolean) d));
-        updater.put("xpos", (n, d) -> items.get(n).setXPos((int) d));
-        updater.put("ypos", (n, d) -> items.get(n).setYPos((int) d));
-        updater.put("scale", (n, d) -> items.get(n).setScale((int) d));
-        updater.put("zpos", (n, d) -> items.get(n).setZPos((int) d));
-        updater.put("xtpos", (n, d) -> items.get(n).setXTextPos((int) d));
-        updater.put("ytpos", (n, d) -> items.get(n).setYTextPos((int) d));
-        updater.put("tmax", (n, d) -> items.get(n).setMaxTextSize((int) d));
-        updater.put("width", (n, d) -> items.get(n).setWidth((int)d));
-        updater.put("height", (n, d) -> items.get(n).setHeight((int)d));
+        updater.put("display", (n, d) -> n.changeVisibility((Boolean) d));
+        updater.put("tshadow", (n, d) -> n.setTextShadow((Boolean) d));
+        updater.put("idisplay", (n, d) -> n.toggleIcon((Boolean) d));
+        updater.put("tdisplay", (n, d) -> n.toggleText((Boolean) d));
+        updater.put("bgdisplay", (n, d) -> n.toggleIcon((Boolean) d));
+        updater.put("tattached", (n, d) -> ((RenderIconTextItem)n).toggleTextAttach((Boolean) d));
+        updater.put("xpos", (n, d) -> n.setXPos((int) d));
+        updater.put("ypos", (n, d) -> n.setYPos((int) d));
+        updater.put("scale", (n, d) -> n.setScale((int) d));
+        updater.put("zpos", (n, d) -> n.setZPos((int) d));
+        updater.put("xtpos", (n, d) -> ((RenderIconTextItem)n).setXTextPos((int) d));
+        updater.put("ytpos", (n, d) -> ((RenderIconTextItem)n).setYTextPos((int) d));
+        updater.put("tmax", (n, d) -> ((PName)n).setMaxTextSize((int) d));
+        updater.put("width", (n, d) -> n.setWidth((int)d));
+        updater.put("height", (n, d) -> n.setHeight((int)d));
         updater.put("ttype", (n,d) -> HealthAnim.setTextType((int)d));
-        updater.put("tcolor", (n, d) -> items.get(n).setColor(0, (int)d));
-        updater.put("tcabsorb", (n, d) -> items.get(n).setColor(1, (int)d));
-        updater.put("tcdead", (n, d) -> items.get(n).setColor(2, (int)d));
+        updater.put("tcolor", (n, d) -> n.setColor(0, (int)d));
+        updater.put("tcabsorb", (n, d) -> n.setColor(1, (int)d));
+        updater.put("tcdead", (n, d) -> n.setColor(2, (int)d));
 
-        updater.put("bbct", (n, d) -> items.get(n).setColor(3, (int)d));
-        updater.put("bbcb", (n, d) -> items.get(n).setColor(4, (int)d));
+        updater.put("bbct", (n, d) -> n.setColor(3, (int)d));
+        updater.put("bbcb", (n, d) -> n.setColor(4, (int)d));
 
-        updater.put("bbact", (n, d) -> items.get(n).setColor(5, (int)d));
-        updater.put("bbacb", (n, d) -> items.get(n).setColor(6, (int)d));
+        updater.put("bbact", (n, d) -> n.setColor(5, (int)d));
+        updater.put("bbacb", (n, d) -> n.setColor(6, (int)d));
 
 
-        updater.put("bct", (n, d) -> items.get(n).setColor(7, (int)d));
-        updater.put("bcb", (n, d) -> items.get(n).setColor(8, (int)d));
+        updater.put("bct", (n, d) -> n.setColor(7, (int)d));
+        updater.put("bcb", (n, d) -> n.setColor(8, (int)d));
 
-        updater.put("bctm", (n, d) -> items.get(n).setColor(9, (int)d));
-        updater.put("bcbm", (n, d) -> items.get(n).setColor(10, (int)d));
+        updater.put("bctm", (n, d) -> n.setColor(9, (int)d));
+        updater.put("bcbm", (n, d) -> n.setColor(10, (int)d));
 
-        updater.put("bcta", (n, d) -> items.get(n).setColor(11, (int)d));
-        updater.put("bcba", (n, d) -> items.get(n).setColor(12, (int)d));
+        updater.put("bcta", (n, d) -> n.setColor(11, (int)d));
+        updater.put("bcba", (n, d) -> n.setColor(12, (int)d));
 
-        updater.put("bcat", (n, d) -> items.get(n).setColor(13, (int)d));
-        updater.put("bcab", (n, d) -> items.get(n).setColor(14, (int)d));
+        updater.put("bcat", (n, d) -> n.setColor(13, (int)d));
+        updater.put("bcab", (n, d) -> n.setColor(14, (int)d));
 
-        updater.put("bcit", (n, d) -> items.get(n).setColor(15, (int)d));
-        updater.put("bcib", (n, d) -> items.get(n).setColor(16, (int)d));
+        updater.put("bcit", (n, d) -> n.setColor(15, (int)d));
+        updater.put("bcib", (n, d) -> n.setColor(16, (int)d));
 
-        updater.put("bcdt", (n, d) -> items.get(n).setColor(17, (int)d));
-        updater.put("bcdb", (n, d) -> items.get(n).setColor(18, (int)d));
+        updater.put("bcdt", (n, d) -> n.setColor(17, (int)d));
+        updater.put("bcdb", (n, d) -> n.setColor(18, (int)d));
 
-        updater.put("buffg", (n, d) -> items.get(n).setColor(0, (int)d));
-        updater.put("buffb", (n, d) -> items.get(n).setColor(1, (int)d));
-        updater.put("flash", (n, d) -> items.get(n).setColor(2, (int)d));
+        updater.put("buffg", (n, d) -> n.setColor(0, (int)d));
+        updater.put("buffb", (n, d) -> n.setColor(1, (int)d));
+        updater.put("flash", (n, d) -> n.setColor(2, (int)d));
 
         updater.put("blim", (n,d) -> EffectHolder.updatebLim((int) d));
         updater.put("dlim", (n,d) -> EffectHolder.updatedLim((int) d));
@@ -589,11 +583,11 @@ public abstract class RenderItem {
         updater.put("bsep", (n,d) -> {PEffectsBoth.prioDur = (boolean) d; ClientPlayerData.markEffectsDirty();});
 
 
-        updater.put("spacex", (n, d) -> items.get(n).setWidth((int)d));
-        updater.put("spacey", (n, d) -> items.get(n).setHeight((int)d));
-        updater.put("bsize", (n,d) -> ((PEffects) items.get(n)).setBorderSize((int) d));
-        updater.put("rowmax", (n,d) -> ((PEffects) items.get(n)).setMaxPerRow((int) d));
-        updater.put("totalmax", (n,d) -> {((PEffects) items.get(n)).setMaxSize((int) d);  ClientPlayerData.markEffectsDirty();});
+        updater.put("spacex", (n, d) -> n.setWidth((int)d));
+        updater.put("spacey", (n, d) -> n.setHeight((int)d));
+        updater.put("bsize", (n,d) -> ((PEffects) n).setBorderSize((int) d));
+        updater.put("rowmax", (n,d) -> ((PEffects) n).setMaxPerRow((int) d));
+        updater.put("totalmax", (n,d) -> {((PEffects) n).setMaxSize((int) d);  ClientPlayerData.markEffectsDirty();});
 
         updater.put("danim", (n,d) -> DimAnim.animActive = (boolean)d);
         updater.put("gen_x", (n,d) -> frameX = (int) d);
@@ -606,13 +600,86 @@ public abstract class RenderItem {
         updater.put("genc_h", (n,d) -> clickArea.height = (int) d);
         updater.put("genc_x", (n,d) -> clickArea.x = (int) d);
         updater.put("genc_y", (n,d) -> clickArea.y = (int) d);
-
-        //TODO: implement maxX, maxY, maxWidth, maxHeight function base renderItem. reference that when in general width/height tab instead of iterating over getconfigoptions.
     }
 
+    public interface Getter {
+        Object getValue(String name);
+    }
 
-    public interface Update {
-        void onUpdate(String name, Object data);
+    public static void initGetter(HashMap<String, Getter> getter) {
+        //Make this be per item instead.
+        getter.put("display", (n) -> Objects.requireNonNull(OverlayRegistry.getEntry(items.get(n).item)).isEnabled());
+        getter.put("tshadow", (n) -> items.get(n).textShadow);
+        getter.put("idisplay", (n) -> items.get(n).iconEnabled);
+        getter.put("tdisplay", (n) -> items.get(n).textEnabled);
+        getter.put("bgdisplay", (n) -> items.get(n).iconEnabled);
+        getter.put("tattached", (n) -> ((RenderIconTextItem)items.get(n)).textAttached);
+        getter.put("xpos", (n) -> items.get(n).x);
+        getter.put("ypos", (n) -> items.get(n).y);
+        getter.put("scale", (n) -> items.get(n).scale);
+        getter.put("zpos", (n) -> items.get(n).zPos);
+        getter.put("xtpos", (n) -> ((RenderIconTextItem)items.get(n)).textX);
+        getter.put("ytpos", (n) -> ((RenderIconTextItem)items.get(n)).textY);
+        getter.put("tmax", (n) -> ((PName)items.get(n)).length);
+        getter.put("width", (n) -> items.get(n).width);
+        getter.put("height", (n) -> items.get(n).height);
+        getter.put("ttype", (n) -> HealthAnim.getTextType());
+        getter.put("tcolor", (n) -> items.get(n).getColor(0));
+        getter.put("tcabsorb", (n) -> items.get(n).getColor(1));
+        getter.put("tcdead", (n) -> items.get(n).getColor(2));
+
+        getter.put("bbct", (n) -> items.get(n).getColor(3));
+        getter.put("bbcb", (n) -> items.get(n).getColor(4));
+
+        getter.put("bbact", (n) -> items.get(n).getColor(5));
+        getter.put("bbacb", (n) -> items.get(n).getColor(6));
+
+
+        getter.put("bct", (n) -> items.get(n).getColor(7));
+        getter.put("bcb", (n) -> items.get(n).getColor(8));
+
+        getter.put("bctm", (n) -> items.get(n).getColor(9));
+        getter.put("bcbm", (n) -> items.get(n).getColor(10));
+
+        getter.put("bcta", (n) -> items.get(n).getColor(11));
+        getter.put("bcba", (n) -> items.get(n).getColor(12));
+
+        getter.put("bcat", (n) -> items.get(n).getColor(13));
+        getter.put("bcab", (n) -> items.get(n).getColor(14));
+
+        getter.put("bcit", (n) -> items.get(n).getColor(15));
+        getter.put("bcib", (n) -> items.get(n).getColor(16));
+
+        getter.put("bcdt", (n) -> items.get(n).getColor(17));
+        getter.put("bcdb", (n) -> items.get(n).getColor(18));
+
+        getter.put("buffg", (n) -> items.get(n).getColor(0));
+        getter.put("buffb", (n) -> items.get(n).getColor(1));
+        getter.put("flash", (n) -> items.get(n).getColor(2));
+
+        getter.put("blim", (n) -> PEffectsBoth.bLim);
+        getter.put("dlim", (n) -> PEffectsBoth.dLim);
+        getter.put("dfirst", (n) -> PEffectsBoth.debuffFirst);
+        getter.put("bsep", (n) -> PEffectsBoth.prioDur);
+
+
+        getter.put("spacex", (n) -> items.get(n).width);
+        getter.put("spacey", (n) -> items.get(n).height);
+        getter.put("bsize", (n) -> ((PEffects) items.get(n)).borderSize);
+        getter.put("rowmax", (n) -> ((PEffects) items.get(n)).maxPerRow);
+        getter.put("totalmax", (n) -> ((PEffects) items.get(n)).maxSize);
+
+        getter.put("danim", (n) -> DimAnim.animActive);
+        getter.put("gen_x", (n) -> frameX);
+        getter.put("gen_y", (n) -> frameY);
+        getter.put("gen_w", (n) -> frameEleW);
+        getter.put("gen_h", (n) -> frameEleH);
+        getter.put("gen_pw", (n) -> framePosW);
+        getter.put("gen_ph", (n) -> framePosH);
+        getter.put("genc_w", (n) -> clickArea.width);
+        getter.put("genc_h", (n) -> clickArea.height);
+        getter.put("genc_x", (n) -> clickArea.x);
+        getter.put("genc_y", (n) -> clickArea.y);
     }
 
     public static void setDefaultValues() {
@@ -621,7 +688,16 @@ public abstract class RenderItem {
         frameEleH = 64;
         framePosW = 0;
         framePosH = 63;
-        items.values().forEach(RenderItem::setDefaults);
+        HashMap<String, Update> updater = new HashMap<>();
+        RenderItem.initUpdater(updater);
+        items.values().forEach(item -> item.getDefaults().forEachEntry((s, v) -> {
+            System.out.println(item.name);
+            updater.get(s).onUpdate(item, v);
+        }));
+    }
+
+    public static void setElementDefaults(RenderItem item, HashMap<String, Update> updater) {
+        item.getDefaults().forEachEntry((s, v) -> updater.get(s).onUpdate(item, v));
     }
 
     public static void defaultPos() {
@@ -629,7 +705,7 @@ public abstract class RenderItem {
         frameY = 16;
     }
 
-    abstract void setDefaults();
+    abstract ConfigEntry getDefaults();
 
 
 }

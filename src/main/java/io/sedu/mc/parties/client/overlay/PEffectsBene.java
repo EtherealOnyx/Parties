@@ -2,6 +2,7 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -10,7 +11,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,21 +85,23 @@ public class PEffectsBene extends PEffects {
     }
 
     @Override
-    void setDefaults() {
-        OverlayRegistry.enableOverlay(item, false);
-        renderText = true;
-        borderSize = 1;
-        beneColor = 0xa9e5ff;
-        flashColor = 0xffffff;
-        x = 46;
-        y = 41;
-        zPos = 0;
-        scale = 1f;
-        renderBg = true;
-        width = 30;
-        height = 44;
-        maxPerRow = 4;
-        maxSize = 8;
+    ConfigEntry getDefaults() {
+        ConfigEntry e = new ConfigEntry();
+        e.addEntry("display", false);
+        e.addEntry("tdisplay", true);
+        e.addEntry("bsize", 1);
+        e.addEntry("buffg", 0xa9e5ff);
+        e.addEntry("flash", 0xffffff);
+        e.addEntry("xpos", 46);
+        e.addEntry("ypos", 41);
+        e.addEntry("zpos", 0);
+        e.addEntry("scale", 2);
+        e.addEntry("idisplay", true);
+        e.addEntry("spacex", 30);
+        e.addEntry("spacey", 44);
+        e.addEntry("rowmax", 8);
+        e.addEntry("totalmax", 8);
+        return e;
     }
 
 }

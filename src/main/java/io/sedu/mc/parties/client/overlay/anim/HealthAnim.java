@@ -27,6 +27,10 @@ public class HealthAnim extends AnimHandler {
         ClientPlayerData.playerList.values().forEach(c -> c.health.updateText());
     }
 
+    public static Object getTextType() {
+        return type;
+    }
+
     @Override
     void activateValues(Object... data) {
         float b1 = getPercent(oldCur, oldMax, oldAbsorb);

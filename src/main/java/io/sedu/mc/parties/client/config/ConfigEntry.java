@@ -1,33 +1,47 @@
 package io.sedu.mc.parties.client.config;
 
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
 public class ConfigEntry {
-    private static final HashMap<String, HashMap<String, Object>> entries = new HashMap<>();
+    ArrayList<EntryObject> entries;
 
-    public static void clearEntries() {
-        entries.clear();
+    public ConfigEntry() {
+        entries = new ArrayList<>();
     }
 
-    public static Object getEntry(String renderName, String entryName) {
-        return entries.get(renderName) == null ? null : entries.get(renderName).get(entryName);
-
+    public void addEntry(String name, Object value) {
+        entries.add(new EntryObject(name, value));
     }
 
-    public static void setEntry(String renderName, String entryName, Object value) {
-        entries.computeIfAbsent(renderName, k -> new HashMap<>());
-        entries.get(renderName).put(entryName, value);
-    }
-
-    public static void forEachInItem(String renderName, BiConsumer<String, Object> action) {
-        Objects.requireNonNull(action);
-        entries.computeIfPresent(renderName, (name, map) -> {
-            map.forEach(action);
-            return map;
-        });
+    public ArrayList<EntryObject> getEntries() {
+        return entries;
     }
 
 
+
+
+
+    public void forEachEntry(BiConsumer<String, Object> action) {
+        entries.forEach(entryObject -> action.accept(entryObject.name, entryObject.value));
+    }
+
+
+    static class EntryObject {
+        String name;
+        Object value;
+
+        public EntryObject(String name, Object value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+    }
 }

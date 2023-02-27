@@ -2,13 +2,13 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.ArrayList;
 
@@ -136,19 +136,21 @@ public class PChicken extends RenderIconTextItem {
     }
 
     @Override
-    void setDefaults() {
-        OverlayRegistry.enableOverlay(item, true);
-        scale = 1f;
-        zPos = 0;
-        iconEnabled = true;
-        x = 143;
-        y = 19;
-        textEnabled = true;
-        textShadow = false;
-        color = 0xddf3ff;
-        textAttached = true;
-        textX = 0;
-        textY = 0;
+    ConfigEntry getDefaults() {
+        ConfigEntry e = new ConfigEntry();
+        e.addEntry("display", true);
+        e.addEntry("scale", 2);
+        e.addEntry("zpos", 0);
+        e.addEntry("idisplay", true);
+        e.addEntry("xpos", 143);
+        e.addEntry("ypos", 19);
+        e.addEntry("tdisplay", true);
+        e.addEntry("tshadow", false);
+        e.addEntry("tcolor", 0xddf3ff);
+        e.addEntry("tattached", true);
+        e.addEntry("xtpos", 0);
+        e.addEntry("ytpos", 0);
+        return e;
     }
 
 }

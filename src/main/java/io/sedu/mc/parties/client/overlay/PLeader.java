@@ -2,12 +2,12 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.OverlayRegistry;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
@@ -63,11 +63,13 @@ public class PLeader extends RenderItem {
     }
 
     @Override
-    void setDefaults() {
-        OverlayRegistry.enableOverlay(item, true);
-        x = 34;
-        y = 33;
-        zPos = 2;
-        scale = 1f;
+    ConfigEntry getDefaults() {
+        ConfigEntry e = new ConfigEntry();
+        e.addEntry("display", true);
+        e.addEntry("xpos", 34);
+        e.addEntry("ypos", 33);
+        e.addEntry("zpos", 2);
+        e.addEntry("scale", 2);
+        return e;
     }
 }

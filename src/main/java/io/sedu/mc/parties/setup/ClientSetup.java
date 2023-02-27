@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.setup;
 
+import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.*;
 import io.sedu.mc.parties.events.ClientEvent;
@@ -69,6 +70,7 @@ public class ClientSetup {
         items.put("bgc", new ClickArea("p_bgc"));
         items.values().forEach(RenderItem::register);
         RenderItem.setDefaultValues();
+        Config.saveCompletePreset("default");
 
         //Disable Overlays
         OverlayRegistry.enableOverlay(ForgeIngameGui.POTION_ICONS_ELEMENT, false);

@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.client.overlay;
 
-import io.sedu.mc.parties.util.ColorUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
@@ -25,7 +25,7 @@ public class GeneralOptions extends RenderItem {
 
     @Override
     int getColor() {
-        return ColorUtils.getRainbowColor();
+        return 0xFFFFFF;
     }
 
     @Override
@@ -39,8 +39,9 @@ public class GeneralOptions extends RenderItem {
     }
 
     @Override
-    void setDefaults() {
+    ConfigEntry getDefaults() {
 
+        return new ConfigEntry();
     }
 
     @Override
@@ -49,17 +50,13 @@ public class GeneralOptions extends RenderItem {
         c.addTitleEntry("gen_f");
         c.addSliderEntry("gen_x", 0, () -> s.width - framePosW*(ClientPlayerData.playerOrderedList.size()-1) - frameEleW, frameX);
         c.addSliderEntry("gen_y", 0, () -> s.height - framePosH*(ClientPlayerData.playerOrderedList.size()-1) - frameEleH, frameY);
-        c.addSliderEntry("gen_w", 0, () -> s.width - frameX, frameEleW, true);
-        c.addSliderEntry("gen_h", 0, () -> s.height - frameY, frameEleH, true);
+        c.addSliderWithUpdater("gen_w", 0, () -> s.width - frameX, frameEleW, this::ensureBounds, true);
+        c.addSliderWithUpdater("gen_h", 0, () -> s.height - frameY, frameEleH, this::ensureBounds, true);
         c.addSliderEntry("gen_pw", 0, () -> s.width - frameX, framePosW, true);
         c.addSliderEntry("gen_ph", 0, () -> s.height - frameY, framePosH, true);
         c.addTitleEntry("gen_c");
         c.addSliderEntry("genc_x", 0, () -> frameEleW - clickArea.width, clickArea.x, true);
         c.addSliderEntry("genc_y", 0, () -> frameEleH - clickArea.height, clickArea.y, true);
-        c.addSliderWithUpdater("genc_w", 0, () -> Math.max(0, frameEleW - clickArea.x), clickArea.width, this::ensureBounds, true);
-        c.addSliderWithUpdater("genc_h", 0, () -> Math.max(0, frameEleH - clickArea.y), clickArea.height, this::ensureBounds, true);
-
-
 
 
         return c;

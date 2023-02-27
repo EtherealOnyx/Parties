@@ -1,16 +1,16 @@
 package io.sedu.mc.parties.client.overlay;
 
-import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
+import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.ArrayList;
 
@@ -292,47 +292,69 @@ public class PHealth extends RenderIconTextItem {
     }
 
     @Override
-    void setDefaults() {
-        OverlayRegistry.enableOverlay(item, true);
-        scale = 1f;
-        zPos = 0;
-        iconEnabled = true;
-        x = 46;
-        y = 29;
-        width = 120;
-        height = 10;
-        textEnabled = true;
-        textShadow = true;
-        HealthAnim.type = 0;
-        textAttached = true;
-        textX = 0;
-        textY = 0;
-        color = 0xffe3e3;
-        absorbColor = 0xfff399;
-        deadColor = 0x530404;
-
-        bColorTop = 0x111111 | 0xCC << 24;
-        bColorBot = 0x555555 | 0xCC << 24;
-
-        bAColorTop = 0xfaf098 | 0xCC << 24;
-        bAColorBot = 0xd9cd68 | 0xCC << 24;
-
-        colorTop = 0xC52C27;
-        colorBot = 0x6C0D15;
-
-        colorTopMissing = 0x450202;
-        colorBotMissing = 0x620909;
-
-        colorTopAbsorb = 0xFFCD42 | 0xCC << 24;
-        colorBotAbsorb = 0xB08610 | 0xCC << 24;
-
-        colorAbsTop = 0xFFCD72;
-        colorAbsBot = 0xB08672;
-
-        colorIncTop = 0xC5FFC5;
-        colorIncBot = 0x6CFF6C;
-
-        colorDecTop = 0xFFC5C5;
-        colorDecBot = 0xFF6C6C;
+    public int getColor(int type) {
+        switch(type) {
+            case 0 -> {return color;}
+            case 1 -> {return absorbColor;}
+            case 2 -> {return deadColor;}
+            case 3 -> {return bColorTop;}
+            case 4 -> {return bColorBot;}
+            case 5 -> {return bAColorTop;}
+            case 6 -> {return bAColorBot;}
+            case 7 -> {return colorTop;}
+            case 8 -> {return colorBot;}
+            case 9 -> {return colorTopMissing;}
+            case 10 -> {return colorBotMissing;}
+            case 11 -> {return colorTopAbsorb;}
+            case 12 -> {return colorBotAbsorb;}
+            case 13 -> {return colorAbsTop;}
+            case 14 -> {return colorAbsBot;}
+            case 15 -> {return colorIncTop;}
+            case 16 -> {return colorIncBot;}
+            case 17 -> {return colorDecTop;}
+            case 18 -> {return colorDecBot;}
+        }
+        return 0;
     }
+
+    @Override
+    ConfigEntry getDefaults() {
+        ConfigEntry e = new ConfigEntry();
+        e.addEntry("display", true);
+        e.addEntry("scale", 2);
+        e.addEntry("zpos", 0);
+        e.addEntry("idisplay", true);
+        e.addEntry("xpos", 46);
+        e.addEntry("ypos", 29);
+        e.addEntry("width", 120);
+        e.addEntry("height", 10);
+        e.addEntry("tdisplay", true);
+        e.addEntry("tshadow", true);
+        e.addEntry("ttype", 0);
+        e.addEntry("tattached", true);
+        e.addEntry("xtpos", 0);
+        e.addEntry("ytpos", 0);
+        e.addEntry("tcolor", 0xffe3e3);
+        e.addEntry("tcabsorb", 0xfff399);
+        e.addEntry("tcdead", 0x530404);
+        e.addEntry("bbct", 0xCC111111);
+        e.addEntry("bbcb", 0xCC555555);
+        e.addEntry("bbact", 0xCCfaf098);
+        e.addEntry("bbacb", 0xCCd9cd68);
+        e.addEntry("bct", 0xC52C27);
+        e.addEntry("bcb", 0x6C0d15);
+        e.addEntry("bctm", 0x450202);
+        e.addEntry("bcbm", 0x620909);
+        e.addEntry("bcta", 0xCCFFCD42);
+        e.addEntry("bcba", 0xCCB08610);
+        e.addEntry("bcat", 0xFFCD72);
+        e.addEntry("bcab", 0xB08672);
+        e.addEntry("bcit", 0xC5FFC5);
+        e.addEntry("bcib", 0x6CFF6C);
+        e.addEntry("bcdt", 0xFFC5C5);
+        e.addEntry("bcdb", 0xFF6C6C);
+        return e;
+    }
+
+
 }

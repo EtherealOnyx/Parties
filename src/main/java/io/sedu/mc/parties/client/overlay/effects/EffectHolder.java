@@ -8,6 +8,8 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static io.sedu.mc.parties.client.overlay.PEffectsBoth.bLim;
+
 public class EffectHolder {
 
     //TODO: Add config
@@ -17,7 +19,7 @@ public class EffectHolder {
     List<Integer> sortedEffectBad = new ArrayList<>();
 
     public static void setValues(int buff, int debuff, boolean dFirst) {
-        PEffectsBoth.bLim = buff;
+        bLim = buff;
         PEffectsBoth.dLim = debuff;
         PEffectsBoth.debuffFirst = dFirst;
     }
@@ -26,14 +28,14 @@ public class EffectHolder {
     }
 
     public static void updatebLim(int data) {
-        PEffectsBoth.bLim = data;
+        bLim = data;
         PEffectsBoth.dLim = PEffectsBoth.maxAll - 1 - data;
         ClientPlayerData.markEffectsDirty();
     }
 
     public static void updatedLim(int data) {
         PEffectsBoth.dLim = data;
-        PEffectsBoth.bLim = PEffectsBoth.maxAll - 1 - data;
+        bLim = PEffectsBoth.maxAll - 1 - data;
         ClientPlayerData.markEffectsDirty();
     }
 
@@ -123,17 +125,17 @@ public class EffectHolder {
                 for(int i = 0; i < mx && i < sortedEffectBad.size(); i++) {
                     sortedEffectAll.add(sortedEffectBad.get(i));
                 }
-                for(int i = 0; i < PEffectsBoth.bLim && i < sortedEffectBene.size(); i++) {
+                for(int i = 0; i < bLim && i < sortedEffectBene.size(); i++) {
                     sortedEffectAll.add(sortedEffectBene.get(i));
                 }
                 for(int i = mx; i < sortedEffectBad.size(); i++) {
                     sortedEffectAll.add(sortedEffectBad.get(i));
                 }
-                for(int i = PEffectsBoth.bLim; i < sortedEffectBene.size(); i++) {
+                for(int i = bLim; i < sortedEffectBene.size(); i++) {
                     sortedEffectAll.add(sortedEffectBene.get(i));
                 }
             } else {
-                mx = Math.max(PEffectsBoth.bLim, (PEffectsBoth.maxAll - sortedEffectBad.size())-1);
+                mx = Math.max(bLim, (PEffectsBoth.maxAll - sortedEffectBad.size())-1);
                 for(int i = 0; i < mx && i < sortedEffectBene.size(); i++) {
                     sortedEffectAll.add(sortedEffectBene.get(i));
                 }

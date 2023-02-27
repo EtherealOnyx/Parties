@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.config.ConfigEntry;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
@@ -48,8 +49,8 @@ public class PRectO extends RenderSelfItem {
     }
 
     @Override
-    void setDefaults() {
-
+    ConfigEntry getDefaults() {
+        return new ConfigEntry();
     }
 
     protected int maxH() {

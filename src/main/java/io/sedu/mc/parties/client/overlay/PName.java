@@ -1,19 +1,19 @@
 package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.OverlayRegistry;
 
 public class PName extends RenderItem {
     public static ItemStack nameTag = null;
 
     int color;
-    private int length = 16;
+    int length = 16;
 
     public PName(String name) {
         super(name);
@@ -61,21 +61,29 @@ public class PName extends RenderItem {
         this.color = data;
     }
 
+
     @Override
+    public int getColor(int type) {
+        return color;
+    }
+
     public void setMaxTextSize(int data) {
         this.length = data;
     }
 
+
     @Override
-    void setDefaults() {
-        OverlayRegistry.enableOverlay(item, true);
-        textShadow = true;
-        this.color = 0xddf3ff;
-        this.length = 16;
-        x = 46;
-        y = 9;
-        zPos = 0;
-        scale = 1f;
+    ConfigEntry getDefaults() {
+        ConfigEntry e = new ConfigEntry();
+        e.addEntry("display", true);
+        e.addEntry("tshadow", true);
+        e.addEntry("tcolor", 0xddf3ff);
+        e.addEntry("tmax", 16);
+        e.addEntry("xpos", 46);
+        e.addEntry("ypos", 9);
+        e.addEntry("zpos", 0);
+        e.addEntry("scale", 2);
+        return e;
     }
 
 }

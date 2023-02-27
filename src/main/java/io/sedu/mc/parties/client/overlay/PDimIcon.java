@@ -1,19 +1,19 @@
 package io.sedu.mc.parties.client.overlay;
 
-import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
+import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.OverlayRegistry;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
@@ -23,7 +23,6 @@ public class PDimIcon extends RenderSelfItem {
 
     public static ItemStack icon = null;
     protected static PHead head = null;
-    private boolean renderText = true;
 
     public PDimIcon(String name) {
         super(name);
@@ -166,7 +165,7 @@ public class PDimIcon extends RenderSelfItem {
 
 
     private void doTextRender(int partyIndex, ForgeIngameGui gui, PoseStack poseStack, int currTick, float partialTicks, DimAnim dim, int color) {
-        if (!renderText) return;
+        if (!textEnabled) return;
         int x, y;
         float transX;
         transX = 0;
@@ -209,7 +208,7 @@ public class PDimIcon extends RenderSelfItem {
         ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
         c.addTitleEntry("display");
         c.addBooleanEntry("display", isEnabled());
-        c.addBooleanEntry("tdisplay", renderText);
+        c.addBooleanEntry("tdisplay", textEnabled);
         c.addBooleanEntry("danim", DimAnim.animActive);
         c.addTitleEntry("position");
         c.addSliderEntry("xpos", 0, () -> frameEleW - frameX - 8, this.x);
@@ -231,10 +230,7 @@ public class PDimIcon extends RenderSelfItem {
     protected void tooltipStart(PoseStack poseStack) {
         poseStack.scale(1/head.scale, 1/head.scale, 1);
     }
-    @Override
-    public void toggleText(boolean data) {
-        renderText = data;
-    }
+
 
 
     @Override
@@ -243,13 +239,15 @@ public class PDimIcon extends RenderSelfItem {
     }
 
     @Override
-    void setDefaults() {
-        OverlayRegistry.enableOverlay(item, true);
-        renderText = true;
-        DimAnim.animActive = true;
-        x = 5;
-        y = 33;
-        zPos = 1;
+    ConfigEntry getDefaults() {
+        ConfigEntry e = new ConfigEntry();
+        e.addEntry("display", true);
+        e.addEntry("tdisplay", true);
+        e.addEntry("danim", true);
+        e.addEntry("xpos", 5);
+        e.addEntry("ypos", 33);
+        e.addEntry("zpos", 1);
+        return e;
     }
 
 }
