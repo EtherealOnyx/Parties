@@ -54,11 +54,6 @@ public class GeneralOptions extends RenderItem {
         c.addSliderWithUpdater("gen_h", 0, () -> s.height - frameY, frameEleH, this::ensureBounds, true);
         c.addSliderEntry("gen_pw", 0, () -> s.width - frameX, framePosW, true);
         c.addSliderEntry("gen_ph", 0, () -> s.height - frameY, framePosH, true);
-        c.addTitleEntry("gen_c");
-        c.addSliderEntry("genc_x", 0, () -> frameEleW - clickArea.width, clickArea.x, true);
-        c.addSliderEntry("genc_y", 0, () -> frameEleH - clickArea.height, clickArea.y, true);
-
-
         return c;
     }
 

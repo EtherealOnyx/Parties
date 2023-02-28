@@ -545,33 +545,16 @@ public abstract class RenderItem {
         updater.put("height", (n, d) -> n.setHeight((int)d));
         updater.put("ttype", (n,d) -> HealthAnim.setTextType((int)d));
         updater.put("tcolor", (n, d) -> n.setColor(0, (int)d));
-        updater.put("tcabsorb", (n, d) -> n.setColor(1, (int)d));
-        updater.put("tcdead", (n, d) -> n.setColor(2, (int)d));
-
-        updater.put("bbct", (n, d) -> n.setColor(3, (int)d));
-        updater.put("bbcb", (n, d) -> n.setColor(4, (int)d));
-
-        updater.put("bbact", (n, d) -> n.setColor(5, (int)d));
-        updater.put("bbacb", (n, d) -> n.setColor(6, (int)d));
+        updater.put("bhue", (n,d) -> ((PHealth)n).setMainHue((int) d));
+        updater.put("ohue", (n,d) -> ((PHealth)n).setOverflowHue((int) d));
 
 
-        updater.put("bct", (n, d) -> n.setColor(7, (int)d));
-        updater.put("bcb", (n, d) -> n.setColor(8, (int)d));
 
-        updater.put("bctm", (n, d) -> n.setColor(9, (int)d));
-        updater.put("bcbm", (n, d) -> n.setColor(10, (int)d));
+        updater.put("bcit", (n, d) -> n.setColor(0, (int)d));
+        updater.put("bcib", (n, d) -> n.setColor(1, (int)d));
 
-        updater.put("bcta", (n, d) -> n.setColor(11, (int)d));
-        updater.put("bcba", (n, d) -> n.setColor(12, (int)d));
-
-        updater.put("bcat", (n, d) -> n.setColor(13, (int)d));
-        updater.put("bcab", (n, d) -> n.setColor(14, (int)d));
-
-        updater.put("bcit", (n, d) -> n.setColor(15, (int)d));
-        updater.put("bcib", (n, d) -> n.setColor(16, (int)d));
-
-        updater.put("bcdt", (n, d) -> n.setColor(17, (int)d));
-        updater.put("bcdb", (n, d) -> n.setColor(18, (int)d));
+        updater.put("bcdt", (n, d) -> n.setColor(2, (int)d));
+        updater.put("bcdb", (n, d) -> n.setColor(3, (int)d));
 
         updater.put("buffg", (n, d) -> n.setColor(0, (int)d));
         updater.put("buffb", (n, d) -> n.setColor(1, (int)d));
@@ -625,33 +608,14 @@ public abstract class RenderItem {
         getter.put("height", (n) -> items.get(n).height);
         getter.put("ttype", (n) -> HealthAnim.getTextType());
         getter.put("tcolor", (n) -> items.get(n).getColor(0));
-        getter.put("tcabsorb", (n) -> items.get(n).getColor(1));
-        getter.put("tcdead", (n) -> items.get(n).getColor(2));
+        getter.put("bhue", (n) -> ((PHealth)items.get(n)).hue);
+        getter.put("ohue", (n) -> ((PHealth)items.get(n)).oHue);
 
-        getter.put("bbct", (n) -> items.get(n).getColor(3));
-        getter.put("bbcb", (n) -> items.get(n).getColor(4));
+        getter.put("bcit", (n) -> items.get(n).getColor(0));
+        getter.put("bcib", (n) -> items.get(n).getColor(1));
 
-        getter.put("bbact", (n) -> items.get(n).getColor(5));
-        getter.put("bbacb", (n) -> items.get(n).getColor(6));
-
-
-        getter.put("bct", (n) -> items.get(n).getColor(7));
-        getter.put("bcb", (n) -> items.get(n).getColor(8));
-
-        getter.put("bctm", (n) -> items.get(n).getColor(9));
-        getter.put("bcbm", (n) -> items.get(n).getColor(10));
-
-        getter.put("bcta", (n) -> items.get(n).getColor(11));
-        getter.put("bcba", (n) -> items.get(n).getColor(12));
-
-        getter.put("bcat", (n) -> items.get(n).getColor(13));
-        getter.put("bcab", (n) -> items.get(n).getColor(14));
-
-        getter.put("bcit", (n) -> items.get(n).getColor(15));
-        getter.put("bcib", (n) -> items.get(n).getColor(16));
-
-        getter.put("bcdt", (n) -> items.get(n).getColor(17));
-        getter.put("bcdb", (n) -> items.get(n).getColor(18));
+        getter.put("bcdt", (n) -> items.get(n).getColor(2));
+        getter.put("bcdb", (n) -> items.get(n).getColor(3));
 
         getter.put("buffg", (n) -> items.get(n).getColor(0));
         getter.put("buffb", (n) -> items.get(n).getColor(1));

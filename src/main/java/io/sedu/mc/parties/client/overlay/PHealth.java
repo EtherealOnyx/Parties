@@ -6,6 +6,7 @@ import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
+import io.sedu.mc.parties.util.ColorUtils;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -20,6 +21,9 @@ import static io.sedu.mc.parties.util.AnimUtils.animPos;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
 public class PHealth extends RenderIconTextItem {
+
+    int hue = 0;
+    int oHue = 0;
 
     int absorbColor;
     int deadColor;
@@ -49,7 +53,7 @@ public class PHealth extends RenderIconTextItem {
 
     @Override
     int getColor() {
-        return 0xe3403d;
+        return colorTop;
     }
 
     @Override
@@ -59,7 +63,7 @@ public class PHealth extends RenderIconTextItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        RenderUtils.sizeRect(poseStack.last().pose(), b.x+7, b.y+9, 0, 22, 7, bColorTop, bColorBot);
+        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+7, b.y+9, 0, 22, 7, bColorTop, bColorBot);
         RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+8, b.y+10, 0, 20, 5, colorTop, colorBot);
         setup(GUI_ICONS_LOCATION);
         RenderSystem.enableDepthTest();
@@ -77,7 +81,7 @@ public class PHealth extends RenderIconTextItem {
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
 
         if (id.isDead) {
-            RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorBot);
+            RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorBot, bColorBot);
             RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing);
 
             textCentered(i, tX(i), tY(i), gui, poseStack, "Dead", deadColor);
@@ -114,13 +118,13 @@ public class PHealth extends RenderIconTextItem {
         float hB, aB;
         hB = id.health.getPercent();
         if (id.health.absorb > 0) {
-            RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, bAColorTop, bAColorBot);
+            RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bAColorTop, bAColorBot);
             RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
             aB = hB + id.health.getPercentA();
             rectRNoA(poseStack, i, zPos, hB, colorTop, colorBot); //Health
             rectB(poseStack, i, zPos, hB, aB, colorTopAbsorb, colorBotAbsorb); //Absorb
         } else {
-            RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorTop, bColorBot);
+            RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorTop, bColorBot);
             RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
             rectRNoA(poseStack, i, zPos, hB, colorTop, colorBot); //Health
         }
@@ -131,15 +135,11 @@ public class PHealth extends RenderIconTextItem {
     }
 
     private void rectB(PoseStack p, int i, int zLevel, float leftPosition, float rightPosition, int startColor, int endColor ) {
-        RenderUtils.rect(p.last().pose(), zPos, Math.max(x(i), x(i) + (width-2)*leftPosition)+1, y(i)+1, Math.min(x(i)+width-1, x(i)+1 + (width-2)*rightPosition), y(i)+height-1, startColor, endColor);
+        RenderUtils.rectNoA(p.last().pose(), zPos, Math.max(x(i), x(i) + (width-2)*leftPosition)+1, y(i)+1, Math.min(x(i)+width-1, x(i)+1 + (width-2)*rightPosition), y(i)+height-1, startColor, endColor);
         //Render.rect(p.last().pose(), zLevel, l(i)+width*leftPosition-1, t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
     }
 
     private void rectAnim(PoseStack p, int i, int zLevel, float leftPosition, float rightPosition, int startColor, int endColor ) {
-        //TODO: Use a left top right bot rect. Width stays untouched. Left pos must be + 1.
-        //TODO: width-2 * (rightpos-leftpos) ???
-        //TODO: X Bound: x + 1 + (width-2)*leftPos??? IS THIS ALL I NEEDED OMG
-        //TODO: Switch to left, top, right, bottom and use Math.max(x+1, val) etc to clamp values.
         //Left Pos: x + offset + (width - offset*2)*leftPos | Right Pos: x + offset + (
         RenderUtils.rectNoA(p.last().pose(), zPos, Math.max(x(i), x(i) + (width-2)*leftPosition)+1, y(i)+1, Math.min(x(i)+width-1, x(i)+1 + (width-2)*rightPosition), y(i)+height-1, startColor, endColor);
         //Render.rectNoA(p.last().pose(), zLevel, l(i)+width*leftPosition-1, t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
@@ -205,48 +205,22 @@ public class PHealth extends RenderIconTextItem {
         entries.add(c.addSliderEntry("xtpos", 0, () -> frameEleW, textX));
         entries.add(c.addSliderEntry("ytpos", 0, () -> frameEleH, textY));
         toggleTextAttach(entries);
-        c.addTitleEntry("textc");
-        c.addColorEntry("tcolor", color);
-        c.addColorEntry("tcabsorb", absorbColor);
-        c.addColorEntry("tcdead", deadColor);
         c.addSpaceEntry();
-        c.addTitleEntry("barc");
-        c.addSpaceEntry();
-        c.addTitleEntry("barb");
-        c.addColorEntry("bbct", bColorTop);
-        c.addColorEntry("bbcb", bColorBot);
-        c.addSpaceEntry();
-        c.addTitleEntry("bara");
-        c.addColorEntry("bbact", bAColorTop);
-        c.addColorEntry("bbacb", bAColorBot);
-        c.addSpaceEntry();
-        c.addTitleEntry("bc");
-        c.addColorEntry("bct", colorTop);
-        c.addColorEntry("bcb", colorBot);
-        c.addSpaceEntry();
-        c.addTitleEntry("bcm");
-        c.addColorEntry("bctm", colorTopMissing);
-        c.addColorEntry("bcbm", colorBotMissing);
-        c.addSpaceEntry();
-        c.addTitleEntry("bca");
-        c.addColorEntry("bcta", colorTopAbsorb);
-        c.addColorEntry("bcba", colorBotAbsorb);
-        c.addSpaceEntry();
-        c.addTitleEntry("baa");
-        c.addColorEntry("bcat", colorAbsTop);
-        c.addColorEntry("bcab", colorAbsBot);
-        c.addSpaceEntry();
+
+        c.addTitleEntry("bhue");
+        c.addSliderEntry("bhue", 0, () -> 100, hue, false);
+        c.addTitleEntry("ohue");
+        c.addSliderEntry("ohue", 0, () -> 100, oHue, false);
         c.addTitleEntry("bai");
         c.addColorEntry("bcit", colorIncTop);
         c.addColorEntry("bcib", colorIncBot);
-        c.addSpaceEntry();
         c.addTitleEntry("bad");
         c.addColorEntry("bcdt", colorDecTop);
         c.addColorEntry("bcdb", colorDecBot);
-        c.addSpaceEntry();
 
         return c;
     }
+
 
     @Override
     protected void updateValues() {
@@ -264,55 +238,35 @@ public class PHealth extends RenderIconTextItem {
         return (int) Math.ceil(frameEleH/scale);
     }
 
-
+    protected void setMainColors() {
+        float hue = this.hue/100f;
+        bColorTop = ColorUtils.HSBtoRGB(hue, .5f, .25f);
+        bColorBot = ColorUtils.HSBtoRGB(hue, .25f, .5f);
+        color = ColorUtils.HSBtoRGB(hue, .2f, 1f);
+        deadColor = ColorUtils.HSBtoRGB(hue, .25f, .75f);
+        colorTop = ColorUtils.HSBtoRGB(hue, .8f, .77f);
+        colorBot = ColorUtils.HSBtoRGB(hue, .88f, .42f);
+        colorTopMissing = ColorUtils.HSBtoRGB(hue, .97f, .27f);
+        colorBotMissing = ColorUtils.HSBtoRGB(hue, .91f, .38f);
+    }
 
     @Override
     public void setColor(int type, int data) {
         switch(type) {
-            case 0 -> color = data;
-            case 1 -> absorbColor = data;
-            case 2 -> deadColor = data;
-            case 3 -> bColorTop = data | 0xCC << 24;
-            case 4 -> bColorBot = data | 0xCC << 24;
-            case 5 -> bAColorTop = data | 0xCC << 24;
-            case 6 -> bAColorBot = data | 0xCC << 24;
-            case 7 -> colorTop = data;
-            case 8 -> colorBot = data;
-            case 9 -> colorTopMissing = data;
-            case 10 -> colorBotMissing = data;
-            case 11 -> colorTopAbsorb = data | 0xCC << 24;
-            case 12 -> colorBotAbsorb = data | 0xCC << 24;
-            case 13 -> colorAbsTop = data;
-            case 14 -> colorAbsBot = data;
-            case 15 -> colorIncTop = data;
-            case 16 -> colorIncBot = data;
-            case 17 -> colorDecTop = data;
-            case 18 -> colorDecBot = data;
+            case 0 -> colorIncTop = data;
+            case 1 -> colorIncBot = data;
+            case 2 -> colorDecTop = data;
+            case 3 -> colorDecBot = data;
         }
     }
 
     @Override
     public int getColor(int type) {
         switch(type) {
-            case 0 -> {return color;}
-            case 1 -> {return absorbColor;}
-            case 2 -> {return deadColor;}
-            case 3 -> {return bColorTop;}
-            case 4 -> {return bColorBot;}
-            case 5 -> {return bAColorTop;}
-            case 6 -> {return bAColorBot;}
-            case 7 -> {return colorTop;}
-            case 8 -> {return colorBot;}
-            case 9 -> {return colorTopMissing;}
-            case 10 -> {return colorBotMissing;}
-            case 11 -> {return colorTopAbsorb;}
-            case 12 -> {return colorBotAbsorb;}
-            case 13 -> {return colorAbsTop;}
-            case 14 -> {return colorAbsBot;}
-            case 15 -> {return colorIncTop;}
-            case 16 -> {return colorIncBot;}
-            case 17 -> {return colorDecTop;}
-            case 18 -> {return colorDecBot;}
+            case 0 -> {return colorIncTop;}
+            case 1 -> {return colorIncBot;}
+            case 2 -> {return colorDecTop;}
+            case 3 -> {return colorDecBot;}
         }
         return 0;
     }
@@ -334,21 +288,8 @@ public class PHealth extends RenderIconTextItem {
         e.addEntry("tattached", true);
         e.addEntry("xtpos", 0);
         e.addEntry("ytpos", 0);
-        e.addEntry("tcolor", 0xffe3e3);
-        e.addEntry("tcabsorb", 0xfff399);
-        e.addEntry("tcdead", 0x530404);
-        e.addEntry("bbct", 0xCC111111);
-        e.addEntry("bbcb", 0xCC555555);
-        e.addEntry("bbact", 0xCCfaf098);
-        e.addEntry("bbacb", 0xCCd9cd68);
-        e.addEntry("bct", 0xC52C27);
-        e.addEntry("bcb", 0x6C0d15);
-        e.addEntry("bctm", 0x450202);
-        e.addEntry("bcbm", 0x620909);
-        e.addEntry("bcta", 0xCCFFCD42);
-        e.addEntry("bcba", 0xCCB08610);
-        e.addEntry("bcat", 0xFFCD72);
-        e.addEntry("bcab", 0xB08672);
+        e.addEntry("bhue", 0);
+        e.addEntry("ohue", 11);
         e.addEntry("bcit", 0xC5FFC5);
         e.addEntry("bcib", 0x6CFF6C);
         e.addEntry("bcdt", 0xFFC5C5);
@@ -356,5 +297,24 @@ public class PHealth extends RenderIconTextItem {
         return e;
     }
 
+    protected void setMainHue(int d) {
+        this.hue = d;
+        setMainColors();
+    }
 
+    protected void setOverflowColors() {
+        float hue = this.oHue/100f;
+        absorbColor = ColorUtils.HSBtoRGB(hue, .3f, 1f);
+        bAColorTop = ColorUtils.HSBtoRGB(hue, .5f, 1f);
+        bAColorBot = ColorUtils.HSBtoRGB(hue, .4f, .75f);
+        colorTopAbsorb = ColorUtils.HSBtoRGB(hue, .75f, 1f);
+        colorBotAbsorb = ColorUtils.HSBtoRGB(hue, .9f, .7f);
+        colorAbsTop = ColorUtils.HSBtoRGB(hue, .55f, 1f);
+        colorAbsBot = ColorUtils.HSBtoRGB(hue, .35f, .69f);
+    }
+
+    protected void setOverflowHue(int d) {
+        this.oHue = d;
+        setOverflowColors();
+    }
 }

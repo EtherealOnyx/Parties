@@ -38,7 +38,7 @@ public class ColorUtils {
     /**
      * HSBtoRGB method from Color.HSBtoRGB(hue, saturation, brightness) without alpha.
      */
-    private static int HSBtoRGB(float hue, float saturation, float brightness) {
+    public static int HSBtoRGB(float hue, float saturation, float brightness) {
         int r = 0;
         int g = 0;
         int b = 0;

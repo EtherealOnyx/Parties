@@ -115,6 +115,7 @@ public class SettingsScreen extends Screen {
             revertCooldown = 0;
             ((SmallButton)miscButtons.get(6)).setColor(1f, 1f, .5f);
             miscButtons.get(6).setMessage(new TextComponent("↺"));
+            refreshCurrentEle();
         } else {
             miscButtons.get(6).active = false;
             triggeredPrompt = true;
@@ -127,8 +128,13 @@ public class SettingsScreen extends Screen {
 
     }
 
+    private void refreshCurrentEle() {
+        selectButton(selEle);
+    }
+
     private void resetEle() {
         RenderItem.setElementDefaults(RenderItem.items.get(tabsOrder.get(selEle)), updater);
+        refreshCurrentEle();
     }
 
     private void toggleEles(boolean b) {
@@ -231,7 +237,7 @@ public class SettingsScreen extends Screen {
             this.renderTooltip(poseStack, confirmPrompt, pMouseX, pMouseY + 16);
             poseStack.translate(0,0,-1);
         }
-        renderFullArea(poseStack, selEle == 0);
+        renderFrameOutline(poseStack);
         renderConfig();
         RenderSystem.enableDepthTest();
         this.options.render(poseStack, pMouseX, pMouseY, pPartialTick);

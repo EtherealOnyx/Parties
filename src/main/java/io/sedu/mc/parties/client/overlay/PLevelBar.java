@@ -192,7 +192,7 @@ public class PLevelBar extends RenderIconTextItem {
         e.addEntry("ypos", 44);
         e.addEntry("width", 40);
         e.addEntry("tdisplay", true);
-        e.addEntry("tshadow", false);
+        e.addEntry("tshadow", true);
         e.addEntry("tcolor", 0x80ff8b);
         e.addEntry("tattached", true);
         e.addEntry("xtpos", 0);

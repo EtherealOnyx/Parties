@@ -68,32 +68,14 @@
   "config.sedparties.name.genc_x": "X Pos",
   "config.sedparties.name.genc_y": "Y Pos",
 
+  "config.sedparties.title.bhue":"Main Bar Color",
+  "config.sedparties.name.bhue": "Hue",
+  "config.sedparties.title.ohue":"Overflow Bar Color",
+  "config.sedparties.name.ohue": "Hue",
+
   "config.sedparties.title.barc":"Bar Color Settings",
   "config.sedparties.title.color":"Color Settings",
 
-  "config.sedparties.title.barb":"Border Gradient",
-  "config.sedparties.name.bbct": "Top",
-  "config.sedparties.name.bbcb": "Bottom",
-
-  "config.sedparties.title.bara":"Absorb Border Gradient",
-  "config.sedparties.name.bbact": "Top",
-  "config.sedparties.name.bbacb": "Bottom",
-
-  "config.sedparties.title.bc":"Normal Health Gradient",
-  "config.sedparties.name.bct": "Top",
-  "config.sedparties.name.bcb": "Bottom",
-
-  "config.sedparties.title.bcm":"Missing Health Gradient",
-  "config.sedparties.name.bctm": "Top",
-  "config.sedparties.name.bcbm": "Bottom",
-
-  "config.sedparties.title.bca":"Absorb Health Gradient",
-  "config.sedparties.name.bcta": "Top",
-  "config.sedparties.name.bcba": "Bottom",
-
-  "config.sedparties.title.baa": "Absorb Anim Gradient",
-  "config.sedparties.name.bcat": "Top",
-  "config.sedparties.name.bcab": "Bottom",
 
   "config.sedparties.title.bai": "Gain Anim Gradient",
   "config.sedparties.name.bcit": "Top",
