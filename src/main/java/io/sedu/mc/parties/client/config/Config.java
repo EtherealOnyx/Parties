@@ -68,7 +68,7 @@ public class Config {
         getPresets(PRESET_PATH, action);
     }
 
-    public static void loadPreset(String file, boolean isDefault, HashMap<String, RenderItem.Update> updater) {
+    public static boolean loadPreset(String file, boolean isDefault, HashMap<String, RenderItem.Update> updater) {
         try (Reader reader = new FileReader((isDefault? DEFAULT_PRESET_PATH : PRESET_PATH).resolve(file + ".json").toFile())) {
             Gson gson = new Gson();
             JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
@@ -77,8 +77,11 @@ public class Config {
             updateValues(new GeneralOptions(""), element, updater);
             RenderItem.items.forEach((name, item) -> updateValues(item, jsonObject.get(name), updater));
         } catch (IOException e) {
-            Parties.LOGGER.error("Error trying to load a preset!", e);
+            Parties.LOGGER.warn("Error trying to load a preset! Refreshing list", e);
+            Parties.LOGGER.warn("Refreshing preset list...", e);
+            return false;
         }
+        return true;
     }
 
     private static void updateValues(RenderItem item, JsonElement element, HashMap<String, RenderItem.Update> updater) {
@@ -125,5 +128,9 @@ public class Config {
         } catch (IOException e) {
             Parties.LOGGER.error("Error trying to load default presets!", e);
         }
+    }
+
+    public static boolean deletePreset(String file) {
+        return PRESET_PATH.resolve(file + ".json").toFile().delete();
     }
 }

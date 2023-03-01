@@ -74,6 +74,9 @@ public class SettingsScreen extends Screen {
     int presetBoxW;
     int presetBoxH;
 
+    private static String nameHolder = null;
+    private static String descHolder = null;
+
     Pattern alphaNumeric = Pattern.compile("^[a-zA-Z0-9_-]*$");
 
     //TODO: Save changes into a new class that tracks the component and the subtype and the value of the change. Disable clearing until they press X
@@ -99,6 +102,8 @@ public class SettingsScreen extends Screen {
 
     private void savePreset() {
         Config.saveCompletePreset(nameBox.getValue(), descBox.getValue());
+        nameBox.setValue("");
+        descBox.setValue("");
         if (selEle == -1) {
             selectButton(-1);
         }
@@ -209,6 +214,8 @@ public class SettingsScreen extends Screen {
         GeneralOptions.icon = null;
         PresetOptions.icon = null;
         INNER_LOC = null;
+        nameHolder = nameBox.getValue().isEmpty() ? null : nameBox.getValue();
+        descHolder = descBox.getValue().isEmpty() ? null : descBox.getValue();
         super.onClose();
     }
 
@@ -341,6 +348,8 @@ public class SettingsScreen extends Screen {
         nameBox = new InputBox(0xFFFFFF, font, 0, 12, new TextComponent("Name"), (s) -> checkSaveFlags(), false);
         descBox = new InputBox(0xFFFFFF, font, 0, 12, new TextComponent("Desc"), (s) -> checkSaveFlags(), false);
         nameBox.filter = s -> alphaNumeric.matcher(s).find();
+        nameBox.insertText(nameHolder == null ? "" : nameHolder);
+        descBox.insertText(descHolder == null ? "" : descHolder);
         descBox.setMaxLength(128);
         checkSaveFlags();
     }
@@ -388,7 +397,7 @@ public class SettingsScreen extends Screen {
         return super.mouseClicked(pMouseX,pMouseY, pButton);
     }
 
-    private void selectButton(int i) {
+    protected void selectButton(int i) {
         selEle = i;
         removeWidget(options);
         options = null;
@@ -513,6 +522,9 @@ public class SettingsScreen extends Screen {
             addRenderableWidget(presetButton);
             addRenderableWidget(nameBox);
             addRenderableWidget(descBox);
+            //Forces the text boxes to update the rendered value...
+            nameBox.setHighlightPos(nameBox.getValue().length());
+            descBox.setHighlightPos(descBox.getValue().length());
 
             //TODO: Ignore ModBox implementation for now. Implement later.
             removeWidget(miscButtons.get(0));
@@ -526,7 +538,7 @@ public class SettingsScreen extends Screen {
         if (this.options == null) {
             if (selEle == -1) {
                 this.options = presetButton.getOptions(this, minecraft, 0, 0, 0, 0);
-                this.options.setItemHeight(32);
+                this.options.setItemHeight(28);
             } else {
                 this.options = tabs.get(tabsOrder.get(selEle)).getOptions(this, minecraft, 0, 0, 0, 0);
             }

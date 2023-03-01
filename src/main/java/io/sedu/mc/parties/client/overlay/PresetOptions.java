@@ -47,11 +47,8 @@ public class PresetOptions extends RenderItem {
     @Override
     protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
         ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
-        c.addTitleEntry("presetc");
-        Config.getCustomPresets((file, desc) -> c.addPresetEntry(file, desc, false));
-
-        c.addTitleEntry("presetd");
         Config.getDefaultPresets((file, desc) -> c.addPresetEntry(file, desc, true));
+        Config.getCustomPresets((file, desc) -> c.addPresetEntry(file, desc, false));
         return c;
     }
 

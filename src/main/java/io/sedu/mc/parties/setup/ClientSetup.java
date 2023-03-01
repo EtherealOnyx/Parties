@@ -85,7 +85,7 @@ public class ClientSetup {
         //TODO: Save preset in folder. read file names in preset folder as valid presets. When loading preset, try to load. Revert to current if failed.
         RenderItem.setDefaultValues();
         Config.init();
-        Config.saveDefaultPreset("default", "The main default preset of the mod.");
+        Config.saveDefaultPreset("standard", "The standard preset of the mod.");
         saveAlternatePresets();
 
         //Config.saveCompletePreset("default");
@@ -95,14 +95,16 @@ public class ClientSetup {
         items.get("effects").setEnabled(false);
         items.get("effects_b").setEnabled(true);
         items.get("effects_d").setEnabled(true);
-        Config.saveDefaultPreset("default-sepb", "A default preset with the buff and debuff bar separated.");
+        Config.saveDefaultPreset("sepbuffs", "A preset with the buff and debuff bar separated.");
         RenderItem.setDefaultValues();
         items.get("effects").setXPos(170);
         items.get("effects").setYPos(19);
         ((PEffects) items.get("effects")).setMaxPerRow(5);
         ((PEffects) items.get("effects")).setMaxSize(5);
         EffectHolder.updatebLim(0); //updates dLim too.
-        Config.saveDefaultPreset("default-sideb", "A default preset with the buffs bar on the right of the frame.");
+        RenderItem.frameEleH = 52;
+        RenderItem.framePosH = 51;
+        Config.saveDefaultPreset("sidebuffs", "A preset with the combined buff bar on the right of the frame. Adds more space.");
         //TODO: Add Minimal version.
         RenderItem.setDefaultValues();
     }

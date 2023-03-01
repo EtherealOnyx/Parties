@@ -700,17 +700,32 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         private String descTrimmed;
         private List<Component> descTip;
         private Button loadPreset;
+        private Button deletePreset;
 
         PresetEntry(String file, String desc, boolean isDefault) {
             this.fileName = file;
             this.desc = desc;
             this.name = new TextComponent(fileName);
-            loadPreset = new Button(0, 0, 32, 20, new TextComponent("Load"), (b) ->
-            {
-                Config.loadPreset(file, isDefault, s.updater);
+            loadPreset = new SmallButton(0, 0, "⬇", pButton -> {
                 assert minecraft.player != null;
-                minecraft.player.sendMessage(new TextComponent("Preset (").withStyle(ChatFormatting.DARK_AQUA).append(new TextComponent(fileName).withStyle(ChatFormatting.YELLOW)).append(new TextComponent(") has been loaded successfully.").withStyle(ChatFormatting.DARK_AQUA)), minecraft.player.getUUID());
-            });
+                if (Config.loadPreset(file, isDefault, s.updater)) {
+                    minecraft.player.sendMessage(new TextComponent("Preset (").withStyle(ChatFormatting.DARK_AQUA).append(new TextComponent(fileName).withStyle(ChatFormatting.YELLOW)).append(new TextComponent(") has been loaded successfully.").withStyle(ChatFormatting.DARK_AQUA)), minecraft.player.getUUID());
+                } else {
+                    minecraft.player.sendMessage(new TextComponent("Preset (").withStyle(ChatFormatting.DARK_AQUA).append(new TextComponent(fileName).withStyle(ChatFormatting.YELLOW)).append(new TextComponent(") was not found.").withStyle(ChatFormatting.DARK_AQUA)), minecraft.player.getUUID());
+                    s.selectButton(-1);
+                }
+
+            }, RenderUtils.tip(s, "Load Preset"), .5f, 1f, .5f, .5f);
+            deletePreset = new SmallButton(0, 0, "x", pButton -> {
+                assert minecraft.player != null;
+                if (Config.deletePreset(file)) {
+                    minecraft.player.sendMessage(new TextComponent("Preset (").withStyle(ChatFormatting.DARK_AQUA).append(new TextComponent(fileName).withStyle(ChatFormatting.YELLOW)).append(new TextComponent(") was deleted successfully.").withStyle(ChatFormatting.DARK_AQUA)), minecraft.player.getUUID());
+                } else {
+                    minecraft.player.sendMessage(new TextComponent("Preset (").withStyle(ChatFormatting.DARK_AQUA).append(new TextComponent(fileName).withStyle(ChatFormatting.YELLOW)).append(new TextComponent(") was not found.").withStyle(ChatFormatting.DARK_AQUA)), minecraft.player.getUUID());
+                }
+                s.selectButton(-1);
+            }, RenderUtils.tip(s, "Delete Preset"), 1f, .5f, .5f, .5f);
+            deletePreset.active = !isDefault;
             this.markDirty();
         }
 
@@ -729,7 +744,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         @Override
         public List<? extends GuiEventListener> children() {
-            return ImmutableList.of(this.loadPreset);
+            return ImmutableList.of(this.loadPreset, this.deletePreset);
         }
 
         @Override
@@ -740,7 +755,8 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         @Override
         void updateValues(int pTop, int pLeft, int pWidth, int pHeight) {
             x = pLeft + 4;
-            loadPreset.x = pLeft + pWidth - 40;
+            loadPreset.x = pLeft + pWidth - 28;
+            deletePreset.x = loadPreset.x + 12;
             descTip = RenderUtils.splitTooltip(desc, pWidth/5);
             descTrimmed = desc.substring(0, Math.min(desc.length(), (pWidth-32)/6));
             if (descTrimmed.length() != desc.length()) {
@@ -765,15 +781,16 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             if (pIsMouseOver)
             {
                 RenderUtils.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + pWidth, pTop + pHeight, entryColor.getColor() | 100 << 24, entryColor.getColor());
-                //ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, x, pTop + 4, 0xFFFFFF);
-                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, x, pTop + 4, 0xFFFFAA);
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, x, pTop + 3, 0xFFFFAA);
                 s.renderTooltip(pPoseStack, descTip, Optional.empty(), s.screenX-8, s.presetBoxY+14);
             } else {
-                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, x, pTop + 4, 0xFFFFFF);
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, x, pTop + 3, 0xFFFFFF);
             }
-            ConfigOptionsList.this.minecraft.font.draw(pPoseStack, descTrimmed, x, pTop + 15, 0xAAAAAAAA);
-            this.loadPreset.y = pTop + 3;
+            ConfigOptionsList.this.minecraft.font.draw(pPoseStack, descTrimmed, x, pTop + 14, 0xAAAAAAAA);
+            this.loadPreset.y = pTop + 7;
+            this.deletePreset.y = this.loadPreset.y;
             this.loadPreset.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+            this.deletePreset.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
         }
     }
 
