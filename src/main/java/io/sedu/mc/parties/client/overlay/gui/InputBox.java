@@ -404,8 +404,7 @@ public class InputBox extends AbstractWidget implements Widget, GuiEventListener
             return false;
         } else {
             boolean flag = pMouseX >= (double)this.x && pMouseX < (double)(this.x + this.width) && pMouseY >= (double)this.y && pMouseY < (double)(this.y + this.height);
-                this.setFocus(flag);
-
+            this.setFocus(flag);
             if (this.isFocused() && flag && pButton == 0) {
                 int i = Mth.floor(pMouseX) - this.x;
                 String s = this.font.plainSubstrByWidth(this.value.substring(this.displayPos), this.getInnerWidth());

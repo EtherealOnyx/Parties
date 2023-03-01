@@ -14,6 +14,8 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static io.sedu.mc.parties.client.overlay.RenderItem.*;
@@ -547,6 +549,34 @@ public class RenderUtils {
             if (b) clickArea.rect(i, poseStack, 0, -1, ColorUtils.getRainbowColor() | 150 << 24);
         }
 
+    }
+
+    public static List<Component> splitTooltip(String text, int splitAt) {
+        ArrayList<Component> tooltip = new ArrayList<>();
+        boolean isTrimming = true;
+        while (isTrimming) {
+            int finalPos = Math.min(splitAt, text.length());
+            //Get a limited line.
+            String line = text.substring(0, finalPos);
+            if (finalPos != text.length()) {
+                int lastWord = line.lastIndexOf(' ');
+                if (lastWord != -1) {
+                    String testLine = line.substring(0, lastWord);
+                    if (testLine.length() > 0) {
+                        line = testLine;
+                        finalPos = lastWord+1;
+                    }
+                }
+            }
+
+            tooltip.add(new TextComponent(line));
+            if (finalPos != text.length()) {
+                text = text.substring(finalPos);
+            } else {
+                isTrimming = false;
+            }
+        }
+        return tooltip;
     }
 
 }

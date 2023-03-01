@@ -239,13 +239,13 @@ public class PDimIcon extends RenderSelfItem {
     }
 
     @Override
-    ConfigEntry getDefaults() {
+    public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
         e.addEntry("display", true);
         e.addEntry("tdisplay", true);
         e.addEntry("danim", true);
         e.addEntry("xpos", 5);
-        e.addEntry("ypos", 33);
+        e.addEntry("ypos", 34);
         e.addEntry("zpos", 1);
         return e;
     }

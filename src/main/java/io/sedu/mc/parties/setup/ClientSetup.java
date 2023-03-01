@@ -3,6 +3,7 @@ package io.sedu.mc.parties.setup;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.*;
+import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.events.ClientEvent;
 import io.sedu.mc.parties.util.ColorUtils;
 import net.minecraft.client.KeyMapping;
@@ -69,8 +70,6 @@ public class ClientSetup {
         items.put("bg1", new PRectD("p_bg1"));
         items.put("bgc", new ClickArea("p_bgc"));
         items.values().forEach(RenderItem::register);
-        RenderItem.setDefaultValues();
-        Config.saveCompletePreset("default");
 
         //Disable Overlays
         OverlayRegistry.enableOverlay(ForgeIngameGui.POTION_ICONS_ELEMENT, false);
@@ -84,6 +83,28 @@ public class ClientSetup {
 
         //DimConfig.init();
         //TODO: Save preset in folder. read file names in preset folder as valid presets. When loading preset, try to load. Revert to current if failed.
+        RenderItem.setDefaultValues();
+        Config.init();
+        Config.saveDefaultPreset("default", "The main default preset of the mod.");
+        saveAlternatePresets();
+
+        //Config.saveCompletePreset("default");
+    }
+
+    private static void saveAlternatePresets() {
+        items.get("effects").setEnabled(false);
+        items.get("effects_b").setEnabled(true);
+        items.get("effects_d").setEnabled(true);
+        Config.saveDefaultPreset("default-sepb", "A default preset with the buff and debuff bar separated.");
+        RenderItem.setDefaultValues();
+        items.get("effects").setXPos(170);
+        items.get("effects").setYPos(19);
+        ((PEffects) items.get("effects")).setMaxPerRow(5);
+        ((PEffects) items.get("effects")).setMaxSize(5);
+        EffectHolder.updatebLim(0); //updates dLim too.
+        Config.saveDefaultPreset("default-sideb", "A default preset with the buffs bar on the right of the frame.");
+        //TODO: Add Minimal version.
+        RenderItem.setDefaultValues();
     }
 
     public static void postInit(FMLLoadCompleteEvent event) {

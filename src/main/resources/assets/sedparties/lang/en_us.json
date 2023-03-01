@@ -1,4 +1,5 @@
 {
+  "gui.sedparties.name.preset": "Load a Preset",
   "gui.sedparties.name.general": "General Settings",
   "gui.sedparties.name.p_leader":"Leader Icon",
   "gui.sedparties.name.p_name":"Name Text",
@@ -16,6 +17,8 @@
   "gui.sedparties.name.p_effects":"Combined Buff/Debuff Bar Element",
   "gui.sedparties.name.p_bgc":"Clickable Frame Area",
   "config.sedparties.title.display":"Display Settings",
+  "config.sedparties.title.presetd":"Default Presets",
+  "config.sedparties.title.presetc":"Custom Presets",
   "config.sedparties.title.position":"Position Settings",
   "config.sedparties.title.general": "General Settings",
   "config.sedparties.title.icon":"Icon Settings",

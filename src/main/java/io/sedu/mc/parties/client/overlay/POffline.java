@@ -87,7 +87,7 @@ public class POffline extends RenderIconTextItem {
     }
 
     @Override
-    ConfigEntry getDefaults() {
+    public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
         e.addEntry("display", true);
         e.addEntry("scale", 2);

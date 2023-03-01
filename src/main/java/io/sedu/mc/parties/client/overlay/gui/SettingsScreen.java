@@ -3,6 +3,7 @@ package io.sedu.mc.parties.client.overlay.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.*;
 import io.sedu.mc.parties.util.ColorUtils;
 import io.sedu.mc.parties.util.RenderUtils;
@@ -23,15 +24,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.util.RenderUtils.*;
 
 public class SettingsScreen extends Screen {
-    private final ResourceLocation MENU_LOC = new ResourceLocation("textures/block/spruce_planks.png");
+    private final ResourceLocation MENU_LOC = new ResourceLocation("textures/block/deepslate_tiles.png");
     private final ResourceLocation MOD_LOC = new ResourceLocation("textures/block/polished_basalt_side.png");
-    public static ResourceLocation INNER_LOC = new ResourceLocation("textures/block/deepslate_bricks");
-    private final ResourceLocation OPTIONS_LOC = new ResourceLocation("textures/block/polished_basalt_side.png");
+    public static ResourceLocation INNER_LOC;
+    private final ResourceLocation OPTIONS_LOC = new ResourceLocation("textures/block/spruce_log.png");
     private final ResourceLocation SEARCH_LOC = new ResourceLocation("textures/block/deepslate_tiles.png");
 
     int screenW;
@@ -50,6 +52,8 @@ public class SettingsScreen extends Screen {
     HashMap<String, TabButton> tabs = new HashMap<>();
     ArrayList<String> tabsOrder = new ArrayList<>();
 
+    TabButton presetButton;
+
 
     private ConfigOptionsList options;
     ArrayList<InputBox> tickables = new ArrayList<>();
@@ -58,19 +62,19 @@ public class SettingsScreen extends Screen {
     int modBoxY;
     int modBoxW;
     int modBoxH;
-    boolean modVisible = true;
+    boolean modVisible = false;
 
     int optBoxX;
     int optBoxY;
     int optBoxW;
     int optBoxH;
 
-    int searchBoxX;
-    int searchBoxY;
-    int searchBoxW;
-    int searchBoxH;
+    int presetBoxX;
+    int presetBoxY;
+    int presetBoxW;
+    int presetBoxH;
 
-    private static boolean active = false;
+    Pattern alphaNumeric = Pattern.compile("^[a-zA-Z0-9_-]*$");
 
     //TODO: Save changes into a new class that tracks the component and the subtype and the value of the change. Disable clearing until they press X
 
@@ -90,22 +94,14 @@ public class SettingsScreen extends Screen {
     protected SettingsScreen() {
         super(new TextComponent("Party Advanced Settings"));
         miscButtons = new ArrayList<>();
-        miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters")));
-        miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters")));
-        miscButtons.add(new SmallButton(0, 0, "c", b -> toggleRGB(), tip(this, "Toggle RGB Input Mode"), 1f, 1f, 1f));
-        miscButtons.add(new SmallButton(0, 0, "x", b -> toggleEles(false), tip(this, "Turn All Other Elements Off"), 1f, 0.5f, 0.5f));
-        miscButtons.add(new SmallButton(0, 0, "✓", b -> toggleEles(true), tip(this, "Turn All Other Elements On"), 0.5f, 1f, 0.5f));
-        miscButtons.add(new SmallButton(0,0, "↺", b -> resetEle(), tip(this, "Reset Current Element to Default"), .5f, 1f, 1f));
-        miscButtons.add(new SmallButton(0,0, "↺", b -> resetAll(), tip(this, "Reset Everything to Default"), 1f, 1f, 0.5f));
-        miscButtons.add(new SmallButton(0,0, "s", b -> savePreset(), tip(this, "Save Preset"), 0.5f, 1f, 0.5f));
         confirmPrompt = new TextComponent("Are you sure? Click again to confirm").withStyle(ChatFormatting.DARK_RED);
     }
 
     private void savePreset() {
-        RenderItem.items.values().forEach(item -> {
-            //Setting parsing to true fills out an arraylist called parser in RenderItem.
-            //item.getConfigOptions(s, minecraft, 0,0,0,0, true);
-        });
+        Config.saveCompletePreset(nameBox.getValue(), descBox.getValue());
+        if (selEle == -1) {
+            selectButton(-1);
+        }
     }
 
     private void resetAll() {
@@ -133,6 +129,8 @@ public class SettingsScreen extends Screen {
     }
 
     private void resetEle() {
+        if (selEle == -1)
+            return;
         RenderItem.setElementDefaults(RenderItem.items.get(tabsOrder.get(selEle)), updater);
         refreshCurrentEle();
     }
@@ -143,15 +141,11 @@ public class SettingsScreen extends Screen {
         RenderItem.items.computeIfPresent(tabsOrder.get(selEle), (s, renderItem) -> renderItem.setEnabled(true));
     }
 
-    private final HashMap<String, RenderItem.Update> updater = new HashMap<>();
+    protected final HashMap<String, RenderItem.Update> updater = new HashMap<>();
 
     private void toggleRGB() {
         HexBox.rgbMode = !HexBox.rgbMode;
         options.markDirty();
-    }
-
-    public static boolean isActive() {
-        return active;
     }
 
     private void toggleModBox(boolean show) {
@@ -208,12 +202,12 @@ public class SettingsScreen extends Screen {
     @Override
     public void onClose() {
         ColorUtils.colorCycle = false;
-        active = false;
         notEditing = true;
         PHead.icon = null;
         PName.nameTag = null;
         PDimIcon.icon = null;
         GeneralOptions.icon = null;
+        PresetOptions.icon = null;
         INNER_LOC = null;
         super.onClose();
     }
@@ -224,6 +218,8 @@ public class SettingsScreen extends Screen {
 
     void resetTickables() {
         tickables.clear();
+        tickables.add(nameBox);
+        tickables.add(descBox);
     }
 
     private void removeRenderButtons() {
@@ -231,7 +227,6 @@ public class SettingsScreen extends Screen {
     }
 
     public void render(PoseStack poseStack, int pMouseX, int pMouseY, float pPartialTick) {
-
         if (triggeredPrompt) {
             poseStack.translate(0,0,1);
             this.renderTooltip(poseStack, confirmPrompt, pMouseX, pMouseY + 16);
@@ -242,14 +237,19 @@ public class SettingsScreen extends Screen {
         RenderSystem.enableDepthTest();
         this.options.render(poseStack, pMouseX, pMouseY, pPartialTick);
         assert minecraft != null;
-        //TODO: Store tab data in a variable in screen instead of constantly calling render
-        //TODO: Or implement another interface that is stored as a variable - the interface draws the config.
-        //TODO: If second method, also store config index and value in a new object class, and then store that in HashMap<String, ConfigEntry>
         renderElementBox(poseStack);
-        if (modVisible)
-            renderModBox();
+        //TODO: ModBox
+        //if (modVisible)
+            //renderModBox();
+
+        //Settings
         renderOptionsBox();
-        renderSearchBox();
+
+        //Presets
+        renderPresetBox();
+        font.drawShadow(poseStack, "Save Preset", presetBoxX + (presetBoxW>>1) - 31, presetBoxY + 3, ColorUtils.getRainbowColor());
+        font.drawShadow(poseStack, "Name:", nameBox.x - 29, nameBox.y, 0xFFFFFF);
+        font.drawShadow(poseStack, "Desc:", descBox.x - 29, descBox.y, 0xFFFFFF);
         renderShadows(poseStack);
 
         super.render(poseStack, pMouseX, pMouseY, pPartialTick);
@@ -260,12 +260,12 @@ public class SettingsScreen extends Screen {
         //renderBg( 0,0,0,0,0,0, 255, INNER_LOC);
     }
 
-    private void renderSearchBox() {
-        renderBg(searchBoxX, searchBoxY, searchBoxX + searchBoxW, searchBoxY + searchBoxH, searchBoxW, searchBoxH, 200, SEARCH_LOC);
+    private void renderPresetBox() {
+        renderBg(presetBoxX, presetBoxY, presetBoxX + presetBoxW, presetBoxY + presetBoxH, presetBoxW, presetBoxH, 200, SEARCH_LOC);
     }
 
     private void renderOptionsBox() {
-        renderBg(optBoxX, optBoxY, optBoxX + optBoxW, optBoxY + optBoxH, optBoxW, optBoxH, 175, OPTIONS_LOC);
+        renderBg(optBoxX, optBoxY, optBoxX + optBoxW, optBoxY + optBoxH, optBoxW, optBoxH, 255, OPTIONS_LOC);
     }
 
     private void renderModBox() {
@@ -275,14 +275,9 @@ public class SettingsScreen extends Screen {
 
     private void renderElementBox(PoseStack poseStack) {
         //RenderItem.drawRect(poseStack.last().pose(), 0,eleBoxX, eleBoxY, eleBoxX + eleBoxW, eleBoxY + eleBoxH, 0x33000000, 0x33000000);
-        renderBg(eleBoxX, eleBoxY, eleBoxX + eleBoxW, eleBoxY + eleBoxH, eleBoxW+32, eleBoxH, 255, MENU_LOC);
+        renderBg(screenX, screenY, screenX + screenW, screenY + eleBoxH, screenW, eleBoxH, 255, MENU_LOC);
 
         //With Arrows
-        if (tabs.size() > maxEles) {
-            for (int i = 0; i < maxEles-2; i++) {
-                renderElementTab(poseStack, i, 34 + i*32);
-            }
-        }
 
     }
 
@@ -297,27 +292,29 @@ public class SettingsScreen extends Screen {
         //Top Shadow
         RenderUtils.rect(poseStack.last().pose(), 0, screenX, screenY + eleBoxH, screenX + screenW, screenY + eleBoxH+10, 0xAA000000, 0x00000000);
         //Left Shadow
-        if (modVisible) {
-            RenderUtils.horizRect(poseStack.last().pose(), 0, screenX + modBoxW, screenY + eleBoxH, screenX + modBoxW + 10, screenY + screenH - searchBoxH, 0xAA000000, 0x00000000);
-        }
+        //TODO: Implement ModBox Later.
+        //if (modVisible) {
+            //RenderUtils.horizRect(poseStack.last().pose(), 0, screenX + modBoxW, screenY + eleBoxH, screenX + modBoxW + 10, screenY + screenH - presetBoxH, 0xAA000000, 0x00000000);
+        //}
         //Bottom Shadow
-        RenderUtils.rect(poseStack.last().pose(), 0, screenX, screenY + screenH - 10 - searchBoxH, screenX + screenW, screenY + screenH - searchBoxH, 0x00000000, 0xAA000000);
+        RenderUtils.rect(poseStack.last().pose(), 0, screenX, screenY + screenH - 10 - presetBoxH, screenX + screenW, screenY + screenH - presetBoxH, 0x00000000, 0xAA000000);
 
 
         //Right Shadow
-        RenderUtils.horizRect(poseStack.last().pose(), 0, screenX + screenW - 10 - optBoxW, screenY + eleBoxH, screenX + screenW - optBoxW, screenY + screenH - searchBoxH, 0x00000000, 0xAA000000);
+        RenderUtils.horizRect(poseStack.last().pose(), 0, screenX + screenW - 10 - optBoxW, screenY + eleBoxH, screenX + screenW - optBoxW, screenY + screenH - presetBoxH, 0x00000000, 0xAA000000);
         //RenderItem.drawRect(poseStack.last().pose(), 0, screenX + modBoxW, screenY + eleBoxH, screenX + screenW - optBoxW, screenY + screenH - searchBoxH, 0x66000000, 0x66000000);
     }
 
 
     protected void init() {
+        initMiscButtons();
         ColorUtils.colorCycle = true;
         RenderItem.initUpdater(updater);
-        active = true;
         notEditing = false;
         INNER_LOC = new ResourceLocation("textures/block/deepslate_bricks.png");
         PHead.icon = new ItemStack(Items.PLAYER_HEAD);
         GeneralOptions.icon = new ItemStack(Items.COMPARATOR);
+        PresetOptions.icon = new ItemStack(Items.CHEST_MINECART);
         assert Minecraft.getInstance().player != null;
         PHead.icon.addTagElement("SkullOwner", StringTag.valueOf(Minecraft.getInstance().player.getName().getContents()));
         PName.nameTag = Items.NAME_TAG.getDefaultInstance();
@@ -329,11 +326,38 @@ public class SettingsScreen extends Screen {
         super.init();
     }
 
+
+    private InputBox nameBox;
+    private InputBox descBox;
+    private void initMiscButtons() {
+        miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters")));
+        miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters")));
+        miscButtons.add(new SmallButton(0, 0, "c", b -> toggleRGB(), tip(this, "Toggle RGB Input Mode"), 1f, 1f, 1f));
+        miscButtons.add(new SmallButton(0, 0, "x", b -> toggleEles(false), tip(this, "Turn All Other Elements Off"), 1f, 0.5f, 0.5f));
+        miscButtons.add(new SmallButton(0, 0, "✓", b -> toggleEles(true), tip(this, "Turn All Other Elements On"), 0.5f, 1f, 0.5f));
+        miscButtons.add(new SmallButton(0,0, "↺", b -> resetEle(), tip(this, "Reset Current Element to Default"), .5f, 1f, 1f));
+        miscButtons.add(new SmallButton(0,0, "↺", b -> resetAll(), tip(this, "Reset Everything to Default"), 1f, 1f, 0.5f));
+        miscButtons.add(new SmallButton(0,0, "s", b -> savePreset(), tip(this, "Save Preset"), 0.5f, 1f, 0.5f));
+        nameBox = new InputBox(0xFFFFFF, font, 0, 12, new TextComponent("Name"), (s) -> checkSaveFlags(), false);
+        descBox = new InputBox(0xFFFFFF, font, 0, 12, new TextComponent("Desc"), (s) -> checkSaveFlags(), false);
+        nameBox.filter = s -> alphaNumeric.matcher(s).find();
+        descBox.setMaxLength(128);
+        checkSaveFlags();
+    }
+
+    private void checkSaveFlags() {
+        miscButtons.get(7).active = !nameBox.getValue().isEmpty() && !descBox.getValue().isEmpty();
+    }
+
     private void initTabButtons() {
         int i = 1;
         Iterator<Map.Entry<String, RenderItem>> iter = RenderItem.items.entrySet().iterator();
         Map.Entry<String, RenderItem> item;
         assert minecraft != null;
+        //Preset Button
+        presetButton = new TabButton(-1, 0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
+                             RenderUtils.tip(this, new TranslatableComponent("gui.sedparties.name.preset")),
+                             new PresetOptions("Load").render((ForgeIngameGui) minecraft.gui), "Load");
         //General Settings
         tabsOrder.add("general");
         tabs.put("general", new TabButton(0, 0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
@@ -365,9 +389,6 @@ public class SettingsScreen extends Screen {
     }
 
     private void selectButton(int i) {
-        //TODO: Prevent replace if setting has been changed without saving?
-        //TODO: Store items in double hashmap list if using bottom option.
-        //TODO: Or, save changes in a set list. Iterate through list updating each widget the list updates. Clear list when finally saved.
         selEle = i;
         removeWidget(options);
         options = null;
@@ -424,10 +445,10 @@ public class SettingsScreen extends Screen {
         screenY = (height-screenH)>>1;
 
 
-        eleBoxW = screenW;
+        eleBoxW = screenW - 32;
         maxEles = eleBoxW / 32;
         eleOffsetX = (eleBoxW - (maxEles*32)) / 2;
-        eleBoxX = screenX;
+        eleBoxX = screenX + 32;
         eleBoxY = screenY;
         eleBoxH = Math.min(32, screenH);
 
@@ -441,20 +462,21 @@ public class SettingsScreen extends Screen {
         modBoxH = screenH - 32;
 
         //Show/Hide Mod Box Buttons
-        miscButtons.get(0).x = screenX + 6;
-        miscButtons.get(1).x = miscButtons.get(0).x;
-        miscButtons.get(0).y = screenY + screenH - 22;
-        miscButtons.get(1).y = miscButtons.get(0).y;
-        miscButtons.get(0).visible = !modVisible;
-        miscButtons.get(1).visible = modVisible;
+        //TODO: Implement ModBox later;
+        //miscButtons.get(0).x = screenX + 6;
+        //miscButtons.get(1).x = miscButtons.get(0).x;
+        //miscButtons.get(0).y = screenY + screenH - 26;
+        //miscButtons.get(1).y = miscButtons.get(0).y;
+        //miscButtons.get(0).visible = !modVisible;
+        //miscButtons.get(1).visible = modVisible;
 
 
         optBoxH = screenH - eleBoxH;
-        optBoxW = Math.min(32, screenW);
+        optBoxW = 16;
         optBoxX = screenX + screenW - optBoxW;
         optBoxY = screenY + eleBoxH;
 
-        miscButtons.get(2).x = optBoxX + 11;
+        miscButtons.get(2).x = optBoxX + 3;
         miscButtons.get(2).y = optBoxY + 8;
         miscButtons.get(3).x = miscButtons.get(2).x;
         miscButtons.get(3).y = optBoxY + 24;
@@ -465,13 +487,22 @@ public class SettingsScreen extends Screen {
         miscButtons.get(6).x = miscButtons.get(2).x;
         miscButtons.get(6).y = optBoxY + 64;
         miscButtons.get(7).x = miscButtons.get(2).x;
-        miscButtons.get(7).y = optBoxY + 80;
 
 
-        searchBoxH = Math.min(24, screenH);
-        searchBoxW = screenW;
-        searchBoxX = screenX;
-        searchBoxY = screenY + screenH - searchBoxH;
+        presetBoxH = Math.min(32, screenH);
+        presetBoxW = screenW;
+        presetBoxX = screenX;
+        presetBoxY = screenY + screenH - presetBoxH;
+        nameBox.setWidth(Math.max(30, screenW/5));
+        nameBox.x = presetBoxX + 34;
+        nameBox.y = presetBoxY + 15;
+
+        descBox.setWidth(Math.max(50, screenW*2/5));
+        descBox.x = optBoxX - descBox.getWidth() - 1;
+        descBox.y = presetBoxY + 15;
+        miscButtons.get(7).y = descBox.y - 1;
+        presetButton.x = screenX;
+        presetButton.y = screenY;
 
 
         if (init) {
@@ -479,6 +510,13 @@ public class SettingsScreen extends Screen {
             addRenderableWidget(right);
             miscButtons.forEach(this::addRenderableWidget);
             tabs.values().forEach(this::addRenderableWidget);
+            addRenderableWidget(presetButton);
+            addRenderableWidget(nameBox);
+            addRenderableWidget(descBox);
+
+            //TODO: Ignore ModBox implementation for now. Implement later.
+            removeWidget(miscButtons.get(0));
+            removeWidget(miscButtons.get(1));
         }
         updateOptionsBounds();
 
@@ -486,14 +524,20 @@ public class SettingsScreen extends Screen {
 
     private void updateOptionsBounds() {
         if (this.options == null) {
-            this.options = tabs.get(tabsOrder.get(selEle)).getOptions(this, minecraft, 0, 0, 0, 0);
+            if (selEle == -1) {
+                this.options = presetButton.getOptions(this, minecraft, 0, 0, 0, 0);
+                this.options.setItemHeight(32);
+            } else {
+                this.options = tabs.get(tabsOrder.get(selEle)).getOptions(this, minecraft, 0, 0, 0, 0);
+            }
+
             this.addWidget(this.options);
         }
 
         if (modVisible)
-            this.options.resetPosition(modBoxX+modBoxW, eleBoxY + eleBoxH, screenW - modBoxW - optBoxW, screenH - eleBoxH - searchBoxH);
+            this.options.resetPosition(modBoxX+modBoxW, eleBoxY + eleBoxH, screenW - modBoxW - optBoxW, screenH - eleBoxH - presetBoxH);
         else
-            this.options.resetPosition(modBoxX, eleBoxY + eleBoxH, screenW - optBoxW, screenH - eleBoxH - searchBoxH);
+            this.options.resetPosition(modBoxX, eleBoxY + eleBoxH, screenW - optBoxW, screenH - eleBoxH - presetBoxH);
     }
 
 

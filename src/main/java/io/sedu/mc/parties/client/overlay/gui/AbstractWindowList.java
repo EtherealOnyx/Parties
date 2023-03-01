@@ -28,7 +28,7 @@ import static io.sedu.mc.parties.client.overlay.gui.SettingsScreen.INNER_LOC;
 @OnlyIn(Dist.CLIENT)
 public abstract class AbstractWindowList<E extends AbstractWindowList.Entry<E>> extends AbstractContainerEventHandler implements Widget, NarratableEntry {
     protected final Minecraft minecraft;
-    protected final int itemHeight;
+    protected int itemHeight;
     private final List<E> children = new AbstractWindowList.TrackedList();
     protected int width;
     protected int height;

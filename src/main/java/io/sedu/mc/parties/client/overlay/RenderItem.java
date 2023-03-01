@@ -59,6 +59,8 @@ public abstract class RenderItem {
     boolean iconEnabled;
 
 
+
+
     public void toggleIcon(boolean data) {
         iconEnabled = data;
     }
@@ -493,6 +495,8 @@ public abstract class RenderItem {
     }
 
 
+
+
     static class ColorComponent {
         static final ColorComponent EMPTY = new ColorComponent(new TextComponent(""), 0);
         MutableComponent c;
@@ -586,40 +590,51 @@ public abstract class RenderItem {
     }
 
     public interface Getter {
-        Object getValue(String name);
+        Object getValue(RenderItem item);
+    }
+
+    public ConfigEntry getCurrentValues(HashMap<String, Getter> getter, boolean complete) {
+        ConfigEntry defaults = getDefaults();
+        ConfigEntry currents = new ConfigEntry();
+        if (complete)
+            defaults.forEachEntry((entry, value) -> currents.addEntry(entry, getter.get(entry).getValue(this)));
+        else {
+            //TODO: Put entry if it is different from default.
+        }
+        return currents;
     }
 
     public static void initGetter(HashMap<String, Getter> getter) {
         //Make this be per item instead.
-        getter.put("display", (n) -> Objects.requireNonNull(OverlayRegistry.getEntry(items.get(n).item)).isEnabled());
-        getter.put("tshadow", (n) -> items.get(n).textShadow);
-        getter.put("idisplay", (n) -> items.get(n).iconEnabled);
-        getter.put("tdisplay", (n) -> items.get(n).textEnabled);
-        getter.put("bgdisplay", (n) -> items.get(n).iconEnabled);
-        getter.put("tattached", (n) -> ((RenderIconTextItem)items.get(n)).textAttached);
-        getter.put("xpos", (n) -> items.get(n).x);
-        getter.put("ypos", (n) -> items.get(n).y);
-        getter.put("scale", (n) -> items.get(n).scale);
-        getter.put("zpos", (n) -> items.get(n).zPos);
-        getter.put("xtpos", (n) -> ((RenderIconTextItem)items.get(n)).textX);
-        getter.put("ytpos", (n) -> ((RenderIconTextItem)items.get(n)).textY);
-        getter.put("tmax", (n) -> ((PName)items.get(n)).length);
-        getter.put("width", (n) -> items.get(n).width);
-        getter.put("height", (n) -> items.get(n).height);
+        getter.put("display", (n) -> Objects.requireNonNull(OverlayRegistry.getEntry(n.item)).isEnabled());
+        getter.put("tshadow", (n) -> n.textShadow);
+        getter.put("idisplay", (n) -> n.iconEnabled);
+        getter.put("tdisplay", (n) -> n.textEnabled);
+        getter.put("bgdisplay", (n) -> n.iconEnabled);
+        getter.put("tattached", (n) -> ((RenderIconTextItem)n).textAttached);
+        getter.put("xpos", (n) -> n.x);
+        getter.put("ypos", (n) -> n.y);
+        getter.put("scale", RenderItem::getScale);
+        getter.put("zpos", (n) -> n.zPos);
+        getter.put("xtpos", (n) -> ((RenderIconTextItem)n).textX);
+        getter.put("ytpos", (n) -> ((RenderIconTextItem)n).textY);
+        getter.put("tmax", (n) -> ((PName)n).length);
+        getter.put("width", (n) -> n.width);
+        getter.put("height", (n) -> n.height);
         getter.put("ttype", (n) -> HealthAnim.getTextType());
-        getter.put("tcolor", (n) -> items.get(n).getColor(0));
-        getter.put("bhue", (n) -> ((PHealth)items.get(n)).hue);
-        getter.put("ohue", (n) -> ((PHealth)items.get(n)).oHue);
+        getter.put("tcolor", (n) -> n.getColor(0));
+        getter.put("bhue", (n) -> ((PHealth)n).hue);
+        getter.put("ohue", (n) -> ((PHealth)n).oHue);
 
-        getter.put("bcit", (n) -> items.get(n).getColor(0));
-        getter.put("bcib", (n) -> items.get(n).getColor(1));
+        getter.put("bcit", (n) -> n.getColor(0));
+        getter.put("bcib", (n) -> n.getColor(1));
 
-        getter.put("bcdt", (n) -> items.get(n).getColor(2));
-        getter.put("bcdb", (n) -> items.get(n).getColor(3));
+        getter.put("bcdt", (n) -> n.getColor(2));
+        getter.put("bcdb", (n) -> n.getColor(3));
 
-        getter.put("buffg", (n) -> items.get(n).getColor(0));
-        getter.put("buffb", (n) -> items.get(n).getColor(1));
-        getter.put("flash", (n) -> items.get(n).getColor(2));
+        getter.put("buffg", (n) -> n.getColor(0));
+        getter.put("buffb", (n) -> n.getColor(1));
+        getter.put("flash", (n) -> n.getColor(2));
 
         getter.put("blim", (n) -> PEffectsBoth.bLim);
         getter.put("dlim", (n) -> PEffectsBoth.dLim);
@@ -627,11 +642,11 @@ public abstract class RenderItem {
         getter.put("bsep", (n) -> PEffectsBoth.prioDur);
 
 
-        getter.put("spacex", (n) -> items.get(n).width);
-        getter.put("spacey", (n) -> items.get(n).height);
-        getter.put("bsize", (n) -> ((PEffects) items.get(n)).borderSize);
-        getter.put("rowmax", (n) -> ((PEffects) items.get(n)).maxPerRow);
-        getter.put("totalmax", (n) -> ((PEffects) items.get(n)).maxSize);
+        getter.put("spacex", (n) -> n.width);
+        getter.put("spacey", (n) -> n.height);
+        getter.put("bsize", (n) -> ((PEffects) n).borderSize);
+        getter.put("rowmax", (n) -> ((PEffects) n).maxPerRow);
+        getter.put("totalmax", (n) -> ((PEffects) n).maxSize);
 
         getter.put("danim", (n) -> DimAnim.animActive);
         getter.put("gen_x", (n) -> frameX);
@@ -669,7 +684,21 @@ public abstract class RenderItem {
         frameY = 16;
     }
 
-    abstract ConfigEntry getDefaults();
+    public abstract ConfigEntry getDefaults();
+
+
+    public static ConfigEntry getGeneralValues() {
+        ConfigEntry e = new ConfigEntry();
+        e.addEntry("gen_x", frameX);
+        e.addEntry("gen_y", frameY);
+        e.addEntry("gen_w", frameEleW);
+        e.addEntry("gen_h", frameEleH);
+        e.addEntry("gen_pw", framePosW);
+        e.addEntry("gen_ph", framePosH);
+        return e;
+    }
+
+
 
 
 }

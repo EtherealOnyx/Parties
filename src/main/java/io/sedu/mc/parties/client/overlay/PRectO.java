@@ -49,7 +49,7 @@ public class PRectO extends RenderSelfItem {
     }
 
     @Override
-    ConfigEntry getDefaults() {
+    public ConfigEntry getDefaults() {
         return new ConfigEntry();
     }
 

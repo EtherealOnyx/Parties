@@ -150,7 +150,7 @@ public class PEffectsBoth extends PEffects {
     }
 
     @Override
-    ConfigEntry getDefaults() {
+    public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
         e.addEntry("display", true);
         e.addEntry("tdisplay", true);

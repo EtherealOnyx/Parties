@@ -91,7 +91,7 @@ public class PEffectsBad extends PEffects{
     }
 
     @Override
-    ConfigEntry getDefaults() {
+    public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
         e.addEntry("display", false);
         e.addEntry("tdisplay", true);

@@ -63,7 +63,7 @@ public class PLeader extends RenderItem {
     }
 
     @Override
-    ConfigEntry getDefaults() {
+    public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
         e.addEntry("display", true);
         e.addEntry("xpos", 34);

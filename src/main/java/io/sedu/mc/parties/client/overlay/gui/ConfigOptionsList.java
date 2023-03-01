@@ -1,10 +1,12 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
-import io.sedu.mc.parties.util.ColorUtils;
-import io.sedu.mc.parties.util.RenderUtils;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.RenderItem;
+import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.util.RenderUtils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -19,12 +21,20 @@ import net.minecraft.util.Mth;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entry> {
     SettingsScreen s;
     EntryColor entryColor;
     ArrayList<SliderEntry> sliders = new ArrayList<>();
-    private boolean parsing;
+    private final boolean parsing;
+
+    public void setItemHeight(int pHeight) {
+        itemHeight = pHeight;
+    }
+
+
+
 
     public interface EntryColor {
         int getColor();
@@ -45,6 +55,11 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         Entry e = new ConfigOptionsList.TitleEntry(title);
         this.addEntry(e);
         return e;
+    }
+
+    public void addPresetEntry(String file, String description, boolean isDefault) {
+        Entry e = new ConfigOptionsList.PresetEntry(file, description, isDefault);
+        this.addEntry(e);
     }
 
     public Entry addBooleanEntry(String name, boolean defaultState) {
@@ -675,6 +690,90 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         @Override
         public void render(PoseStack pPoseStack, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pIsMouseOver, float pPartialTick) {
+        }
+    }
+
+    public class PresetEntry extends ConfigOptionsList.Entry {
+        private int x;
+        private String fileName;
+        private String desc;
+        private String descTrimmed;
+        private List<Component> descTip;
+        private Button loadPreset;
+
+        PresetEntry(String file, String desc, boolean isDefault) {
+            this.fileName = file;
+            this.desc = desc;
+            this.name = new TextComponent(fileName);
+            loadPreset = new Button(0, 0, 32, 20, new TextComponent("Load"), (b) ->
+            {
+                Config.loadPreset(file, isDefault, s.updater);
+                assert minecraft.player != null;
+                minecraft.player.sendMessage(new TextComponent("Preset (").withStyle(ChatFormatting.DARK_AQUA).append(new TextComponent(fileName).withStyle(ChatFormatting.YELLOW)).append(new TextComponent(") has been loaded successfully.").withStyle(ChatFormatting.DARK_AQUA)), minecraft.player.getUUID());
+            });
+            this.markDirty();
+        }
+
+        @Override
+        public List<? extends NarratableEntry> narratables() {
+            return ImmutableList.of(new NarratableEntry() {
+                public NarratableEntry.NarrationPriority narrationPriority() {
+                    return NarratableEntry.NarrationPriority.HOVERED;
+                }
+
+                public void updateNarration(NarrationElementOutput p_193906_) {
+                    p_193906_.add(NarratedElementType.TITLE,ConfigOptionsList.PresetEntry.this.name);
+                }
+            });
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children() {
+            return ImmutableList.of(this.loadPreset);
+        }
+
+        @Override
+        void toggle(boolean enabled) {
+
+        }
+
+        @Override
+        void updateValues(int pTop, int pLeft, int pWidth, int pHeight) {
+            x = pLeft + 4;
+            loadPreset.x = pLeft + pWidth - 40;
+            descTip = RenderUtils.splitTooltip(desc, pWidth/5);
+            descTrimmed = desc.substring(0, Math.min(desc.length(), (pWidth-32)/6));
+            if (descTrimmed.length() != desc.length()) {
+                descTrimmed += "...";
+            }
+        }
+
+        @Override
+        void updateValues() {
+
+        }
+
+        @Override
+        public void render(PoseStack pPoseStack, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pIsMouseOver, float pPartialTick) {
+            if (isDirty) {
+                updateValues(pTop, pLeft, pWidth, pHeight);
+                isDirty = false;
+            }
+
+            RenderUtils.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop-3, pLeft + (pWidth>>1), pTop-1, entryColor.getColor(), entryColor.getColor() | 255 << 24);
+            RenderUtils.horizRect(pPoseStack.last().pose(), 0, pLeft + (pWidth>>1), pTop-3, pLeft + pWidth, pTop-1, entryColor.getColor() | 255 << 24, entryColor.getColor());
+            if (pIsMouseOver)
+            {
+                RenderUtils.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + pWidth, pTop + pHeight, entryColor.getColor() | 100 << 24, entryColor.getColor());
+                //ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, x, pTop + 4, 0xFFFFFF);
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, x, pTop + 4, 0xFFFFAA);
+                s.renderTooltip(pPoseStack, descTip, Optional.empty(), s.screenX-8, s.presetBoxY+14);
+            } else {
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, x, pTop + 4, 0xFFFFFF);
+            }
+            ConfigOptionsList.this.minecraft.font.draw(pPoseStack, descTrimmed, x, pTop + 15, 0xAAAAAAAA);
+            this.loadPreset.y = pTop + 3;
+            this.loadPreset.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
         }
     }
 

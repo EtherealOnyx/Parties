@@ -30,7 +30,7 @@ public class GeneralOptions extends RenderItem {
 
     @Override
     public String getType() {
-        return "";
+        return "Main";
     }
 
     @Override
@@ -39,9 +39,20 @@ public class GeneralOptions extends RenderItem {
     }
 
     @Override
-    ConfigEntry getDefaults() {
+    public ConfigEntry getDefaults() {
+        ConfigEntry e = new ConfigEntry();
+        e.addEntry("gen_x", frameX);
+        e.addEntry("gen_y", frameY);
+        e.addEntry("gen_w", frameEleW);
+        e.addEntry("gen_h", frameEleH);
+        e.addEntry("gen_pw", framePosW);
+        e.addEntry("gen_ph", framePosH);
+        return e;
+    }
 
-        return new ConfigEntry();
+    @Override
+    public void register() {
+        //Fake item :)
     }
 
     @Override
