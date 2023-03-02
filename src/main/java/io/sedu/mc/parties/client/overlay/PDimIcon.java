@@ -211,8 +211,8 @@ public class PDimIcon extends RenderSelfItem {
         c.addBooleanEntry("tdisplay", textEnabled);
         c.addBooleanEntry("danim", DimAnim.animActive);
         c.addTitleEntry("position");
-        c.addSliderEntry("xpos", 0, () -> frameEleW - frameX - 8, this.x);
-        c.addSliderEntry("ypos", 0, () -> frameEleH - frameY - 8, this.y);
+        c.addSliderEntry("xpos", 0, this::maxX, this.x);
+        c.addSliderEntry("ypos", 0, this::maxY, this.y);
         c.addSliderEntry("zpos", 0, () -> 10, zPos);
 
 
@@ -231,7 +231,13 @@ public class PDimIcon extends RenderSelfItem {
         poseStack.scale(1/head.scale, 1/head.scale, 1);
     }
 
+    protected int maxX() {
+        return Math.max(0, frameEleW - (int)(width*head.scale));
+    }
 
+    protected int maxY() {
+        return Math.max(0, frameEleH - (int)(height*head.scale));
+    }
 
     @Override
     protected void updateValues() {

@@ -38,6 +38,8 @@ public abstract class PEffects extends RenderSelfItem {
 
     private int xOff;
     private int yOff;
+    private int eleWidth;
+    private int eleHeight;
 
 
     public PEffects(String name) {
@@ -131,6 +133,9 @@ public abstract class PEffects extends RenderSelfItem {
     }
 
 
+
+
+
     void start(PoseStack poseStack, int i, int size) {
         poseStack.pushPose();
         if (iconEnabled)
@@ -147,6 +152,7 @@ public abstract class PEffects extends RenderSelfItem {
         RenderSystem.disableBlend();
         poseStack.popPose();
     }
+
 
 
     private void rectInscribed(Matrix4f pose, int radius, int x, int y, int width, int height, int outColor, boolean ben) {
@@ -182,14 +188,24 @@ public abstract class PEffects extends RenderSelfItem {
     protected void setWidth(Integer d) {
         this.width = d;
         this.xOff = (width-26)/2;
-
+        this.eleWidth = ((width * maxPerRow) / 2);
     }
 
 
     protected void setHeight(Integer d) {
         this.height = d;
         this.yOff = (height-26)/2;
+        this.eleHeight = (int) (height * Math.ceil(maxSize / (float)maxPerRow) / 2); //why is this off by 1...
     }
+
+    protected int maxX() {
+        return Math.max(0, frameEleW - (int)(eleWidth*scale));
+    }
+
+    protected int maxY() {
+        return Math.max(0, frameEleH - (int)(eleHeight*scale));
+    }
+
 
     @Override
     protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
@@ -200,19 +216,20 @@ public abstract class PEffects extends RenderSelfItem {
         c.addSliderEntry("bsize", 1, () -> 4, borderSize);
         getColorEntry(c);
         c.addTitleEntry("position");
-        c.addSliderEntry("xpos", 0, () -> frameEleW + 32, this.x);
-        c.addSliderEntry("ypos", 0, () -> frameEleH + 32, this.y);
+        c.addSliderEntry("xpos", 0, this::maxX, this.x);
+        c.addSliderEntry("ypos", 0, this::maxY, this.y);
         c.addSliderEntry("zpos", 0, () -> 10, zPos);
-        c.addSliderEntry("scale", 1, () -> 3, getScale());
+        c.addSliderEntry("scale", 1, () -> 3, getScale(), true);
 
         c.addTitleEntry("icon");
         c.addBooleanEntry("bgdisplay", iconEnabled);
-        c.addSliderEntry("spacex", 1, () -> 64, width);
-        c.addSliderEntry("spacey", 1, () -> 64, height);
+        c.addSliderEntry("spacex", 1, () -> 64, width, true);
+        c.addSliderEntry("spacey", 1, () -> 64, height, true);
         getLimitEntries(c);
 
         return c;
     }
+
 
     protected void updateAffectedSliders(HashMap<String, ConfigOptionsList.SliderEntry> sliders) {
         sliders.computeIfPresent("totalmax", ((s, sliderEntry) -> sliderEntry.forceUpdate(Math.max(maxPerRow, maxSize))));

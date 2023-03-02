@@ -69,6 +69,6 @@ public class GeneralOptions extends RenderItem {
     }
 
     private void ensureBounds() {
-        RenderItem.items.values().forEach(RenderItem::updateValues);
+        //RenderItem.items.values().forEach(RenderItem::updateValues);
     }
 }

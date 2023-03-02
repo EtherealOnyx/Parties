@@ -95,6 +95,7 @@ public class ClientSetup {
         items.get("effects").setEnabled(false);
         items.get("effects_b").setEnabled(true);
         items.get("effects_d").setEnabled(true);
+        RenderItem.frameEleW = 232;
         Config.saveDefaultPreset("sepbuffs", "A preset with the buff and debuff bar separated.");
         RenderItem.setDefaultValues();
         items.get("effects").setXPos(170);
@@ -104,6 +105,7 @@ public class ClientSetup {
         EffectHolder.updatebLim(0); //updates dLim too.
         RenderItem.frameEleH = 52;
         RenderItem.framePosH = 51;
+        RenderItem.frameEleW = 248;
         Config.saveDefaultPreset("sidebuffs", "A preset with the combined buff bar on the right of the frame. Adds more space.");
         //TODO: Add Minimal version.
         RenderItem.setDefaultValues();
