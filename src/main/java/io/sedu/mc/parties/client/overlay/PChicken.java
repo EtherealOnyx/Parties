@@ -138,18 +138,18 @@ public class PChicken extends RenderIconTextItem {
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("display", true);
-        e.addEntry("scale", 2);
-        e.addEntry("zpos", 0);
-        e.addEntry("idisplay", true);
-        e.addEntry("xpos", 143);
-        e.addEntry("ypos", 19);
-        e.addEntry("tdisplay", true);
-        e.addEntry("tshadow", false);
-        e.addEntry("tcolor", 0xddf3ff);
-        e.addEntry("tattached", true);
-        e.addEntry("xtpos", 0);
-        e.addEntry("ytpos", 0);
+        e.addEntry("display", true, 1);
+        e.addEntry("scale", 2, 2);
+        e.addEntry("zpos", 0, 4);
+        e.addEntry("idisplay", true, 1);
+        e.addEntry("xpos", 143, 12);
+        e.addEntry("ypos", 19, 12);
+        e.addEntry("tdisplay", true, 1);
+        e.addEntry("tshadow", false, 1);
+        e.addEntry("tcolor", 0xddf3ff, 24);
+        e.addEntry("tattached", true, 1);
+        e.addEntry("xtpos", 0, 12);
+        e.addEntry("ytpos", 0, 12);
         return e;
     }
 

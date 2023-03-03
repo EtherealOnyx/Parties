@@ -45,10 +45,10 @@ public class ClickArea extends RenderItem {
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("xpos", 7);
-        e.addEntry("ypos", 7);
-        e.addEntry("width", 159);
-        e.addEntry("height", 34);
+        e.addEntry("xpos", 7, 12);
+        e.addEntry("ypos", 7, 12);
+        e.addEntry("width", 159, 12);
+        e.addEntry("height", 34, 12);
         return e;
     }
 

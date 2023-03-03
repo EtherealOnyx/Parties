@@ -41,11 +41,11 @@ public class PHead extends RenderItem {
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("display", true);
-        e.addEntry("xpos", 8);
-        e.addEntry("ypos", 8);
-        e.addEntry("zpos", 0);
-        e.addEntry("scale", 2);
+        e.addEntry("display", true, 1);
+        e.addEntry("xpos", 8, 12);
+        e.addEntry("ypos", 8, 12);
+        e.addEntry("zpos", 0, 4);
+        e.addEntry("scale", 2, 2);
         return e;
     }
 

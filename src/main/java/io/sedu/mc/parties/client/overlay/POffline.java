@@ -89,18 +89,18 @@ public class POffline extends RenderIconTextItem {
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("display", true);
-        e.addEntry("scale", 2);
-        e.addEntry("zpos", 0);
-        e.addEntry("idisplay", true);
-        e.addEntry("xpos", 156);
-        e.addEntry("ypos", 8);
-        e.addEntry("tdisplay", true);
-        e.addEntry("tshadow", false);
-        e.addEntry("tcolor", 0xddf3ff);
-        e.addEntry("tattached", false);
-        e.addEntry("xtpos", 86);
-        e.addEntry("ytpos", 20);
+        e.addEntry("display", true, 1);
+        e.addEntry("scale", 2, 2);
+        e.addEntry("zpos", 0, 4);
+        e.addEntry("idisplay", true, 1);
+        e.addEntry("xpos", 156, 12);
+        e.addEntry("ypos", 8, 12);
+        e.addEntry("tdisplay", true, 1);
+        e.addEntry("tshadow", false, 1);
+        e.addEntry("tcolor", 0xddf3ff, 24);
+        e.addEntry("tattached", false, 1);
+        e.addEntry("xtpos", 86, 12);
+        e.addEntry("ytpos", 20, 12);
         return e;
     }
 

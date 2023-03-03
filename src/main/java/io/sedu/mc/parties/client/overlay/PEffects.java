@@ -10,7 +10,6 @@ import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.Registry;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
@@ -239,7 +238,7 @@ public abstract class PEffects extends RenderSelfItem {
     protected void getLimitEntries(ConfigOptionsList c) {
         final HashMap<String, ConfigOptionsList.SliderEntry> entries = new HashMap<>();
         entries.put("rowmax", c.addSliderWithUpdater("rowmax", 1, () -> maxSize, maxPerRow, () -> updateAffectedSliders(entries), false));
-        entries.put("totalmax", c.addSliderWithUpdater("totalmax", maxPerRow, Registry.MOB_EFFECT::size, maxSize, () -> updateAffectedSliders(entries), false));
+        entries.put("totalmax", c.addSliderWithUpdater("totalmax", maxPerRow, () -> 64, maxSize, () -> updateAffectedSliders(entries), false));
     }
 
     protected void getColorEntry(ConfigOptionsList c) {

@@ -9,13 +9,20 @@ import java.util.function.Consumer;
 
 public class ConfigEntry {
     ArrayList<EntryObject> entries;
+    int totalBits;
 
     public ConfigEntry() {
         entries = new ArrayList<>();
     }
 
-    public void addEntry(String name, Object value) {
-        entries.add(new EntryObject(name, value));
+    public void addEntry(String name, Object value, int bits) {
+        entries.add(new EntryObject(name, value, bits));
+        totalBits += bits;
+    }
+
+    public void addEntry(EntryObject obj, Object value) {
+        entries.add(new EntryObject(obj.name, value, obj.bitSize));
+        totalBits += obj.bitSize;
     }
 
     public ArrayList<EntryObject> getEntries() {
@@ -28,12 +35,28 @@ public class ConfigEntry {
         return json;
     }
 
+    public String getBits() {
+        StringBuilder bits = new StringBuilder();
+        entries.forEach(e -> bits.append(e.getBits()));
+        return bits.toString();
+    }
+
+
+    public int readBits(int index, char[] bits, BiConsumer<String, Object> action) {
+        for (EntryObject entry : entries) {
+            entry.updateValue(bits, index);
+            action.accept(entry.name, entry.value);
+            index += entry.bitSize;
+        }
+        return totalBits;
+    }
 
 
 
 
-    public void forEachEntry(BiConsumer<String, Object> action) {
-        entries.forEach(entryObject -> action.accept(entryObject.name, entryObject.value));
+
+    public void forEachEntry(BiConsumer<EntryObject, Object> action) {
+        entries.forEach(entryObject -> action.accept(entryObject, entryObject.value));
     }
 
     public void forEachKey(Consumer<String> action) {
@@ -41,13 +64,15 @@ public class ConfigEntry {
     }
 
 
-    static class EntryObject {
+    public static class EntryObject {
         String name;
         Object value;
+        int bitSize;
 
-        public EntryObject(String name, Object value) {
+        EntryObject(String name, Object value, int bitSize) {
             this.name = name;
             this.value = value;
+            this.bitSize = bitSize;
         }
 
         public String getName() {
@@ -57,5 +82,30 @@ public class ConfigEntry {
         public Object getValue() {
             return value;
         }
+
+        String getBits() {
+            String bits = "";
+            if (value instanceof Integer i) {
+                bits = String.format("%" + bitSize + "s", Integer.toBinaryString(i)).replace(' ', '0');
+            } else if (value instanceof Boolean b) {
+                if (b) bits = "1";
+                else bits = "0";
+            }
+            return bits;
+        }
+
+        //Returns number of bits used.
+        void updateValue(char[] bits, int index) {
+            if (value instanceof Boolean) {
+                value = bits[index] == '1';
+            } else if (value instanceof Integer) {
+                StringBuilder s = new StringBuilder();
+                for (int i = 0; i < bitSize; i++) {
+                    s.append(bits[index+i]);
+                }
+                this.value = Integer.parseInt(s.toString(), 2);
+            }
+        }
+
     }
 }

@@ -75,14 +75,14 @@ public class PName extends RenderItem {
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("display", true);
-        e.addEntry("tshadow", true);
-        e.addEntry("tcolor", 0xddf3ff);
-        e.addEntry("tmax", 16);
-        e.addEntry("xpos", 46);
-        e.addEntry("ypos", 9);
-        e.addEntry("zpos", 0);
-        e.addEntry("scale", 2);
+        e.addEntry("display", true, 1);
+        e.addEntry("tshadow", true, 1);
+        e.addEntry("tcolor", 0xddf3ff, 24);
+        e.addEntry("tmax", 16, 5);
+        e.addEntry("xpos", 46, 12);
+        e.addEntry("ypos", 9, 12);
+        e.addEntry("zpos", 0, 4);
+        e.addEntry("scale", 2, 2);
         return e;
     }
 

@@ -301,16 +301,12 @@ public abstract class RenderItem {
 
     protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, MutableComponent text, int outStart, int outEnd, int inStart, int inEnd, int textColor) {
         tooltipStart(poseStack);
-        //gui.setBlitOffset(400);
-        //poseStack.pushPose();
         poseStack.translate(0, 0, 100);
         rectCO(poseStack, 0, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+gui.getFont().width(text)+offsetX, currentY+mouseY()+(gui.getFont().lineHeight)+offsetY, outStart, outEnd);
         rectCO(poseStack, 0, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+gui.getFont().width(text)+offsetX, currentY+mouseY()+(gui.getFont().lineHeight)+offsetY, inStart, inEnd);
         gui.getFont().drawShadow(poseStack, text, mouseX()+offsetX, currentY+mouseY()+1, textColor);
         poseStack.translate(0,0,-100);
         tooltipEnd(poseStack);
-        //poseStack.popPose();
-
         currentY += gui.getFont().lineHeight+offsetY+8;
 
     }
@@ -482,8 +478,6 @@ public abstract class RenderItem {
     protected void updateValues() {
         x = Mth.clamp(x, 0, maxX());
         y = Mth.clamp(y, 0, maxY());
-        //width = Mth.clamp(width, 0, maxW());
-        //height = Mth.clamp(width, 0, maxH());
     }
 
     protected int maxX() {
@@ -597,10 +591,15 @@ public abstract class RenderItem {
         ConfigEntry defaults = getDefaults();
         ConfigEntry currents = new ConfigEntry();
         if (complete)
-            defaults.forEachEntry((entry, value) -> currents.addEntry(entry, getter.get(entry).getValue(this)));
+            defaults.forEachEntry((entry, value) -> currents.addEntry(entry, getter.get(entry.getName()).getValue(this)));
         else {
-            //TODO: Put entry if it is different from default.
-        }
+            /*defaults.forEachEntry((entry, value) -> {
+                if (!getter.get(entry.getName()).getValue(this).toString().equals(value.toString())) {
+                    System.out.println(getter.get(entry.getName()).getValue(this) + "!= " + value);
+                    currents.addEntry(entry, getter.get(entry.getName()).getValue(this));
+                }
+            });*/
+        } //TODO: Finish Implementation.
         return currents;
     }
 
@@ -669,14 +668,11 @@ public abstract class RenderItem {
         framePosH = 63;
         HashMap<String, Update> updater = new HashMap<>();
         RenderItem.initUpdater(updater);
-        items.values().forEach(item -> item.getDefaults().forEachEntry((s, v) -> {
-            System.out.println(item.name);
-            updater.get(s).onUpdate(item, v);
-        }));
+        items.values().forEach(item -> item.getDefaults().forEachEntry((s, v) -> updater.get(s.getName()).onUpdate(item, v)));
     }
 
     public static void setElementDefaults(RenderItem item, HashMap<String, Update> updater) {
-        item.getDefaults().forEachEntry((s, v) -> updater.get(s).onUpdate(item, v));
+        item.getDefaults().forEachEntry((s, v) -> updater.get(s.getName()).onUpdate(item, v));
     }
 
     public static void defaultPos() {
@@ -689,12 +685,12 @@ public abstract class RenderItem {
 
     public static ConfigEntry getGeneralValues() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("gen_x", frameX);
-        e.addEntry("gen_y", frameY);
-        e.addEntry("gen_w", frameEleW);
-        e.addEntry("gen_h", frameEleH);
-        e.addEntry("gen_pw", framePosW);
-        e.addEntry("gen_ph", framePosH);
+        e.addEntry("gen_x", frameX, 12);
+        e.addEntry("gen_y", frameY, 12);
+        e.addEntry("gen_w", frameEleW, 12);
+        e.addEntry("gen_h", frameEleH, 12);
+        e.addEntry("gen_pw", framePosW, 12);
+        e.addEntry("gen_ph", framePosH, 12);
         return e;
     }
 

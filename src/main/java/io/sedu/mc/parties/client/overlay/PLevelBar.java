@@ -184,19 +184,19 @@ public class PLevelBar extends RenderIconTextItem {
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("display", true);
-        e.addEntry("scale", 2);
-        e.addEntry("zpos", 0);
-        e.addEntry("idisplay", true);
-        e.addEntry("xpos", 4);
-        e.addEntry("ypos", 44);
-        e.addEntry("width", 40);
-        e.addEntry("tdisplay", true);
-        e.addEntry("tshadow", true);
-        e.addEntry("tcolor", 0x80ff8b);
-        e.addEntry("tattached", true);
-        e.addEntry("xtpos", 0);
-        e.addEntry("ytpos", 0);
+        e.addEntry("display", true, 1);
+        e.addEntry("scale", 2, 2);
+        e.addEntry("zpos", 0, 4);
+        e.addEntry("idisplay", true, 1);
+        e.addEntry("xpos", 4, 12);
+        e.addEntry("ypos", 44, 12);
+        e.addEntry("width", 40, 12);
+        e.addEntry("tdisplay", true, 1);
+        e.addEntry("tshadow", true, 1);
+        e.addEntry("tcolor", 0x80ff8b, 24);
+        e.addEntry("tattached", true, 1);
+        e.addEntry("xtpos", 0, 12);
+        e.addEntry("ytpos", 0,12);
         return e;
     }
 

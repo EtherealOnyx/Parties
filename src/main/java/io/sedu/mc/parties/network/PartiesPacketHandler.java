@@ -46,6 +46,12 @@ public class PartiesPacketHandler {
            .encoder(RenderPacketData::encode)
            .consumer(RenderPacketData::handle)
            .add();
+
+        net.messageBuilder(StringPacketData.class, id(), NetworkDirection.PLAY_TO_SERVER)
+           .decoder(StringPacketData::new)
+           .encoder(StringPacketData::encode)
+           .consumer(StringPacketData::handle)
+           .add();
     }
 
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {

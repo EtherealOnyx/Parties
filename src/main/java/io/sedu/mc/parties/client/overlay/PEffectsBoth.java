@@ -152,25 +152,25 @@ public class PEffectsBoth extends PEffects {
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("display", true);
-        e.addEntry("tdisplay", true);
-        e.addEntry("bsize", 1);
-        e.addEntry("buffg", 0xa9e5ff);
-        e.addEntry("buffb", 0xffa9a9);
-        e.addEntry("flash", 0xffffff);
-        e.addEntry("xpos", 46);
-        e.addEntry("ypos", 41);
-        e.addEntry("zpos", 0);
-        e.addEntry("scale", 2);
-        e.addEntry("idisplay", true);
-        e.addEntry("spacex", 30);
-        e.addEntry("spacey", 44);
-        e.addEntry("rowmax", 8);
-        e.addEntry("totalmax", 8);
-        e.addEntry("bsep", false);
-        e.addEntry("dfirst", true);
-        e.addEntry("dlim", 4);
-        e.addEntry("blim", 3);
+        e.addEntry("display", true, 1);
+        e.addEntry("tdisplay", true, 1);
+        e.addEntry("bsize", 1, 4);
+        e.addEntry("buffg", 0xa9e5ff,24);
+        e.addEntry("buffb", 0xffa9a9, 24);
+        e.addEntry("flash", 0xffffff, 24);
+        e.addEntry("xpos", 46, 12);
+        e.addEntry("ypos", 41, 12);
+        e.addEntry("zpos", 0, 4);
+        e.addEntry("scale", 2, 2);
+        e.addEntry("idisplay", true, 1);
+        e.addEntry("spacex", 30, 8);
+        e.addEntry("spacey", 44, 8);
+        e.addEntry("rowmax", 8, 8);
+        e.addEntry("totalmax", 8, 8);
+        e.addEntry("bsep", false, 1);
+        e.addEntry("dfirst", true, 1);
+        e.addEntry("dlim", 4, 8);
+        e.addEntry("blim", 3, 8);
         return e;
     }
 

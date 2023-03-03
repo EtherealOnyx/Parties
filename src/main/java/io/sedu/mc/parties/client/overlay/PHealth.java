@@ -274,26 +274,26 @@ public class PHealth extends RenderIconTextItem {
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("display", true);
-        e.addEntry("scale", 2);
-        e.addEntry("zpos", 0);
-        e.addEntry("idisplay", true);
-        e.addEntry("xpos", 46);
-        e.addEntry("ypos", 29);
-        e.addEntry("width", 120);
-        e.addEntry("height", 10);
-        e.addEntry("tdisplay", true);
-        e.addEntry("tshadow", true);
-        e.addEntry("ttype", 0);
-        e.addEntry("tattached", true);
-        e.addEntry("xtpos", 0);
-        e.addEntry("ytpos", 0);
-        e.addEntry("bhue", 0);
-        e.addEntry("ohue", 11);
-        e.addEntry("bcit", 0xC5FFC5);
-        e.addEntry("bcib", 0x6CFF6C);
-        e.addEntry("bcdt", 0xFFC5C5);
-        e.addEntry("bcdb", 0xFF6C6C);
+        e.addEntry("display", true, 1);
+        e.addEntry("scale", 2, 2);
+        e.addEntry("zpos", 0, 4);
+        e.addEntry("idisplay", true, 1);
+        e.addEntry("xpos", 46, 12);
+        e.addEntry("ypos", 29, 12);
+        e.addEntry("width", 120, 12);
+        e.addEntry("height", 10, 12);
+        e.addEntry("tdisplay", true, 1);
+        e.addEntry("tshadow", true, 1);
+        e.addEntry("ttype", 0, 4);
+        e.addEntry("tattached", true, 1);
+        e.addEntry("xtpos", 0, 12);
+        e.addEntry("ytpos", 0, 12);
+        e.addEntry("bhue", 0, 7);
+        e.addEntry("ohue", 11, 7);
+        e.addEntry("bcit", 0xC5FFC5, 24);
+        e.addEntry("bcib", 0x6CFF6C, 24);
+        e.addEntry("bcdt", 0xFFC5C5, 24);
+        e.addEntry("bcdb", 0xFF6C6C, 24);
         return e;
     }
 

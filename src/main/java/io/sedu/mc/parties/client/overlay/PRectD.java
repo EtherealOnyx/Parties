@@ -76,11 +76,11 @@ public class PRectD extends RenderItem {
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("display", true);
-        e.addEntry("xpos", 44);
-        e.addEntry("ypos", 7);
-        e.addEntry("width", 124);
-        e.addEntry("height", 34);
+        e.addEntry("display", true, 1);
+        e.addEntry("xpos", 44, 12);
+        e.addEntry("ypos", 7, 12);
+        e.addEntry("width", 124, 12);
+        e.addEntry("height", 34, 12);
         return e;
     }
 }

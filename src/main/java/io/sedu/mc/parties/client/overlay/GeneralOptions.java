@@ -11,11 +11,12 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 public class GeneralOptions extends RenderItem {
 
+    public static final GeneralOptions INSTANCE = new GeneralOptions("options");
+
     public static ItemStack icon = null;
 
     public GeneralOptions(String name) {
         super(name);
-
     }
 
     @Override
@@ -41,12 +42,12 @@ public class GeneralOptions extends RenderItem {
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("gen_x", frameX);
-        e.addEntry("gen_y", frameY);
-        e.addEntry("gen_w", frameEleW);
-        e.addEntry("gen_h", frameEleH);
-        e.addEntry("gen_pw", framePosW);
-        e.addEntry("gen_ph", framePosH);
+        e.addEntry("gen_x", 16, 12);
+        e.addEntry("gen_y", 16, 12);
+        e.addEntry("gen_w", 168, 12);
+        e.addEntry("gen_h", 64, 12);
+        e.addEntry("gen_pw", 0, 12);
+        e.addEntry("gen_ph", 63, 12);
         return e;
     }
 
@@ -69,6 +70,6 @@ public class GeneralOptions extends RenderItem {
     }
 
     private void ensureBounds() {
-        //RenderItem.items.values().forEach(RenderItem::updateValues);
+        RenderItem.items.values().forEach(RenderItem::updateValues);
     }
 }

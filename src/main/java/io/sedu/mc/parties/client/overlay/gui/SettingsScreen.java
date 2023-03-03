@@ -5,6 +5,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.*;
+import io.sedu.mc.parties.network.PartiesPacketHandler;
+import io.sedu.mc.parties.network.StringPacketData;
 import io.sedu.mc.parties.util.ColorUtils;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.ChatFormatting;
@@ -100,14 +102,7 @@ public class SettingsScreen extends Screen {
         confirmPrompt = new TextComponent("Are you sure? Click again to confirm").withStyle(ChatFormatting.DARK_RED);
     }
 
-    private void savePreset() {
-        Config.saveCompletePreset(nameBox.getValue(), descBox.getValue());
-        nameBox.setValue("");
-        descBox.setValue("");
-        if (selEle == -1) {
-            selectButton(-1);
-        }
-    }
+
 
     private void resetAll() {
         if (isConfirmed) {
@@ -147,6 +142,7 @@ public class SettingsScreen extends Screen {
     }
 
     protected final HashMap<String, RenderItem.Update> updater = new HashMap<>();
+    protected final HashMap<String, RenderItem.Getter> getter = new HashMap<>();
 
     private void toggleRGB() {
         HexBox.rgbMode = !HexBox.rgbMode;
@@ -317,6 +313,7 @@ public class SettingsScreen extends Screen {
         initMiscButtons();
         ColorUtils.colorCycle = true;
         RenderItem.initUpdater(updater);
+        RenderItem.initGetter(getter);
         notEditing = false;
         INNER_LOC = new ResourceLocation("textures/block/deepslate_bricks.png");
         PHead.icon = new ItemStack(Items.PLAYER_HEAD);
@@ -339,12 +336,15 @@ public class SettingsScreen extends Screen {
     private void initMiscButtons() {
         miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters")));
         miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters")));
-        miscButtons.add(new SmallButton(0, 0, "c", b -> toggleRGB(), tip(this, "Toggle RGB Input Mode"), 1f, 1f, 1f));
+        miscButtons.add(new SmallButton(0, 0, "c", b -> toggleRGB(), tip(this, "Toggle RGB Input Mode"), 0.5f, 0.5f, 0.5f));
         miscButtons.add(new SmallButton(0, 0, "x", b -> toggleEles(false), tip(this, "Turn All Other Elements Off"), 1f, 0.5f, 0.5f));
         miscButtons.add(new SmallButton(0, 0, "✓", b -> toggleEles(true), tip(this, "Turn All Other Elements On"), 0.5f, 1f, 0.5f));
         miscButtons.add(new SmallButton(0,0, "↺", b -> resetEle(), tip(this, "Reset Current Element to Default"), .5f, 1f, 1f));
         miscButtons.add(new SmallButton(0,0, "↺", b -> resetAll(), tip(this, "Reset Everything to Default"), 1f, 1f, 0.5f));
         miscButtons.add(new SmallButton(0,0, "s", b -> savePreset(), tip(this, "Save Preset"), 0.5f, 1f, 0.5f));
+        miscButtons.add(new SmallButton(0,0, "c", b -> copyPreset(), tip(this, "Copy Preset to Clipboard"), 1f, 0.5f, 1f));
+        miscButtons.add(new SmallButton(0,0, "p", b -> pastePreset(), tip(this, "Load Preset from Clipboard"), 1f, 0.5f, 1f));
+        miscButtons.add(new SmallButton(0, 0, "✎", b -> sendPresetToChat(), tip(this, "Link Preset to Chat"), 0, 1, 1f, 0.5f, 1f));
         nameBox = new InputBox(0xFFFFFF, font, 0, 12, new TextComponent("Name"), (s) -> checkSaveFlags(), false);
         descBox = new InputBox(0xFFFFFF, font, 0, 12, new TextComponent("Desc"), (s) -> checkSaveFlags(), false);
         nameBox.filter = s -> alphaNumeric.matcher(s).find();
@@ -352,6 +352,38 @@ public class SettingsScreen extends Screen {
         descBox.insertText(descHolder == null ? "" : descHolder);
         descBox.setMaxLength(128);
         checkSaveFlags();
+    }
+
+    private void sendPresetToChat() {
+        PartiesPacketHandler.sendToServer(new StringPacketData(0, Config.getPresetString(minecraft, getter)));
+    }
+
+    private void pastePreset() {
+        assert minecraft != null;
+        if (Config.pastePreset(minecraft, updater)) {
+            minecraft.player.displayClientMessage(new TextComponent("Preset loaded from clipboard successfully.").withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.ITALIC), true);
+        } else {
+            minecraft.player.displayClientMessage(new TextComponent("The clipboard does not contain a valid preset.").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), true);
+        }
+    }
+
+    private void savePreset() {
+        if (Config.saveCompletePreset(nameBox.getValue(), descBox.getValue(), getter)) {
+            minecraft.player.displayClientMessage(new TextComponent("Preset saved as " + nameBox.getValue() + "successfully.").withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.ITALIC), true);
+            nameBox.setValue("");
+            descBox.setValue("");
+            if (selEle == -1) {
+                selectButton(-1);
+            }
+        } else {
+            minecraft.player.displayClientMessage(new TextComponent("There was an issue saving the preset.").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), true);
+        }
+    }
+
+    private void copyPreset() {
+        assert minecraft != null;
+        Config.copyPreset(minecraft, getter);
+        minecraft.player.displayClientMessage(new TextComponent("Preset has been copied to clipboard.").withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.ITALIC), true);
     }
 
     private void checkSaveFlags() {
@@ -485,17 +517,24 @@ public class SettingsScreen extends Screen {
         optBoxX = screenX + screenW - optBoxW;
         optBoxY = screenY + eleBoxH;
 
-        miscButtons.get(2).x = optBoxX + 3;
-        miscButtons.get(2).y = optBoxY + 8;
-        miscButtons.get(3).x = miscButtons.get(2).x;
-        miscButtons.get(3).y = optBoxY + 24;
-        miscButtons.get(4).x = miscButtons.get(2).x;
-        miscButtons.get(4).y = optBoxY + 36;
-        miscButtons.get(5).x = miscButtons.get(2).x;
-        miscButtons.get(5).y = optBoxY + 52;
-        miscButtons.get(6).x = miscButtons.get(2).x;
-        miscButtons.get(6).y = optBoxY + 64;
-        miscButtons.get(7).x = miscButtons.get(2).x;
+        int butX = optBoxX + 3;
+        miscButtons.get(2).x = butX;
+        miscButtons.get(2).y = optBoxY + 6;
+        miscButtons.get(3).x = butX;
+        miscButtons.get(3).y = optBoxY + 22;
+        miscButtons.get(4).x = butX;
+        miscButtons.get(4).y = optBoxY + 34;
+        miscButtons.get(5).x = butX;
+        miscButtons.get(5).y = optBoxY + 50;
+        miscButtons.get(6).x = butX;
+        miscButtons.get(6).y = optBoxY + 62;
+        miscButtons.get(7).x = butX;
+        miscButtons.get(8).x = butX;
+        miscButtons.get(8).y = optBoxY + 78;
+        miscButtons.get(9).x = butX;
+        miscButtons.get(9).y = optBoxY + 90;
+        miscButtons.get(10).x = butX;
+        miscButtons.get(10).y = optBoxY + 102;
 
 
         presetBoxH = Math.min(32, screenH);
