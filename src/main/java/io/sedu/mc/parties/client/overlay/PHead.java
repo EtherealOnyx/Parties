@@ -35,7 +35,7 @@ public class PHead extends RenderItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+8, b.y+3, 0);
+        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+8, b.y, 0);
     }
 
     @Override

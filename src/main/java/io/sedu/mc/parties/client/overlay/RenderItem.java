@@ -29,7 +29,6 @@ import java.util.*;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseX;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseY;
-import static io.sedu.mc.parties.client.overlay.gui.SettingsScreen.INNER_LOC;
 import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 
 public abstract class RenderItem {
@@ -41,6 +40,7 @@ public abstract class RenderItem {
     public static ArrayList<String> parser = new ArrayList<>();
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
     static final ResourceLocation TAB_LOC = new ResourceLocation("textures/block/glass.png");
+    static final ResourceLocation SEL_LOC = new ResourceLocation("textures/block/glass.png");
 
     public static int frameX = 16;
     public static int frameY = 16;
@@ -225,7 +225,7 @@ public abstract class RenderItem {
     void renderTab(PoseStack p, TabButton b) {
         RenderSystem.enableDepthTest();
         RenderUtils.setRenderColor(getColor());
-        RenderUtils.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 150, TAB_LOC);
+        RenderUtils.renderBg(b.x, b.y, b.getWidth(), b.getHeight(), 150, TAB_LOC);
         RenderUtils.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x44FFFFFF, 0x88000000);
         resetColor();
         RenderUtils.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 100 << 24, getColor() | 100 << 24);
@@ -236,7 +236,7 @@ public abstract class RenderItem {
     void renderTabHover(PoseStack p, TabButton b) {
         RenderSystem.enableDepthTest();
         RenderUtils.setRenderColor(getColor());
-        RenderUtils.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 255, TAB_LOC);
+        RenderUtils.renderBg(b.x, b.y, b.getWidth(), b.getHeight(), 255, TAB_LOC);
         RenderUtils.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x66FFFFFF, 0x22FFFFFF);
         resetColor();
         RenderUtils.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 200 << 24, getColor());
@@ -244,12 +244,12 @@ public abstract class RenderItem {
 
     void renderTabClicked(PoseStack p, TabButton b) {
         RenderSystem.enableDepthTest();
-        RenderUtils.renderBg(b.x, b.y, b.x+32, b.y+32, 32, 32, 110, INNER_LOC);
         RenderUtils.setRenderColor(getColor());
-        RenderUtils.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x77FFFFFF, 0x00FFFFFF);
+        RenderUtils.renderBg(b.x, b.y, b.getWidth(), b.getHeight(), 255, TAB_LOC);
         resetColor();
+        RenderUtils.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), (getColor() & 0xfefefe) >> 1 | 200 << 24, getColor() | 50 << 24);
         p.translate(0,0,5);
-        RenderUtils.borderRectNoBottom(p.last().pose(), -1, 2, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 255 << 24, getColor() | 150 << 24);
+        RenderUtils.borderRectNoA(p.last().pose(), -1, 2, b.x, b.y, b.getWidth(), b.getHeight(), 0xFFFFFF);
         p.translate(0,0,-5);
     }
 
@@ -381,21 +381,21 @@ public abstract class RenderItem {
             @Override
             public void onRender(PoseStack p, TabButton b) {
                 renderTab(p, b);
-                renderTypeText(p, gui, b.type, b.x, b.y);
+                //renderTypeText(p, gui, b.type, b.x, b.y);
                 renderElement(p, gui, b);
             }
 
             @Override
             public void onHover(PoseStack p, TabButton b) {
                 renderTabHover(p, b);
-                renderTypeText(p, gui, b.type, b.x, b.y);
+                //renderTypeText(p, gui, b.type, b.x, b.y);
                 renderElement(p, gui, b);
             }
 
             @Override
             public void onSelect(PoseStack p, TabButton b) {
                 renderTabClicked(p, b);
-                renderTypeText(p, gui, b.type, b.x, b.y);
+                //renderTypeText(p, gui, b.type, b.x, b.y);
                 renderElement(p, gui, b);
             }
 

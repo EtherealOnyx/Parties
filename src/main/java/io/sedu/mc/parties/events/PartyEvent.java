@@ -74,6 +74,7 @@ public class PartyEvent {
 
     private static final short playerUpdateInterval = 10;
     public static final short playerAcceptTimer = 30;
+    public static final short playerMessageCooldown = 10;
 
     @SubscribeEvent
     public static void onEntityTick(TickEvent.PlayerTickEvent e) {
@@ -94,6 +95,15 @@ public class PartyEvent {
             if (e.player.tickCount % 20 == 7) {
                 PlayerData.playerList.get(e.player.getUUID()).tickInviters();
             }
+        }
+    }
+
+    private static int tickCounter = 8;
+    @SubscribeEvent
+    public static void onServerTick(TickEvent.ServerTickEvent e) {
+        if (e.phase == TickEvent.Phase.END && tickCounter++ >= 20) {
+            tickCounter = 1;
+            PlayerData.messageCd.removeIf(PlayerData.MessageCdHolder::tick);
         }
     }
 

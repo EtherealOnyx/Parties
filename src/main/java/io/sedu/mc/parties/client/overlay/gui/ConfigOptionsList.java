@@ -137,6 +137,9 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         boolean doesRefresh = false;
         OuterUpdate outerUpdate;
 
+        String desc;
+        List<Component> descTip;
+
         public void setVisible(boolean enabled) {
             if (parsing) return;
             toggle(enabled);
@@ -202,6 +205,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             enable.visible = !isEnabled;
             disable.visible = isEnabled;
             internal = name;
+            this.desc = new TranslatableComponent("config.sedparties.tooltip." + name).getString();
         }
 
         @Override
@@ -241,7 +245,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         @Override
         void updateValues(int pTop, int pLeft, int pWidth, int pHeight) {
-
+            descTip = RenderUtils.splitTooltip(desc, pWidth/5);
         }
 
         @Override
@@ -256,8 +260,20 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         @Override
         public void render(PoseStack pPoseStack, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pIsMouseOver, float pPartialTick) {
-            super.render(pPoseStack, pIndex, pTop, pLeft, pWidth, pHeight, pMouseX, pMouseY, pIsMouseOver, pPartialTick);
+            if (isDirty) {
+                updateValues(pTop, pLeft, pWidth, pHeight);
+                isDirty = false;
+            }
 
+            if (pIsMouseOver)
+            {
+                RenderUtils.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + pWidth, pTop + pHeight, entryColor.getColor() | 100 << 24, entryColor.getColor());
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), entryColor.getColor());
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), 0xAAFFFFFF);
+                s.renderTooltip(pPoseStack, descTip, Optional.empty(), s.screenX-8, s.presetBoxY+14);
+            } else {
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), entryColor.getColor());
+            }
             this.enable.x = pLeft + pWidth - 16;
             this.enable.y = pTop + 3;
             this.disable.x = this.enable.x;
@@ -296,6 +312,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             s.addTickableEntry(input);
             this.markDirty();
             internal = name;
+            this.desc = new TranslatableComponent("config.sedparties.tooltip." + name).getString();
         }
 
 
@@ -373,6 +390,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             slider.rightBound = pLeft + pWidth - 50; //Minus width
             slider.boundWidth = slider.rightBound - slider.leftBound;
             input.x = pLeft + pWidth - 38;
+            descTip = RenderUtils.splitTooltip(desc, pWidth/5);
             updateValues();
         }
 
@@ -412,8 +430,20 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         @Override
         public void render(PoseStack pPoseStack, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pIsMouseOver, float pPartialTick) {
-            super.render(pPoseStack, pIndex, pTop, pLeft, pWidth, pHeight, pMouseX, pMouseY, pIsMouseOver, pPartialTick);
+            if (isDirty) {
+                updateValues(pTop, pLeft, pWidth, pHeight);
+                isDirty = false;
+            }
 
+            if (pIsMouseOver)
+            {
+                RenderUtils.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + pWidth, pTop + pHeight, entryColor.getColor() | 100 << 24, entryColor.getColor());
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), entryColor.getColor());
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), 0xAAFFFFFF);
+                s.renderTooltip(pPoseStack, descTip, Optional.empty(), s.screenX-8, s.presetBoxY+14);
+            } else {
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), entryColor.getColor());
+            }
             //Render Slider BG
 
             this.slider.updateX();
@@ -457,6 +487,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             s.addTickableEntry(b);
             this.markDirty();
             internal = pName;
+            this.desc = new TranslatableComponent("config.sedparties.tooltip." + pName).getString();
         }
 
         private void updateRVal(String text) {
@@ -562,6 +593,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             b.x = pLeft + pWidth - 21 - inWidth;
             g.x = b.x - inWidth - 6;
             r.x = g.x - inWidth - 6;
+            descTip = RenderUtils.splitTooltip(desc, pWidth/5);
         }
 
         @Override
@@ -578,7 +610,20 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         @Override
         public void render(PoseStack pPoseStack, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pIsMouseOver, float pPartialTick) {
-            super.render(pPoseStack, pIndex, pTop, pLeft, pWidth, pHeight, pMouseX, pMouseY, pIsMouseOver, pPartialTick);
+            if (isDirty) {
+                updateValues(pTop, pLeft, pWidth, pHeight);
+                isDirty = false;
+            }
+
+            if (pIsMouseOver)
+            {
+                RenderUtils.horizRect(pPoseStack.last().pose(), 0, pLeft, pTop, pLeft + pWidth, pTop + pHeight, entryColor.getColor() | 100 << 24, entryColor.getColor());
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), entryColor.getColor());
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), 0xAAFFFFFF);
+                s.renderTooltip(pPoseStack, descTip, Optional.empty(), s.screenX-8, s.presetBoxY+14);
+            } else {
+                ConfigOptionsList.this.minecraft.font.draw(pPoseStack, name, pLeft+10, (float)(pTop + pHeight / 2 - 9 / 2), entryColor.getColor());
+            }
 
             //Render Slider BG
             int color = entryColor.getColor();
@@ -696,9 +741,8 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
     public class PresetEntry extends ConfigOptionsList.Entry {
         private int x;
         private String fileName;
-        private String desc;
+
         private String descTrimmed;
-        private List<Component> descTip;
         private Button loadPreset;
         private Button deletePreset;
 

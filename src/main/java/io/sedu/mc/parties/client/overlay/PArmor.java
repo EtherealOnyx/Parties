@@ -37,12 +37,8 @@ public class PArmor extends RenderIconTextItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        poseStack.pushPose();
-        poseStack.scale(2f,2f,0);
-        poseStack.translate(-.5f, 1, 0);
         setup(GUI_ICONS_LOCATION);
-        blit(poseStack, (b.x>>1)+4, b.y>>1, 34, 9, 9, 9);
-        poseStack.popPose();
+        blit(poseStack, b.x+12, b.y+3, 34, 9, 9, 9);
     }
 
     @Override

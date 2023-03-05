@@ -38,13 +38,18 @@ public class PEffectsBoth extends PEffects {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
+        poseStack.pushPose();
+        poseStack.scale(.5f,.5f,1f);
+        poseStack.translate(b.x, b.y, 0);
         RenderSystem.enableDepthTest();
         TextureAtlasSprite sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.BAD_OMEN);
         RenderSystem.setShaderTexture(0, sprite.atlas().location());
-        Gui.blit(poseStack, b.x + 11, b.y+2, 0, 18, 18, sprite);
+        Gui.blit(poseStack, b.x + 28, b.y+5, 0, 18, 18, sprite);
         sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.DAMAGE_RESISTANCE);
         RenderSystem.setShaderTexture(0, sprite.atlas().location());
-        Gui.blit(poseStack, b.x + 3, b.y +3,0, 18, 18, sprite);
+        Gui.blit(poseStack, b.x + 18, b.y +7,0, 18, 18, sprite);
+
+        poseStack.popPose();
     }
 
     @Override

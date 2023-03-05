@@ -31,7 +31,7 @@ public class PRectD extends RenderItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+9, b.y+5, 0, 14, 14, 0xd3ffff, 0x779fa9);
+        RenderUtils.sizeRect(poseStack.last().pose(), b.x+12, b.y+4, 0, 8, 8, 0x66002024, 0x66002024);
     }
 
     @Override

@@ -43,7 +43,16 @@ public class PDimIcon extends RenderSelfItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+8, b.y+3, 0);
+        DimConfig.entry("minecraft:overworld", (sprite, color) -> {
+
+            //rectScaled(0, poseStack, zPos, -head.scale, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 1/head.scale);
+
+            RenderSystem.setShaderTexture(0, sprite.atlas().location());
+            RenderSystem.enableBlend();
+            RenderUtils.offRectNoA(poseStack.last().pose(), b.x+12, b.y+4, 0, -1, 8, 8, (color & 0xfefefe) >> 1, color);
+            Gui.blit(poseStack, b.x+12, b.y+4, zPos, 8, 8, sprite);
+
+        });
     }
 
     @Override

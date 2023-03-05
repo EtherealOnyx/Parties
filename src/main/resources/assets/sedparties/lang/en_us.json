@@ -27,6 +27,13 @@
   "config.sedparties.title.sepe":"Separate Entry Settings",
   "config.sedparties.title.gen_f":"Frame Position Settings",
   "config.sedparties.title.gen_c":"Clickable Frame Settings",
+  "config.sedparties.title.bhue":"Main Bar Color",
+  "config.sedparties.title.ohue":"Overflow Bar Color",
+  "config.sedparties.title.bai": "Gain Anim Gradient",
+  "config.sedparties.title.bad": "Lose Anim Gradient",
+  "config.sedparties.title.barc":"Bar Color Settings",
+  "config.sedparties.title.color":"Color Settings",
+
   "config.sedparties.name.display": "Enabled",
   "config.sedparties.name.xpos": "X Pos",
   "config.sedparties.name.xtpos": "X Pos",
@@ -71,22 +78,68 @@
   "config.sedparties.name.genc_x": "X Pos",
   "config.sedparties.name.genc_y": "Y Pos",
 
-  "config.sedparties.title.bhue":"Main Bar Color",
   "config.sedparties.name.bhue": "Hue",
-  "config.sedparties.title.ohue":"Overflow Bar Color",
   "config.sedparties.name.ohue": "Hue",
 
-  "config.sedparties.title.barc":"Bar Color Settings",
-  "config.sedparties.title.color":"Color Settings",
-
-
-  "config.sedparties.title.bai": "Gain Anim Gradient",
   "config.sedparties.name.bcit": "Top",
   "config.sedparties.name.bcib": "Bottom",
 
-  "config.sedparties.title.bad": "Lose Anim Gradient",
   "config.sedparties.name.bcdt": "Top",
   "config.sedparties.name.bcdb": "Bottom",
-  "config.sedparties.name.ttype": "Text Type"
+  "config.sedparties.name.ttype": "Text Type",
+
+  "config.sedparties.tooltip.display": "Activate or deactivate the current element.",
+  "config.sedparties.tooltip.xpos": "The X position of the current element (or icon).",
+  "config.sedparties.tooltip.xtpos": "The X position of the text in the current element when unattached.",
+  "config.sedparties.tooltip.ypos": "The Y position of the current element (or icon).",
+  "config.sedparties.tooltip.zpos": "The Z position of the current element. Elements with higher values render on top of those with lower values.",
+  "config.sedparties.tooltip.ytpos": "The Y position of the text in the current element when unattached.",
+  "config.sedparties.tooltip.scale": "The scaling of the element. Options are 50%, 100%, or 200%.",
+  "config.sedparties.tooltip.tcolor": "The main color of the element's text.",
+  "config.sedparties.tooltip.tcabsorb": "The health text color when an absorb effect is active. ",
+  "config.sedparties.tooltip.tcdead": "The health text color when the player is dead.",
+  "config.sedparties.tooltip.tshadow": "Whether or not the element's text should also render a shadow (or outline).",
+  "config.sedparties.tooltip.tmax": "The text's max length. Names will be cut to this value of they are over the limit.",
+  "config.sedparties.tooltip.tattached": "Whether the text should be attached to the icon or not.",
+  "config.sedparties.tooltip.idisplay": "Enable the display of the element's icon or image.",
+  "config.sedparties.tooltip.bgdisplay": "Enable the background of the element.",
+  "config.sedparties.tooltip.tdisplay": "Enable the text of the element.",
+  "config.sedparties.tooltip.danim": "Enable an animation when party members switch dimensions.",
+  "config.sedparties.tooltip.width": "The element's (or icon's) width.",
+  "config.sedparties.tooltip.height": "The element's (or icon's height",
+  "config.sedparties.tooltip.spacex": "Horizontal spacing between effects icons.",
+  "config.sedparties.tooltip.spacey": "Vertical spacing between effects icons.",
+  "config.sedparties.tooltip.rowmax": "The maximum number of buffs in one row.",
+  "config.sedparties.tooltip.totalmax": "The maximum number of buffs displayed total.",
+  "config.sedparties.tooltip.buffg": "The outline color of a beneficial effect.",
+  "config.sedparties.tooltip.buffb": "The outline color of a detrimental effect",
+  "config.sedparties.tooltip.flash": "The outline color of when an effect flashes. Happens when an instant effect is displayed.",
+  "config.sedparties.tooltip.blim": "The number of good effects displayed when an overflow indicator is active. (Duration prioritization must be off.)",
+  "config.sedparties.tooltip.dlim": "The number of bad effects displayed when an overflow indicator is active. (Duration prioritization must be off.)",
+  "config.sedparties.tooltip.dfirst": "Whether or not beneficial effects are displayed ",
+  "config.sedparties.tooltip.bsep": "Whether or not duration is prioritized. If active, debuff prioritization and good/bad buff ratios are disabled.",
+  "config.sedparties.tooltip.bsize": "The size of the border around the effect icon square. Grows inwards.",
+
+
+  "config.sedparties.tooltip.gen_x": "The party frame's X position.",
+  "config.sedparties.tooltip.gen_y": "The party frame's Y position.",
+  "config.sedparties.tooltip.gen_w": "The party frame's width (for element boundaries).",
+  "config.sedparties.tooltip.gen_h": "The party frame's height (for element boundaries).",
+  "config.sedparties.tooltip.gen_pw": "Horizontal spacing between party member frames.",
+  "config.sedparties.tooltip.gen_ph": "Vertical spacing between party member frames.",
+  "config.sedparties.tooltip.genc_w": "The width of the clickable area (for targeting and selection)",
+  "config.sedparties.tooltip.genc_h": "The height of the clickable area (for targeting and selection",
+  "config.sedparties.tooltip.genc_x": "The x position of the clickable area (which bounded within the frame)",
+  "config.sedparties.tooltip.genc_y": "The y position of the clickable area (which bounded within the frame)",
+
+  "config.sedparties.tooltip.bhue": "The hue of bar's main color (example: health)",
+  "config.sedparties.tooltip.ohue": "The hue of the bar's overflow color (example: absorption)",
+
+  "config.sedparties.tooltip.bcit": "The top gradient color of the health increase animation",
+  "config.sedparties.tooltip.bcib": "The bottom gradient color of the health increase animation",
+
+  "config.sedparties.tooltip.bcdt": "The top gradient color of the health decrease animation",
+  "config.sedparties.tooltip.bcdb": "The bottom gradient color of the health decrease animation",
+  "config.sedparties.tooltip.ttype": "Text display type. Options are a ratio, current health only, and a percentage."
 }
 

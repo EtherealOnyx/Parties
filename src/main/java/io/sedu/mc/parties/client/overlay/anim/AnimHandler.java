@@ -6,8 +6,6 @@ import java.util.List;
 public abstract class AnimHandler {
 
 
-    //Ticker
-    static int currTick;
     static List<AnimHandler> animTickers = new ArrayList<>();
     //Generic data
     public final int length;

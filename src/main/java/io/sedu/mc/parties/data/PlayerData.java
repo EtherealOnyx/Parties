@@ -4,26 +4,18 @@ import io.sedu.mc.parties.events.PartyEvent;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class PlayerData {
 
     public static HashMap<UUID, PlayerData> playerList = new HashMap<>();
 
+    public static List<MessageCdHolder> messageCd = new ArrayList<>();
+
     //Boolean true = server side tracking, false = client side tracking.
     //Inner UUID belongs to ID that is tracking the outer player.
     public static HashMap<UUID,HashMap<UUID, Boolean>> playerTrackers = new HashMap<>();
-
-    //Left = Tracked, right = trackers
-    public static HashMap<UUID, UUID> xpTrackers = new HashMap<>();
-
-
-
-
 
     //Player Entity
     protected WeakReference<ServerPlayer> serverPlayer;
@@ -33,6 +25,7 @@ public class PlayerData {
 
     //Invite tracker
     private LinkedHashMap<UUID, Short> inviters = new LinkedHashMap<>();
+
     //Player old hunger;
     private int oldHunger;
 
@@ -44,6 +37,14 @@ public class PlayerData {
 
     public PlayerData(UUID id) {
         playerList.put(id, this);
+    }
+
+    public static boolean isOnMessageCd(UUID uuid) {
+        for (MessageCdHolder h : messageCd) {
+            if (h.id == uuid)
+                return true;
+        }
+        return false;
     }
 
     public boolean hasParty() {
@@ -62,11 +63,10 @@ public class PlayerData {
         inviters.put(inviter, PartyEvent.playerAcceptTimer);
     }
 
-    public boolean addParty(UUID id) {
+    public void addParty(UUID id) {
         if (party != null)
-            return false;
+            return;
         party = id;
-        return true;
     }
 
     public ServerPlayer getPlayer() {
@@ -160,5 +160,18 @@ public class PlayerData {
             id = iter.next();
         }
         if (id != null) action.accept(id);
+    }
+
+    public static class MessageCdHolder {
+        UUID id;
+        int cooldown;
+        public MessageCdHolder(UUID id, int cooldown) {
+            this.id = id;
+            this.cooldown = cooldown;
+        }
+
+        public boolean tick() {
+            return cooldown-- <= 0;
+        }
     }
 }

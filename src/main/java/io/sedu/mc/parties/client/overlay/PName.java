@@ -42,7 +42,12 @@ public class PName extends RenderItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(nameTag, b.x+8, b.y+3, 0);
+        poseStack.pushPose();
+        poseStack.scale(.5f,.5f,1f);
+        poseStack.translate(b.x+8,b.y,0);
+        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(nameTag, b.x+8, b.y, 0);
+        poseStack.popPose();
+
     }
 
     @Override

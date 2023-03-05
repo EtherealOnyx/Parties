@@ -47,7 +47,6 @@ public class SettingsScreen extends Screen {
     int eleBoxY;
     int eleBoxW;
     int eleBoxH;
-    int eleOffsetX;
     static int selEle = 0;
     private static int offEle = 0;
     int maxEles = 0;
@@ -81,15 +80,13 @@ public class SettingsScreen extends Screen {
 
     Pattern alphaNumeric = Pattern.compile("^[a-zA-Z0-9_-]*$");
 
-    //TODO: Save changes into a new class that tracks the component and the subtype and the value of the change. Disable clearing until they press X
-
-    private final Button left = new ColorButton(0xbb8f44, 0, 0, 20, 20, new TextComponent("◄"), b -> cycleElements(true), tip(this, "Cycle Elements Left"));
-    private final Button right = new ColorButton(0xbb8f44, 0, 0, 20, 20, new TextComponent("►"), b -> cycleElements(false), tip(this, "Cycle Elements Right"));
     private final ArrayList<Button> miscButtons;
 
     private final MutableComponent confirmPrompt;
     private boolean isConfirmed = false;
     public int buttonCooldown = 0;
+    public boolean sentMessage = false;
+    public int messageCooldown = 0;
     public int revertCooldown = 0;
     private boolean triggeredPrompt = false;
 
@@ -162,23 +159,6 @@ public class SettingsScreen extends Screen {
         updateOptionsBounds();
     }
 
-    private void cycleElements(boolean isLeftCycle) {
-        removeRenderButtons();
-        if (isLeftCycle && left.active) {
-            //To prevent errors??
-
-            offEle--;
-            addRenderButtons();
-            checkArrows();
-            return;
-        }
-        if (!isLeftCycle && right.active) {
-            offEle++;
-            addRenderButtons();
-            checkArrows();
-        }
-    }
-
     public void tick() {
         tickables.forEach(InputBox::tick);
         if (triggeredPrompt && buttonCooldown > 0) {
@@ -194,6 +174,11 @@ public class SettingsScreen extends Screen {
                 ((SmallButton)miscButtons.get(6)).setColor(1f, 1f, .5f);
                 miscButtons.get(6).setMessage(new TextComponent("↺"));
             }
+        }
+
+        if (sentMessage && messageCooldown-- < 0) {
+            sentMessage = false;
+            miscButtons.get(10).active = true;
         }
     }
 
@@ -223,10 +208,6 @@ public class SettingsScreen extends Screen {
         tickables.clear();
         tickables.add(nameBox);
         tickables.add(descBox);
-    }
-
-    private void removeRenderButtons() {
-        tabs.values().forEach(tabButton -> tabButton.visible = false);
     }
 
     public void render(PoseStack poseStack, int pMouseX, int pMouseY, float pPartialTick) {
@@ -278,7 +259,8 @@ public class SettingsScreen extends Screen {
 
     private void renderElementBox(PoseStack poseStack) {
         //RenderItem.drawRect(poseStack.last().pose(), 0,eleBoxX, eleBoxY, eleBoxX + eleBoxW, eleBoxY + eleBoxH, 0x33000000, 0x33000000);
-        renderBg(screenX, screenY, screenX + screenW, screenY + eleBoxH, screenW, eleBoxH, 255, MENU_LOC);
+        renderBg(screenX, screenY, screenX + 32, screenY + eleBoxH, 32, eleBoxH, 50, MENU_LOC);
+        //renderBg(screenX+32, screenY, screenX + screenW, screenY + eleBoxH, screenW - 32, eleBoxH, 150, MENU_LOC);
 
         //With Arrows
 
@@ -355,7 +337,11 @@ public class SettingsScreen extends Screen {
     }
 
     private void sendPresetToChat() {
+        if (sentMessage) return;
         PartiesPacketHandler.sendToServer(new StringPacketData(0, Config.getPresetString(minecraft, getter)));
+        sentMessage = true;
+        messageCooldown = 300;
+        miscButtons.get(10).active = false;
     }
 
     private void pastePreset() {
@@ -401,26 +387,24 @@ public class SettingsScreen extends Screen {
                              new PresetOptions("Load").render((ForgeIngameGui) minecraft.gui), "Load");
         //General Settings
         tabsOrder.add("general");
-        tabs.put("general", new TabButton(0, 0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
+        tabs.put("general", new TabButton(0, 0, 0, 32, 16, b -> this.selectButton(((TabButton)b).index),
                                           RenderUtils.tip(this, new TranslatableComponent("gui.sedparties.name.general")),
                                           new GeneralOptions("general").render((ForgeIngameGui) minecraft.gui),
-                                          "Main"
+                                          "Main", true
                                           ));
         while (iter.hasNext()) {
             item = iter.next();
             if (item.getValue().isTabRendered()) {
                 tabsOrder.add(item.getKey());
-                tabs.put(item.getKey(), new TabButton(i, 0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
+                tabs.put(item.getKey(), new TabButton(i, 0, 0, 32, 16, b -> this.selectButton(((TabButton)b).index),
                                                       RenderUtils.tip(this, new TranslatableComponent(item.getValue().translateName())),
                                                       item.getValue().render((ForgeIngameGui) minecraft.gui),
-                                                      item.getValue().getType()
+                                                      item.getValue().getType(), true
 
                 ));
                 i++;
             }
         }
-        removeRenderButtons();
-        //initRenderButtons();
     }
 
     @Override
@@ -434,46 +418,7 @@ public class SettingsScreen extends Screen {
         removeWidget(options);
         options = null;
         updateOptionsBounds();
-    }
-
-    private void initRenderButtons() {
-        if (maxEles < tabsOrder.size()) {
-            left.x = eleBoxX + 6 + eleOffsetX;
-            left.y = eleBoxY + 6;
-            right.x = eleBoxX + 6 + (maxEles-1)*32 + eleOffsetX;
-            right.y = eleBoxY + 6;
-            left.visible = true;
-            right.visible = true;
-            if (offEle + maxEles - 2 > tabsOrder.size()) {
-                offEle = tabsOrder.size() - maxEles + 2;
-            }
-            addRenderButtons();
-            checkArrows();
-        } else {
-            left.visible = false;
-            right.visible = false;
-        }
-    }
-
-    private void addRenderButtons() {
-        Button b;
-        for (int i = 0; i < maxEles - 2; i++) {
-            b = tabs.get(tabsOrder.get(offEle+i));
-            b.x = eleOffsetX + eleBoxX + (i+1)*32;
-            b.y = eleBoxY;
-            b.visible = true;
-        }
-    }
-
-    private void checkArrows() {
-        if (offEle == 0)
-            left.active = false;
-        else
-            left.active = true;
-        if (offEle + maxEles - 2 >= tabsOrder.size()) {
-            right.active = false;
-        } else
-            right.active = true;
+        organizeTabButtons();
     }
 
     private void setBounds(int width, int height, boolean init) {
@@ -488,14 +433,11 @@ public class SettingsScreen extends Screen {
 
         eleBoxW = screenW - 32;
         maxEles = eleBoxW / 32;
-        eleOffsetX = (eleBoxW - (maxEles*32)) / 2;
         eleBoxX = screenX + 32;
         eleBoxY = screenY;
         eleBoxH = Math.min(32, screenH);
 
-
-        removeRenderButtons();
-        initRenderButtons();
+        organizeTabButtons();
 
         modBoxW = Math.min(32, screenW);
         modBoxX = screenX;
@@ -554,8 +496,6 @@ public class SettingsScreen extends Screen {
 
 
         if (init) {
-            addRenderableWidget(left);
-            addRenderableWidget(right);
             miscButtons.forEach(this::addRenderableWidget);
             tabs.values().forEach(this::addRenderableWidget);
             addRenderableWidget(presetButton);
@@ -571,6 +511,26 @@ public class SettingsScreen extends Screen {
         }
         updateOptionsBounds();
 
+    }
+
+    private void organizeTabButtons() {
+        TabButton b;
+        int eleCounter = 0;
+        int xOffset = eleBoxX + (eleBoxW - (32*maxEles))/2;
+        int yOffset = eleBoxY+16;
+        int currEle = 0;
+        for (String tab : tabsOrder) {
+            b = tabs.get(tab);
+            if (eleCounter++ == maxEles) {
+                yOffset -= 16;
+                currEle += maxEles;
+                xOffset = eleBoxX + (eleBoxW - (32*Math.min(maxEles, tabs.size() - currEle)))/2;
+                eleCounter = 1;
+            }
+            b.x = xOffset;
+            b.y = yOffset;
+            xOffset += 32;
+        }
     }
 
     private void updateOptionsBounds() {

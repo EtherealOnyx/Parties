@@ -13,12 +13,22 @@ public class TabButton extends Button {
     private final Action action;
     public Component type;
     int index;
+    boolean isCut;
 
     public TabButton(int index, int pX, int pY, int pWidth, int pHeight, OnPress pOnPress, OnTooltip pOnTooltip, Action i, String type) {
         super(pX, pY, pWidth, pHeight, EMPTY, pOnPress, pOnTooltip);
         this.type = new TextComponent(type);
         action = i;
         this.index = index;
+        isCut = false;
+    }
+
+    public TabButton(int index, int pX, int pY, int pWidth, int pHeight, OnPress pOnPress, OnTooltip pOnTooltip, Action i, String type, boolean isCut) {
+        super(pX, pY, pWidth, pHeight, EMPTY, pOnPress, pOnTooltip);
+        this.type = new TextComponent(type);
+        action = i;
+        this.index = index;
+        this.isCut = isCut;
     }
 
 
