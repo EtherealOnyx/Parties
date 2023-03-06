@@ -593,4 +593,29 @@ public class RenderUtils {
         return tooltip;
     }
 
+    public static void offRectNoA(Matrix4f mat, float x, float y, int z, int offset, float width, float height, int startColor)
+    {
+        float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
+        float startGreen = (float)(startColor >>  8 & 255) / 255.0F;
+        float startBlue  = (float)(startColor       & 255) / 255.0F;
+
+
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.enableDepthTest();
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, x+width-offset,    y+offset, z).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat,  x+offset,    y+offset, z).color(startRed, startGreen, startBlue, 1f).endVertex();
+        buffer.vertex(mat,  x+offset, y+height-offset, z).color(  startRed,   startGreen,   startBlue,1f).endVertex();
+        buffer.vertex(mat, x+width-offset, y+height-offset, z).color(  startRed,   startGreen,   startBlue,1f).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
 }

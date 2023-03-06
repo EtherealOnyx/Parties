@@ -34,7 +34,6 @@ import static io.sedu.mc.parties.util.RenderUtils.*;
 public class SettingsScreen extends Screen {
     private final ResourceLocation MENU_LOC = new ResourceLocation("textures/block/deepslate_tiles.png");
     private final ResourceLocation MOD_LOC = new ResourceLocation("textures/block/polished_basalt_side.png");
-    public static ResourceLocation INNER_LOC;
     private final ResourceLocation OPTIONS_LOC = new ResourceLocation("textures/block/spruce_log.png");
     private final ResourceLocation SEARCH_LOC = new ResourceLocation("textures/block/deepslate_tiles.png");
 
@@ -194,7 +193,6 @@ public class SettingsScreen extends Screen {
         PDimIcon.icon = null;
         GeneralOptions.icon = null;
         PresetOptions.icon = null;
-        INNER_LOC = null;
         nameHolder = nameBox.getValue().isEmpty() ? null : nameBox.getValue();
         descHolder = descBox.getValue().isEmpty() ? null : descBox.getValue();
         super.onClose();
@@ -217,11 +215,12 @@ public class SettingsScreen extends Screen {
             poseStack.translate(0,0,-1);
         }
         renderFrameOutline(poseStack);
-        renderConfig();
         RenderSystem.enableDepthTest();
         this.options.render(poseStack, pMouseX, pMouseY, pPartialTick);
         assert minecraft != null;
-        renderElementBox(poseStack);
+        RenderUtils.offRectNoA(poseStack.last().pose(), screenX, screenY+32, -1, -2, screenW, screenH-32, ColorUtils.getRainbowColor(), 0x232323);
+        RenderUtils.offRectNoA(poseStack.last().pose(), screenX, screenY, -1, -2, 32, 32, ColorUtils.getRainbowColor());
+        renderBg(screenX, screenY, screenX + 32, screenY + eleBoxH, 32, eleBoxH, 50, MENU_LOC);
         //TODO: ModBox
         //if (modVisible)
             //renderModBox();
@@ -240,9 +239,7 @@ public class SettingsScreen extends Screen {
 
     }
 
-    private void renderConfig() {
-        //renderBg( 0,0,0,0,0,0, 255, INNER_LOC);
-    }
+
 
     private void renderPresetBox() {
         renderBg(presetBoxX, presetBoxY, presetBoxX + presetBoxW, presetBoxY + presetBoxH, presetBoxW, presetBoxH, 200, SEARCH_LOC);
@@ -250,25 +247,6 @@ public class SettingsScreen extends Screen {
 
     private void renderOptionsBox() {
         renderBg(optBoxX, optBoxY, optBoxX + optBoxW, optBoxY + optBoxH, optBoxW, optBoxH, 255, OPTIONS_LOC);
-    }
-
-    private void renderModBox() {
-        //RenderItem.drawRect(poseStack.last().pose(), 0,modBoxX - 40, modBoxY, modBoxX + modBoxW, modBoxY + modBoxH, 0x33000000, 0x33000000);
-        renderBg(modBoxX, modBoxY, modBoxX + modBoxW, modBoxY + modBoxH, modBoxW, modBoxH, 175, MOD_LOC);
-    }
-
-    private void renderElementBox(PoseStack poseStack) {
-        //RenderItem.drawRect(poseStack.last().pose(), 0,eleBoxX, eleBoxY, eleBoxX + eleBoxW, eleBoxY + eleBoxH, 0x33000000, 0x33000000);
-        renderBg(screenX, screenY, screenX + 32, screenY + eleBoxH, 32, eleBoxH, 50, MENU_LOC);
-        //renderBg(screenX+32, screenY, screenX + screenW, screenY + eleBoxH, screenW - 32, eleBoxH, 150, MENU_LOC);
-
-        //With Arrows
-
-    }
-
-    private void renderElementTab(PoseStack poseStack, int i, int offset) {
-        //tabs.get(tabsOrder.get(i/*+currentIndex*/)).render(poseStack,minecraft.gui, eleBoxX + offset, eleBoxY, eleBoxX + offset + 32, eleBoxY + 32);
-        //RenderItem.drawRectCO(poseStack.last().pose(), 0, eleBoxX + offset, eleBoxY, eleBoxX + offset + 32, eleBoxY + 32, 0xFFFF | (255*(i%2)) <<16, 0x777777);
     }
 
 
@@ -297,7 +275,7 @@ public class SettingsScreen extends Screen {
         RenderItem.initUpdater(updater);
         RenderItem.initGetter(getter);
         notEditing = false;
-        INNER_LOC = new ResourceLocation("textures/block/deepslate_bricks.png");
+        //INNER_LOC = tabs.get(tabsOrder.get(selEle)).getInnerBg();
         PHead.icon = new ItemStack(Items.PLAYER_HEAD);
         GeneralOptions.icon = new ItemStack(Items.COMPARATOR);
         PresetOptions.icon = new ItemStack(Items.CHEST_MINECART);
@@ -538,8 +516,11 @@ public class SettingsScreen extends Screen {
             if (selEle == -1) {
                 this.options = presetButton.getOptions(this, minecraft, 0, 0, 0, 0);
                 this.options.setItemHeight(28);
+                this.options.setBackground(presetButton.getInnerBg());
             } else {
-                this.options = tabs.get(tabsOrder.get(selEle)).getOptions(this, minecraft, 0, 0, 0, 0);
+                TabButton b = tabs.get(tabsOrder.get(selEle));
+                this.options = b.getOptions(this, minecraft, 0, 0, 0, 0);
+                this.options.setBackground(b.getInnerBg());
             }
 
             this.addWidget(this.options);

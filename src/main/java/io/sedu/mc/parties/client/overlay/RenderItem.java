@@ -224,10 +224,7 @@ public abstract class RenderItem {
 
     void renderTab(PoseStack p, TabButton b) {
         RenderSystem.enableDepthTest();
-        RenderUtils.setRenderColor(getColor());
-        RenderUtils.renderBg(b.x, b.y, b.getWidth(), b.getHeight(), 150, TAB_LOC);
-        RenderUtils.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x44FFFFFF, 0x88000000);
-        resetColor();
+        RenderUtils.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), getColor() | 100 << 24, (getColor() & 0xfefefe) >> 1 | 200 << 24);
         RenderUtils.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 100 << 24, getColor() | 100 << 24);
 
     }
@@ -235,19 +232,13 @@ public abstract class RenderItem {
 
     void renderTabHover(PoseStack p, TabButton b) {
         RenderSystem.enableDepthTest();
-        RenderUtils.setRenderColor(getColor());
-        RenderUtils.renderBg(b.x, b.y, b.getWidth(), b.getHeight(), 255, TAB_LOC);
-        RenderUtils.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), 0x66FFFFFF, 0x22FFFFFF);
-        resetColor();
+        RenderUtils.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), (getColor() & 0xfefefe) >> 1 | 200 << 24, getColor() | 100 << 24);
         RenderUtils.borderRect(p.last().pose(), -1, 1, b.x, b.y, b.getWidth(), b.getHeight(), getColor() | 200 << 24, getColor());
     }
 
     void renderTabClicked(PoseStack p, TabButton b) {
         RenderSystem.enableDepthTest();
-        RenderUtils.setRenderColor(getColor());
-        RenderUtils.renderBg(b.x, b.y, b.getWidth(), b.getHeight(), 255, TAB_LOC);
-        resetColor();
-        RenderUtils.sizeRect(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), (getColor() & 0xfefefe) >> 1 | 200 << 24, getColor() | 50 << 24);
+        RenderUtils.sizeRectNoA(p.last().pose(), b.x, b.y, 0, b.getWidth(), b.getHeight(), (getColor() & 0xfefefe) >> 1, getColor());
         p.translate(0,0,5);
         RenderUtils.borderRectNoA(p.last().pose(), -1, 2, b.x, b.y, b.getWidth(), b.getHeight(), 0xFFFFFF);
         p.translate(0,0,-5);
@@ -403,7 +394,16 @@ public abstract class RenderItem {
             public ConfigOptionsList getOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h) {
                 return getConfigOptions(s, minecraft, x, y, w, h, false);
             }
+
+            @Override
+            public ResourceLocation getInnerBackground() {
+                return getItemBackground();
+            }
         };
+    }
+
+    protected ResourceLocation getItemBackground() {
+        return new ResourceLocation("textures/block/deepslate_bricks.png");
     }
 
     protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {

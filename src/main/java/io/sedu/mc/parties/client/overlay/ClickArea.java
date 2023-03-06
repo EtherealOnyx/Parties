@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
-import io.sedu.mc.parties.util.ColorUtils;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -22,7 +21,7 @@ public class ClickArea extends RenderItem {
 
     @Override
     int getColor() {
-        return ColorUtils.getRainbowColor();
+        return 0xFFFFFF;
     }
 
     @Override
@@ -32,7 +31,7 @@ public class ClickArea extends RenderItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+12, b.y+4, 0, 8, 8, ColorUtils.getRainbowColor(), ColorUtils.getRainbowColor());
+        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+12, b.y+4, 0, 8, 8, 0xFFFFFF, 0xFFFFFF);
     }
 
     protected int maxH() {

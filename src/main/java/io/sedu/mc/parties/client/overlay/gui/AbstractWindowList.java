@@ -12,6 +12,7 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import static io.sedu.mc.parties.client.overlay.gui.SettingsScreen.INNER_LOC;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class AbstractWindowList<E extends AbstractWindowList.Entry<E>> extends AbstractContainerEventHandler implements Widget, NarratableEntry {
@@ -33,6 +33,7 @@ public abstract class AbstractWindowList<E extends AbstractWindowList.Entry<E>> 
     protected int width;
     protected int height;
     protected int top;
+    private ResourceLocation INNER_LOC;
     private boolean renderSelection = true; //TODO: Check usage.
     protected int bottom;
     protected int right;
@@ -57,6 +58,11 @@ public abstract class AbstractWindowList<E extends AbstractWindowList.Entry<E>> 
 
     public void setRenderSelection(boolean pRenderSelection) {
         this.renderSelection = pRenderSelection;
+    }
+
+    public AbstractWindowList<E> setBackground(ResourceLocation bg) {
+        INNER_LOC = bg;
+        return this;
     }
 
     @Nullable

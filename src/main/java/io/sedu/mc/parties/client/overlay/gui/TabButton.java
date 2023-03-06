@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 
 public class TabButton extends Button {
 
@@ -58,12 +59,17 @@ public class TabButton extends Button {
         return action.getOptions(s, minecraft, x, y, w, h);
     }
 
+    public ResourceLocation getInnerBg() {
+        return action.getInnerBackground();
+    }
+
 
     public interface Action {
         void onRender(PoseStack p, TabButton b);
         void onHover(PoseStack p, TabButton b);
         void onSelect(PoseStack p, TabButton b);
         ConfigOptionsList getOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h);
+        ResourceLocation getInnerBackground();
 
     }
 }
