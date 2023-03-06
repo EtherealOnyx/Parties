@@ -18,6 +18,7 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
@@ -184,17 +185,19 @@ public abstract class PEffects extends RenderSelfItem {
     }
 
 
-    protected void setWidth(Integer d) {
+    protected SmallBound setWidth(Integer d) {
         this.width = d;
         this.xOff = (width-26)/2;
         this.eleWidth = ((width * maxPerRow) / 2);
+        return new SmallBound(2, (int) (width/2*maxPerRow*scale));
     }
 
 
-    protected void setHeight(Integer d) {
+    protected SmallBound setHeight(Integer d) {
         this.height = d;
         this.yOff = (height-26)/2;
         this.eleHeight = (int) (height * Math.ceil(maxSize / (float)maxPerRow) / 2); //why is this off by 1...
+        return new SmallBound(3, (int) ((height/2)*Math.ceil(1f*maxSize/maxPerRow)*scale));
     }
 
     protected int maxX() {
@@ -245,12 +248,13 @@ public abstract class PEffects extends RenderSelfItem {
     }
 
     @Override
-    public void setColor(int type, int data) {
+    public SmallBound setColor(int type, int data) {
         switch(type) {
             case 0 -> beneColor = data;
             case 1 -> badColor = data;
             case 2 -> flashColor = data;
         }
+        return null;
     }
 
     @Override
@@ -263,19 +267,61 @@ public abstract class PEffects extends RenderSelfItem {
         return 0;
     }
 
-    public void setBorderSize(int data) {
+    public SmallBound setBorderSize(int data) {
         this.borderSize = data;
+        return null;
     }
 
-    public void setMaxSize(int data) {
+    public SmallBound setMaxSize(int data) {
         this.maxSize = data;
+        return new SmallBound(2, (int) (width/2*maxPerRow*scale)){
+            @Override
+            public void update(BiConsumer<Integer, Integer> action) {
+                action.accept(type, value);
+                action.accept(3, (int) ((height/2)*Math.ceil(1f*maxSize/maxPerRow)*scale));
+            }
+        };
     }
 
-    public void setMaxPerRow(int data) {
+    public SmallBound setMaxPerRow(int data) {
         this.maxPerRow = data;
+        return new SmallBound(2, (int) (width/2*maxPerRow*scale)){
+            @Override
+            public void update(BiConsumer<Integer, Integer> action) {
+                action.accept(type, value);
+                action.accept(3, (int) ((height/2)*Math.ceil(1f*maxSize/maxPerRow)*scale));
+            }
+        };
     }
 
+    @Override
+    public ItemBound getRenderItemBound() {
+        return new ItemBound(frameX + x, frameY + y, (int) (width/2*maxPerRow*scale), (int) ((height/2)*Math.ceil(1f*maxSize/maxPerRow)*scale));
+    }
 
-
+    @Override
+    public SmallBound setScale(int data) {
+        switch (data) {
+            case 1 -> {
+                scale = 0.5f;
+                scalePos = 1;
+            }
+            case 2 -> {
+                scale = 1f;
+                scalePos = 0;
+            }
+            case 3 -> {
+                scale = 2f;
+                scalePos = -0.5f;
+            }
+        }
+        return new SmallBound(2, (int) (width/2*maxPerRow*scale)){
+            @Override
+            public void update(BiConsumer<Integer, Integer> action) {
+                action.accept(type, value);
+                action.accept(3, (int) ((height/2)*Math.ceil(1f*maxSize/maxPerRow)*scale));
+            }
+        };
+    }
 
 }

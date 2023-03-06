@@ -2,6 +2,7 @@ package io.sedu.mc.parties.client.overlay.effects;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PEffectsBoth;
+import io.sedu.mc.parties.client.overlay.RenderItem;
 import net.minecraft.world.effect.MobEffect;
 
 import java.util.*;
@@ -27,16 +28,18 @@ public class EffectHolder {
     public EffectHolder() {
     }
 
-    public static void updatebLim(int data) {
+    public static RenderItem.SmallBound updatebLim(int data) {
         bLim = data;
         PEffectsBoth.dLim = PEffectsBoth.maxAll - 1 - data;
         ClientPlayerData.markEffectsDirty();
+        return null;
     }
 
-    public static void updatedLim(int data) {
+    public static RenderItem.SmallBound updatedLim(int data) {
         PEffectsBoth.dLim = data;
         bLim = PEffectsBoth.maxAll - 1 - data;
         ClientPlayerData.markEffectsDirty();
+        return null;
     }
 
 

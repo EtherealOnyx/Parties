@@ -265,4 +265,8 @@ public class PDimIcon extends RenderSelfItem {
         return e;
     }
 
+    public ItemBound getRenderItemBound() {
+        return new ItemBound(frameX + x, frameY + y, (int) (width*head.scale), (int) (height*head.scale));
+    }
+
 }

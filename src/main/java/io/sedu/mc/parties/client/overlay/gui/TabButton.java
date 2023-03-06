@@ -2,6 +2,7 @@ package io.sedu.mc.parties.client.overlay.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.client.overlay.RenderItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
@@ -63,6 +64,10 @@ public class TabButton extends Button {
         return action.getInnerBackground();
     }
 
+    public RenderItem.ItemBound getBounds() {
+        return action.getItemBound();
+    }
+
 
     public interface Action {
         void onRender(PoseStack p, TabButton b);
@@ -70,6 +75,7 @@ public class TabButton extends Button {
         void onSelect(PoseStack p, TabButton b);
         ConfigOptionsList getOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h);
         ResourceLocation getInnerBackground();
+        RenderItem.ItemBound getItemBound();
 
     }
 }

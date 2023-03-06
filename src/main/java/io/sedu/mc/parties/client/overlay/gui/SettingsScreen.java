@@ -2,7 +2,6 @@ package io.sedu.mc.parties.client.overlay.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.*;
 import io.sedu.mc.parties.network.PartiesPacketHandler;
@@ -74,6 +73,12 @@ public class SettingsScreen extends Screen {
     int presetBoxW;
     int presetBoxH;
 
+    int selBoxX;
+    int selBoxY;
+    int selBoxW;
+    int selBoxH;
+    boolean renderSelBox = false;
+
     private static String nameHolder = null;
     private static String descHolder = null;
 
@@ -127,7 +132,10 @@ public class SettingsScreen extends Screen {
     private void resetEle() {
         if (selEle == -1)
             return;
-        RenderItem.setElementDefaults(RenderItem.items.get(tabsOrder.get(selEle)), updater);
+        if (selEle == 0)
+            RenderItem.getGeneralDefaults().forEachEntry((s, v) -> updater.get(s.getName()).onUpdate(null, v));
+        else
+            RenderItem.setElementDefaults(RenderItem.items.get(tabsOrder.get(selEle)), updater);
         refreshCurrentEle();
     }
 
@@ -215,12 +223,13 @@ public class SettingsScreen extends Screen {
             poseStack.translate(0,0,-1);
         }
         renderFrameOutline(poseStack);
+        renderBg(-5, screenX, screenY, screenX + screenW, screenY + eleBoxH, screenW, eleBoxH, 200, MENU_LOC);
+        if (renderSelBox)
+            renderSelection(poseStack);
         RenderSystem.enableDepthTest();
         this.options.render(poseStack, pMouseX, pMouseY, pPartialTick);
         assert minecraft != null;
-        RenderUtils.offRectNoA(poseStack.last().pose(), screenX, screenY+32, -1, -2, screenW, screenH-32, ColorUtils.getRainbowColor(), 0x232323);
-        RenderUtils.offRectNoA(poseStack.last().pose(), screenX, screenY, -1, -2, 32, 32, ColorUtils.getRainbowColor());
-        renderBg(screenX, screenY, screenX + 32, screenY + eleBoxH, 32, eleBoxH, 50, MENU_LOC);
+        RenderUtils.offRectNoA(poseStack.last().pose(), screenX, screenY, -1, -2, screenW, screenH, ColorUtils.getRainbowColor(), 0x232323);
         //TODO: ModBox
         //if (modVisible)
             //renderModBox();
@@ -239,6 +248,9 @@ public class SettingsScreen extends Screen {
 
     }
 
+    private void renderSelection(PoseStack poseStack) {
+        RenderUtils.borderRectNoA(poseStack.last().pose(), 0, 1, selBoxX, selBoxY, selBoxW, selBoxH, ColorUtils.getRainbowColor());
+    }
 
 
     private void renderPresetBox() {
@@ -514,13 +526,24 @@ public class SettingsScreen extends Screen {
     private void updateOptionsBounds() {
         if (this.options == null) {
             if (selEle == -1) {
+                miscButtons.get(5).active = false;
                 this.options = presetButton.getOptions(this, minecraft, 0, 0, 0, 0);
                 this.options.setItemHeight(28);
                 this.options.setBackground(presetButton.getInnerBg());
+                renderSelBox = false;
             } else {
+                miscButtons.get(5).active = true;
                 TabButton b = tabs.get(tabsOrder.get(selEle));
                 this.options = b.getOptions(this, minecraft, 0, 0, 0, 0);
                 this.options.setBackground(b.getInnerBg());
+
+                //Set Bounds
+                RenderItem.ItemBound bound = b.getBounds();
+                this.selBoxX = bound.getX();
+                this.selBoxY = bound.getY();
+                this.selBoxW = bound.getWidth();
+                this.selBoxH = bound.getHeight();
+                renderSelBox = selEle != 0;
             }
 
             this.addWidget(this.options);
@@ -540,8 +563,8 @@ public class SettingsScreen extends Screen {
     }
 
     public void finalizeUpdate(String name, Object data, boolean markDirty) {
-        Parties.LOGGER.debug("TRIGGERED FINALIZATION UPDATE FOR: " + tabsOrder.get(selEle) + " | " + name + " | " + data);
         triggerUpdate(name, data);
+
         if (markDirty)
             markDirty();
     }
@@ -551,7 +574,16 @@ public class SettingsScreen extends Screen {
     }
 
     public void triggerUpdate(String name, Object data) {
-        Parties.LOGGER.debug("TRIGGERED UPDATE FOR: " + tabsOrder.get(selEle) + " | " + name + " | " + data);
-        updater.get(name).onUpdate(RenderItem.items.get(tabsOrder.get(selEle)), data);
+        RenderItem.SmallBound upval;
+        if ((upval = updater.get(name).onUpdate(RenderItem.items.get(tabsOrder.get(selEle)), data)) != null) {
+            upval.update((type, value) -> {
+                switch(type) {
+                    case 0 -> selBoxX = value;
+                    case 1 -> selBoxY = value;
+                    case 2 -> selBoxW = value;
+                    case 3 -> selBoxH = value;
+                }
+            });
+        }
     }
 }

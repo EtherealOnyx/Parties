@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 
 public class PEffectsBoth extends PEffects {
 
@@ -149,9 +150,16 @@ public class PEffectsBoth extends PEffects {
     }
 
     @Override
-    public void setMaxSize(int data) {
+    public SmallBound setMaxSize(int data) {
         this.maxSize = data;
         updateMax();
+        return new SmallBound(2, (int) (width/2*maxPerRow*scale)){
+            @Override
+            public void update(BiConsumer<Integer, Integer> action) {
+                action.accept(type, value);
+                action.accept(3, (int) ((height/2)*Math.ceil(1f*maxSize/maxPerRow)*scale));
+            }
+        };
     }
 
     @Override

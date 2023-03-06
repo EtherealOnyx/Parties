@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.client.overlay.anim;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
+import io.sedu.mc.parties.client.overlay.RenderItem;
 
 public class HealthAnim extends AnimHandler {
 
@@ -22,9 +23,10 @@ public class HealthAnim extends AnimHandler {
         updateText();
     }
 
-    public static void setTextType(int d) {
+    public static RenderItem.SmallBound setTextType(int d) {
         type = d;
         ClientPlayerData.playerList.values().forEach(c -> c.health.updateText());
+        return null;
     }
 
     public static Object getTextType() {

@@ -30,23 +30,27 @@ public abstract class RenderIconTextItem extends RenderSelfItem {
 
 
 
-    public void toggleTextAttach(boolean data) {
+    public SmallBound toggleTextAttach(boolean data) {
         textAttached = data;
+        return null;
     }
 
 
-    public void setXTextPos(Integer data) {
+    public SmallBound setXTextPos(Integer data) {
         textX = data;
+        return null;
     }
 
 
-    public void setYTextPos(Integer data) {
+    public SmallBound setYTextPos(Integer data) {
         textY = data;
+        return null;
     }
 
     @Override
-    public void setColor(int type, int data) {
+    public SmallBound setColor(int type, int data) {
         this.color = data;
+        return null;
     }
 
     @Override

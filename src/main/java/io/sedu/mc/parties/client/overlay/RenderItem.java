@@ -26,6 +26,7 @@ import net.minecraftforge.client.gui.IIngameOverlay;
 import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseX;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseY;
@@ -50,7 +51,11 @@ public abstract class RenderItem {
     public static int frameEleW = 0;
     public static int currentY = 0;
 
-    protected int x, y, width, height;
+    protected int x;
+    protected int y;
+    protected int width;
+    protected int height;
+
     float scale = 1f;
     float scalePos = 0f;
     int zPos = 0;
@@ -58,14 +63,61 @@ public abstract class RenderItem {
     boolean textEnabled;
     boolean iconEnabled;
 
+    public class ItemBound {
 
+        int x;
+        int y;
+        int width;
+        int height;
 
+        public ItemBound(int x, int y, int width, int height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
 
-    public void toggleIcon(boolean data) {
-        iconEnabled = data;
+        public int getX() {
+            return x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
+        public int getWidth() {
+            return width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
     }
-    public void toggleText(boolean data) {
+
+    public class SmallBound {
+        int type;
+        int value;
+        public SmallBound(int type, int value) {
+            this.type = type;
+            this.value = value;
+        }
+
+        public void update(BiConsumer<Integer, Integer> action) {
+            action.accept(type, value);
+        }
+    }
+
+
+
+
+    public SmallBound toggleIcon(boolean data) {
+        iconEnabled = data;
+        return null;
+    }
+    public SmallBound toggleText(boolean data) {
         textEnabled = data;
+        return null;
     }
 
 
@@ -399,7 +451,16 @@ public abstract class RenderItem {
             public ResourceLocation getInnerBackground() {
                 return getItemBackground();
             }
+
+            @Override
+            public ItemBound getItemBound() {
+                return getRenderItemBound();
+            }
         };
+    }
+
+    public ItemBound getRenderItemBound() {
+        return new ItemBound(frameX + x, frameY + y, (int) (width*scale), (int) (height*scale));
     }
 
     protected ResourceLocation getItemBackground() {
@@ -417,24 +478,28 @@ public abstract class RenderItem {
         return OverlayRegistry.getEntry(this.item).isEnabled();
     }
 
-    public void changeVisibility(boolean data) {
+    public SmallBound changeVisibility(boolean data) {
         OverlayRegistry.enableOverlay(this.item, data);
+        return null;
     }
 
-    public void setXPos(int data) {
+    public SmallBound setXPos(int data) {
         this.x = data;
+        return new SmallBound(0, frameX + x);
     }
 
-    public void setYPos(int data) {
+    public SmallBound setYPos(int data) {
         this.y = data;
+        return new SmallBound(1, frameY + y);
     }
 
-    public void setZPos(int data) {
+    public SmallBound setZPos(int data) {
         this.zPos = data;
+        return null;
     }
 
 
-    public void setScale(int data) {
+    public SmallBound setScale(int data) {
         switch (data) {
             case 1 -> {
                 scale = 0.5f;
@@ -449,6 +514,13 @@ public abstract class RenderItem {
                 scalePos = -0.5f;
             }
         }
+        return new SmallBound(2, (int) (width*scale)){
+            @Override
+            public void update(BiConsumer<Integer, Integer> action) {
+                action.accept(type, value);
+                action.accept(3, (int) (height*scale));
+            }
+        };
     }
 
     public int getScale() {
@@ -458,21 +530,24 @@ public abstract class RenderItem {
         return -1;
     }
 
-    public void setColor(int type, int data) {
+    public SmallBound setColor(int type, int data) {
+        return null;
     }
 
-    public void setTextShadow(boolean data) {
+    public SmallBound setTextShadow(boolean data) {
         this.textShadow = data;
+        return null;
     }
 
 
-    protected void setWidth(Integer d) {
+    protected SmallBound setWidth(Integer d) {
         this.width = d;
-
+        return new SmallBound(2, (int) (width*scale));
     }
 
-    protected void setHeight(Integer d) {
+    protected SmallBound setHeight(Integer d) {
         this.height = d;
+        return new SmallBound(3, (int) (height*scale));
     }
 
     protected void updateValues() {
@@ -521,7 +596,7 @@ public abstract class RenderItem {
     }
 
     public interface Update {
-        void onUpdate(RenderItem item, Object data);
+        SmallBound onUpdate(RenderItem item, Object data);
     }
 
     public static void initUpdater(HashMap<String, Update> updater) {
@@ -560,27 +635,27 @@ public abstract class RenderItem {
 
         updater.put("blim", (n,d) -> EffectHolder.updatebLim((int) d));
         updater.put("dlim", (n,d) -> EffectHolder.updatedLim((int) d));
-        updater.put("dfirst", (n,d) -> {PEffectsBoth.debuffFirst = (boolean) d; ClientPlayerData.markEffectsDirty();});
-        updater.put("bsep", (n,d) -> {PEffectsBoth.prioDur = (boolean) d; ClientPlayerData.markEffectsDirty();});
+        updater.put("dfirst", (n,d) -> {PEffectsBoth.debuffFirst = (boolean) d; ClientPlayerData.markEffectsDirty(); return null;});
+        updater.put("bsep", (n,d) -> {PEffectsBoth.prioDur = (boolean) d; ClientPlayerData.markEffectsDirty(); return null;});
 
 
         updater.put("spacex", (n, d) -> n.setWidth((int)d));
         updater.put("spacey", (n, d) -> n.setHeight((int)d));
         updater.put("bsize", (n,d) -> ((PEffects) n).setBorderSize((int) d));
         updater.put("rowmax", (n,d) -> ((PEffects) n).setMaxPerRow((int) d));
-        updater.put("totalmax", (n,d) -> {((PEffects) n).setMaxSize((int) d);  ClientPlayerData.markEffectsDirty();});
+        updater.put("totalmax", (n,d) -> ((PEffects) n).setMaxSize((int) d));
 
-        updater.put("danim", (n,d) -> DimAnim.animActive = (boolean)d);
-        updater.put("gen_x", (n,d) -> frameX = (int) d);
-        updater.put("gen_y", (n,d) -> frameY = (int) d);
-        updater.put("gen_w", (n,d) -> frameEleW = (int) d);
-        updater.put("gen_h", (n,d) -> frameEleH = (int) d);
-        updater.put("gen_pw", (n,d) -> framePosW = (int) d);
-        updater.put("gen_ph", (n,d) -> framePosH = (int) d);
-        updater.put("genc_w", (n,d) -> clickArea.width = (int) d);
-        updater.put("genc_h", (n,d) -> clickArea.height = (int) d);
-        updater.put("genc_x", (n,d) -> clickArea.x = (int) d);
-        updater.put("genc_y", (n,d) -> clickArea.y = (int) d);
+        updater.put("danim", (n,d) -> {DimAnim.animActive = (boolean)d; return null;});
+        updater.put("gen_x", (n,d) -> {frameX = (int) d; return null;});
+        updater.put("gen_y", (n,d) -> {frameY = (int) d; return null;});
+        updater.put("gen_w", (n,d) -> {frameEleW = (int) d; return null;});
+        updater.put("gen_h", (n,d) -> {frameEleH = (int) d; return null;});
+        updater.put("gen_pw", (n,d) -> {framePosW = (int) d; return null;});
+        updater.put("gen_ph", (n,d) -> {framePosH = (int) d; return null;});
+        updater.put("genc_w", (n, d) -> n.setWidth((int)d));
+        updater.put("genc_h", (n, d) -> n.setHeight((int)d));
+        updater.put("genc_x", (n, d) -> n.setXPos((int)d));
+        updater.put("genc_y", (n, d) -> n.setYPos((int)d));
     }
 
     public interface Getter {
@@ -691,6 +766,17 @@ public abstract class RenderItem {
         e.addEntry("gen_h", frameEleH, 12);
         e.addEntry("gen_pw", framePosW, 12);
         e.addEntry("gen_ph", framePosH, 12);
+        return e;
+    }
+
+    public static ConfigEntry getGeneralDefaults() {
+        ConfigEntry e = new ConfigEntry();
+        e.addEntry("gen_x", 16, 12);
+        e.addEntry("gen_y", 16, 12);
+        e.addEntry("gen_w", 168, 12);
+        e.addEntry("gen_h", 64, 12);
+        e.addEntry("gen_pw", 0, 12);
+        e.addEntry("gen_ph", 63, 12);
         return e;
     }
 

@@ -251,13 +251,14 @@ public class PHealth extends RenderIconTextItem {
     }
 
     @Override
-    public void setColor(int type, int data) {
+    public SmallBound setColor(int type, int data) {
         switch(type) {
             case 0 -> colorIncTop = data;
             case 1 -> colorIncBot = data;
             case 2 -> colorDecTop = data;
             case 3 -> colorDecBot = data;
         }
+        return null;
     }
 
     @Override
@@ -297,9 +298,10 @@ public class PHealth extends RenderIconTextItem {
         return e;
     }
 
-    protected void setMainHue(int d) {
+    protected SmallBound setMainHue(int d) {
         this.hue = d;
         setMainColors();
+        return null;
     }
 
     protected void setOverflowColors() {
@@ -313,8 +315,9 @@ public class PHealth extends RenderIconTextItem {
         colorAbsBot = ColorUtils.HSBtoRGB(hue, .35f, .69f);
     }
 
-    protected void setOverflowHue(int d) {
+    protected SmallBound setOverflowHue(int d) {
         this.oHue = d;
         setOverflowColors();
+        return null;
     }
 }

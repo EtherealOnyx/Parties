@@ -507,6 +507,20 @@ public class RenderUtils {
         tesselator.end();
     }
 
+    public static void renderBg(int index, int l, int t, int r, int b, int w, int h, int brightness, ResourceLocation loc) {
+        RenderSystem.enableDepthTest();
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder bufferbuilder = tesselator.getBuilder();
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShaderTexture(0, loc);
+        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        bufferbuilder.vertex(l, b, 0.0D).uv(0.0F, (float)h / 32.0F).color(brightness,brightness,brightness, 255).endVertex();
+        bufferbuilder.vertex(r, b, 0.0D).uv((float)w / 32.0F, (float)h / 32.0F).color(brightness,brightness,brightness, 255).endVertex();
+        bufferbuilder.vertex(r, t, 0.0D).uv((float)w / 32.0F, 0).color(brightness,brightness,brightness,255).endVertex();
+        bufferbuilder.vertex(l, t, 0).uv(0.0F, 0).color(brightness,brightness,brightness, 255).endVertex();
+        tesselator.end();
+    }
+
     public static void renderBg(int l, int t, int w, int h, int brightness, ResourceLocation loc) {
         RenderSystem.enableDepthTest();
         Tesselator tesselator = Tesselator.getInstance();
