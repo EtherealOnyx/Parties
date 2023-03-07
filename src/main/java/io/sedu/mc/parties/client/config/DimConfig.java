@@ -48,7 +48,8 @@ public class DimConfig {
         addDimEntry("minecraft:overworld", "textures/block/grass_block_side.png", 0x7CDF9D, 0);
         addDimEntry("minecraft:the_nether", "textures/block/warped_nylium_side.png", 0xFFDA7A, 0);
         addDimEntry("minecraft:the_end", "textures/block/obsidian.png", 0xCF7CDF, 0);
-        addDimEntry("twilightforest:twilight_forest", "twilightforest:textures/block/hedge.png", 0x90C7B4, 0);
+        //ItemStack item = ForgeRegistries.ITEMS.getValue()
+        addDimEntry("twilightforest:twilight_forest", "twilightforest:textures/block/steeleaf_block.png", 0x58CBB6, 0);
     }
 
     private static void addDimEntry(String name, String loc, int color, int priority) {
