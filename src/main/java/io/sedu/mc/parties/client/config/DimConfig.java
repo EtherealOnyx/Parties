@@ -1,73 +1,71 @@
 package io.sedu.mc.parties.client.config;
 
+import io.sedu.mc.parties.Parties;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.Random;
 import java.util.function.BiConsumer;
 
 public class DimConfig {
 
     public static HashMap<String, DimEntry> dimEntries = new HashMap<>();
 
-    public static final DimEntry DEFAULT_ENTRY = new DimEntry("minecraft:bedrock", 0xFFFFFFF);
+    public static final DimEntry DEFAULT_ENTRY = new DimEntry(new ResourceLocation("textures/block/bedrock.png"), 0xFFFFFFF, 0);
 
     static class DimEntry {
         ResourceLocation loc;
-        TextureAtlasSprite tex;
         int color;
+        int priority;
 
-        static Random r = null;
-
-        public DimEntry(String loc, int color) {
+        public DimEntry(ResourceLocation loc, int color, int priority) {
             this.color = color;
-            this.loc = new ResourceLocation(loc);
-        }
+            this.loc = loc;
+            this.priority = priority;
 
-        public TextureAtlasSprite getSprite() {
-            if (tex == null)
-                try {
-                    tex = Minecraft.getInstance().getBlockRenderer().getBlockModel(ForgeRegistries.BLOCKS.getValue(loc).defaultBlockState())
-                                   .getQuads(ForgeRegistries.BLOCKS.getValue(loc).defaultBlockState(), Direction.NORTH, DimEntry.r).get(0).getSprite();
-                } catch (Exception ignored){//help me
-                    }
-            return tex;
         }
     }
 
-    public static void entry(String loc, BiConsumer<TextureAtlasSprite, Integer> action) {
+    public static void entry(String loc, BiConsumer<ResourceLocation, Integer> action) {
         Objects.requireNonNull(action);
         DimEntry d = dimEntries.getOrDefault(loc, DEFAULT_ENTRY);
-
-        action.accept(d.getSprite(), d.color);
+        action.accept(d.loc, d.color);
     }
 
-
-    public static TextureAtlasSprite sprite(String loc) {
-
-        return dimEntries.getOrDefault(loc, DEFAULT_ENTRY).getSprite();
-    }
 
     public static int color(String loc) {
         return dimEntries.getOrDefault(loc, DEFAULT_ENTRY).color;
     }
 
+    public static ResourceLocation loc(String loc) {return dimEntries.getOrDefault(loc, DEFAULT_ENTRY).loc;}
+
     public static void init() {
-        DimEntry.r = new Random();
-        DimEntry.r.setSeed(42L);
 
 
         //TODO: Only put entries if the dimension exists.
-        dimEntries.put("minecraft:overworld", new DimEntry("minecraft:grass_block", 0x7CDF9D));
-        dimEntries.put("minecraft:the_nether", new DimEntry("minecraft:warped_nylium", 0xFFDA7A));
-        dimEntries.put("minecraft:the_end", new DimEntry("minecraft:obsidian", 0xCF7CDF));
+        addDimEntry("minecraft:overworld", "textures/block/grass_block_side.png", 0x7CDF9D, 0);
+        addDimEntry("minecraft:the_nether", "textures/block/warped_nylium_side.png", 0xFFDA7A, 0);
+        addDimEntry("minecraft:the_end", "textures/block/obsidian.png", 0xCF7CDF, 0);
+        addDimEntry("twilightforest:twilight_forest", "twilightforest:textures/block/hedge.png", 0x90C7B4, 0);
+    }
 
-        //if (ModList.get().isLoaded("")) For future mod dim support.
+    private static void addDimEntry(String name, String loc, int color, int priority) {
+        if (dimEntries.containsKey(name) && dimEntries.get(name).priority >= priority) return;
+        ResourceLocation location = new ResourceLocation(loc);
+        if (resourceInvalid(location)) return;
+        dimEntries.put(name, new DimEntry(location, color, priority));
+    }
+
+    private static boolean resourceInvalid(ResourceLocation loc) {
+        try {
+            Minecraft.getInstance().getResourceManager().getResource(loc);
+        } catch (IOException e){
+            Parties.LOGGER.debug("Error trying to load resource: " + loc + ". This may be alright!");
+            return true;
+        }
+        return false;
     }
 
 

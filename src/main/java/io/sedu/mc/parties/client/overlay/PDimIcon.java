@@ -9,9 +9,8 @@ import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
@@ -47,10 +46,10 @@ public class PDimIcon extends RenderSelfItem {
 
             //rectScaled(0, poseStack, zPos, -head.scale, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 1/head.scale);
 
-            RenderSystem.setShaderTexture(0, sprite.atlas().location());
+            //RenderSystem.setShaderTexture(0, sprite.atlas().location());
             RenderSystem.enableBlend();
             RenderUtils.offRectNoA(poseStack.last().pose(), b.x+12, b.y+4, 0, -1, 8, 8, (color & 0xfefefe) >> 1, color);
-            Gui.blit(poseStack, b.x+12, b.y+4, zPos, 8, 8, sprite);
+            //Gui.blit(poseStack, b.x+12, b.y+4, zPos, 8, 8, sprite);
 
         });
     }
@@ -72,13 +71,10 @@ public class PDimIcon extends RenderSelfItem {
 
 
     private void world(PoseStack poseStack, int pI, ForgeIngameGui gui, ClientPlayerData id) {
-        DimConfig.entry(id.dim.dimension, (sprite, color) -> {
+        DimConfig.entry(id.dim.dimension, (loc, color) -> {
 
             rectScaled(pI, poseStack, zPos, -head.scale, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 1/head.scale);
-
-            RenderSystem.setShaderTexture(0, sprite.atlas().location());
-            RenderSystem.enableBlend();
-            Gui.blit(poseStack, (int) ((x(pI))/head.scale), (int) ((y(pI))/head.scale), zPos, width, height, sprite);
+            RenderUtils.renderBg(poseStack.last().pose(),zPos, (int) (x(pI)/head.scale), (int) (y(pI)/head.scale), width, height, 255, loc);
 
             //Tooltip Render
             if (notEditing() && withinBounds(xNormal(pI), yNormal(pI), width, height, 4, scale)) {
@@ -135,32 +131,28 @@ public class PDimIcon extends RenderSelfItem {
         poseStack.pushPose();
         poseStack.translate(translateX, translateY, 0);
         int color, x, y;
-        TextureAtlasSprite sprite;
+        ResourceLocation loc;
         x = (int) (x(pI)/head.scale);
         y = (int) (y(pI)/head.scale);
         if (alphaOld > 0f) {
 
-            sprite = DimConfig.sprite(id.dim.oldDimension);
+            loc = DimConfig.loc(id.dim.oldDimension);
             color = DimConfig.color(id.dim.oldDimension);
             setColor(1f,1f,1f,alphaOld);
             rectScaled(pI, poseStack, zPos, -head.scale, size,size, ((color & 0xfefefe) >> 1) | (int)(255*alphaOld) << 24, color | (int)(255*alphaOld) << 24 , 1/head.scale);
-
-            RenderSystem.setShaderTexture(0, sprite.atlas().location());
+            RenderUtils.renderBg(poseStack.last().pose(),zPos+1, x, y, size, size, 255, loc);
             RenderSystem.enableBlend();
-            Gui.blit(poseStack, x, y, zPos, size,size, sprite);
 
         }
 
         color = DimConfig.color(id.dim.dimension);
         if (alphaNew > 0f) {
-            sprite = DimConfig.sprite(id.dim.dimension);
+            loc = DimConfig.loc(id.dim.dimension);
             setColor(1f,1f,1f,alphaNew);
             rectScaled(pI, poseStack, zPos, -head.scale, size,size, ((color & 0xfefefe) >> 1) | (int)(255*alphaNew) << 24, color | (int)(255*alphaNew) << 24 , 1/head.scale);
 
-
-            RenderSystem.setShaderTexture(0, sprite.atlas().location());
+            RenderUtils.renderBg(poseStack.last().pose(), zPos+1, x, y, size, size, 255, loc);
             RenderSystem.enableBlend();
-            Gui.blit(poseStack, x, y, zPos, size,size, sprite);
 
         }
         poseStack.popPose();

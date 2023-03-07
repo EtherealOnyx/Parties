@@ -241,6 +241,14 @@ public abstract class RenderItem {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
     }
 
+    static void setupSprite(ResourceLocation loc) {
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.enableTexture();
+        RenderSystem.setShaderTexture(0, loc);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+    }
+
     void blit(PoseStack p, int x, int y, int u, int v, int w, int h) {
         RenderSystem.enableDepthTest();
         GuiUtils.drawTexturedModalRect(p, x, y, u, v, w, h, zPos);

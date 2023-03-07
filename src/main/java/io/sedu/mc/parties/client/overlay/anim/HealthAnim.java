@@ -92,7 +92,6 @@ public class HealthAnim extends AnimHandler {
     }
 
     private void updateText() {
-        System.out.println("Text Updated: " + cur);
         switch (type) {
             case 0 -> healthText = (int) Math.ceil(cur + absorb) + "/" + (int) max;
             case 1 -> {
