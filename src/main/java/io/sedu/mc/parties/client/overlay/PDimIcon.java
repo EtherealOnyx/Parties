@@ -1,7 +1,6 @@
 package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.config.ConfigEntry;
@@ -47,9 +46,7 @@ public class PDimIcon extends RenderSelfItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        DimConfig.entry("minecraft:overworld", (icon, color) -> {
-            renderGuiItem(icon, b.x+11, b.y+3, .75f, 5);
-        });
+        DimConfig.entry("minecraft:overworld", (icon, color) -> renderGuiItem(icon, b.x+11, b.y+3, .75f, 5));
     }
 
     @Override
@@ -125,17 +122,11 @@ public class PDimIcon extends RenderSelfItem {
         PoseStack posestack1 = new PoseStack();
         posestack1.scale(scale*head.scale,scale*head.scale,1f);
         MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
-        boolean flag = !bakedmodel.usesBlockLight();
-        if (flag) {
-            Lighting.setupForFlatItems();
-        }
+        RenderSystem.setupGuiFlatDiffuseLighting(RenderUtils.POS, RenderUtils.NEG);
 
         Minecraft.getInstance().getItemRenderer().render(iStack, ItemTransforms.TransformType.GUI, false, posestack1, multibuffersource$buffersource, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
         multibuffersource$buffersource.endBatch();
         RenderSystem.enableDepthTest();
-        if (!flag) {
-            Lighting.setupFor3DItems();
-        }
 
         posestack.popPose();
         RenderSystem.applyModelViewMatrix();

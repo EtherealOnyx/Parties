@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.client.config;
 
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.overlay.GeneralOptions;
 import io.sedu.mc.parties.client.overlay.RenderItem;
@@ -12,12 +13,16 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class Config {
@@ -27,6 +32,7 @@ public class Config {
         try {
             Files.createDirectories(DEFAULT_PRESET_PATH);
             Files.createDirectories(PRESET_PATH);
+            Files.createDirectories(FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).resolve("dims"));
         } catch (IOException e) {
             Parties.LOGGER.error("Error trying to create config paths!", e);
         }
@@ -187,5 +193,36 @@ public class Config {
         BigInteger temp = new BigInteger(bits.toString(), 2);
         int sizeDiff = temp.toString(2).length() - bits.length();
         return Parties.ENCODE_VERSION + "|" + sizeDiff + "|" + Base64.encodeBase64String(temp.toByteArray());
+    }
+
+    public static void saveDefaultDims(List<DimConfig.DimEntryConfig> entries) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try (FileWriter writer = new FileWriter(new File(FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).resolve("dims").toFile(), "default.json"))){
+            writer.write(gson.toJson(entries));
+            writer.flush();
+        } catch (IOException e) {
+            Parties.LOGGER.error("Error trying to save default dimension entries !", e);
+        }
+    }
+
+    public static void forEachDimFile(Consumer<List<DimConfig.DimEntryConfig>> action) {
+        Gson gson = new Gson();
+        Type dimListType = new TypeToken<ArrayList<DimConfig.DimEntryConfig>>(){}.getType();
+        Path master = FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).resolve("dims");
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(master)) {
+            for (Path path : stream) {
+                if (!Files.isDirectory(path)) {
+                    String pathName = path.getFileName().toString();
+                    if (pathName.endsWith(".json") && !pathName.equals("default.json")) {
+                        try (Reader reader = new FileReader(master.resolve(path).toFile())) {
+                            List<DimConfig.DimEntryConfig> l = gson.fromJson(reader, dimListType);
+                            if (l != null) action.accept(l);
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            Parties.LOGGER.error("Error trying to load dimension entries!", e);
+        }
     }
 }

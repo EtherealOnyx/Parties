@@ -3,6 +3,8 @@ package io.sedu.mc.parties.commands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import io.sedu.mc.parties.data.PartyHelper;
+import io.sedu.mc.parties.network.ClientPacketData;
+import io.sedu.mc.parties.network.PartiesPacketHandler;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -51,6 +53,10 @@ public class PartyCommands {
                 else {
                     return 0;
                 }
+            }))
+            .then(Commands.literal("reload").executes(ctx -> {
+                PartiesPacketHandler.sendToPlayer(new ClientPacketData(7), ctx.getSource().getPlayerOrException());
+                return Command.SINGLE_SUCCESS;
             }))
             .then(Commands.literal("kick").then(Commands.argument("member", new NotSelfArgument(true)).executes(ctx -> {
                 if (isLeader(ctx.getSource().getPlayerOrException().getUUID()) && PartyHelper.kickPlayer(ctx.getSource().getPlayerOrException().getUUID(), EntityArgument.getPlayer(ctx, "member").getUUID())) {

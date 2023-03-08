@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.network;
 
+import io.sedu.mc.parties.client.config.DimConfig;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -87,6 +88,9 @@ public class ClientPacketData {
             }
             //#6 Sends a packet to the client, indicating that the party has been disbanded.
             case 6 -> ClientPacketHelper.disbandParty();
+
+            //#7 Reload config
+            case 7 -> DimConfig.reload();
             default -> {
                 return false;
             }
