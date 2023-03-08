@@ -1,5 +1,7 @@
 package io.sedu.mc.parties.client.overlay;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.config.ConfigEntry;
@@ -10,8 +12,13 @@ import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
@@ -20,14 +27,12 @@ import static io.sedu.mc.parties.util.AnimUtils.animPos;
 
 public class PDimIcon extends RenderSelfItem {
 
-    public static ItemStack icon = null;
     protected static PHead head = null;
 
     public PDimIcon(String name) {
         super(name);
-        width = 8;
-        height = 8;
-        scale = 1f;
+        width = 10;
+        height = 10;
     }
 
     @Override
@@ -42,15 +47,8 @@ public class PDimIcon extends RenderSelfItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        DimConfig.entry("minecraft:overworld", (sprite, color) -> {
-
-            //rectScaled(0, poseStack, zPos, -head.scale, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 1/head.scale);
-
-            //RenderSystem.setShaderTexture(0, sprite.atlas().location());
-            RenderSystem.enableBlend();
-            RenderUtils.offRectNoA(poseStack.last().pose(), b.x+12, b.y+4, 0, -1, 8, 8, (color & 0xfefefe) >> 1, color);
-            //Gui.blit(poseStack, b.x+12, b.y+4, zPos, 8, 8, sprite);
-
+        DimConfig.entry("minecraft:overworld", (icon, color) -> {
+            renderGuiItem(icon, b.x+11, b.y+3, .75f, 5);
         });
     }
 
@@ -71,95 +69,113 @@ public class PDimIcon extends RenderSelfItem {
 
 
     private void world(PoseStack poseStack, int pI, ForgeIngameGui gui, ClientPlayerData id) {
-        DimConfig.entry(id.dim.dimension, (loc, color) -> {
-
-            rectScaled(pI, poseStack, zPos, -head.scale, ((color & 0xfefefe) >> 1) | id.alphaI << 24, color | id.alphaI << 24, 1/head.scale);
-            RenderUtils.renderBg(poseStack.last().pose(),zPos, (int) (x(pI)/head.scale), (int) (y(pI)/head.scale), width, height, 255, loc);
+        DimConfig.entry(id.dim.dimension, (icon, color) -> {
+            renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale);
 
             //Tooltip Render
-            if (notEditing() && withinBounds(xNormal(pI), yNormal(pI), width, height, 4, scale)) {
+            if (notEditing() && withinBounds(xNormal(pI), yNormal(pI), width, height, 2, head.scale)) {
                 renderTooltip(poseStack, gui, 10, 0, id.dim.dimNorm, (color & 0xfefefe) >> 1, color, 0, (color & 0xfefefe) >> 1, color);
             }
         });
 
     }
 
-    void rectScaled(int i, PoseStack pose, int z, float offset, int width, int height, int startColor, int endColor, float scale) {
-        RenderUtils.rect(pose.last().pose(), z, ((x(i)+offset)*scale), ((y(i)+offset)*scale), ((x(i)-offset)*scale)+width, ((y(i)-offset)*scale)+height, startColor, endColor);
+    protected void renderGuiItem(ItemStack iStack, int pX, int pY, float scale, float scalePos) {
+        BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, (Level)null, Minecraft.getInstance().player, 0);
+        Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
+        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        PoseStack posestack = RenderSystem.getModelViewStack();
+        posestack.pushPose();
+        posestack.translate(pX, pY, zPos+2);
+        posestack.translate(scalePos, scalePos, 0.0D);
+        posestack.scale(1.0F, -1.0F, 1.0F);
+        posestack.scale(16.0F, 16.0F, 1F);
+        RenderSystem.applyModelViewMatrix();
+        PoseStack posestack1 = new PoseStack();
+        posestack1.scale(scale,scale,1f);
+        MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
+        RenderSystem.setupGuiFlatDiffuseLighting(RenderUtils.POS, RenderUtils.NEG);
+
+        Minecraft.getInstance().getItemRenderer().render(iStack, ItemTransforms.TransformType.GUI, false, posestack1, multibuffersource$buffersource, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
+        multibuffersource$buffersource.endBatch();
+        RenderSystem.enableDepthTest();
+
+        posestack.popPose();
+        RenderSystem.applyModelViewMatrix();
     }
 
-    void rectScaled(int i, PoseStack pose, int z, float offset, int startColor, int endColor, float scale) {
-        RenderUtils.rect(pose.last().pose(), z, ((x(i)+offset)*scale), ((y(i)+offset)*scale), ((x(i)-offset)*scale)+width, ((y(i)-offset)*scale)+height, startColor, endColor);
+    protected void renderGuiItem(ItemStack iStack, int pX, int pY, float x, float y, float scale, float scalePos) {
+        BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, (Level)null, Minecraft.getInstance().player, 0);
+        Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
+        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        PoseStack posestack = RenderSystem.getModelViewStack();
+        posestack.pushPose();
+        posestack.translate(pX, pY, zPos+2);
+        posestack.translate(scalePos, scalePos, 0.0D);
+        posestack.translate(x, y, 0);
+        posestack.scale(1.0F, -1.0F, 1.0F);
+        posestack.scale(16.0F, 16.0F, 1F);
+        RenderSystem.applyModelViewMatrix();
+        PoseStack posestack1 = new PoseStack();
+        posestack1.scale(scale*head.scale,scale*head.scale,1f);
+        MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
+        boolean flag = !bakedmodel.usesBlockLight();
+        if (flag) {
+            Lighting.setupForFlatItems();
+        }
+
+        Minecraft.getInstance().getItemRenderer().render(iStack, ItemTransforms.TransformType.GUI, false, posestack1, multibuffersource$buffersource, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
+        multibuffersource$buffersource.endBatch();
+        RenderSystem.enableDepthTest();
+        if (!flag) {
+            Lighting.setupFor3DItems();
+        }
+
+        posestack.popPose();
+        RenderSystem.applyModelViewMatrix();
     }
-
-
 
     private void worldAnim(PoseStack poseStack, int pI, ForgeIngameGui gui, ClientPlayerData id, float partialTicks) {
         int currTick = 0;
-        float translateX = (head.x - x)/head.scale;
-        float translateY = (head.y - y)/head.scale;
-        int size;
-        float alphaOld = 1f;
-        float alphaNew = 0f;
+        float translateX = (head.x - x);
+        float translateY = (head.y - y);
+        float scale = 2f;
+        float scalePos = 16*head.scale;
         boolean renderText = false;
         float offY = 0;
         if (id.dim.animTime > 90) {
             currTick = 10 - (id.dim.animTime - 90); //0-10
             float curPos = animPos(currTick, partialTicks, true, 10, 2);
-            translateX = (head.x - x)/head.scale*curPos;
-            translateY = (head.y - y)/head.scale*curPos;
-            size = (int) (8 + (24*curPos));
+            translateX = (head.x - x)*curPos;
+            translateY = (head.y - y)*curPos;
             offY = (currTick + partialTicks - 5);
             offY *= -offY;
             offY += 25;
+            scale = .75f + (1.25f)*curPos;
+            scalePos = (5F + 11F*curPos)*head.scale;
         } else if (id.dim.animTime > 10) {
             currTick = id.dim.animTime - 10; //80 - 0
             renderText = true;
-            alphaOld = animPos(currTick, partialTicks, false, 80, 1);
-            alphaNew = 1f - alphaOld;
-            size = 32;
         } else { //10 - 0
             float curPos = animPos(id.dim.animTime, partialTicks, false, 10, 2);
-            translateX = (head.x - x)/head.scale*curPos;
-            translateY = (head.y - y)/head.scale*curPos;
-            alphaOld = 0f;
-            alphaNew = 1f;
-            size = (int) (8 + (24*curPos));
+            translateX = (head.x - x)*curPos;
+            translateY = (head.y - y)*curPos;
+            scale = .75f + (1.25f)*curPos;
+            scalePos = (5F + 11F*curPos)*head.scale;
         }
         translateY += offY;
 
-        poseStack.pushPose();
-        poseStack.translate(translateX, translateY, 0);
-        int color, x, y;
-        ResourceLocation loc;
-        x = (int) (x(pI)/head.scale);
-        y = (int) (y(pI)/head.scale);
-        if (alphaOld > 0f) {
-
-            loc = DimConfig.loc(id.dim.oldDimension);
-            color = DimConfig.color(id.dim.oldDimension);
-            setColor(1f,1f,1f,alphaOld);
-            rectScaled(pI, poseStack, zPos, -head.scale, size,size, ((color & 0xfefefe) >> 1) | (int)(255*alphaOld) << 24, color | (int)(255*alphaOld) << 24 , 1/head.scale);
-            RenderUtils.renderBg(poseStack.last().pose(),zPos+1, x, y, size, size, 255, loc);
-            RenderSystem.enableBlend();
-
-        }
-
-        color = DimConfig.color(id.dim.dimension);
-        if (alphaNew > 0f) {
-            loc = DimConfig.loc(id.dim.dimension);
-            setColor(1f,1f,1f,alphaNew);
-            rectScaled(pI, poseStack, zPos, -head.scale, size,size, ((color & 0xfefefe) >> 1) | (int)(255*alphaNew) << 24, color | (int)(255*alphaNew) << 24 , 1/head.scale);
-
-            RenderUtils.renderBg(poseStack.last().pose(), zPos+1, x, y, size, size, 255, loc);
-            RenderSystem.enableBlend();
-
-        }
-        poseStack.popPose();
+        renderGuiItem(DimConfig.item(id.dim.dimension), x(pI), y(pI), translateX, translateY, scale, scalePos);
 
         if (renderText)
-            //TODO: Revert id.dim to id.dim.dimName and extract sounds to their own implementation
-            doTextRender(pI, gui, poseStack, currTick, partialTicks, id.dim, color);
+            //TODO: Extract sounds to their own implementation
+            doTextRender(pI, gui, poseStack, currTick, partialTicks, id.dim, DimConfig.color(id.dim.dimension));
         resetColor();
     }
 
@@ -251,8 +267,8 @@ public class PDimIcon extends RenderSelfItem {
         e.addEntry("display", true, 1);
         e.addEntry("tdisplay", true, 1);
         e.addEntry("danim", true, 1);
-        e.addEntry("xpos", 5, 12);
-        e.addEntry("ypos", 34, 12);
+        e.addEntry("xpos", 4, 12);
+        e.addEntry("ypos", 32, 12);
         e.addEntry("zpos", 1, 4);
         return e;
     }
@@ -260,5 +276,4 @@ public class PDimIcon extends RenderSelfItem {
     public ItemBound getRenderItemBound() {
         return new ItemBound(frameX + x, frameY + y, (int) (width*head.scale), (int) (height*head.scale));
     }
-
 }

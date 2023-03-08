@@ -46,7 +46,6 @@ public class SettingsScreen extends Screen {
     int eleBoxW;
     int eleBoxH;
     static int selEle = 0;
-    private static int offEle = 0;
     int maxEles = 0;
     HashMap<String, TabButton> tabs = new HashMap<>();
     ArrayList<String> tabsOrder = new ArrayList<>();
@@ -198,7 +197,6 @@ public class SettingsScreen extends Screen {
         notEditing = true;
         PHead.icon = null;
         PName.nameTag = null;
-        PDimIcon.icon = null;
         GeneralOptions.icon = null;
         PresetOptions.icon = null;
         nameHolder = nameBox.getValue().isEmpty() ? null : nameBox.getValue();
@@ -294,7 +292,6 @@ public class SettingsScreen extends Screen {
         assert Minecraft.getInstance().player != null;
         PHead.icon.addTagElement("SkullOwner", StringTag.valueOf(Minecraft.getInstance().player.getName().getContents()));
         PName.nameTag = Items.NAME_TAG.getDefaultInstance();
-        PDimIcon.icon = Items.END_PORTAL_FRAME.getDefaultInstance();
 
         //Setup Data.
         initTabButtons();

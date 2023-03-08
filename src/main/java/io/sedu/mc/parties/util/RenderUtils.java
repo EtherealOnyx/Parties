@@ -3,6 +3,7 @@ package io.sedu.mc.parties.util;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.gui.components.Button;
@@ -21,6 +22,8 @@ import java.util.function.Consumer;
 import static io.sedu.mc.parties.client.overlay.RenderItem.*;
 
 public class RenderUtils {
+    public static final Vector3f NEG = new Vector3f(-1, -1, -1);
+    public static final Vector3f POS = new Vector3f(1, 1, 1);
     public static Button.OnTooltip tip(Screen s, String t) {
         return new Button.OnTooltip() {
             private final Component text = new TextComponent(t);
