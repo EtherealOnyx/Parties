@@ -244,6 +244,7 @@ public class SettingsScreen extends Screen {
 
         super.render(poseStack, pMouseX, pMouseY, pPartialTick);
 
+        RenderItem.getCurrentMouseFrame(pMouseX, pMouseY, RenderItem::renderEachItem);
     }
 
     private void renderSelection(PoseStack poseStack) {

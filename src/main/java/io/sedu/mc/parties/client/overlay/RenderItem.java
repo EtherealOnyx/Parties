@@ -38,6 +38,7 @@ public abstract class RenderItem {
     public static RenderItem clickArea;
 
     public static final LinkedHashMap<String, RenderItem> items = new LinkedHashMap<>();
+    public static final List<TooltipItem> tooltipItems = new ArrayList<>();
     public static ArrayList<String> parser = new ArrayList<>();
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
     static final ResourceLocation TAB_LOC = new ResourceLocation("textures/block/glass.png");
@@ -62,6 +63,10 @@ public abstract class RenderItem {
     boolean textShadow = true;
     boolean textEnabled;
     boolean iconEnabled;
+
+    public static void renderEachItem(Integer index, SimplePair<Integer, Integer> mouse) {
+        tooltipItems.forEach(t -> t.renderTooltip(index, mouse));
+    }
 
     public class ItemBound {
 
@@ -786,6 +791,40 @@ public abstract class RenderItem {
         e.addEntry("gen_pw", 0, 12);
         e.addEntry("gen_ph", 63, 12);
         return e;
+    }
+
+    public static class SimplePair<A, B> {
+        public A first;
+        public B second;
+
+        public SimplePair(A first, B second) {
+            this.first = first;
+            this.second = second;
+        }
+
+        public static <A, B> SimplePair<A,B> create(A first, B second) {
+            return new SimplePair<>(first, second);
+        }
+    }
+
+    public static void getCurrentMouseFrame(int mouseX, int mouseY, BiConsumer<Integer, SimplePair<Integer, Integer>> action) {
+
+        if (mouseX < frameX || mouseY < frameY) return;
+
+        mouseX = mouseX - frameX;
+        mouseY = mouseY - frameY;
+        if (mouseX < frameEleW && mouseY < frameEleH) {
+            action.accept(0, SimplePair.create(mouseX, mouseY));
+        }
+
+        for (int i = 1; i < 5; i++) {
+            mouseX -= framePosW;
+            mouseY -= framePosH;
+            if (mouseX < 0 || mouseY < 0) return;
+            if (mouseX < frameEleW && mouseY < frameEleH) {
+                action.accept(i, SimplePair.create(mouseX, mouseY));
+            }
+        }
     }
 
 
