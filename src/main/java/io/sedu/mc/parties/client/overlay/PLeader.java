@@ -12,7 +12,7 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
-public class PLeader extends RenderItem {
+public class PLeader extends RenderItem implements TooltipItem{
 
     public PLeader(String name) {
         super(name);
@@ -28,7 +28,7 @@ public class PLeader extends RenderItem {
             blit(poseStack, x(i), y(i), 0, 0, 9, 9);
             resetColor();
             if (notEditing() && withinBounds(x(i), y(i), 9, 9,2, scale)) {
-                renderTooltip(poseStack, gui, 10, 0, "Party Leader", 0xFFF2A9, 0x978B47, 0xFFE554);
+                //renderTooltip(poseStack, gui, 10, 0, "Party Leader", 0xFFF2A9, 0x978B47, 0xFFE554);
             }
         }
     }
@@ -67,5 +67,11 @@ public class PLeader extends RenderItem {
         e.addEntry("zpos", 2, 4);
         e.addEntry("scale", 2, 2);
         return e;
+    }
+
+    @Override
+    public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
+        if (ClientPlayerData.getOrderedPlayer(index).isLeader())
+            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Party Leader", 0xFFF2A9, 0x978B47, 0xFFE554);
     }
 }

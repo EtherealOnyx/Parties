@@ -15,12 +15,10 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
-public class PHealth extends RenderIconTextItem {
+public class PHealth extends RenderIconTextItem implements TooltipItem {
 
     int hue = 0;
     int oHue = 0;
@@ -96,9 +94,6 @@ public class PHealth extends RenderIconTextItem {
 
             //Dimmer
             RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 255 - id.alphaI << 24);
-            if (notEditing() && withinBounds(x(i), y(i), width, height, 2, scale)) {
-                renderTooltip(poseStack, gui, 10, 0, "Health: " + (id.health.cur + id.health.absorb) + "/" + id.health.max, 0xfc807c, 0x4d110f, 0xffbfbd);
-            }
         }
         if (textEnabled)
             if (id.health.absorb > 0) {
@@ -319,5 +314,11 @@ public class PHealth extends RenderIconTextItem {
         this.oHue = d;
         setOverflowColors();
         return null;
+    }
+
+    @Override
+    public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
+        HealthAnim h = ClientPlayerData.getOrderedPlayer(index).health;
+        renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Health: " + (h.cur + h.absorb) + "/" + h.max, 0xfc807c, 0x4d110f, 0xffbfbd);
     }
 }

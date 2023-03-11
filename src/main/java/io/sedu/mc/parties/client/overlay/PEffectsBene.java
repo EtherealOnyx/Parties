@@ -68,7 +68,7 @@ public class PEffectsBene extends PEffects {
                 if (renderOverflow(gui, poseStack, i, iX.get(), iY.get(), partialTicks)) {
                     List<ColorComponent> lC = new ArrayList<>();
                     id.effects.forBeneRemainder(maxSize, (effect) -> lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), beneColor)));
-                    renderGroupEffectTooltip(poseStack, gui, 10, 0, lC, 0x3101b8, 0x24015b, 0x150615, 0x150615);
+                    //renderGroupEffectTooltip(poseStack, gui, 10, 0, lC, 0x3101b8, 0x24015b, 0x150615, 0x150615);
 
                 }
                 poseStack.popPose();

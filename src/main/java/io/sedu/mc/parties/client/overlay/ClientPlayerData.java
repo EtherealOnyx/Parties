@@ -70,6 +70,10 @@ public class ClientPlayerData {
         playerName = "???";
     }
 
+    public static ClientPlayerData getOrderedPlayer(int index) {
+        return playerList.get(playerOrderedList.get(index));
+    }
+
     public static void addClientMember(UUID uuid) {
         ClientPlayerData p = new ClientPlayerData();
         p.setId(uuid);

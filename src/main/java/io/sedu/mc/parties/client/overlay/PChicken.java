@@ -12,11 +12,10 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
+import static io.sedu.mc.parties.client.overlay.ClientPlayerData.getOrderedPlayer;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
-public class PChicken extends RenderIconTextItem {
+public class PChicken extends RenderIconTextItem implements TooltipItem {
 
 
     public PChicken(String name) {
@@ -90,9 +89,6 @@ public class PChicken extends RenderIconTextItem {
 
 
             resetColor();
-            if (notEditing() && withinBounds(xNormal(i), yNormal(i), 9, 9, 2, scale)) {
-                renderTooltip(poseStack, gui, 10, 0, "Hunger: " + hunger + "/20", 0xb88458, 0x613c1b, 0xffd5b0);
-            }
         }
         if (textEnabled)
             text(gui, poseStack, String.valueOf(hunger), tX(i), tY(i), color);
@@ -147,6 +143,11 @@ public class PChicken extends RenderIconTextItem {
         e.addEntry("xtpos", 0, 12);
         e.addEntry("ytpos", 0, 12);
         return e;
+    }
+
+    @Override
+    public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
+        renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Hunger: " + (isSelf(index) ? getOrderedPlayer(index).getHungerForced() : getOrderedPlayer(index).getHunger()), 0xb88458, 0x613c1b, 0xffd5b0);
     }
 
 }

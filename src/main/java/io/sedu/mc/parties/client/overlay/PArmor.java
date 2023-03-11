@@ -11,11 +11,10 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
+import static io.sedu.mc.parties.client.overlay.ClientPlayerData.getOrderedPlayer;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
-public class PArmor extends RenderIconTextItem {
+public class PArmor extends RenderIconTextItem implements TooltipItem {
 
     public PArmor(String name) {
         super(name);
@@ -58,13 +57,12 @@ public class PArmor extends RenderIconTextItem {
             setup(Gui.GUI_ICONS_LOCATION);
             blit(poseStack, x(i), y(i), 34, 9, 9, 9);
             resetColor();
-            if (notEditing() && withinBounds(xNormal(i), yNormal(i), 9, 9, 2, scale)) {
-                renderTooltip(poseStack, gui, 10, 0, "Armor: " + armor, 0xabfcff, 0x629b9e, 0xd1d1d1);
-            }
         }
         if (textEnabled)
             text(gui, poseStack, String.valueOf(armor), tX(i), tY(i), color);
     }
+
+
 
     @Override
     protected int attachedX(int pOffset) {
@@ -121,4 +119,8 @@ public class PArmor extends RenderIconTextItem {
         return e;
     }
 
+    @Override
+    public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
+        renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Armor: " + getOrderedPlayer(index).getArmor(), 0xabfcff, 0x629b9e, 0xd1d1d1);
+    }
 }

@@ -27,13 +27,17 @@ public abstract class RenderSelfItem extends RenderItem {
 
             for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++) {
                 itemStart(poseStack);
-                if (i == selfIndex)
+                if (isSelf(i))
                     renderSelf(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack, partialTicks);
                 else
                     renderMember(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack, partialTicks);
                 itemEnd(poseStack);
             }
         };
+    }
+
+    public static boolean isSelf(int index) {
+        return index == selfIndex;
     }
 
     public static void updateSelfIndex() {

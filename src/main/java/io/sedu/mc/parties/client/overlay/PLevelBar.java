@@ -14,9 +14,9 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.*;
+import static io.sedu.mc.parties.client.overlay.ClientPlayerData.getOrderedPlayer;
 
-public class PLevelBar extends RenderIconTextItem {
+public class PLevelBar extends RenderIconTextItem implements TooltipItem {
 
 
     public PLevelBar(String name) {
@@ -89,7 +89,6 @@ public class PLevelBar extends RenderIconTextItem {
             setup(Gui.GUI_ICONS_LOCATION);
             RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
             RenderSystem.enableDepthTest();
-            //this.blit(poseStack, pXPos, l, 0, 64, 182, 5);
             blit(poseStack, x(i), y(i), 0, 64, width>>1, height);
             blit(poseStack, x(i)+(width>>1), y(i), 182-(width>>1), 64, width>>1, height);
             int w = (int) (width*bar);
@@ -115,23 +114,27 @@ public class PLevelBar extends RenderIconTextItem {
         }
         g.getFont().draw(poseStack, s, (float)x, (float)y, 8453920);
         poseStack.translate(0,0,-zPos);
-        if (notEditing() && withinBounds(x, y, g.getFont().width(s), g.getFont().lineHeight, 2, scale)) {
-            renderXpTooltip(poseStack, g, 10, 0, level);
-        }
     }
 
-    protected void renderXpTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, float level) {
 
-        poseStack.pushPose();
-        poseStack.translate(0, 0, 100);
-        rectCO(poseStack, 0, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+offsetX+182, currentY+mouseY()+5+offsetY, 0x8ec265, 0x385e1a);
-        rectCO(poseStack, 0, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+offsetX+182, currentY+mouseY()+5+offsetY, 0x140514, 0x140514);
+    protected void renderXpTooltip(PoseStack poseStack, ForgeIngameGui gui, int mouseX, int mouseY, int offsetX, int offsetY, float bar, int level) {
+        int left = mouseX+offsetX;
+        int top = currentY + mouseY + offsetY;
+        rectCO(poseStack, 0, -3, mouseX+offsetX, currentY+mouseY+offsetY, mouseX+offsetX+182, currentY+mouseY+5+offsetY, 0x8ec265, 0x385e1a);
+        rectCO(poseStack, 0, -2, mouseX+offsetX, currentY+mouseY+offsetY, mouseX+offsetX+182, currentY+mouseY+5+offsetY, 0x140514, 0x140514);
         setup(Gui.GUI_ICONS_LOCATION);
         RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
-        blit(poseStack, mouseX()+offsetX, currentY+mouseY()+offsetY, 0, 64, 182, 5);
-        blit(poseStack, mouseX()+offsetX, currentY+mouseY()+offsetY, 0, 69, (int) (182*level), 5);
-        poseStack.popPose();
-        currentY += gui.getFont().lineHeight+offsetY+8;
+        blit(poseStack, mouseX+offsetX, currentY+mouseY+offsetY, 0, 64, 182, 5);
+        blit(poseStack, mouseX+offsetX, currentY+mouseY+offsetY, 0, 69, (int) (182*bar), 5);
+        String s = "" + level;
+        int i1 = left + 91 - gui.getFont().width(s)/2;
+        int j1 = top - 1;
+            gui.getFont().draw(poseStack, s, (float)(i1 + 1), (float)j1, 0);
+        gui.getFont().draw(poseStack, s, (float)(i1 - 1), (float)j1, 0);
+        gui.getFont().draw(poseStack, s, (float)i1, (float)(j1 + 1), 0);
+        gui.getFont().draw(poseStack, s, (float)i1, (float)(j1 - 1), 0);
+        gui.getFont().draw(poseStack, s, (float)i1, (float)j1, 8453920);
+        currentY += gui.getFont().lineHeight+offsetY+4;
     }
 
     @Override
@@ -201,4 +204,13 @@ public class PLevelBar extends RenderIconTextItem {
     }
 
 
+    @Override
+    public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
+        ClientPlayerData p = getOrderedPlayer(index);
+        if (isSelf(index)) {
+            renderXpTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.getXpBarForced(), p.getLevelForced());
+        } else {
+            renderXpTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.getXpBar(), p.getXpLevel());
+        }
+    }
 }

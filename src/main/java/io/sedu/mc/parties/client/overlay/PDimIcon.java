@@ -20,11 +20,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 
-public class PDimIcon extends RenderSelfItem {
+public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
     protected static PHead head = null;
 
@@ -69,10 +67,6 @@ public class PDimIcon extends RenderSelfItem {
         DimConfig.entry(id.dim.dimension, (icon, color) -> {
             renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale);
 
-            //Tooltip Render
-            if (notEditing() && withinBounds(xNormal(pI), yNormal(pI), width, height, 2, head.scale)) {
-                renderTooltip(poseStack, gui, 10, 0, id.dim.dimNorm, (color & 0xfefefe) >> 1, color, 0, (color & 0xfefefe) >> 1, color);
-            }
         });
 
     }
@@ -234,10 +228,6 @@ public class PDimIcon extends RenderSelfItem {
             poseStack.scale(head.scale, head.scale, 1);
         poseStack.translate(0,0, zPos);
     }
-    @Override
-    protected void tooltipStart(PoseStack poseStack) {
-        poseStack.scale(1/head.scale, 1/head.scale, 1);
-    }
 
     protected int maxX() {
         return Math.max(0, frameEleW - (int)(width*head.scale));
@@ -249,7 +239,6 @@ public class PDimIcon extends RenderSelfItem {
 
     @Override
     protected void updateValues() {
-        //TODO: Add to here.
     }
 
     @Override
@@ -266,5 +255,13 @@ public class PDimIcon extends RenderSelfItem {
 
     public ItemBound getRenderItemBound() {
         return new ItemBound(frameX + x, frameY + y, (int) (width*head.scale), (int) (height*head.scale));
+    }
+
+    @Override
+    public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
+        ClientPlayerData p = ClientPlayerData.getOrderedPlayer(index);
+        int color = DimConfig.color(p.dim.dimension);
+        int darkCol = (color & 0xfefefe) >> 1;
+        renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.dim.dimNorm, darkCol, color, 0, darkCol, color);
     }
 }

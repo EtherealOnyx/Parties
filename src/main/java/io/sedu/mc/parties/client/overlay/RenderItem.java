@@ -11,6 +11,7 @@ import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.client.overlay.gui.TabButton;
 import io.sedu.mc.parties.util.RenderUtils;
+import io.sedu.mc.parties.util.TriConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
@@ -27,6 +28,7 @@ import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseX;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.mouseY;
@@ -38,7 +40,7 @@ public abstract class RenderItem {
     public static RenderItem clickArea;
 
     public static final LinkedHashMap<String, RenderItem> items = new LinkedHashMap<>();
-    public static final List<TooltipItem> tooltipItems = new ArrayList<>();
+    public static final List<RenderItem> tooltipItems = new ArrayList<>();
     public static ArrayList<String> parser = new ArrayList<>();
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
     static final ResourceLocation TAB_LOC = new ResourceLocation("textures/block/glass.png");
@@ -64,8 +66,16 @@ public abstract class RenderItem {
     boolean textEnabled;
     boolean iconEnabled;
 
-    public static void renderEachItem(Integer index, SimplePair<Integer, Integer> mouse) {
-        tooltipItems.forEach(t -> t.renderTooltip(index, mouse));
+    public static void checkTooltip(int posX, int posY, Consumer<TooltipItem> action) {
+        tooltipItems.forEach(t -> {
+            if (t.isInBound(posX, posY))
+                action.accept((TooltipItem) t);
+        });
+    }
+
+    boolean isInBound(int mouseX, int mouseY) {
+        return mouseX > x - 2 && mouseY > y - 2
+                && mouseX < x + 2 + width*scale && mouseY < y + 2 + height*scale;
     }
 
     public class ItemBound {
@@ -197,13 +207,6 @@ public abstract class RenderItem {
         poseStack.popPose();
     }
 
-    protected void tooltipStart(PoseStack poseStack) {
-        poseStack.scale(1/scale, 1/scale, 1);
-    }
-
-    protected void tooltipEnd(PoseStack poseStack) {
-        poseStack.scale(scale, scale, 1);
-    }
 
     public boolean isTabRendered() {
         return true;
@@ -221,6 +224,9 @@ public abstract class RenderItem {
     public void register() {
         initItem();
         OverlayRegistry.registerOverlayAbove(HOTBAR_ELEMENT, name, item);
+        if (this instanceof TooltipItem) {
+            tooltipItems.add(this);
+        }
     }
 
 
@@ -355,14 +361,10 @@ public abstract class RenderItem {
         setColor(1f,1f,1f,1f);
     }
 
-    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, MutableComponent text, int outStart, int outEnd, int inStart, int inEnd, int textColor) {
-        tooltipStart(poseStack);
-        poseStack.translate(0, 0, 100);
-        rectCO(poseStack, 0, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+gui.getFont().width(text)+offsetX, currentY+mouseY()+(gui.getFont().lineHeight)+offsetY, outStart, outEnd);
-        rectCO(poseStack, 0, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+gui.getFont().width(text)+offsetX, currentY+mouseY()+(gui.getFont().lineHeight)+offsetY, inStart, inEnd);
-        gui.getFont().drawShadow(poseStack, text, mouseX()+offsetX, currentY+mouseY()+1, textColor);
-        poseStack.translate(0,0,-100);
-        tooltipEnd(poseStack);
+    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int mouseX, int mouseY, int offsetX, int offsetY, MutableComponent text, int outStart, int outEnd, int inStart, int inEnd, int textColor) {
+        rectCO(poseStack, 0, -3, mouseX+offsetX, currentY+mouseY+offsetY, mouseX+gui.getFont().width(text)+offsetX, currentY+mouseY+(gui.getFont().lineHeight)+offsetY, outStart, outEnd);
+        rectCO(poseStack, 0, -2, mouseX+offsetX, currentY+mouseY+offsetY, mouseX+gui.getFont().width(text)+offsetX, currentY+mouseY+(gui.getFont().lineHeight)+offsetY, inStart, inEnd);
+        gui.getFont().drawShadow(poseStack, text, mouseX+offsetX, currentY+mouseY+1, textColor);
         currentY += gui.getFont().lineHeight+offsetY+8;
 
     }
@@ -371,38 +373,36 @@ public abstract class RenderItem {
 
 
 
-    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, String text, int outStart, int outEnd, int inStart, int inEnd, int textColor) {
-        renderTooltip(poseStack, gui, offsetX, offsetY, new TextComponent(text), outStart, outEnd, inStart, inEnd, textColor);
+    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int mouseX, int mouseY, int offsetX, int offsetY, String text, int outStart, int outEnd, int inStart, int inEnd, int textColor) {
+        renderTooltip(poseStack, gui, mouseX, mouseY, offsetX, offsetY, new TextComponent(text), outStart, outEnd, inStart, inEnd, textColor);
     }
 
-    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, String text, int outStart, int outEnd, int textColor) {
-        renderTooltip(poseStack, gui, offsetX, offsetY, new TextComponent(text), outStart, outEnd, 0x140514, 0x140514, textColor);
+    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int mouseX, int mouseY, int offsetX, int offsetY, String text, int outStart, int outEnd, int textColor) {
+        renderTooltip(poseStack, gui, mouseX, mouseY, offsetX, offsetY, new TextComponent(text), outStart, outEnd, 0x140514, 0x140514, textColor);
     }
 
-    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, MutableComponent text, int outStart, int outEnd, int textColor) {
-        renderTooltip(poseStack, gui, offsetX, offsetY, text, outStart, outEnd, 0x140514, 0x140514, textColor);
+    protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int mouseX, int mouseY, int offsetX, int offsetY, MutableComponent text, int outStart, int outEnd, int textColor) {
+        renderTooltip(poseStack, gui, mouseX, mouseY, offsetX, offsetY, text, outStart, outEnd, 0x140514, 0x140514, textColor);
     }
 
-    protected void renderGroupEffectTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, List<ColorComponent> text, int outStart, int outEnd, int inStart, int inEnd) {
+    protected void renderGroupEffectTooltip(PoseStack poseStack, ForgeIngameGui gui, int mouseX, int mouseY, int offsetX, int offsetY, List<ColorComponent> text, int outStart, int outEnd, int inStart, int inEnd) {
         poseStack.pushPose();
-        tooltipStart(poseStack);
         int max = 0;
         int y = offsetY;
         poseStack.translate(0,0,100);
         for (ColorComponent c : text) {
-            gui.getFont().drawShadow(poseStack, c.c, mouseX()+offsetX, currentY+mouseY()+1+y, c.color);
+            gui.getFont().drawShadow(poseStack, c.c, mouseX+offsetX, currentY+mouseY+1+y, c.color);
             max = Math.max(max, gui.getFont().width(c.c));
             y += gui.getFont().lineHeight+1;
         }
-        rectCO(poseStack, -1, -3, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+max+offsetX, currentY+mouseY()+y+offsetY, outStart, outEnd);
-        rectCO(poseStack, -1, -2, mouseX()+offsetX, currentY+mouseY()+offsetY, mouseX()+max+offsetX, currentY+mouseY()+y+offsetY, inStart, inEnd);
+        rectCO(poseStack, -1, -3, mouseX+offsetX, currentY+mouseY+offsetY, mouseX+max+offsetX, currentY+mouseY+y+offsetY, outStart, outEnd);
+        rectCO(poseStack, -1, -2, mouseX+offsetX, currentY+mouseY+offsetY, mouseX+max+offsetX, currentY+mouseY+y+offsetY, inStart, inEnd);
         poseStack.popPose();
         currentY += y+8;
     }
 
     protected void renderSingleEffectTooltip(PoseStack poseStack, ForgeIngameGui gui, int offsetX, int offsetY, List<ColorComponent> text, int color) {
         poseStack.pushPose();
-        tooltipStart(poseStack);
         poseStack.translate(0, 0, 100);
         int max = 0;
         int y = 0;
@@ -793,36 +793,23 @@ public abstract class RenderItem {
         return e;
     }
 
-    public static class SimplePair<A, B> {
-        public A first;
-        public B second;
-
-        public SimplePair(A first, B second) {
-            this.first = first;
-            this.second = second;
-        }
-
-        public static <A, B> SimplePair<A,B> create(A first, B second) {
-            return new SimplePair<>(first, second);
-        }
-    }
-
-    public static void getCurrentMouseFrame(int mouseX, int mouseY, BiConsumer<Integer, SimplePair<Integer, Integer>> action) {
+    public static void getCurrentMouseFrame(int mouseX, int mouseY, TriConsumer<Integer, Integer, Integer> action) {
 
         if (mouseX < frameX || mouseY < frameY) return;
 
         mouseX = mouseX - frameX;
         mouseY = mouseY - frameY;
         if (mouseX < frameEleW && mouseY < frameEleH) {
-            action.accept(0, SimplePair.create(mouseX, mouseY));
+            action.accept(0, mouseX, mouseY);
         }
 
-        for (int i = 1; i < 5; i++) {
+
+        for (int i = 1; i < ClientPlayerData.playerOrderedList.size(); i++) {
             mouseX -= framePosW;
             mouseY -= framePosH;
             if (mouseX < 0 || mouseY < 0) return;
             if (mouseX < frameEleW && mouseY < frameEleH) {
-                action.accept(i, SimplePair.create(mouseX, mouseY));
+                action.accept(i, mouseX, mouseY);
             }
         }
     }

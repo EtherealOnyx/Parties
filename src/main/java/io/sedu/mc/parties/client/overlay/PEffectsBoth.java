@@ -84,7 +84,7 @@ public class PEffectsBoth extends PEffects {
                         lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.getEffect().isBeneficial() ? beneColor : badColor));
                         //renderTooltip(poseStack, gui, 10, 0, new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.getEffect().getColor(), (effect.getEffect().getColor() & 0xfefefe) >> 1, effect.colorType());
                     });
-                    renderGroupEffectTooltip(poseStack, gui, 10, 0, lC, 0x3101b8, 0x24015b, 0x150615, 0x150615);
+                    //renderGroupEffectTooltip(poseStack, gui, 10, 0, lC, 0x3101b8, 0x24015b, 0x150615, 0x150615);
                 }
                 poseStack.popPose();
             } else {
