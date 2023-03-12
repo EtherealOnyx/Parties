@@ -9,13 +9,11 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Registry;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
@@ -76,16 +74,7 @@ public class PEffectsBoth extends PEffects {
                     iX.set(0);
                     iY.getAndIncrement();
                 }
-                if (renderOverflow(gui, poseStack, i, iX.get(), iY.get(), partialTicks)) {
-                    List<ColorComponent> lC = new ArrayList<>();
-                    //poseStack.translate((mouseX()+10), (mouseY()), 0);
-                    id.effects.forAllRemainder(maxSize, (effect) -> {
-
-                        lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.getEffect().isBeneficial() ? beneColor : badColor));
-                        //renderTooltip(poseStack, gui, 10, 0, new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.getEffect().getColor(), (effect.getEffect().getColor() & 0xfefefe) >> 1, effect.colorType());
-                    });
-                    //renderGroupEffectTooltip(poseStack, gui, 10, 0, lC, 0x3101b8, 0x24015b, 0x150615, 0x150615);
-                }
+                renderOverflow(gui, poseStack, i, iX.get(), iY.get(), partialTicks);
                 poseStack.popPose();
             } else {
                 id.effects.forEachAll((effect) -> {

@@ -15,9 +15,9 @@ public class EffectHolder {
 
     //TODO: Add config
     HashMap<Integer, ClientEffect> effects = new HashMap<>();
-    List<Integer> sortedEffectAll = new ArrayList<>();
-    List<Integer> sortedEffectBene = new ArrayList<>();
-    List<Integer> sortedEffectBad = new ArrayList<>();
+    public List<Integer> sortedEffectAll = new ArrayList<>();
+    public List<Integer> sortedEffectBene = new ArrayList<>();
+    public List<Integer> sortedEffectBad = new ArrayList<>();
 
     public static void setValues(int buff, int debuff, boolean dFirst) {
         bLim = buff;
@@ -26,6 +26,20 @@ public class EffectHolder {
     }
 
     public EffectHolder() {
+    }
+
+    public boolean getEffect(int maxSize, List<Integer> sortedEffects, int buffIndex, Consumer<ClientEffect> action) {
+        if (buffIndex < sortedEffects.size()) {
+            if (buffIndex == maxSize - 1) {
+                if (sortedEffects.size() > maxSize)
+                    return true;
+                else
+                    action.accept(effects.get(sortedEffects.get(buffIndex)));
+            } else {
+                action.accept(effects.get(sortedEffects.get(buffIndex)));
+            }
+        }
+        return false;
     }
 
     public static RenderItem.SmallBound updatebLim(int data) {
@@ -270,4 +284,6 @@ public class EffectHolder {
     public boolean largerBad(int max) {
         return sortedEffectAll.size() > max;
     }
+
+
 }

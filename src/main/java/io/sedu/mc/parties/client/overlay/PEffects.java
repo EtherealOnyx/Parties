@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
+import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.util.RenderUtils;
@@ -14,14 +15,14 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 import static io.sedu.mc.parties.util.RenderUtils.sizeRectNoA;
 
 public abstract class PEffects extends RenderSelfItem {
@@ -41,10 +42,40 @@ public abstract class PEffects extends RenderSelfItem {
     private int eleWidth;
     private int eleHeight;
 
+    private static final List<PEffects> effectItems = new ArrayList<>();
+
+    @Override
+    public SmallBound changeVisibility(boolean data) {
+        OverlayRegistry.enableOverlay(this.item, data);
+        //Prevent tooltip rendering.
+        int index = effectItems.indexOf(this);
+        if (data) {
+            if (index == -1) effectItems.add(this);
+        } else {
+            if (index == -1) return null;
+            effectItems.remove(index);
+        }
+        return null;
+    }
 
     public PEffects(String name) {
         super(name);
     }
+
+    public static void checkEffectTooltip(int posX, int posY, BiConsumer<PEffects, Integer> action) {
+        effectItems.forEach(item -> {
+            int newX = (posX - item.x)/(item.width/2);
+            if (newX < item.maxPerRow) {
+                int eleIndex = ((posY - item.y)/(item.height/2))*item.maxPerRow + newX;
+                if (eleIndex < item.maxSize && eleIndex > -1) {
+                    action.accept(item, eleIndex);
+                }
+            }
+        });
+
+
+    }
+
 
     @Override
     int getColor() {
@@ -63,12 +94,11 @@ public abstract class PEffects extends RenderSelfItem {
         }
     }
 
-    boolean renderOverflow(ForgeIngameGui gui, PoseStack poseStack, int i, int iX, int iY, float partialTicks) {
+    void renderOverflow(ForgeIngameGui gui, PoseStack poseStack, int i, int iX, int iY, float partialTicks) {
 
         drawOverflowText(gui, poseStack,
                          (int) ((rX(i, iX))/scale)+3, (int) ((rY(i, iY))/scale)+3,
                          (int) Mth.clamp((255*(float) (.5f + Math.sin((gui.getGuiTicks() + partialTicks) / 4f) / 2f)), 10, 245));
-        return (notEditing() && withinBounds((int) rX(i, iX), (int) rY(i, iY), 13, 13, 1, scale));
     }
 
     void drawOverflowText(ForgeIngameGui gui, PoseStack p, int x, int y, int alpha) {
@@ -109,30 +139,43 @@ public abstract class PEffects extends RenderSelfItem {
             gui.getFont().drawShadow(poseStack, effect.getRomanTrimmed(), x, y, 0xFFD700);
         }
 
-        String secs = "§oInstant";
-        int scol = 0x88888888;
         if (textEnabled && !effect.isInstant()) {
             x = sX(i, iX) + effect.getOffset() + 7;
             y = sY(i, iY) + 29;
             gui.getFont().drawShadow(poseStack, effect.getDisplay(), x, y, 0xFFFFFF);
-            secs = effect.getDur() + "s";
-            scol = 0xFFFFFF;
-        }
-
-        if (notEditing() && withinBounds((int) rX(i, iX), (int) rY(i, iY), 13, 13, 1, scale)) {
-            poseStack.pushPose();
-            poseStack.scale(2f,2f,1f);
-            List<ColorComponent> list = new ArrayList<>();
-            list.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.getEffect().isBeneficial() ? beneColor : badColor));
-            //TODO: Support descriptions via datapacks :)
-            list.add(new ColorComponent(new TextComponent(secs), scol));
-            renderSingleEffectTooltip(poseStack, gui, 10, 0, list,
-                                      effect.getEffect().getColor());
-            poseStack.popPose();
         }
     }
 
+    public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, EffectHolder effects, Integer buffIndex, int pMouseX, int pMouseY) {
+        if (getClientEffect(effects, buffIndex, (effect) -> {
+            List<ColorComponent> list = new ArrayList<>();
+            list.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.getEffect().isBeneficial() ? beneColor : badColor));
+            //TODO: Support descriptions via datapacks :)
+            if (effect.isInstant())
+                list.add(new ColorComponent(new TextComponent("§oInstant"), 0x88888888));
+            else
+                list.add(new ColorComponent(new TextComponent( effect.getDur() + "s"), 0xFFFFFF));
+            renderSingleEffectTooltip(poseStack, gui, 10, 0, list,
+                                      effect.getEffect().getColor());
+        })) {
+            renderOverflow(effects, poseStack, gui, pMouseX, pMouseY);
+        }
 
+    }
+
+    protected boolean getClientEffect(EffectHolder effects, Integer buffIndex, Consumer<ClientEffect> action) {
+        return effects.getEffect(maxSize, effects.sortedEffectAll, buffIndex, action);
+    }
+
+    protected void renderOverflow(EffectHolder effects, PoseStack poseStack, ForgeIngameGui gui, int mouseX, int mouseY) {
+        List<ColorComponent> lC = new ArrayList<>();
+        effects.forAllRemainder(maxSize, (effect) -> {
+
+            lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.getEffect().isBeneficial() ? beneColor : badColor));
+
+        });
+        renderGroupEffectTooltip(poseStack, gui, mouseX, mouseY, 10, 0, lC, 0x3101b8, 0x24015b, 0x150615, 0x150615);
+    }
 
 
 
@@ -323,5 +366,6 @@ public abstract class PEffects extends RenderSelfItem {
             }
         };
     }
+
 
 }

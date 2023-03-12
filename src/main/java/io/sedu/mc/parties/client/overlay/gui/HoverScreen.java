@@ -2,6 +2,7 @@ package io.sedu.mc.parties.client.overlay.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
+import io.sedu.mc.parties.client.overlay.PEffects;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import io.sedu.mc.parties.util.ColorUtils;
 import net.minecraft.client.GuiMessage;
@@ -14,6 +15,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -318,8 +320,12 @@ public class HoverScreen extends Screen {
         if (style != null && style.getHoverEvent() != null) {
             this.renderComponentHoverEffect(poseStack, style, mX, mY);
         }
-        //rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
 
+        assert minecraft != null;
+        RenderItem.getCurrentMouseFrame(mX, mY, (index, posX, posY) -> {
+            RenderItem.checkTooltip(posX, posY, (tooltipItem) -> tooltipItem.renderTooltip(poseStack, (ForgeIngameGui) minecraft.gui, index, mX, mY));
+            PEffects.checkEffectTooltip(posX, posY, (effectItem, buffIndex) -> effectItem.renderTooltip(poseStack, (ForgeIngameGui) minecraft.gui, ClientPlayerData.getOrderedPlayer(index).effects, buffIndex, mX, mY));
+        });
     }
 
     private void checkFrameRender(PoseStack poseStack) {

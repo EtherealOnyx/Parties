@@ -243,12 +243,6 @@ public class SettingsScreen extends Screen {
         renderShadows(poseStack);
 
         super.render(poseStack, pMouseX, pMouseY, pPartialTick);
-
-        RenderItem.getCurrentMouseFrame(pMouseX, pMouseY, (index, posX, posY) -> {
-            RenderItem.checkTooltip(posX, posY, (tooltipItem) -> tooltipItem.renderTooltip(poseStack, (ForgeIngameGui) minecraft.gui, index, pMouseX, pMouseY));
-            //TODO: Add Check Effects for special case tooltips of each effect.
-            //RenderItem.checkEffectTooltip(posX, posY, (tooltipItem, buffIndex) -> effectItem.renderEffectTooltip(poseStack, minecraft.gui, index, pMouseX, pMouseY, buffIndex);
-        });
     }
 
     private void renderSelection(PoseStack poseStack) {

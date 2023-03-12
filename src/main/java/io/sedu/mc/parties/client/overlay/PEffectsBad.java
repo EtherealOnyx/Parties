@@ -3,18 +3,18 @@ package io.sedu.mc.parties.client.overlay;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.config.ConfigEntry;
+import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
+import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 public class PEffectsBad extends PEffects{
 
@@ -71,12 +71,7 @@ public class PEffectsBad extends PEffects{
                     iX.set(0);
                     iY.getAndIncrement();
                 }
-                if (renderOverflow(gui, poseStack, i, iX.get(), iY.get(), partialTicks)) {
-                    List<ColorComponent> lC = new ArrayList<>();
-                    id.effects.forBadRemainder(maxSize, (effect) -> lC.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), badColor)));
-                    //renderGroupEffectTooltip(poseStack, gui, 10, 0, lC, 0x3101b8, 0x24015b, 0x150615, 0x150615);
-
-                }
+                renderOverflow(gui, poseStack, i, iX.get(), iY.get(), partialTicks);
                 poseStack.popPose();
             } else {
                 id.effects.forEachBad((effect) -> {
@@ -112,6 +107,11 @@ public class PEffectsBad extends PEffects{
         e.addEntry("rowmax", 4, 8);
         e.addEntry("totalmax", 8, 8);
         return e;
+    }
+
+    @Override
+    protected boolean getClientEffect(EffectHolder effects, Integer buffIndex, Consumer<ClientEffect> action) {
+        return effects.getEffect(maxSize, effects.sortedEffectBad, buffIndex, action);
     }
 
 

@@ -224,9 +224,6 @@ public abstract class RenderItem {
     public void register() {
         initItem();
         OverlayRegistry.registerOverlayAbove(HOTBAR_ELEMENT, name, item);
-        if (this instanceof TooltipItem) {
-            tooltipItems.add(this);
-        }
     }
 
 
@@ -493,6 +490,15 @@ public abstract class RenderItem {
 
     public SmallBound changeVisibility(boolean data) {
         OverlayRegistry.enableOverlay(this.item, data);
+        //Prevent tooltip rendering.
+        int index = tooltipItems.indexOf(this);
+        if (data) {
+            if (this instanceof TooltipItem && index == -1) tooltipItems.add(this);
+        } else {
+            if (index == -1) return null;
+            tooltipItems.remove(index);
+        }
+
         return null;
     }
 
