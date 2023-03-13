@@ -77,7 +77,6 @@ public class HoverScreen extends Screen {
         } catch(NoSuchFieldException | IllegalAccessException ignored) {}
 
         ColorUtils.colorCycle = true;
-        //TODO: Add 'rearranging' boolean to know when config is in this state or not. helps with 2nd todo.
         int y = Math.max(0, clickArea.t(0) - 10);
         int x = clickArea.l(0);
         settingsButton = addRenderableWidget(new SmallButton(x, y, "⚙", p -> doTask(1), tip(this, "Open Party Settings"), .5f, .5f, 1f, .5f));
@@ -85,8 +84,6 @@ public class HoverScreen extends Screen {
         initPartyButtons();
         initMenuButtons(x, y);
         initDragButtons();
-        //TODO: Add a way to reinitialize buttons in case party comp changes. HoverScreen.reInit();
-        //Perhaps force close the screen. Easy!
         doTask(0);
     }
 
@@ -355,8 +352,8 @@ public class HoverScreen extends Screen {
                         int j = (int) (d1 / 9.0D);
                         if (j >= 0 && j < trimmedMessages.size()) {
                             GuiMessage<FormattedCharSequence> guimessage = trimmedMessages.get(j);
-                            return this.minecraft.font.getSplitter().componentStyleAtWidth(guimessage.getMessage(),
-                                                                                           (int) d0);
+                            if (200 + guimessage.getAddedTime() - this.minecraft.gui.getGuiTicks() > 0)
+                                return this.minecraft.font.getSplitter().componentStyleAtWidth(guimessage.getMessage(), (int) d0);
                         }
                     }
 
