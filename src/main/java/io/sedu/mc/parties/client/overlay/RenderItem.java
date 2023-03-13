@@ -675,25 +675,19 @@ public abstract class RenderItem {
         updater.put("genc_h", (n, d) -> n.setHeight((int)d));
         updater.put("genc_x", (n, d) -> n.setXPos((int)d));
         updater.put("genc_y", (n, d) -> n.setYPos((int)d));
+
+        updater.put("htype", (n, d) -> {PHead.renderType = (int)d; return null;});
     }
 
     public interface Getter {
         Object getValue(RenderItem item);
     }
 
-    public ConfigEntry getCurrentValues(HashMap<String, Getter> getter, boolean complete) {
+    public ConfigEntry getCurrentValues(HashMap<String, Getter> getter) {
         ConfigEntry defaults = getDefaults();
         ConfigEntry currents = new ConfigEntry();
-        if (complete)
-            defaults.forEachEntry((entry, value) -> currents.addEntry(entry, getter.get(entry.getName()).getValue(this)));
-        else {
-            /*defaults.forEachEntry((entry, value) -> {
-                if (!getter.get(entry.getName()).getValue(this).toString().equals(value.toString())) {
-                    System.out.println(getter.get(entry.getName()).getValue(this) + "!= " + value);
-                    currents.addEntry(entry, getter.get(entry.getName()).getValue(this));
-                }
-            });*/
-        } //TODO: Finish Implementation.
+        defaults.forEachEntry((entry, value) -> currents.addEntry(entry, getter.get(entry.getName()).getValue(this)));
+
         return currents;
     }
 
@@ -752,6 +746,7 @@ public abstract class RenderItem {
         getter.put("genc_h", (n) -> clickArea.height);
         getter.put("genc_x", (n) -> clickArea.x);
         getter.put("genc_y", (n) -> clickArea.y);
+        getter.put("htype", (n) -> PHead.renderType);
     }
 
     public static void setDefaultValues() {

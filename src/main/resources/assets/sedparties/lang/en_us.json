@@ -87,6 +87,7 @@
   "config.sedparties.name.bcdt": "Top",
   "config.sedparties.name.bcdb": "Bottom",
   "config.sedparties.name.ttype": "Text Type",
+  "config.sedparties.name.htype": "Head Icon Type",
 
   "config.sedparties.tooltip.display": "Activate or deactivate the current element.",
   "config.sedparties.tooltip.xpos": "The X position of the current element (or icon).",
@@ -140,6 +141,7 @@
 
   "config.sedparties.tooltip.bcdt": "The top gradient color of the health decrease animation",
   "config.sedparties.tooltip.bcdb": "The bottom gradient color of the health decrease animation",
-  "config.sedparties.tooltip.ttype": "Text display type. Options are a ratio, current health only, and a percentage."
+  "config.sedparties.tooltip.ttype": "Text display type. Options are a ratio, current health only, and a percentage.",
+  "config.sedparties.tooltip.htype": "Changes the head display. 0 for icons, 1 for self model only, 2 for party models."
 }
 

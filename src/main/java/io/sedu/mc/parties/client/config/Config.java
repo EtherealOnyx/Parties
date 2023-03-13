@@ -43,8 +43,8 @@ public class Config {
         JsonObject json = new JsonObject();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         json.addProperty("description", desc);
-        json.add("general", GeneralOptions.INSTANCE.getCurrentValues(itemGetter, true).getJsonEntries(gson));
-        RenderItem.items.forEach((itemName, item) -> json.add(itemName, item.getCurrentValues(itemGetter, true).getJsonEntries(gson)));
+        json.add("general", GeneralOptions.INSTANCE.getCurrentValues(itemGetter).getJsonEntries(gson));
+        RenderItem.items.forEach((itemName, item) -> json.add(itemName, item.getCurrentValues(itemGetter).getJsonEntries(gson)));
         try (FileWriter writer = new FileWriter(new File(PRESET_PATH.toFile(), name + ".json"))){
             writer.write(gson.toJson(json));
             writer.flush();
@@ -62,7 +62,7 @@ public class Config {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         json.addProperty("description", desc);
         json.add("general", RenderItem.getGeneralValues().getJsonEntries(gson));
-        RenderItem.items.forEach((itemName, item) -> json.add(itemName, item.getCurrentValues(itemGetter, true).getJsonEntries(gson)));
+        RenderItem.items.forEach((itemName, item) -> json.add(itemName, item.getCurrentValues(itemGetter).getJsonEntries(gson)));
         try(FileWriter writer = new FileWriter(new File(DEFAULT_PRESET_PATH.toFile(), name + ".json"))) {
             writer.write(gson.toJson(json));
             writer.flush();
@@ -188,8 +188,8 @@ public class Config {
 
     public static String getPresetString(Minecraft minecraft, HashMap<String, RenderItem.Getter> getter) {
         StringBuilder bits = new StringBuilder();
-        bits.append(GeneralOptions.INSTANCE.getCurrentValues(getter, true).getBits());
-        RenderItem.items.values().forEach((item) -> bits.append(item.getCurrentValues(getter, true).getBits()));
+        bits.append(GeneralOptions.INSTANCE.getCurrentValues(getter).getBits());
+        RenderItem.items.values().forEach((item) -> bits.append(item.getCurrentValues(getter).getBits()));
         BigInteger temp = new BigInteger(bits.toString(), 2);
         int sizeDiff = temp.toString(2).length() - bits.length();
         return Parties.ENCODE_VERSION + "|" + sizeDiff + "|" + Base64.encodeBase64String(temp.toByteArray());
