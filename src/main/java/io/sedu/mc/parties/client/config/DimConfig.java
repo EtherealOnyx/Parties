@@ -78,6 +78,8 @@ public class DimConfig {
         dims.add( new DimEntryConfig("minecraft:the_nether", "minecraft:netherrack", 0xFFDA7A, -1));
         dims.add( new DimEntryConfig("minecraft:the_end", "minecraft:end_portal_frame", 0xCF7CDF, -1));
         dims.add( new DimEntryConfig("twilightforest:twilight_forest", "twilightforest:twilight_portal_miniature_structure", 0x58CBB6, -1));
+        dims.add( new DimEntryConfig("rftoolsdim:dim", "rftoolsdim:dimensional_cross_block", 0xbbdddd, -2));
+        dims.add( new DimEntryConfig("rftoolsdim:dim", "rftoolsutility:matter_transmitter", 0xbbdddd, -1));
         return dims;
     }
 

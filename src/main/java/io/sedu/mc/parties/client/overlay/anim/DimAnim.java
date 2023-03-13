@@ -43,6 +43,17 @@ public class DimAnim extends AnimHandler {
     }
 
     private void setupDim(String data) {
+        //Custom RFTools Dimensions support (since it has unlimited entries)
+        if (data.substring(0, data.indexOf(':')).equals("rftoolsdim")) {
+            dimension = "rftoolsdim:dim";
+            data = data.substring(data.indexOf(':')+1);
+            dimName = new ArrayList<>();
+            dimName.add("§oRFTools");
+            dimName.add("§oDimension:");
+            dimName.add("§o'" + data + "'");
+            dimNorm = "RFTools Dim: " + data;
+            return;
+        }
         dimension = data;
         data = data.substring(data.indexOf(':')+1).toLowerCase();
         String[] split = data.split("[-_ ]");
