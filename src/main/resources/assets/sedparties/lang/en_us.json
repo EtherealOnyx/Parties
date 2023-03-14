@@ -1,4 +1,5 @@
 {
+  "key.sedparties.hover": "Show Mouse (Party UI)",
   "gui.sedparties.name.preset": "Load a Preset",
   "gui.sedparties.name.general": "General Settings",
   "gui.sedparties.name.p_leader":"Leader Icon",

@@ -25,7 +25,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_ALT;
 @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientSetup {
 
-    public static final KeyMapping showMouse = new KeyMapping(MODID + ".key.hover", GLFW_KEY_LEFT_ALT, KeyMapping.CATEGORY_INTERFACE);
+    public static final KeyMapping showMouse = new KeyMapping("key." + MODID + ".hover", GLFW_KEY_LEFT_ALT, KeyMapping.CATEGORY_INTERFACE);
 
     private static final IIngameOverlay control = (gui, poseStack, partialTicks, width, height) -> {
         RenderItem.resetPos();
