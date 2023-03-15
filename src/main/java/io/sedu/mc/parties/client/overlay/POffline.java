@@ -44,7 +44,7 @@ public class POffline extends RenderIconTextItem {
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         setup(GUI_ICONS_LOCATION);
-        blit(poseStack, b.x+11, b.y+4, 0, 216, 10, 8);
+        blit(poseStack, b.x+7, b.y+4, 0, 216, 10, 8);
     }
 
     @Override

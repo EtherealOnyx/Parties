@@ -14,8 +14,8 @@ public class SmallButton extends Button {
     private float r = 1f;
     private float g = 1f;
     private float b = 1f;
-    private int offX = 0;
-    private int offY = 0;
+    private float offX = 0;
+    private float offY = 0;
 
     public SmallButton(int pX, int pY, String m, OnPress pOnPress, OnTooltip pOnTooltip, float r, float g, float b) {
         super(pX, pY, 10,10, new TextComponent(m), pOnPress, pOnTooltip);
@@ -39,7 +39,7 @@ public class SmallButton extends Button {
         this.startAlpha = a;
     }
 
-    public SmallButton(int pX, int pY, String m, OnPress pOnPress, OnTooltip pOnTooltip, int offX, int offY, float r, float g, float b) {
+    public SmallButton(int pX, int pY, String m, OnPress pOnPress, OnTooltip pOnTooltip, float offX, float offY, float r, float g, float b) {
         super(pX, pY, 10,10, new TextComponent(m), pOnPress, pOnTooltip);
         this.offX = offX;
         this.offY = offY;
@@ -48,7 +48,7 @@ public class SmallButton extends Button {
         this.b = b;
     }
 
-    public SmallButton(int pX, int pY, int w, String m, OnPress pOnPress, OnTooltip pOnTooltip, int offX, int offY, float r, float g, float b, float a) {
+    public SmallButton(int pX, int pY, int w, String m, OnPress pOnPress, OnTooltip pOnTooltip, float offX, float offY, float r, float g, float b, float a) {
         super(pX, pY, w, 10, new TextComponent(m), pOnPress, pOnTooltip);
         this.offX = offX;
         this.offY = offY;
@@ -81,9 +81,9 @@ public class SmallButton extends Button {
         this.blit(pPoseStack, (this.x<<1) + width, this.y<<1, 190 + (10 - width), 46 + i * 20, width, 20);
 
         pPoseStack.scale(2f,2f,0);
-        //this.renderBg(pPoseStack, minecraft, pMouseX, pMouseY);
         int j = getFGColor();
-        font.draw(pPoseStack, this.getMessage(), (float)((this.x+5+offX) - font.width(this.getMessage()) / 2), this.y+offY, j);
+        pPoseStack.translate(offX, offY, 0);
+        font.draw(pPoseStack, this.getMessage(), (float)(this.x+5 - font.width(this.getMessage()) / 2), this.y, j);
         //drawCenteredString(pPoseStack, font, this.getMessage(), this.x+5+offX, this.y+offY, j);
         pPoseStack.popPose();
         RenderSystem.setShaderColor(1f,1f,1f,1f);

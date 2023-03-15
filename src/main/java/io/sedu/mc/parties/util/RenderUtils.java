@@ -510,7 +510,7 @@ public class RenderUtils {
         tesselator.end();
     }
 
-    public static void renderBg(int index, int l, int t, int r, int b, int w, int h, int brightness, ResourceLocation loc) {
+    public static void renderBg(int z, int l, int t, int r, int b, int w, int h, int brightness, ResourceLocation loc) {
         RenderSystem.enableDepthTest();
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferbuilder = tesselator.getBuilder();

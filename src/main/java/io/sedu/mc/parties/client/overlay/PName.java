@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 public class PName extends RenderItem {
-    public static ItemStack nameTag = null;
+    public static ItemStack sign = null;
 
     int color;
     int length = 16;
@@ -43,9 +43,7 @@ public class PName extends RenderItem {
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         poseStack.pushPose();
-        poseStack.scale(.5f,.5f,1f);
-        poseStack.translate(b.x+8,b.y,0);
-        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(nameTag, b.x+8, b.y, 0);
+        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(sign, b.x+4, b.y-1, 0);
         poseStack.popPose();
 
     }

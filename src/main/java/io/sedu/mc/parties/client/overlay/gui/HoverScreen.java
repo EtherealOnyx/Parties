@@ -47,6 +47,7 @@ public class HoverScreen extends Screen {
     private List<Button> menu = new ArrayList<>();
     private List<Button> moveFrame = new ArrayList<>();
     private Button settingsButton;
+    private Button presetButton;
     private Button goBackButton;
     private List<GuiMessage<FormattedCharSequence>> trimmedMessages;
 
@@ -79,7 +80,8 @@ public class HoverScreen extends Screen {
         ColorUtils.colorCycle = true;
         int y = Math.max(0, clickArea.t(0) - 10);
         int x = clickArea.l(0);
-        settingsButton = addRenderableWidget(new SmallButton(x, y, "⚙", p -> doTask(1), tip(this, "Open Party Settings"), .5f, .5f, 1f, .5f));
+        settingsButton = addRenderableWidget(new SmallButton(x, y, "⚙", p -> doTask(1), tip(this, "Open Party Settings"), 0, .5f, .5f, .5f, 1f));
+        presetButton = addRenderableWidget(new SmallButton(x+11, y, "☰", p -> doTask(5), tip(this, "Use a Preset"), .5f, 1, 0f, 1f, 1f));
         goBackButton = addRenderableWidget(new SmallButton(x, y,"x", p -> doTask(1), tip(this, "Close"), 1f, .5f, .5f));
         initPartyButtons();
         initMenuButtons(x, y);
@@ -114,16 +116,16 @@ public class HoverScreen extends Screen {
     }
 
     private void initMenuButtons(int x, int y) {
-        menu.add(addRenderableWidget(new SmallButton(x, y,"x", p -> doTask(0), tip(this, "Close Menu"), 1f, .5f, .5f)));
-        menu.add(addRenderableWidget(new SmallButton(x+11, y,"⬆⬇", p -> doTask(2), tip(this, "Change Party Order"), .5f, .5f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(x, y,"x", p -> doTask(0), tip(this, "Close Menu"), .5f, 0f, 1f, .5f, .5f)));
+        menu.add(addRenderableWidget(new SmallButton(x+11, y,"⬆⬇", p -> doTask(2), tip(this, "Change Party Order"), .5f, .25f, .5f, .5f, 1f)));
         menu.add(addRenderableWidget(new SmallButton(x+22, y,"✥", p -> doTask(3), tip(this, "Reposition Party Frame"), 0, 1, .5f, .5f, 1f)));
-        menu.add(addRenderableWidget(new SmallButton(x+33, y,"⚙", p -> doTask(4), tip(this, "Open Advanced Settings"), 0, 1, .5f, 1f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(x+33, y,"⚙", p -> doTask(4), tip(this, "Open Advanced Settings"), 0, .5f, .5f, 1f, 1f)));
 
     }
 
     private void initDragButtons() {
         int y = Math.max(0, frameY - 10);
-        moveFrame.add(addRenderableWidget(new SmallButton(frameX, y, "x", p -> revertPos(), tip(this, "Revert & Close"), 1, .5f, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(frameX, y, "x", p -> revertPos(), tip(this, "Revert & Close"),.5f, 0f, 1, .5f, .5f)));
         moveFrame.add(addRenderableWidget(new SmallButton(frameX+11, y,"↺", p -> defaultPos(), tip(this, "Reset To Default & Close"), .5f, 1f, 1f)));
         Button b = addRenderableWidget(new SmallButton(frameX+22, y,"◄", p -> updatePos(true), tip(this, "Undo Move"), 1, 1, .5f));
         b.active = false;
@@ -262,12 +264,17 @@ public class HoverScreen extends Screen {
         notEditing = true;
         settingsButton.visible = false;
         goBackButton.visible = false;
+        presetButton.visible = false;
         menu.forEach(b -> b.visible = false);
         moveParty.forEach(b -> b.visible = false);
         moveFrame.forEach(b -> b.visible = false);
         switch (task) {
-            case 0 -> //Standard screen
-                    settingsButton.visible = true;
+            case 0 -> {
+                //Standard screen
+                presetButton.visible = true;
+                settingsButton.visible = true;
+            }
+
             case 1 -> //Settings screen
             {
                 menu.forEach(b -> b.visible = true);
@@ -296,7 +303,11 @@ public class HoverScreen extends Screen {
             }
             case 4 -> {
                 //Still technically active?
-                Minecraft.getInstance().setScreen(new SettingsScreen());
+                Minecraft.getInstance().setScreen(new SettingsScreen(false));
+            }
+
+            case 5 -> {
+                Minecraft.getInstance().setScreen(new SettingsScreen(true));
             }
         }
     }

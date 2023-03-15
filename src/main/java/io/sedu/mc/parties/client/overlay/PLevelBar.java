@@ -43,23 +43,23 @@ public class PLevelBar extends RenderIconTextItem implements TooltipItem {
         setup(Gui.GUI_ICONS_LOCATION);
         RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
         RenderSystem.enableDepthTest();
-        blit(poseStack, b.x+2, b.y+6, 0, 64, 14, 5);
-        blit(poseStack, b.x+16, b.y+6, 168, 64, 14, 5);
-        int w = (int) (28*bar);
-        if (w > 14) {
-            blit(poseStack, b.x+2, b.y+6, 0, 69, 14, 5);
-            blit(poseStack, b.x+16, b.y+6, 168, 69, w-14, 5);
+        blit(poseStack, b.x+2, b.y+6, 0, 64, 10, 5);
+        blit(poseStack, b.x+12, b.y+6, 172, 64, 10, 5);
+        int w = (int) (20*bar);
+        if (w > 10) {
+            blit(poseStack, b.x+2, b.y+6, 0, 69, 10, 5);
+            blit(poseStack, b.x+12, b.y+6, 172, 69, w-10, 5);
         } else {
             blit(poseStack, b.x+2,b.y+6, 0, 69, w, 5);
         }
-        if (w > 14) {
-            blit(poseStack, b.x+2, b.y+6, 0, 69, 14, 5);
-            blit(poseStack, b.x+16, b.y+6, 168, 69, w-14, 5);
+        if (w > 10) {
+            blit(poseStack, b.x+2, b.y+6, 0, 69, 10, 5);
+            blit(poseStack, b.x+12, b.y+6, 172, 69, w-10, 5);
         } else {
             blit(poseStack, b.x+2,b.y+6, 0, 69, w, 5);
         }
         String level = String.valueOf(Minecraft.getInstance().player.experienceLevel);
-        int x = b.x + 16 - (gui.getFont().width(level)>>1);
+        int x = b.x + 12 - (gui.getFont().width(level)>>1);
         int y = b.y + 5;
         poseStack.translate(0,0,zPos);
         gui.getFont().draw(poseStack, level, (float)(x + 1), y, 0);

@@ -31,7 +31,7 @@ public class ClickArea extends RenderItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+12, b.y+4, 0, 8, 8, 0xFFFFFF, 0xFFFFFF);
+        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+8, b.y+4, 0, 8, 8, 0xFFFFFF, 0xFFFFFF);
     }
 
     protected int maxH() {

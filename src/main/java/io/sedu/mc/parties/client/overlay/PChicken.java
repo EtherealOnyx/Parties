@@ -41,18 +41,18 @@ public class PChicken extends RenderIconTextItem implements TooltipItem {
         assert Minecraft.getInstance().player != null;
         int hunger = Minecraft.getInstance().player.getFoodData().getFoodLevel();
         if (hunger > 16) {
-            blit(poseStack, b.x+12, b.y+3, 16, 27, 9, 9);
-            blit(poseStack, b.x+12, b.y+3, 52, 27, 9, 9);
+            blit(poseStack, b.x+8, b.y+3, 16, 27, 9, 9);
+            blit(poseStack, b.x+8, b.y+3, 52, 27, 9, 9);
         }
         else if (hunger > 12) {
-            blit(poseStack, b.x+12, b.y+3, 16, 27, 9, 9);
-            blit(poseStack, b.x+12, b.y+3, 61 - (gui.getGuiTicks() >> 4 & 1)*9, 27, 9, 9);
+            blit(poseStack, b.x+8, b.y+3, 16, 27, 9, 9);
+            blit(poseStack, b.x+8, b.y+3, 61 - (gui.getGuiTicks() >> 4 & 1)*9, 27, 9, 9);
         } else if (hunger > 4) {
-            blit(poseStack, b.x+12, b.y+3, 16, 27, 9, 9);
+            blit(poseStack, b.x+8, b.y+3, 16, 27, 9, 9);
             if ((gui.getGuiTicks() >> 4 & 1) == 0)
-                blit(poseStack, b.x+12,b.y+3, 61, 27, 9, 9);
+                blit(poseStack, b.x+8,b.y+3, 61, 27, 9, 9);
         } else
-            blit(poseStack, b.x+12, b.y+3, 16 + (gui.getGuiTicks() >> 3 & 1)*9, 27, 9, 9);
+            blit(poseStack, b.x+8, b.y+3, 16 + (gui.getGuiTicks() >> 3 & 1)*9, 27, 9, 9);
     }
 
     @Override

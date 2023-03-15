@@ -37,7 +37,7 @@ public class PArmor extends RenderIconTextItem implements TooltipItem {
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         setup(GUI_ICONS_LOCATION);
-        blit(poseStack, b.x+12, b.y+3, 34, 9, 9, 9);
+        blit(poseStack, b.x+8, b.y+3, 34, 9, 9, 9);
     }
 
     @Override

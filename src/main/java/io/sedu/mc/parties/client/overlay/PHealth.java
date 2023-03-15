@@ -61,8 +61,8 @@ public class PHealth extends RenderIconTextItem implements TooltipItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+7, b.y+5, 0, 22, 7, bColorTop, bColorBot);
-        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+8, b.y+6, 0, 20, 5, colorTop, colorBot);
+        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+7, b.y+5, 0, 14, 7, bColorTop, bColorBot);
+        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+8, b.y+6, 0, 12, 5, colorTop, colorBot);
         setup(GUI_ICONS_LOCATION);
         RenderSystem.enableDepthTest();
         blit(poseStack,b.x+3, b.y+4, 16, 0, 9, 9);

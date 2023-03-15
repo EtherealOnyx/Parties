@@ -47,7 +47,7 @@ public class PLeader extends RenderItem implements TooltipItem{
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         setup(partyPath);
         RenderSystem.enableDepthTest();
-        blit(poseStack, (b.x)+12, b.y+2, 0, 0, 9, 9);
+        blit(poseStack, (b.x)+8, b.y+2, 0, 0, 9, 9);
     }
 
     @Override

@@ -32,7 +32,6 @@ import static io.sedu.mc.parties.util.RenderUtils.*;
 
 public class SettingsScreen extends Screen {
     private final ResourceLocation MENU_LOC = new ResourceLocation("textures/block/deepslate_tiles.png");
-    private final ResourceLocation MOD_LOC = new ResourceLocation("textures/block/polished_basalt_side.png");
     private final ResourceLocation OPTIONS_LOC = new ResourceLocation("textures/block/spruce_log.png");
     private final ResourceLocation SEARCH_LOC = new ResourceLocation("textures/block/deepslate_tiles.png");
 
@@ -53,7 +52,7 @@ public class SettingsScreen extends Screen {
     TabButton presetButton;
 
 
-    private ConfigOptionsList options;
+    ConfigOptionsList options;
     ArrayList<InputBox> tickables = new ArrayList<>();
 
     int modBoxX;
@@ -92,13 +91,15 @@ public class SettingsScreen extends Screen {
     public int messageCooldown = 0;
     public int revertCooldown = 0;
     private boolean triggeredPrompt = false;
+    private boolean isPresetOnly;
 
 
 
 
-    protected SettingsScreen() {
+    protected SettingsScreen(boolean b) {
         super(new TextComponent("Party Advanced Settings"));
         miscButtons = new ArrayList<>();
+        isPresetOnly = b;
         confirmPrompt = new TextComponent("Are you sure? Click again to confirm").withStyle(ChatFormatting.DARK_RED);
     }
 
@@ -196,7 +197,7 @@ public class SettingsScreen extends Screen {
         ColorUtils.colorCycle = false;
         notEditing = true;
         PHead.icon = null;
-        PName.nameTag = null;
+        PName.sign = null;
         GeneralOptions.icon = null;
         PresetOptions.icon = null;
         nameHolder = nameBox.getValue().isEmpty() ? null : nameBox.getValue();
@@ -221,7 +222,7 @@ public class SettingsScreen extends Screen {
             poseStack.translate(0,0,-1);
         }
         renderFrameOutline(poseStack);
-        renderBg(-5, screenX, screenY, screenX + screenW, screenY + eleBoxH, screenW, eleBoxH, 200, MENU_LOC);
+
         if (renderSelBox)
             renderSelection(poseStack);
         RenderSystem.enableDepthTest();
@@ -242,6 +243,7 @@ public class SettingsScreen extends Screen {
         font.drawShadow(poseStack, "Desc:", descBox.x - 29, descBox.y, 0xFFFFFF);
         renderShadows(poseStack);
 
+        renderBg(-5, screenX, screenY, screenX + screenW, screenY + eleBoxH, screenW, eleBoxH, 200, MENU_LOC);
         super.render(poseStack, pMouseX, pMouseY, pPartialTick);
     }
 
@@ -250,7 +252,7 @@ public class SettingsScreen extends Screen {
     }
 
 
-    private void renderPresetBox() {
+    void renderPresetBox() {
         renderBg(presetBoxX, presetBoxY, presetBoxX + presetBoxW, presetBoxY + presetBoxH, presetBoxW, presetBoxH, 200, SEARCH_LOC);
     }
 
@@ -259,7 +261,7 @@ public class SettingsScreen extends Screen {
     }
 
 
-    private void renderShadows(PoseStack poseStack) {
+    void renderShadows(PoseStack poseStack) {
         //renderBg(screenX + modBoxW, screenY + eleBoxH, screenX + screenW, screenY + screenH, screenW - modBoxW, screenH - eleBoxH, 80);
         //Top Shadow
         RenderUtils.rect(poseStack.last().pose(), 0, screenX, screenY + eleBoxH, screenX + screenW, screenY + eleBoxH+10, 0xAA000000, 0x00000000);
@@ -283,35 +285,38 @@ public class SettingsScreen extends Screen {
         ColorUtils.colorCycle = true;
         RenderItem.initUpdater(updater);
         RenderItem.initGetter(getter);
-        notEditing = false;
-        //INNER_LOC = tabs.get(tabsOrder.get(selEle)).getInnerBg();
+        notEditing = isPresetOnly;
+        if (isPresetOnly) {
+
+        }
         PHead.icon = new ItemStack(Items.PLAYER_HEAD);
         GeneralOptions.icon = new ItemStack(Items.COMPARATOR);
         PresetOptions.icon = new ItemStack(Items.CHEST_MINECART);
         assert Minecraft.getInstance().player != null;
         PHead.icon.addTagElement("SkullOwner", StringTag.valueOf(Minecraft.getInstance().player.getName().getContents()));
-        PName.nameTag = Items.NAME_TAG.getDefaultInstance();
+        PName.sign = Items.SPRUCE_SIGN.getDefaultInstance();
 
         //Setup Data.
+
         initTabButtons();
         setBounds(width, height, true);
         super.init();
     }
 
 
-    private InputBox nameBox;
-    private InputBox descBox;
-    private void initMiscButtons() {
+    InputBox nameBox;
+    InputBox descBox;
+    void initMiscButtons() {
         miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters")));
         miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters")));
-        miscButtons.add(new SmallButton(0, 0, "c", b -> toggleRGB(), tip(this, "Toggle RGB Input Mode"), 0.5f, 0.5f, 0.5f));
+        miscButtons.add(new SmallButton(0, 0, "c", b -> toggleRGB(), tip(this, "Toggle RGB Input Mode"), .5f, 0f, 0.5f, 0.5f, 0.5f));
         miscButtons.add(new SmallButton(0, 0, "x", b -> toggleEles(false), tip(this, "Turn All Other Elements Off"), 1f, 0.5f, 0.5f));
         miscButtons.add(new SmallButton(0, 0, "✓", b -> toggleEles(true), tip(this, "Turn All Other Elements On"), 0.5f, 1f, 0.5f));
         miscButtons.add(new SmallButton(0,0, "↺", b -> resetEle(), tip(this, "Reset Current Element to Default"), .5f, 1f, 1f));
         miscButtons.add(new SmallButton(0,0, "↺", b -> resetAll(), tip(this, "Reset Everything to Default"), 1f, 1f, 0.5f));
-        miscButtons.add(new SmallButton(0,0, "s", b -> savePreset(), tip(this, "Save Preset"), 0.5f, 1f, 0.5f));
-        miscButtons.add(new SmallButton(0,0, "c", b -> copyPreset(), tip(this, "Copy Preset to Clipboard"), 1f, 0.5f, 1f));
-        miscButtons.add(new SmallButton(0,0, "p", b -> pastePreset(), tip(this, "Load Preset from Clipboard"), 1f, 0.5f, 1f));
+        miscButtons.add(new SmallButton(0,0, "s", b -> savePreset(), tip(this, "Save Preset"), .5f, 0f, 0.5f, 1f, 0.5f));
+        miscButtons.add(new SmallButton(0,0, "c", b -> copyPreset(), tip(this, "Copy Preset to Clipboard"), .5f, 0f,1f, 0.5f, 1f));
+        miscButtons.add(new SmallButton(0,0, "p", b -> pastePreset(), tip(this, "Load Preset from Clipboard"),.5f, 0f, 1f, 0.5f, 1f));
         miscButtons.add(new SmallButton(0, 0, "✎", b -> sendPresetToChat(), tip(this, "Link Preset to Chat"), 0, 1, 1f, 0.5f, 1f));
         nameBox = new InputBox(0xFFFFFF, font, 0, 12, new TextComponent("Name"), (s) -> checkSaveFlags(), false);
         descBox = new InputBox(0xFFFFFF, font, 0, 12, new TextComponent("Desc"), (s) -> checkSaveFlags(), false);
@@ -363,17 +368,28 @@ public class SettingsScreen extends Screen {
     }
 
     private void initTabButtons() {
+
+        assert minecraft != null;
+        //Preset Button
+        if (isPresetOnly) {
+            presetButton = new TabButton(-1, 0, 0, 32, 32, b -> {},
+                                         RenderUtils.tip(this, new TranslatableComponent("gui.sedparties.name.preset")),
+                                         new PresetOptions("Load").render((ForgeIngameGui) minecraft.gui), "Load");
+        } else {
+            presetButton = new TabButton(-1, 0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
+                                         RenderUtils.tip(this, new TranslatableComponent("gui.sedparties.name.preset")),
+                                         new PresetOptions("Load").render((ForgeIngameGui) minecraft.gui), "Load");
+        }
+
+
+        if (isPresetOnly) return;
+
         int i = 1;
         Iterator<Map.Entry<String, RenderItem>> iter = RenderItem.items.entrySet().iterator();
         Map.Entry<String, RenderItem> item;
-        assert minecraft != null;
-        //Preset Button
-        presetButton = new TabButton(-1, 0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
-                             RenderUtils.tip(this, new TranslatableComponent("gui.sedparties.name.preset")),
-                             new PresetOptions("Load").render((ForgeIngameGui) minecraft.gui), "Load");
         //General Settings
         tabsOrder.add("general");
-        tabs.put("general", new TabButton(0, 0, 0, 32, 16, b -> this.selectButton(((TabButton)b).index),
+        tabs.put("general", new TabButton(0, 0, 0, 24, 16, b -> this.selectButton(((TabButton)b).index),
                                           RenderUtils.tip(this, new TranslatableComponent("gui.sedparties.name.general")),
                                           new GeneralOptions("general").render((ForgeIngameGui) minecraft.gui),
                                           "Main", true
@@ -382,7 +398,7 @@ public class SettingsScreen extends Screen {
             item = iter.next();
             if (item.getValue().isTabRendered()) {
                 tabsOrder.add(item.getKey());
-                tabs.put(item.getKey(), new TabButton(i, 0, 0, 32, 16, b -> this.selectButton(((TabButton)b).index),
+                tabs.put(item.getKey(), new TabButton(i, 0, 0, 24, 16, b -> this.selectButton(((TabButton)b).index),
                                                       RenderUtils.tip(this, new TranslatableComponent(item.getValue().translateName())),
                                                       item.getValue().render((ForgeIngameGui) minecraft.gui),
                                                       item.getValue().getType(), true
@@ -395,7 +411,8 @@ public class SettingsScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        tickables.forEach(inputBox -> inputBox.setFocus(false));
+        if (tickables.size() > 0)
+            tickables.forEach(inputBox -> inputBox.setFocus(false));
         return super.mouseClicked(pMouseX,pMouseY, pButton);
     }
 
@@ -407,7 +424,7 @@ public class SettingsScreen extends Screen {
         organizeTabButtons();
     }
 
-    private void setBounds(int width, int height, boolean init) {
+    void setBounds(int width, int height, boolean init) {
         this.screenW = Math.min(width>>1, 320);
         this.screenH = Math.min((height>>2)*3, 300);
         if (width > 720)
@@ -418,7 +435,7 @@ public class SettingsScreen extends Screen {
 
 
         eleBoxW = screenW - 32;
-        maxEles = eleBoxW / 32;
+        maxEles = eleBoxW / 24;
         eleBoxX = screenX + 32;
         eleBoxY = screenY;
         eleBoxH = Math.min(32, screenH);
@@ -477,9 +494,8 @@ public class SettingsScreen extends Screen {
         descBox.x = optBoxX - descBox.getWidth() - 1;
         descBox.y = presetBoxY + 15;
         miscButtons.get(7).y = descBox.y - 1;
-        presetButton.x = screenX;
+        presetButton.x = isPresetOnly ? screenX + (screenW)/2 - 16 : screenX;
         presetButton.y = screenY;
-
 
         if (init) {
             miscButtons.forEach(this::addRenderableWidget);
@@ -494,6 +510,15 @@ public class SettingsScreen extends Screen {
             //TODO: Ignore ModBox implementation for now. Implement later.
             removeWidget(miscButtons.get(0));
             removeWidget(miscButtons.get(1));
+            if (isPresetOnly) {
+                miscButtons.get(0).active = false;
+                miscButtons.get(1).active = false;
+                miscButtons.get(2).active = false;
+                miscButtons.get(3).active = false;
+                miscButtons.get(4).active = false;
+                miscButtons.get(5).active = false;
+                miscButtons.get(6).active = false;
+            }
         }
         updateOptionsBounds();
 
@@ -502,7 +527,7 @@ public class SettingsScreen extends Screen {
     private void organizeTabButtons() {
         TabButton b;
         int eleCounter = 0;
-        int xOffset = eleBoxX + (eleBoxW - (32*maxEles))/2;
+        int xOffset = eleBoxX + (eleBoxW - (24*maxEles))/2;
         int yOffset = eleBoxY+16;
         int currEle = 0;
         for (String tab : tabsOrder) {
@@ -510,18 +535,18 @@ public class SettingsScreen extends Screen {
             if (eleCounter++ == maxEles) {
                 yOffset -= 16;
                 currEle += maxEles;
-                xOffset = eleBoxX + (eleBoxW - (32*Math.min(maxEles, tabs.size() - currEle)))/2;
+                xOffset = eleBoxX + (eleBoxW - (24*Math.min(maxEles, tabs.size() - currEle)))/2;
                 eleCounter = 1;
             }
             b.x = xOffset;
             b.y = yOffset;
-            xOffset += 32;
+            xOffset += 24;
         }
     }
 
-    private void updateOptionsBounds() {
+    protected void updateOptionsBounds() {
         if (this.options == null) {
-            if (selEle == -1) {
+            if (selEle == -1 || isPresetOnly) {
                 miscButtons.get(5).active = false;
                 this.options = presetButton.getOptions(this, minecraft, 0, 0, 0, 0);
                 this.options.setItemHeight(28);

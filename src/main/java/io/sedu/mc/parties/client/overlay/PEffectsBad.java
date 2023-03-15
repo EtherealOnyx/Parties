@@ -40,7 +40,7 @@ public class PEffectsBad extends PEffects{
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         poseStack.pushPose();
         poseStack.scale(.5f,.5f,1f);
-        poseStack.translate(b.x+23, b.y+6, 0);
+        poseStack.translate(b.x+15, b.y+6, 0);
         RenderSystem.enableDepthTest();
         TextureAtlasSprite sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.WITHER);
         RenderSystem.setShaderTexture(0, sprite.atlas().location());

@@ -44,7 +44,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        DimConfig.entry("minecraft:overworld", (icon, color) -> renderGuiItem(icon, b.x+11, b.y+3, .75f, 5));
+        DimConfig.entry("minecraft:overworld", (icon, color) -> renderGuiItem(icon, b.x+7, b.y+3, .75f, 5));
     }
 
     @Override

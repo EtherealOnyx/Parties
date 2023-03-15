@@ -32,7 +32,7 @@ public class PDead extends RenderItem {
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         setup(GUI_ICONS_LOCATION);
-        blit(poseStack, b.x+12, b.y+4, 16 + (gui.getGuiTicks() >> 4 & 1)*9, 0, 9, 9);
+        blit(poseStack, b.x+8, b.y+4, 16 + (gui.getGuiTicks() >> 4 & 1)*9, 0, 9, 9);
     }
 
     @Override

@@ -43,10 +43,10 @@ public class PEffectsBoth extends PEffects {
         RenderSystem.enableDepthTest();
         TextureAtlasSprite sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.BAD_OMEN);
         RenderSystem.setShaderTexture(0, sprite.atlas().location());
-        Gui.blit(poseStack, b.x + 28, b.y+5, 0, 18, 18, sprite);
+        Gui.blit(poseStack, b.x + 20, b.y+5, 0, 18, 18, sprite);
         sprite = Minecraft.getInstance().getMobEffectTextures().get(MobEffects.DAMAGE_RESISTANCE);
         RenderSystem.setShaderTexture(0, sprite.atlas().location());
-        Gui.blit(poseStack, b.x + 18, b.y +7,0, 18, 18, sprite);
+        Gui.blit(poseStack, b.x + 10, b.y +7,0, 18, 18, sprite);
 
         poseStack.popPose();
     }
