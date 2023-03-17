@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.client.overlay.anim;
 
 
+import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,10 +16,13 @@ public class DimAnim extends AnimHandler {
     public List<String> dimName = new ArrayList<>();
     public String dimNorm = "";
     public static boolean animActive = true;
+    protected ClientPlayerData player;
+    private boolean oldFlag = false;
 
 
-    public DimAnim(int length, boolean enabled) {
-        super(length, enabled);
+    public DimAnim(int length, ClientPlayerData player) {
+        super(length, true);
+        this.player = player;
         dimName.add("?");
         dimName.add("?");
     }
@@ -34,7 +38,11 @@ public class DimAnim extends AnimHandler {
 
     @Override
     public void activate(Object... data) {
-        if (animActive) super.activate(data);
+        if (animActive) {
+            super.activate(data);
+            oldFlag = player.shouldRenderModel;
+            player.shouldRenderModel = false;
+        }
         else setupDim((String) data[0]);
     }
 
@@ -65,5 +73,17 @@ public class DimAnim extends AnimHandler {
         dim.forEach(word -> fString.add("§o" + word.substring(0, 1).toUpperCase() + word.substring(1)));
         this.dimName = fString;
         this.dimNorm = String.join(" ", dimName).replace("§o", "");
+    }
+
+    @Override
+    boolean tickAnim() {
+        animTime -= 1;
+        if (animTime <= 0) {
+            animTime = 0;
+            active = false;
+            player.shouldRenderModel = oldFlag;
+            return true;
+        }
+        return false;
     }
 }

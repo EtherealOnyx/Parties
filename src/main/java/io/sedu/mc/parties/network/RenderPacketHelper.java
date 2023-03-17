@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
+import io.sedu.mc.parties.client.overlay.RenderItem;
 import net.minecraft.client.Minecraft;
 
 import java.util.UUID;
@@ -53,7 +54,7 @@ public class RenderPacketHelper {
     }
 
     public static void setDim(UUID player, String data) {
-        ClientPlayerData.playerList.get(player).dim.activate(data, false);
+        if (RenderItem.items.get("dim").isEnabled()) ClientPlayerData.playerList.get(player).dim.activate(data, false);
     }
 
     public static void markDeath() {

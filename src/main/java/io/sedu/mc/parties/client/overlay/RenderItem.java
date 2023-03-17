@@ -43,8 +43,6 @@ public abstract class RenderItem {
     public static final List<RenderItem> tooltipItems = new ArrayList<>();
     public static ArrayList<String> parser = new ArrayList<>();
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
-    static final ResourceLocation TAB_LOC = new ResourceLocation("textures/block/glass.png");
-    static final ResourceLocation SEL_LOC = new ResourceLocation("textures/block/glass.png");
 
     public static int frameX = 16;
     public static int frameY = 16;
@@ -68,7 +66,7 @@ public abstract class RenderItem {
 
     public static void checkTooltip(int posX, int posY, Consumer<TooltipItem> action) {
         tooltipItems.forEach(t -> {
-            if (t.isInBound(posX, posY))
+            if (t.isInBound(posX, posY) && t.isEnabled())
                 action.accept((TooltipItem) t);
         });
     }
@@ -484,7 +482,7 @@ public abstract class RenderItem {
 
     abstract void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b);
 
-    protected boolean isEnabled() {
+    public boolean isEnabled() {
         return OverlayRegistry.getEntry(this.item).isEnabled();
     }
 
@@ -813,6 +811,11 @@ public abstract class RenderItem {
                 action.accept(i, mouseX, mouseY);
             }
         }
+    }
+
+
+    public void forItem(Consumer<RenderItem> action) {
+        action.accept(this);
     }
 
 

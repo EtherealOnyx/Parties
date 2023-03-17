@@ -94,14 +94,21 @@ public class ClientSetup {
     private static void saveAlternatePresets() {
         items.get("effects").setEnabled(false);
         items.get("effects_b").setEnabled(true);
-        items.get("effects_d").setEnabled(true);
         RenderItem.frameEleW = 232;
+        items.get("effects_d").forItem(item -> {
+            item.setEnabled(true);
+            ((PEffects) item).setMaxPerRow(4);
+            item.setXPos(170);
+            item.setYPos(19);
+        });
         Config.saveDefaultPreset("sepbuffs", "A preset with the buff and debuff bar separated.");
         RenderItem.setDefaultValues();
-        items.get("effects").setXPos(170);
-        items.get("effects").setYPos(19);
-        ((PEffects) items.get("effects")).setMaxPerRow(5);
-        ((PEffects) items.get("effects")).setMaxSize(5);
+        items.get("effects").forItem(item -> {
+            item.setYPos(170);
+            item.setXPos(19);
+            ((PEffects) item).setMaxPerRow(5);
+            ((PEffects) item).setMaxSize(5);
+        });
         EffectHolder.updatebLim(0); //updates dLim too.
         RenderItem.frameEleH = 52;
         RenderItem.framePosH = 51;
@@ -109,6 +116,7 @@ public class ClientSetup {
         Config.saveDefaultPreset("sidebuffs", "A preset with the combined buff bar on the right of the frame. Adds more space.");
         //TODO: Add Minimal version.
         RenderItem.setDefaultValues();
+
     }
 
     public static void postInit(FMLLoadCompleteEvent event) {

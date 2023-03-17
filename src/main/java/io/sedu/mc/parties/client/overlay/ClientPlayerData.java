@@ -51,7 +51,8 @@ public class ClientPlayerData {
     public int alphaI = 216;
 
     //Dimension Animation
-    public DimAnim dim = new DimAnim(100, true);
+    public DimAnim dim = new DimAnim(100, this);
+    public boolean shouldRenderModel = false;
 
     //Health Animation
     public HealthAnim health = new HealthAnim(20, true);
@@ -94,7 +95,9 @@ public class ClientPlayerData {
         if (showSelf & (p = Minecraft.getInstance().player) != null)
         {
             ClientPlayerData.addClientMember(p.getUUID());
-            playerList.get(p.getUUID()).setClientPlayer(p).dim.activate(String.valueOf(p.level.dimension().location()), true);
+            if (RenderItem.items.get("dim").isEnabled()) playerList.get(p.getUUID()).setClientPlayer(p).dim.activate(String.valueOf(p.level.dimension().location()), true);
+            playerList.get(p.getUUID()).isOnline = true;
+
         }
     }
 
@@ -126,7 +129,8 @@ public class ClientPlayerData {
 
     public static void updateSelfDim(String data) {
         if(ClientPlayerData.playerOrderedList.size() > 0) {
-            playerList.get(Minecraft.getInstance().player.getUUID()).dim.activate(data, false);
+            if (RenderItem.items.get("dim").isEnabled())
+                playerList.get(Minecraft.getInstance().player.getUUID()).dim.activate(data, false);
         }
     }
 
@@ -174,6 +178,7 @@ public class ClientPlayerData {
 
     public void setOffline() {
         isOnline = false;
+        isDead = false;
         alpha = .25f;
         alphaI = 64;
     }
@@ -185,6 +190,7 @@ public class ClientPlayerData {
     public ClientPlayerData setClientPlayer(Player entity) {
         clientPlayer = entity;
         trackedOnClient = true;
+        shouldRenderModel = true;
         playerName = entity.getName().getContents();
         //Try to add client skin if it exists.
         if (skinLoc == null) {
@@ -206,6 +212,7 @@ public class ClientPlayerData {
         trackedOnClient = false;
         alpha = .6f;
         alphaI = 192;
+        shouldRenderModel = false;
     }
 
     public boolean isTrackedOnServer() {

@@ -79,8 +79,10 @@ public class PHealth extends RenderIconTextItem implements TooltipItem {
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
 
         if (id.isDead) {
-            RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorBot, bColorBot);
-            RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing);
+            if (iconEnabled) {
+                RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorBot, bColorBot);
+                RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing);
+            }
 
             textCentered(i, tX(i), tY(i), gui, poseStack, "Dead", deadColor);
             return;
@@ -318,7 +320,11 @@ public class PHealth extends RenderIconTextItem implements TooltipItem {
 
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
-        HealthAnim h = ClientPlayerData.getOrderedPlayer(index).health;
-        renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Health: " + (h.cur + h.absorb) + "/" + h.max, 0xfc807c, 0x4d110f, 0xffbfbd);
+        ClientPlayerData p;
+        if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
+            HealthAnim h = p.health;
+            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Health: " + (h.cur + h.absorb) + "/" + h.max, 0xfc807c, 0x4d110f, 0xffbfbd);
+
+        }
     }
 }

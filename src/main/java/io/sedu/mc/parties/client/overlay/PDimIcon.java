@@ -33,6 +33,13 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
     }
 
     @Override
+    boolean isInBound(int mouseX, int mouseY) {
+        return mouseX > x - 2 && mouseY > y - 2
+                && mouseX < x + 2 + width*head.scale && mouseY < y + 2 + height*head.scale;
+    }
+
+
+    @Override
     int getColor() {
         return 0x93c263;
     }
@@ -259,9 +266,18 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
-        ClientPlayerData p = ClientPlayerData.getOrderedPlayer(index);
-        int color = DimConfig.color(p.dim.dimension);
-        int darkCol = (color & 0xfefefe) >> 1;
-        renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.dim.dimNorm, darkCol, color, 0, darkCol, color);
+        ClientPlayerData p;
+        if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
+            int color = DimConfig.color(p.dim.dimension);
+            int darkCol = (color & 0xfefefe) >> 1;
+            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.dim.dimNorm, darkCol, color, 0, darkCol, color);
+        }
+
+    }
+
+    @Override
+    public SmallBound changeVisibility(boolean data) {
+        DimAnim.animActive = data;
+        return super.changeVisibility(data);
     }
 }

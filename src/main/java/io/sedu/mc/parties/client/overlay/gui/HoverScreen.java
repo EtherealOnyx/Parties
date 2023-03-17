@@ -18,7 +18,6 @@ import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,11 +70,7 @@ public class HoverScreen extends Screen {
 
     @Override
     protected void init() {
-        try {
-            Field f = ChatComponent.class.getDeclaredField("trimmedMessages");
-            f.setAccessible(true);
-            trimmedMessages = (List<GuiMessage<FormattedCharSequence>>) f.get(minecraft.gui.getChat());
-        } catch(NoSuchFieldException | IllegalAccessException ignored) {}
+        trimmedMessages = minecraft.gui.getChat().trimmedMessages;
 
         ColorUtils.colorCycle = true;
         int y = Math.max(0, clickArea.t(0) - 10);

@@ -41,7 +41,7 @@ public class Config {
 
     public static boolean saveCompletePreset(String name, String desc, HashMap<String, RenderItem.Getter> itemGetter) {
         JsonObject json = new JsonObject();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         json.addProperty("description", desc);
         json.add("general", GeneralOptions.INSTANCE.getCurrentValues(itemGetter).getJsonEntries(gson));
         RenderItem.items.forEach((itemName, item) -> json.add(itemName, item.getCurrentValues(itemGetter).getJsonEntries(gson)));
@@ -59,7 +59,7 @@ public class Config {
         JsonObject json = new JsonObject();
         HashMap<String, RenderItem.Getter> itemGetter = new HashMap<>();
         RenderItem.initGetter(itemGetter);
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         json.addProperty("description", desc);
         json.add("general", RenderItem.getGeneralValues().getJsonEntries(gson));
         RenderItem.items.forEach((itemName, item) -> json.add(itemName, item.getCurrentValues(itemGetter).getJsonEntries(gson)));
@@ -196,7 +196,7 @@ public class Config {
     }
 
     public static void saveDefaultDims(List<DimConfig.DimEntryConfig> entries) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         try (FileWriter writer = new FileWriter(new File(FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).resolve("dims").toFile(), "default.json"))){
             writer.write(gson.toJson(entries));
             writer.flush();

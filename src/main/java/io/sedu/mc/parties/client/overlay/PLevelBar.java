@@ -14,8 +14,6 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
-import static io.sedu.mc.parties.client.overlay.ClientPlayerData.getOrderedPlayer;
-
 public class PLevelBar extends RenderIconTextItem implements TooltipItem {
 
 
@@ -129,12 +127,14 @@ public class PLevelBar extends RenderIconTextItem implements TooltipItem {
         String s = "" + level;
         int i1 = left + 91 - gui.getFont().width(s)/2;
         int j1 = top - 1;
-            gui.getFont().draw(poseStack, s, (float)(i1 + 1), (float)j1, 0);
+        poseStack.translate(0,0,zPos);
+        gui.getFont().draw(poseStack, s, (float)(i1 + 1), (float)j1, 0);
         gui.getFont().draw(poseStack, s, (float)(i1 - 1), (float)j1, 0);
         gui.getFont().draw(poseStack, s, (float)i1, (float)(j1 + 1), 0);
         gui.getFont().draw(poseStack, s, (float)i1, (float)(j1 - 1), 0);
         gui.getFont().draw(poseStack, s, (float)i1, (float)j1, 8453920);
         currentY += gui.getFont().lineHeight+offsetY+4;
+        poseStack.translate(0,0,-zPos);
     }
 
     @Override
@@ -206,11 +206,13 @@ public class PLevelBar extends RenderIconTextItem implements TooltipItem {
 
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
-        ClientPlayerData p = getOrderedPlayer(index);
-        if (isSelf(index)) {
-            renderXpTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.getXpBarForced(), p.getLevelForced());
-        } else {
-            renderXpTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.getXpBar(), p.getXpLevel());
+        ClientPlayerData p;
+        if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
+            if (isSelf(index)) {
+                renderXpTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.getXpBarForced(), p.getLevelForced());
+            } else {
+                renderXpTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.getXpBar(), p.getXpLevel());
+            }
         }
     }
 }

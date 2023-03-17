@@ -12,7 +12,6 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
-import static io.sedu.mc.parties.client.overlay.ClientPlayerData.getOrderedPlayer;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
 public class PChicken extends RenderIconTextItem implements TooltipItem {
@@ -147,7 +146,11 @@ public class PChicken extends RenderIconTextItem implements TooltipItem {
 
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
-        renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Hunger: " + (isSelf(index) ? getOrderedPlayer(index).getHungerForced() : getOrderedPlayer(index).getHunger()), 0xb88458, 0x613c1b, 0xffd5b0);
+        ClientPlayerData p;
+        if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
+            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Hunger: " + (isSelf(index) ? p.getHungerForced() : p.getHunger()), 0xb88458, 0x613c1b, 0xffd5b0);
+
+        }
     }
 
 }
