@@ -228,19 +228,21 @@ public class SettingsScreen extends Screen {
             this.renderTooltip(poseStack, confirmPrompt, pMouseX, pMouseY + 16);
             poseStack.translate(0,0,-1);
         }
-        RenderUtils.offRectNoA(poseStack.last().pose(), screenX, screenY, -1, -2, screenW, screenH, ColorUtils.getRainbowColor(), 0x232323);
 
         renderFrameOutline(poseStack);
         if (renderSelBox)
             renderSelection(poseStack);
 
         if (draggingWindow) {
+            RenderUtils.borderRectNoA(poseStack.last().pose(), 0, 1, screenX, screenY, screenW, screenH, ColorUtils.getRainbowColor());
+            RenderUtils.sizeRect(poseStack.last().pose(), screenX, screenY, 0, screenW, screenH, ColorUtils.getRainbowColor() | 40 << 24);
             move(pMouseX, pMouseY);
             return;
         } else if (oldMX != null) {
             save();
             return;
         }
+        RenderUtils.offRectNoA(poseStack.last().pose(), screenX, screenY, -1, -1, screenW, screenH, ColorUtils.getRainbowColor(), 0x232323);
         RenderSystem.enableDepthTest();
         this.options.render(poseStack, pMouseX, pMouseY, pPartialTick);
         assert minecraft != null;
