@@ -346,7 +346,7 @@ public class SettingsScreen extends Screen {
 
     private void savePreset() {
         if (Config.saveCompletePreset(nameBox.getValue(), descBox.getValue(), getter)) {
-            minecraft.player.displayClientMessage(new TextComponent("Preset saved as " + nameBox.getValue() + "successfully.").withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.ITALIC), true);
+            minecraft.player.displayClientMessage(new TextComponent("Preset saved as " + nameBox.getValue() + " successfully.").withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.ITALIC), true);
             nameBox.setValue("");
             descBox.setValue("");
             if (selEle == -1) {

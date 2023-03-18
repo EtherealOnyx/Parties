@@ -225,4 +225,14 @@ public class Config {
             Parties.LOGGER.error("Error trying to load dimension entries!", e);
         }
     }
+
+    public static void saveDefaultPresetFromString(HashMap<String, RenderItem.Update> updater, String fileName, String description, String load) {
+        Gson gson = new Gson();
+        JsonObject jsonObject = gson.fromJson(load, JsonObject.class);
+        //General values
+        JsonElement element = jsonObject.get("general");
+        updateValues(GeneralOptions.INSTANCE, element, updater);
+        RenderItem.items.forEach((name, item) -> updateValues(item, jsonObject.get(name), updater));
+        saveDefaultPreset(fileName, description);
+    }
 }
