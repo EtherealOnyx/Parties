@@ -669,6 +669,7 @@ public class RenderUtils {
 
         boolean shouldSit = pEntity.isPassenger() && (pEntity.getVehicle() != null && pEntity.getVehicle().shouldRiderSit());
         render.getModel().riding = shouldSit;
+        render.getModel().young = pEntity.isBaby();
         float f = Mth.rotLerp(pPartialTicks, pEntity.yBodyRotO, pEntity.yBodyRot);
         float f1 = Mth.rotLerp(pPartialTicks, pEntity.yHeadRotO, pEntity.yHeadRot);
         float f2 = f1 - f;
