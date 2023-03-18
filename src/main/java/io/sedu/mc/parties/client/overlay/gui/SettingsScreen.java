@@ -39,6 +39,13 @@ public class SettingsScreen extends Screen {
     int screenH;
     int screenX = 0;
     int screenY = 0;
+    private int oldX = 0;
+    private int oldY = 0;
+    private Integer oldMX = null;
+    private Integer oldMY = null;
+    private int maxScreenX;
+    private int maxScreenY;
+    private boolean draggingWindow = false;
 
     int eleBoxX;
     int eleBoxY;
@@ -221,14 +228,22 @@ public class SettingsScreen extends Screen {
             this.renderTooltip(poseStack, confirmPrompt, pMouseX, pMouseY + 16);
             poseStack.translate(0,0,-1);
         }
-        renderFrameOutline(poseStack);
+        RenderUtils.offRectNoA(poseStack.last().pose(), screenX, screenY, -1, -2, screenW, screenH, ColorUtils.getRainbowColor(), 0x232323);
 
+        renderFrameOutline(poseStack);
         if (renderSelBox)
             renderSelection(poseStack);
+
+        if (draggingWindow) {
+            move(pMouseX, pMouseY);
+            return;
+        } else if (oldMX != null) {
+            save();
+            return;
+        }
         RenderSystem.enableDepthTest();
         this.options.render(poseStack, pMouseX, pMouseY, pPartialTick);
         assert minecraft != null;
-        RenderUtils.offRectNoA(poseStack.last().pose(), screenX, screenY, -1, -2, screenW, screenH, ColorUtils.getRainbowColor(), 0x232323);
         //TODO: ModBox
         //if (modVisible)
             //renderModBox();
@@ -245,6 +260,46 @@ public class SettingsScreen extends Screen {
 
         renderBg(-5, screenX, screenY, screenX + screenW, screenY + eleBoxH, screenW, eleBoxH, 200, MENU_LOC);
         super.render(poseStack, pMouseX, pMouseY, pPartialTick);
+
+
+    }
+
+    private void move(int x, int y) {
+
+        if (oldMX == null) {
+            oldMX = x;
+            oldMY = y;
+            oldX = screenX;
+            oldY = screenY;
+        }
+        checkLimits(x, y);
+    }
+
+    private void checkLimits(int x, int y) {
+        int tempFrame = x - oldMX + oldX;
+        if (tempFrame < 0) {
+            screenX = 0;
+        } else if (tempFrame + screenW > maxScreenX) {
+            screenX = maxScreenX - screenW;
+        } else {
+            screenX = tempFrame;
+        }
+        tempFrame = y - oldMY + oldY;
+        if (tempFrame < 0) {
+            screenY = 0;
+        } else if (tempFrame + screenH > maxScreenY) {
+            screenY = maxScreenY - screenH;
+        } else {
+            screenY = tempFrame;
+        }
+
+    }
+
+    private void save() {
+        oldMY = null;
+        oldMX = null;
+        //Do other things
+        setBounds(width, height, false, true);
     }
 
     private void renderSelection(PoseStack poseStack) {
@@ -299,7 +354,7 @@ public class SettingsScreen extends Screen {
         //Setup Data.
 
         initTabButtons();
-        setBounds(width, height, true);
+        setBounds(width, height, true, false);
         super.init();
     }
 
@@ -411,9 +466,25 @@ public class SettingsScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
+
         if (tickables.size() > 0)
             tickables.forEach(inputBox -> inputBox.setFocus(false));
-        return super.mouseClicked(pMouseX,pMouseY, pButton);
+
+        if (!super.mouseClicked(pMouseX, pMouseY, pButton)) {
+            checkWindowDrag(pMouseX, pMouseY);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean mouseReleased(double pMouseX, double pMouseY, int pButton) {
+        draggingWindow = false;
+        return super.mouseReleased(pMouseX, pMouseY, pButton);
+    }
+
+    private void checkWindowDrag(double x, double y) {
+        draggingWindow = (x < screenX || x > screenX + screenW) || (y < screenY || y > screenY + screenH);
     }
 
     protected void selectButton(int i) {
@@ -424,14 +495,16 @@ public class SettingsScreen extends Screen {
         organizeTabButtons();
     }
 
-    void setBounds(int width, int height, boolean init) {
-        this.screenW = Math.min(width>>1, 320);
-        this.screenH = Math.min((height>>2)*3, 300);
-        if (width > 720)
-            screenX = (width-screenW)>>1;
-        else
-            screenX = width - screenW - 10;
-        screenY = (height-screenH)>>1;
+    void setBounds(int width, int height, boolean init, boolean moved) {
+        if (!moved) {
+            this.screenW = Math.min(width>>1, 320);
+            this.screenH = Math.min((height>>2)*3, 300);
+            if (width > 720)
+                screenX = (width-screenW)>>1;
+            else
+                screenX = width - screenW - 10;
+            screenY = (height-screenH)>>1;
+        }
 
 
         eleBoxW = screenW - 32;
@@ -521,7 +594,8 @@ public class SettingsScreen extends Screen {
             }
         }
         updateOptionsBounds();
-
+        maxScreenX = minecraft.getWindow().getGuiScaledWidth();
+        maxScreenY = minecraft.getWindow().getGuiScaledHeight();
     }
 
     private void organizeTabButtons() {
@@ -578,7 +652,7 @@ public class SettingsScreen extends Screen {
 
 
     public void resize(Minecraft pMinecraft, int pWidth, int pHeight) {
-        setBounds(pWidth, pHeight, false);
+        setBounds(pWidth, pHeight, false, false);
         this.width = pWidth;
         this.height = pHeight;
     }

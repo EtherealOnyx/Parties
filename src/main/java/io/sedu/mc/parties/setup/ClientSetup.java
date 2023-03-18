@@ -83,8 +83,8 @@ public class ClientSetup {
 
         //DimConfig.init();
         //TODO: Save preset in folder. read file names in preset folder as valid presets. When loading preset, try to load. Revert to current if failed.
-        RenderItem.setDefaultValues();
         Config.init();
+        RenderItem.setDefaultValues();
         saveDefaultPresets();
 
     }
@@ -125,6 +125,10 @@ public class ClientSetup {
                """;
         Config.saveDefaultPresetFromString(updater, "models-v", "A minimalistic preset focused on rendering all party member's models. Vertical orientation.", load);
 
+        load = """
+               {"general":{"gen_x":16,"gen_y":16,"gen_w":168,"gen_h":64,"gen_pw":0,"gen_ph":63},"head":{"display":true,"htype":1,"xpos":8,"ypos":8,"zpos":0,"scale":2},"name":{"display":true,"tshadow":true,"tcolor":14545919,"tmax":16,"xpos":46,"ypos":9,"zpos":0,"scale":2},"leader":{"display":true,"xpos":34,"ypos":33,"zpos":2,"scale":2},"dim":{"display":true,"tdisplay":true,"danim":true,"xpos":4,"ypos":32,"zpos":1},"effects":{"display":true,"tdisplay":true,"bsize":1,"buffg":11134463,"buffb":16755113,"flash":16777215,"xpos":46,"ypos":41,"zpos":0,"scale":2,"idisplay":true,"spacex":30,"spacey":44,"rowmax":8,"totalmax":8,"bsep":false,"dfirst":true,"dlim":4,"blim":3},"effects_b":{"display":false,"tdisplay":true,"bsize":1,"buffg":11134463,"flash":16777215,"xpos":46,"ypos":41,"zpos":0,"scale":2,"idisplay":true,"spacex":30,"spacey":44,"rowmax":8,"totalmax":8},"effects_d":{"display":false,"tdisplay":true,"bsize":1,"buffb":16755113,"flash":16777215,"xpos":46,"ypos":41,"zpos":0,"scale":2,"idisplay":true,"spacex":30,"spacey":44,"rowmax":8,"totalmax":8},"armor":{"display":true,"scale":2,"zpos":0,"idisplay":true,"xpos":46,"ypos":19,"tdisplay":true,"tshadow":false,"tcolor":14545919,"tattached":true,"xtpos":0,"ytpos":0},"chicken":{"display":true,"scale":2,"zpos":0,"idisplay":true,"xpos":143,"ypos":19,"tdisplay":true,"tshadow":false,"tcolor":14545919,"tattached":true,"xtpos":0,"ytpos":0},"lvlbar":{"display":true,"scale":2,"zpos":0,"idisplay":true,"xpos":4,"ypos":44,"width":40,"tdisplay":true,"tshadow":true,"tcolor":8454027,"tattached":true,"xtpos":0,"ytpos":0},"health":{"display":true,"scale":2,"zpos":0,"idisplay":true,"xpos":46,"ypos":29,"width":120,"height":10,"tdisplay":true,"tshadow":true,"ttype":0,"tattached":true,"xtpos":0,"ytpos":0,"bhue":0,"ohue":11,"bcit":12976069,"bcib":7143276,"bcdt":16762309,"bcdb":16739436},"offline":{"display":true,"scale":2,"zpos":0,"idisplay":true,"xpos":156,"ypos":8,"tdisplay":true,"tshadow":false,"tcolor":14545919,"tattached":false,"xtpos":86,"ytpos":20},"dead":{"display":true,"xpos":157,"ypos":9,"zpos":0,"scale":2},"bg1":{"display":true,"xpos":44,"ypos":7,"width":124,"height":34},"bgc":{"xpos":7,"ypos":7,"width":159,"height":34}}
+               """;
+        Config.saveDefaultPresetFromString(updater, "standard", "The standard preset of this mod. UI is rpg-like.", load);
     }
 
     public static void postInit(FMLLoadCompleteEvent event) {

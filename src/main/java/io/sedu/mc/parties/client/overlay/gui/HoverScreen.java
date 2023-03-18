@@ -60,14 +60,6 @@ public class HoverScreen extends Screen {
         key = value;
     }
 
-    public static boolean arranging() {
-        return isArranging;
-    }
-
-    public static boolean moving() {
-        return isMoving;
-    }
-
     @Override
     protected void init() {
         trimmedMessages = minecraft.gui.getChat().trimmedMessages;
