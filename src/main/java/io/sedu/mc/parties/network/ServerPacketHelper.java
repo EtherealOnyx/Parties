@@ -2,7 +2,6 @@ package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.data.Util;
-import io.sedu.mc.parties.events.PartyEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.ClickEvent;
@@ -15,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static io.sedu.mc.parties.data.ServerConfigData.playerMessageCooldown;
 import static io.sedu.mc.parties.data.Util.*;
 
 public class ServerPacketHelper {
@@ -127,6 +127,6 @@ public class ServerPacketHelper {
     public static void sendMessageToAll(List<ServerPlayer> playerList, ServerPlayer sender, String data) {
         if (PlayerData.isOnMessageCd(sender.getUUID())) return;
         playerList.forEach((p) -> p.sendMessage(new TextComponent("<").append(sender.getName()).append(new TextComponent("> ")).append(new TextComponent("[").withStyle(ChatFormatting.DARK_AQUA)).append(new TextComponent("Preset").withStyle(style -> style.withColor(ChatFormatting.YELLOW).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, data)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("Click to copy preset to clipboard."))))).append(new TextComponent("]").withStyle(ChatFormatting.DARK_AQUA)).append(new TextComponent(" (Click to copy)").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC)), ChatType.CHAT, sender.getUUID()));
-        PlayerData.messageCd.add(new PlayerData.MessageCdHolder(sender.getUUID(), PartyEvent.playerMessageCooldown));
+        PlayerData.messageCd.add(new PlayerData.MessageCdHolder(sender.getUUID(), playerMessageCooldown));
     }
 }

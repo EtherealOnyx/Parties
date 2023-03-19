@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
+import static io.sedu.mc.parties.data.ServerConfigData.partySize;
 import static io.sedu.mc.parties.data.PlayerData.addTracker;
 import static io.sedu.mc.parties.data.PlayerData.removeTracker;
 
@@ -125,5 +126,9 @@ public class PartyData {
 
     public UUID getLeader() {
         return leader;
+    }
+
+    public boolean isFull() {
+        return party.size() >= partySize.get();
     }
 }

@@ -4,6 +4,7 @@ package io.sedu.mc.parties;
 
 import io.sedu.mc.parties.events.PartyEvent;
 import io.sedu.mc.parties.setup.ClientSetup;
+import io.sedu.mc.parties.setup.Config;
 import io.sedu.mc.parties.setup.ModSetup;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -26,7 +27,7 @@ public class Parties
         // Register the deferred registry
         //ModSetup.setup();
         //Registration.init();
-        //Config.register();
+        Config.register();
 
         // Register the setup method for mod-loading
         IEventBus modbus = FMLJavaModLoadingContext.get().getModEventBus();

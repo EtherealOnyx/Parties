@@ -9,7 +9,7 @@ modLoader="javafml" #mandatory
 loaderVersion="[40,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
-license="All rights reserved"
+license="All Rights Reserved"
 # A URL to refer people to when problems occur with this mod
 #issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #optional
 # A list of mods - how many allowed here is determined by the individual mod loader
@@ -19,7 +19,7 @@ modId="sedparties" #mandatory
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
 # ${file.jarVersion} will substitute the value of the Implementation-Version as read from the mod's JAR file metadata
 # see the associated build.gradle script for how to populate this completely automatically during a build
-version="${file.jarVersion}" #mandatory
+version="1.18.2-0.1.95" #mandatory
  # A display name for the mod
 displayName="Parties" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/
@@ -31,14 +31,42 @@ logoFile="sedparties.png" #optional
 # A text field displayed in the mod UI
 credits="" #optional
 # A text field displayed in the mod UI
-authors="EtherealOnyx, Sedulity" #optional
+authors="EtherealOnyx" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-This mod adds a party system to minecraft!
+⚑ This mod adds a party system to minecraft!
 
-Keep track of health, potion effects, hunger and more for each of your party members!
+Track your party members' health, xp, or even dimension!
+Choose from several presets or create your own...
+almost everything is configurable!
+Special support for other mods will be added over time!
 
-Support for other mods will be added over time!
+⭐ Configurable Elements:
+✔ Player Head/Model
+✔ Player Name
+✔ Leader Indicator
+✔ Dimension Indicator/Animation:
+    ⏵ (Mod Support: RFTools Dimensions)
+    ⏵ Default Preset Support:
+        ⏵ Vanilla Minecraft
+        ⏵ RFTools Dimensions
+        ⏵ Twilight Forest
+        ⏵ (Customizable Support)
+✔ Potion Effects:
+    ⏵ Buffs Only Bar
+    ⏵ Debuffs Only Bar
+    ⏵ Combined Buff/Debuff Bar
+✔ Armor Indicator
+✔ Hunger Indicator
+✔ Experience Bar
+✔ Health Bar/Animation
+✔ Offline Indicator
+✔ Dead Indicator
+✔ Transparent Box Background
+⏳Clickable Box Area
+⏳Mana Bar (Mod Support: Ars Noveau)
+
+⭐ NOTE: Items marked with ⏳ are not implemented yet and/or are still a work in progress.
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.sedparties]] #optional

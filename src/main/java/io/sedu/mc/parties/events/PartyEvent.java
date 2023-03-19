@@ -28,6 +28,7 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static io.sedu.mc.parties.data.ServerConfigData.playerUpdateInterval;
 import static io.sedu.mc.parties.data.Util.getPlayer;
 
 @Mod.EventBusSubscriber(modid = Parties.MODID)
@@ -72,14 +73,12 @@ public class PartyEvent {
         }
     }
 
-    private static final short playerUpdateInterval = 10;
-    public static final short playerAcceptTimer = 30;
-    public static final short playerMessageCooldown = 10;
+
 
     @SubscribeEvent
     public static void onEntityTick(TickEvent.PlayerTickEvent e) {
         if (e.side == LogicalSide.SERVER && e.phase == TickEvent.Phase.END) {
-            if (e.player.tickCount % playerUpdateInterval == 3) {
+            if (e.player.tickCount % playerUpdateInterval.get() == 3) {
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
@@ -142,9 +141,6 @@ public class PartyEvent {
         }
     }
 
-
-    //Client never receives any hunger updates OR xp level updates from the server for any entity aside from self.
-
     @SubscribeEvent
     public static void onEntityDamage(LivingDamageEvent event) {
         if (!event.getEntityLiving().level.isClientSide()) {
@@ -154,7 +150,7 @@ public class PartyEvent {
                     if (serverTracked) {
                         if (event.getAmount() != 0f) {
                             InfoPacketHelper.sendHealth(id, p.getUUID(), Math.max(p.getHealth() - event.getAmount(), 0f));
-                        } //else, send empty update to trigger refresh?
+                        }
                         InfoPacketHelper.sendAbsorb(id, p.getUUID(), p.getAbsorptionAmount());
                         //TODO: Max Health
                     }
@@ -171,8 +167,7 @@ public class PartyEvent {
                     if (serverTracked) {
                         if (event.getAmount() != 0f) {
                             InfoPacketHelper.sendHealth(id, p.getUUID(), Math.min(p.getHealth() + event.getAmount(), p.getMaxHealth()));
-                        }//else, send empty update to trigger refresh?
-                        //InfoPacketHelper.sendAbsorb(id, p.getUUID(), event.getAmount());
+                        }
                         //TODO: Max Health
                     }
                 });
@@ -255,9 +250,6 @@ public class PartyEvent {
 
     @SubscribeEvent
     public static void onPotionAdded(PotionEvent.PotionAddedEvent event) {
-        System.out.println("Potion Effect Added: " + event.getPotionEffect().getAmplifier() + " | " + event.getPotionEffect().getDuration());
-        //TODO : Send client data of potion added.
-        //TODO: Send client data if the entity is being tracked.
         if (!event.getEntityLiving().level.isClientSide()) {
             if (event.getEntity() instanceof Player p) {
                 InfoPacketHelper.sendEffect(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()), event.getPotionEffect().getDuration(),
@@ -275,8 +267,6 @@ public class PartyEvent {
     }
     @SubscribeEvent
     public static void onPotionRemoved(PotionEvent.PotionRemoveEvent event) {
-        //TODO : Send client data of potion removed.
-        //TODO: Send client data if the entity is being tracked.
         if (!event.getEntityLiving().level.isClientSide()) {
             if (event.getEntity() instanceof Player p) {
                 InfoPacketHelper.sendEffectExpired(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
@@ -292,8 +282,6 @@ public class PartyEvent {
 
     @SubscribeEvent
     public static void onPotionExpired(PotionEvent.PotionExpiryEvent event) {
-        //TODO : Send client data of potion removed.
-        //TODO: Send client data if the entity is being tracked.
         if (!event.getEntityLiving().level.isClientSide()) {
             if (event.getEntity() instanceof Player p) {
                 InfoPacketHelper.sendEffectExpired(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
@@ -305,14 +293,6 @@ public class PartyEvent {
                 }
             }
         }
-    }
-
-    @SubscribeEvent
-    public static void track(PlayerEvent.StartTracking event) {
-    }
-
-    @SubscribeEvent
-    public static void untrack(PlayerEvent.StopTracking event) {
     }
 
     @SubscribeEvent

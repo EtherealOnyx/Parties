@@ -1,10 +1,13 @@
 package io.sedu.mc.parties.data;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Util {
@@ -53,8 +56,14 @@ public class Util {
 
     public static boolean isLeader(UUID playerId) {
         PartyData p;
-        if ((p = getPartyFromMember(playerId)) != null)
-            return p.isLeader(playerId);
+        if ((p = getPartyFromMember(playerId)) != null) {
+            if (!p.isLeader(playerId)) {
+                Objects.requireNonNull(getServerPlayer(playerId)).sendMessage(new TextComponent(
+                        "Only the party leader can kick other players.").withStyle(ChatFormatting.DARK_AQUA), playerId);
+                return false;
+            }
+            return true;
+        }
         return false;
     }
 

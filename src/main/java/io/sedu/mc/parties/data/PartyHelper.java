@@ -99,7 +99,6 @@ public class PartyHelper {
 
     public static void questionPlayer(UUID initiator, UUID futureMember) {
         //This checks if futureMember is a valid player that exists on the server.
-        
         if (verifyRequest(initiator, futureMember) && !getPlayer(futureMember).isInviter(initiator)) {
             
             getPlayer(futureMember).addInviter(initiator);
@@ -151,20 +150,27 @@ public class PartyHelper {
     }
 
     private static boolean verifyRequest(UUID initiator, UUID futureMember) {
-        if (getPlayer(futureMember) == null || getPlayer(initiator) == null || initiator.equals(futureMember)) {
+        ServerPlayer p;
+        if (getPlayer(futureMember) == null || (p = getServerPlayer(initiator)) == null || initiator.equals(futureMember)) {
             
             return false;
         }
         
         //This checks if the target is currently in a party.
         if (getPlayer(futureMember).hasParty()) {
-            
+            p.sendMessage(new TextComponent(getPlayer(futureMember).getName()).withStyle(ChatFormatting.YELLOW).append(new TextComponent(
+                    " is already in a party.").withStyle(ChatFormatting.DARK_AQUA)), initiator);
+            return false;
+        }
+        if (getPlayer(initiator).hasParty() && !isLeader(initiator)) {
+            p.sendMessage(new TextComponent(
+                    "Only the party leader can invite other players.").withStyle(ChatFormatting.DARK_AQUA), initiator);
             return false;
         }
 
-
-        if (getPlayer(initiator).hasParty() && !isLeader(initiator)) {
-
+        if (getPartyFromMember(initiator).isFull()) {
+            p.sendMessage(new TextComponent(
+                    "Your party is full.").withStyle(ChatFormatting.DARK_AQUA), initiator);
             return false;
         }
 
