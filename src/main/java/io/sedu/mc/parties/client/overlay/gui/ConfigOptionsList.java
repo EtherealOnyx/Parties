@@ -40,8 +40,6 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         int getColor();
     }
 
-    //TODO: Combine entry lists
-
     public ConfigOptionsList(EntryColor color, SettingsScreen s, Minecraft pMinecraft, int x, int y, int w, int h, boolean parsing) {
         super(pMinecraft, w, h, x, y, 20);
         this.entryColor = color;

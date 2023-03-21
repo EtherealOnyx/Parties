@@ -65,6 +65,23 @@ public class RenderUtils {
         };
     }
 
+    public static Button.OnTooltip transTip(Screen s, TranslatableComponent t) {
+        return new Button.OnTooltip() {
+            private final Component text = t;
+
+            public void onTooltip(Button b, PoseStack p, int mX, int mY) {
+                if (b.active) {
+                    s.renderTooltip(p, text, mX, mY+16);
+                }
+
+            }
+
+            public void narrateTooltip(Consumer<Component> p_169456_) {
+                p_169456_.accept(this.text);
+            }
+        };
+    }
+
     public static Button.OnTooltip tip(SettingsScreen s, TranslatableComponent tC) {
         return new Button.OnTooltip() {
             private final Component text = tC;

@@ -13,6 +13,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
@@ -103,24 +104,24 @@ public class HoverScreen extends Screen {
     }
 
     private void initMenuButtons(int x, int y) {
-        menu.add(addRenderableWidget(new SmallButton(x, y,"x", p -> doTask(0), tip(this, "Close Menu"), .5f, 0f, 1f, .5f, .5f)));
-        menu.add(addRenderableWidget(new SmallButton(x+11, y,"⬆⬇", p -> doTask(2), tip(this, "Change Party Order"), .5f, .25f, .5f, .5f, 1f)));
-        menu.add(addRenderableWidget(new SmallButton(x+22, y,"✥", p -> doTask(3), tip(this, "Reposition Party Frame"), 0, 1, .5f, .5f, 1f)));
-        menu.add(addRenderableWidget(new SmallButton(x+33, y,"⚙", p -> doTask(4), tip(this, "Open Advanced Settings"), 0, .5f, .5f, 1f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(x, y, "x", p -> doTask(0), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), .5f, 0f, 1f, .5f, .5f)));
+        menu.add(addRenderableWidget(new SmallButton(x+11, y,"⬆⬇", p -> doTask(2), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rearrange")), .5f, .25f, .5f, .5f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(x+22, y,"✥", p -> doTask(3), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.move")), 0, 1, .5f, .5f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(x+33, y,"⚙", p -> doTask(4), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.advsettings")), 0, .5f, .5f, 1f, 1f)));
 
     }
 
     private void initDragButtons() {
         int y = Math.max(0, frameY - 10);
-        moveFrame.add(addRenderableWidget(new SmallButton(frameX, y, "x", p -> revertPos(), tip(this, "Revert & Close"),.5f, 0f, 1, .5f, .5f)));
-        moveFrame.add(addRenderableWidget(new SmallButton(frameX+11, y,"↺", p -> defaultPos(), tip(this, "Reset To Default & Close"), .5f, 1f, 1f)));
-        Button b = addRenderableWidget(new SmallButton(frameX+22, y,"◄", p -> updatePos(true), tip(this, "Undo Move"), 1, 1, .5f));
+        moveFrame.add(addRenderableWidget(new SmallButton(frameX, y, "x", p -> revertPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")),.5f, 0f, 1, .5f, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(frameX+11, y,"↺", p -> defaultPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")), .5f, 1f, 1f)));
+        Button b = addRenderableWidget(new SmallButton(frameX+22, y,"◄", p -> updatePos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.umove")), 1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        b = addRenderableWidget(new SmallButton(frameX+33, y, "►", p -> updatePos(false), tip(this, "Redo Move"),1, 1, .5f));
+        b = addRenderableWidget(new SmallButton(frameX+33, y, "►", p -> updatePos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rmove")),1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        moveFrame.add(addRenderableWidget(new SmallButton(frameX+44, y,"✓", p -> acceptPos(), tip(this, "Save Position & Close"), .5f, 1, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(frameX+44, y,"✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
 
     }
 

@@ -7,7 +7,7 @@ import io.sedu.mc.parties.client.overlay.GeneralOptions;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.codec.binary.Base64;
@@ -151,7 +151,7 @@ public class Config {
     }
 
     public static void copyPreset(Minecraft minecraft, HashMap<String, RenderItem.Getter> getter) {
-        minecraft.keyboardHandler.setClipboard(getPresetString(minecraft, getter));
+        minecraft.keyboardHandler.setClipboard(getPresetString(getter));
     }
 
     public static boolean pastePreset(Minecraft minecraft, HashMap<String, RenderItem.Update> updater) {
@@ -159,8 +159,8 @@ public class Config {
         try {
             String bits = minecraft.keyboardHandler.getClipboard();
             if (Integer.parseInt(bits.substring(0, bits.indexOf('|'))) != Parties.ENCODE_VERSION) {
-                minecraft.player.sendMessage(new TextComponent("Load not successful because preset is of a different version.").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), minecraft.player.getUUID());
-                minecraft.player.sendMessage(new TextComponent("Try loading a file instead or copy a preset of the same version (v. " + Parties.ENCODE_VERSION + ")").withStyle(ChatFormatting.GRAY), minecraft.player.getUUID());
+                minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.config.loadfail").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), minecraft.player.getUUID());
+                minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.config.loadfailv").append("(v. " + Parties.ENCODE_VERSION + ")").withStyle(ChatFormatting.GRAY), minecraft.player.getUUID());
                 return false;
             }
             bits = bits.substring(bits.indexOf('|') + 1);
@@ -186,7 +186,7 @@ public class Config {
         }
     }
 
-    public static String getPresetString(Minecraft minecraft, HashMap<String, RenderItem.Getter> getter) {
+    public static String getPresetString(HashMap<String, RenderItem.Getter> getter) {
         StringBuilder bits = new StringBuilder();
         bits.append(GeneralOptions.INSTANCE.getCurrentValues(getter).getBits());
         RenderItem.items.values().forEach((item) -> bits.append(item.getCurrentValues(getter).getBits()));

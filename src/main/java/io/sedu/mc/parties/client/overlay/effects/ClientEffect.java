@@ -62,7 +62,7 @@ public class ClientEffect {
         return String.valueOf(cur.duration);
     }
 
-    class Effect { //TODO: Tick all hidden effects. Remove them if the duration < 0. Remove entire effect structure on expirey event from server (markForRemoval), Implement amp tracker.
+    class Effect {
         int duration; //In seconds
         int amp;
         Effect hidden;

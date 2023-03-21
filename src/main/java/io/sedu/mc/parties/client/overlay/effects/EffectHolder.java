@@ -13,7 +13,6 @@ import static io.sedu.mc.parties.client.overlay.PEffectsBoth.bLim;
 
 public class EffectHolder {
 
-    //TODO: Add config
     HashMap<Integer, ClientEffect> effects = new HashMap<>();
     public List<Integer> sortedEffectAll = new ArrayList<>();
     public List<Integer> sortedEffectBene = new ArrayList<>();

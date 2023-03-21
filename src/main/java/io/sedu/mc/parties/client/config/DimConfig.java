@@ -2,7 +2,7 @@ package io.sedu.mc.parties.client.config;
 
 import io.sedu.mc.parties.Parties;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -87,7 +87,7 @@ public class DimConfig {
         dimEntries.clear();
         init();
         Config.forEachDimFile(list -> list.forEach(DimConfig::addDimEntry));
-        Minecraft.getInstance().player.displayClientMessage(new TextComponent("Configurations reloaded successfully."), true);
+        Minecraft.getInstance().player.displayClientMessage(new TranslatableComponent("messages.sedparties.config.reloadsuccess"), true);
     }
 
     private static void addDimEntry(DimEntryConfig entry) {

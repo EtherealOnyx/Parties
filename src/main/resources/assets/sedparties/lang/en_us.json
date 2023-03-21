@@ -143,6 +143,23 @@
   "config.sedparties.tooltip.bcdt": "The top gradient color of the health decrease animation",
   "config.sedparties.tooltip.bcdb": "The bottom gradient color of the health decrease animation",
   "config.sedparties.tooltip.ttype": "Text display type. Options are a ratio, current health only, and a percentage.",
-  "config.sedparties.tooltip.htype": "Changes the head display. 0 for icons, 1 for self model only, 2 for party models."
+  "config.sedparties.tooltip.htype": "Changes the head display. 0 for icons, 1 for self model only, 2 for party models.",
+
+
+  "messages.sedparties.config.loadfail": "Load not successful because preset is of a different version.",
+  "messages.sedparties.config.loadfailv": "Try loading a file instead or copy a preset of the same version.",
+  "messages.sedparties.config.reloadsuccess": "Configurations reloaded successfully.",
+
+  "gui.sedparties.tooltip.close": "Close Menu",
+  "gui.sedparties.tooltip.rearrange": "Change Party Order",
+  "gui.sedparties.tooltip.move": "Reposition Party Frame",
+  "gui.sedparties.tooltip.advsettings": "Open Advanced Settings",
+  "gui.sedparties.tooltip.rclose": "Revert & Close",
+  "gui.sedparties.tooltip.dclose": "Reset to Default & Close",
+  "gui.sedparties.tooltip.umove": "Undo Move",
+  "gui.sedparties.tooltip.rmove": "Redo Move",
+  "gui.sedparties.tooltip.sclose": "Save Position & Close",
+  "gui.sedparties.tooltip.confirmreset": "Are you sure? Click again to confirm."
+
 }
 

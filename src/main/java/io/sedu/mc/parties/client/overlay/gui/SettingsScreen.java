@@ -107,7 +107,7 @@ public class SettingsScreen extends Screen {
         super(new TextComponent("Party Advanced Settings"));
         miscButtons = new ArrayList<>();
         isPresetOnly = b;
-        confirmPrompt = new TextComponent("Are you sure? Click again to confirm").withStyle(ChatFormatting.DARK_RED);
+        confirmPrompt = new TranslatableComponent("gui.sedparties.tooltip.confirmreset").withStyle(ChatFormatting.DARK_RED);
     }
 
 
@@ -386,7 +386,7 @@ public class SettingsScreen extends Screen {
 
     private void sendPresetToChat() {
         if (sentMessage) return;
-        PartiesPacketHandler.sendToServer(new StringPacketData(0, Config.getPresetString(minecraft, getter)));
+        PartiesPacketHandler.sendToServer(new StringPacketData(0, Config.getPresetString(getter)));
         sentMessage = true;
         messageCooldown = 300;
         miscButtons.get(10).active = false;
