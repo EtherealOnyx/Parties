@@ -145,16 +145,19 @@ public class PartyEvent {
     public static void onEntityDamage(LivingDamageEvent event) {
         if (!event.getEntityLiving().level.isClientSide()) {
             HashMap<UUID, Boolean> trackers;
-            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
-                trackers.forEach((id, serverTracked) -> {
-                    if (serverTracked) {
-                        if (event.getAmount() != 0f) {
-                            InfoPacketHelper.sendHealth(id, p.getUUID(), Math.max(p.getHealth() - event.getAmount(), 0f));
+            if (event.getEntity() instanceof Player p) {
+                InfoPacketHelper.sendClose((ServerPlayer) p);
+                if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                    trackers.forEach((id, serverTracked) -> {
+                        if (serverTracked) {
+                            if (event.getAmount() != 0f) {
+                                InfoPacketHelper.sendHealth(id, p.getUUID(), Math.max(p.getHealth() - event.getAmount(), 0f));
+                            }
+                            InfoPacketHelper.sendAbsorb(id, p.getUUID(), p.getAbsorptionAmount());
+                            //TODO: Max Health
                         }
-                        InfoPacketHelper.sendAbsorb(id, p.getUUID(), p.getAbsorptionAmount());
-                        //TODO: Max Health
-                    }
-                });
+                    });
+                }
             }
         }
     }

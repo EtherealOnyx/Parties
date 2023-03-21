@@ -267,7 +267,6 @@ public class ClientPlayerData {
 
     public void setHealth(float data) {
         health.checkHealth(data);
-        System.out.println("Health Set: " + data);
     }
 
     public void setAbsorb(float data) {
@@ -324,9 +323,6 @@ public class ClientPlayerData {
     public void tick() {
         if (trackedOnClient)
             health.checkAnim(clientPlayer.getHealth(), clientPlayer.getMaxHealth(), clientPlayer.getAbsorptionAmount());
-        //Potion
-        //TODO: Decide if we automatically remove effects or wait for the server to tell us to remove them.
-        //Remove automatically for now.
     }
 
     public void slowTick() {

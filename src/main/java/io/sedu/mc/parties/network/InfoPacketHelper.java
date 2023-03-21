@@ -114,4 +114,8 @@ public class InfoPacketHelper {
     public static void sendXpBar(UUID sendTo, UUID propOf, float bar) {
         sendData(getServerPlayer(sendTo), propOf, 14, bar);
     }
+
+    public static void sendClose(ServerPlayer p) {
+        PartiesPacketHandler.sendToPlayer(new ClientPacketData(8), p);
+    }
 }

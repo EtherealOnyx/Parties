@@ -1,7 +1,9 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.client.config.DimConfig;
+import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.setup.ClientSetup;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -95,11 +97,20 @@ public class ClientPacketData {
                 DimConfig.reload();
                 ClientSetup.saveDefaultPresets(true);
             }
+            case 8 -> {
+                ClientPacketData.closeScreens();
+            }
             default -> {
                 return false;
             }
         }
         return true;
+    }
+
+    private static void closeScreens() {
+        if (Minecraft.getInstance().screen instanceof SettingsScreen) {
+            Minecraft.getInstance().setScreen(null);
+        }
     }
 
 
