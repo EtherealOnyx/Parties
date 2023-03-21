@@ -71,6 +71,16 @@ public class Config {
         }
     }
 
+    public static JsonObject savePresetToObject() {
+        JsonObject json = new JsonObject();
+        HashMap<String, RenderItem.Getter> itemGetter = new HashMap<>();
+        RenderItem.initGetter(itemGetter);
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        json.add("general", RenderItem.getGeneralValues().getJsonEntries(gson));
+        RenderItem.items.forEach((itemName, item) -> json.add(itemName, item.getCurrentValues(itemGetter).getJsonEntries(gson)));
+        return json;
+    }
+
     public static void getDefaultPresets(BiConsumer<String, String> action) {
         getPresets(DEFAULT_PRESET_PATH, action);
     }
@@ -234,5 +244,11 @@ public class Config {
         updateValues(GeneralOptions.INSTANCE, element, updater);
         RenderItem.items.forEach((name, item) -> updateValues(item, jsonObject.get(name), updater));
         saveDefaultPreset(fileName, description);
+    }
+
+    public static void loadPresetFromObject(JsonObject jsonObject, HashMap<String, RenderItem.Update> updater) {
+        JsonElement element = jsonObject.get("general");
+        updateValues(GeneralOptions.INSTANCE, element, updater);
+        RenderItem.items.forEach((name, item) -> updateValues(item, jsonObject.get(name), updater));
     }
 }

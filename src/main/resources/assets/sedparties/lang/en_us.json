@@ -145,10 +145,20 @@
   "config.sedparties.tooltip.ttype": "Text display type. Options are a ratio, current health only, and a percentage.",
   "config.sedparties.tooltip.htype": "Changes the head display. 0 for icons, 1 for self model only, 2 for party models.",
 
+  "config.sedparties.tooltip.enableb": "Enabled",
+  "config.sedparties.tooltip.disableb": "Disabled",
+
 
   "messages.sedparties.config.loadfail": "Load not successful because preset is of a different version.",
   "messages.sedparties.config.loadfailv": "Try loading a file instead or copy a preset of the same version.",
   "messages.sedparties.config.reloadsuccess": "Configurations reloaded successfully.",
+
+  "messages.sedparties.preset.pasteload": "Preset loaded from clipboard successfully",
+  "messages.sedparties.preset.pastefail": "The clipboard doesn't contain a valid preset",
+  "messages.sedparties.preset.save1": "Preset saved as ",
+  "messages.sedparties.preset.save2": " successfully.",
+  "messages.sedparties.preset.savefail": "There was an issue saving the preset.",
+  "messages.sedparties.preset.copy": "Preset has been copied to clipboard.",
 
   "gui.sedparties.tooltip.close": "Close Menu",
   "gui.sedparties.tooltip.rearrange": "Change Party Order",
@@ -159,7 +169,34 @@
   "gui.sedparties.tooltip.umove": "Undo Move",
   "gui.sedparties.tooltip.rmove": "Redo Move",
   "gui.sedparties.tooltip.sclose": "Save Position & Close",
-  "gui.sedparties.tooltip.confirmreset": "Are you sure? Click again to confirm."
+  "gui.sedparties.tooltip.partysettings": "Open Party Settings",
+  "gui.sedparties.tooltip.usepreset": "Use a Preset",
+  "gui.sedparties.tooltip.movedown": "Move Down",
+  "gui.sedparties.tooltip.moveup": "Move Up",
+  "gui.sedparties.tooltip.showfilters": "Show Filters",
+  "gui.sedparties.tooltip.hidefilters": "Hide Filters",
+  "gui.sedparties.tooltip.loadpresetb": "Load Preset",
+  "gui.sedparties.tooltip.delpresetb": "Delete Preset",
+
+  "gui.sedparties.tooltip.confirmreset": "Are you sure? Click again to confirm.",
+  "gui.sedparties.name.namebox": "Name",
+  "gui.sedparties.name.descbox": "Desc",
+  "gui.sedparties.tooltip.rgbtoggle": "Toggle RGB Input Mode",
+  "gui.sedparties.tooltip.eleoff": "Turn All Other Elements Off",
+  "gui.sedparties.tooltip.eleon": "Turn All Other Elements On",
+  "gui.sedparties.tooltip.curdefault": "Reset Current Element to Default",
+  "gui.sedparties.tooltip.alldefault": "Reset Every Element to Default",
+  "gui.sedparties.tooltip.savepreset": "Save Preset",
+  "gui.sedparties.tooltip.copypreset": "Copy Preset to Clipboard",
+  "gui.sedparties.tooltip.loadpreset": "Load Preset From Clipboard",
+  "gui.sedparties.tooltip.linkpreset": "Link Preset to Chat",
+
+  "ui.sedparties.tooltip.armor": "Armor: ",
+  "ui.sedparties.tooltip.hunger": "Hunger: ",
+  "ui.sedparties.tooltip.health": "Health: ",
+  "ui.sedparties.tooltip.leader": "Party Leader"
+
+
 
 }
 

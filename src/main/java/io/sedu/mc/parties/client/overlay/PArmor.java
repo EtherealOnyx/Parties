@@ -7,6 +7,7 @@ import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
 public class PArmor extends RenderIconTextItem implements TooltipItem {
 
+    private TranslatableComponent tipName = new TranslatableComponent("ui.sedparties.tooltip.armor");
     public PArmor(String name) {
         super(name);
         width = 9;
@@ -96,10 +98,6 @@ public class PArmor extends RenderIconTextItem implements TooltipItem {
         return c;
     }
 
-    //TODO: Make setDefaults return a LinkedHashMap filled with defaults and their entry name. "xpos, tcolor, etc"
-    //TODO: Rename setDefaults to getDefaults()
-    //TODO: This will be used to preserve
-
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
@@ -122,7 +120,7 @@ public class PArmor extends RenderIconTextItem implements TooltipItem {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData p;
         if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
-            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Armor: " + p.getArmor(), 0xabfcff, 0x629b9e, 0xd1d1d1);
+            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + p.getArmor(), 0xabfcff, 0x629b9e, 0xd1d1d1);
         }
     }
 }

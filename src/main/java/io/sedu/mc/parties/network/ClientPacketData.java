@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.client.config.DimConfig;
+import io.sedu.mc.parties.setup.ClientSetup;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -90,7 +91,10 @@ public class ClientPacketData {
             case 6 -> ClientPacketHelper.disbandParty();
 
             //#7 Reload config
-            case 7 -> DimConfig.reload();
+            case 7 -> {
+                DimConfig.reload();
+                ClientSetup.saveDefaultPresets(true);
+            }
             default -> {
                 return false;
             }

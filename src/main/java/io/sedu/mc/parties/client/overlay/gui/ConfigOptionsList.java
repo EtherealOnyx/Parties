@@ -198,8 +198,8 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             }
             this.name = new TranslatableComponent("config.sedparties.name." + name);
             this.isEnabled = isEnabled;
-            disable = new SmallButton(0, 0, "✓", pButton -> updateVal(false), RenderUtils.tip(s, "Enabled"), .5f, 1f, .5f, .5f);
-            enable = new SmallButton(0, 0, "x", pButton -> updateVal(true), RenderUtils.tip(s, "Disabled"), 1f, .5f, .5f, .5f);
+            disable = new SmallButton(0, 0, "✓", pButton -> updateVal(false), RenderUtils.transTip(s, new TranslatableComponent("config.sedparties.tooltip.enableb")), .5f, 1f, .5f, .5f);
+            enable = new SmallButton(0, 0, "x", pButton -> updateVal(true), RenderUtils.transTip(s, new TranslatableComponent("config.sedparties.tooltip.disableb")), 1f, .5f, .5f, .5f);
             enable.visible = !isEnabled;
             disable.visible = isEnabled;
             internal = name;
@@ -757,7 +757,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
                     s.selectButton(-1);
                 }
 
-            }, RenderUtils.tip(s, "Load Preset"), .5f, 1f, .5f, .5f);
+            }, RenderUtils.transTip(s, new TranslatableComponent("gui.sedparties.tooltip.loadpresetb")), .5f, 1f, .5f, .5f);
             deletePreset = new SmallButton(0, 0, "x", pButton -> {
                 assert minecraft.player != null;
                 if (Config.deletePreset(file)) {
@@ -766,7 +766,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
                     minecraft.player.sendMessage(new TextComponent("Preset (").withStyle(ChatFormatting.DARK_AQUA).append(new TextComponent(fileName).withStyle(ChatFormatting.YELLOW)).append(new TextComponent(") was not found.").withStyle(ChatFormatting.DARK_AQUA)), minecraft.player.getUUID());
                 }
                 s.selectButton(-1);
-            }, RenderUtils.tip(s, "Delete Preset"), 1f, .5f, .5f, .5f);
+            }, RenderUtils.transTip(s, new TranslatableComponent("gui.sedparties.tooltip.delpresetb")), 1f, .5f, .5f, .5f);
             deletePreset.active = !isDefault;
             this.markDirty();
         }

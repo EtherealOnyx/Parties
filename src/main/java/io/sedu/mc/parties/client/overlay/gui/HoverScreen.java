@@ -68,9 +68,9 @@ public class HoverScreen extends Screen {
         ColorUtils.colorCycle = true;
         int y = Math.max(0, clickArea.t(0) - 10);
         int x = clickArea.l(0);
-        settingsButton = addRenderableWidget(new SmallButton(x, y, "⚙", p -> doTask(1), tip(this, "Open Party Settings"), 0, .5f, .5f, .5f, 1f));
-        presetButton = addRenderableWidget(new SmallButton(x+11, y, "☰", p -> doTask(5), tip(this, "Use a Preset"), .5f, 1, 0f, 1f, 1f));
-        goBackButton = addRenderableWidget(new SmallButton(x, y,"x", p -> doTask(1), tip(this, "Close"), 1f, .5f, .5f));
+        settingsButton = addRenderableWidget(new SmallButton(x, y, "⚙", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.partysettings")), 0, .5f, .5f, .5f, 1f));
+        presetButton = addRenderableWidget(new SmallButton(x+11, y, "☰", p -> doTask(5), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.usepreset")), .5f, 1, 0f, 1f, 1f));
+        goBackButton = addRenderableWidget(new SmallButton(x, y,"x", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), 1f, .5f, .5f));
         initPartyButtons();
         initMenuButtons(x, y);
         initDragButtons();
@@ -84,20 +84,20 @@ public class HoverScreen extends Screen {
             for (int i = 0; i < ClientPlayerData.partySize(); i++) {
                 int finalI = i;
                 if (i == ClientPlayerData.partySize()-1) {
-                    b = addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, tip(this, "Move Down")));
+                    b = addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
                     b.active = false;
                     moveParty.add(b);
                 }
                 else
-                    moveParty.add(addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI+1), tip(this, "Move Down"))));
+                    moveParty.add(addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI+1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
 
                 if (i == 0) {
-                    b = addRenderableWidget(new Button(clickArea.l(i) , clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, tip(this, "Move Up")));
+                    b = addRenderableWidget(new Button(clickArea.l(i) , clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
                     b.active = false;
                     moveParty.add(b);
                 }
                 else
-                    moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI-1, finalI), tip(this, "Move Up"))));
+                    moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI-1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
                 //rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
             }
         }

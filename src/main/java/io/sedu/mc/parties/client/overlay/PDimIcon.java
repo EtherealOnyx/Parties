@@ -24,6 +24,7 @@ import static io.sedu.mc.parties.util.AnimUtils.animPos;
 
 public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
+
     protected static PHead head = null;
 
     public PDimIcon(String name) {

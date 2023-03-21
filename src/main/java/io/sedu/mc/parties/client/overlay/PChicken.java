@@ -8,6 +8,7 @@ import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
 public class PChicken extends RenderIconTextItem implements TooltipItem {
 
+    private TranslatableComponent tipName = new TranslatableComponent("ui.sedparties.tooltip.hunger");
 
     public PChicken(String name) {
         super(name);
@@ -148,7 +150,7 @@ public class PChicken extends RenderIconTextItem implements TooltipItem {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData p;
         if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
-            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Hunger: " + (isSelf(index) ? p.getHungerForced() : p.getHunger()), 0xb88458, 0x613c1b, 0xffd5b0);
+            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (isSelf(index) ? p.getHungerForced() : p.getHunger()), 0xb88458, 0x613c1b, 0xffd5b0);
 
         }
     }

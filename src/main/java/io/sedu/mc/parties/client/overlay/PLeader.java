@@ -7,12 +7,15 @@ import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
 
 public class PLeader extends RenderItem implements TooltipItem{
+
+    private TranslatableComponent tipName = new TranslatableComponent("ui.sedparties.tooltip.leader");
 
     public PLeader(String name) {
         super(name);
@@ -72,6 +75,6 @@ public class PLeader extends RenderItem implements TooltipItem{
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         if (ClientPlayerData.getOrderedPlayer(index).isLeader())
-            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Party Leader", 0xFFF2A9, 0x978B47, 0xFFE554);
+            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName, 0xFFF2A9, 0x978B47, 0xFFE554);
     }
 }

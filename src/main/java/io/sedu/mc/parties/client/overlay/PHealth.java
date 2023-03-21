@@ -10,6 +10,7 @@ import io.sedu.mc.parties.util.ColorUtils;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
@@ -19,6 +20,8 @@ import static io.sedu.mc.parties.util.AnimUtils.animPos;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
 public class PHealth extends RenderIconTextItem implements TooltipItem {
+
+    private TranslatableComponent tipName = new TranslatableComponent("ui.sedparties.tooltip.health");
 
     int hue = 0;
     int oHue = 0;
@@ -323,7 +326,7 @@ public class PHealth extends RenderIconTextItem implements TooltipItem {
         ClientPlayerData p;
         if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
             HealthAnim h = p.health;
-            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Health: " + (h.cur + h.absorb) + "/" + h.max, 0xfc807c, 0x4d110f, 0xffbfbd);
+            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur + h.absorb) + "/" + h.max, 0xfc807c, 0x4d110f, 0xffbfbd);
 
         }
     }

@@ -364,19 +364,19 @@ public class SettingsScreen extends Screen {
     InputBox nameBox;
     InputBox descBox;
     void initMiscButtons() {
-        miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), tip(this, "Show Mod Filters")));
-        miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), tip(this, "Hide Mod Filters")));
-        miscButtons.add(new SmallButton(0, 0, "c", b -> toggleRGB(), tip(this, "Toggle RGB Input Mode"), .5f, 0f, 0.5f, 0.5f, 0.5f));
-        miscButtons.add(new SmallButton(0, 0, "x", b -> toggleEles(false), tip(this, "Turn All Other Elements Off"), 1f, 0.5f, 0.5f));
-        miscButtons.add(new SmallButton(0, 0, "✓", b -> toggleEles(true), tip(this, "Turn All Other Elements On"), 0.5f, 1f, 0.5f));
-        miscButtons.add(new SmallButton(0,0, "↺", b -> resetEle(), tip(this, "Reset Current Element to Default"), .5f, 1f, 1f));
-        miscButtons.add(new SmallButton(0,0, "↺", b -> resetAll(), tip(this, "Reset Everything to Default"), 1f, 1f, 0.5f));
-        miscButtons.add(new SmallButton(0,0, "s", b -> savePreset(), tip(this, "Save Preset"), .5f, 0f, 0.5f, 1f, 0.5f));
-        miscButtons.add(new SmallButton(0,0, "c", b -> copyPreset(), tip(this, "Copy Preset to Clipboard"), .5f, 0f,1f, 0.5f, 1f));
-        miscButtons.add(new SmallButton(0,0, "p", b -> pastePreset(), tip(this, "Load Preset from Clipboard"),.5f, 0f, 1f, 0.5f, 1f));
-        miscButtons.add(new SmallButton(0, 0, "✎", b -> sendPresetToChat(), tip(this, "Link Preset to Chat"), 0, 1, 1f, 0.5f, 1f));
-        nameBox = new InputBox(0xFFFFFF, font, 0, 12, new TextComponent("Name"), (s) -> checkSaveFlags(), false);
-        descBox = new InputBox(0xFFFFFF, font, 0, 12, new TextComponent("Desc"), (s) -> checkSaveFlags(), false);
+        miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("►"), b -> toggleModBox(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.showfilters"))));
+        miscButtons.add(new ColorButton(0x6536c3, 0, 0, 20, 20, new TextComponent("◄"), b -> toggleModBox(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.hidefilters"))));
+        miscButtons.add(new SmallButton(0, 0, "c", b -> toggleRGB(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rgbtoggle")), .5f, 0f, 0.5f, 0.5f, 0.5f));
+        miscButtons.add(new SmallButton(0, 0, "x", b -> toggleEles(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.eleoff")), 1f, 0.5f, 0.5f));
+        miscButtons.add(new SmallButton(0, 0, "✓", b -> toggleEles(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.eleon")), 0.5f, 1f, 0.5f));
+        miscButtons.add(new SmallButton(0,0, "↺", b -> resetEle(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.curdefault")), .5f, 1f, 1f));
+        miscButtons.add(new SmallButton(0,0, "↺", b -> resetAll(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.alldefault")), 1f, 1f, 0.5f));
+        miscButtons.add(new SmallButton(0,0, "s", b -> savePreset(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.savepreset")), .5f, 0f, 0.5f, 1f, 0.5f));
+        miscButtons.add(new SmallButton(0,0, "c", b -> copyPreset(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.copypreset")), .5f, 0f,1f, 0.5f, 1f));
+        miscButtons.add(new SmallButton(0,0, "p", b -> pastePreset(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.loadpreset")),.5f, 0f, 1f, 0.5f, 1f));
+        miscButtons.add(new SmallButton(0, 0, "✎", b -> sendPresetToChat(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.linkpreset")), 0, 1, 1f, 0.5f, 1f));
+        nameBox = new InputBox(0xFFFFFF, font, 0, 12, new TranslatableComponent("gui.sedparties.name.namebox"), (s) -> checkSaveFlags(), false);
+        descBox = new InputBox(0xFFFFFF, font, 0, 12, new TranslatableComponent("gui.sedparties.name.descbox"), (s) -> checkSaveFlags(), false);
         nameBox.filter = s -> alphaNumeric.matcher(s).find();
         nameBox.insertText(nameHolder == null ? "" : nameHolder);
         descBox.insertText(descHolder == null ? "" : descHolder);
@@ -395,29 +395,29 @@ public class SettingsScreen extends Screen {
     private void pastePreset() {
         assert minecraft != null;
         if (Config.pastePreset(minecraft, updater)) {
-            minecraft.player.displayClientMessage(new TextComponent("Preset loaded from clipboard successfully.").withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.ITALIC), true);
+            minecraft.player.displayClientMessage(new TranslatableComponent("messages.sedparties.preset.pasteload").withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.ITALIC), true);
         } else {
-            minecraft.player.displayClientMessage(new TextComponent("The clipboard does not contain a valid preset.").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), true);
+            minecraft.player.displayClientMessage(new TranslatableComponent("messages.sedparties.preset.pastefail").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), true);
         }
     }
 
     private void savePreset() {
         if (Config.saveCompletePreset(nameBox.getValue(), descBox.getValue(), getter)) {
-            minecraft.player.displayClientMessage(new TextComponent("Preset saved as " + nameBox.getValue() + " successfully.").withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.ITALIC), true);
+            minecraft.player.displayClientMessage(new TranslatableComponent("messages.sedparties.preset.save1").append(nameBox.getValue()).append(new TranslatableComponent("messages.sedparties.preset.save2")).withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.ITALIC), true);
             nameBox.setValue("");
             descBox.setValue("");
             if (selEle == -1) {
                 selectButton(-1);
             }
         } else {
-            minecraft.player.displayClientMessage(new TextComponent("There was an issue saving the preset.").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), true);
+            minecraft.player.displayClientMessage(new TranslatableComponent("messages.sedparties.preset.savefail").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), true);
         }
     }
 
     private void copyPreset() {
         assert minecraft != null;
         Config.copyPreset(minecraft, getter);
-        minecraft.player.displayClientMessage(new TextComponent("Preset has been copied to clipboard.").withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.ITALIC), true);
+        minecraft.player.displayClientMessage(new TranslatableComponent("messages.sedparties.preset.copy").withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.ITALIC), true);
     }
 
     private void checkSaveFlags() {
@@ -430,11 +430,11 @@ public class SettingsScreen extends Screen {
         //Preset Button
         if (isPresetOnly) {
             presetButton = new TabButton(-1, 0, 0, 32, 32, b -> {},
-                                         RenderUtils.tip(this, new TranslatableComponent("gui.sedparties.name.preset")),
+                                         RenderUtils.transTip(this, new TranslatableComponent("gui.sedparties.name.preset")),
                                          new PresetOptions("Load").render((ForgeIngameGui) minecraft.gui), "Load");
         } else {
             presetButton = new TabButton(-1, 0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
-                                         RenderUtils.tip(this, new TranslatableComponent("gui.sedparties.name.preset")),
+                                         RenderUtils.transTip(this, new TranslatableComponent("gui.sedparties.name.preset")),
                                          new PresetOptions("Load").render((ForgeIngameGui) minecraft.gui), "Load");
         }
 
@@ -447,7 +447,7 @@ public class SettingsScreen extends Screen {
         //General Settings
         tabsOrder.add("general");
         tabs.put("general", new TabButton(0, 0, 0, 24, 16, b -> this.selectButton(((TabButton)b).index),
-                                          RenderUtils.tip(this, new TranslatableComponent("gui.sedparties.name.general")),
+                                          RenderUtils.transTip(this, new TranslatableComponent("gui.sedparties.name.general")),
                                           new GeneralOptions("general").render((ForgeIngameGui) minecraft.gui),
                                           "Main", true
                                           ));
@@ -456,7 +456,7 @@ public class SettingsScreen extends Screen {
             if (item.getValue().isTabRendered()) {
                 tabsOrder.add(item.getKey());
                 tabs.put(item.getKey(), new TabButton(i, 0, 0, 24, 16, b -> this.selectButton(((TabButton)b).index),
-                                                      RenderUtils.tip(this, new TranslatableComponent(item.getValue().translateName())),
+                                                      RenderUtils.transTip(this, new TranslatableComponent(item.getValue().translateName())),
                                                       item.getValue().render((ForgeIngameGui) minecraft.gui),
                                                       item.getValue().getType(), true
 
