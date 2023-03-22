@@ -28,6 +28,7 @@ public class ClientEvent {
     public static void ticker(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             AnimHandler.tick();
+            if (Minecraft.getInstance().isPaused()) return;
             ClientPlayerData.playerList.values().forEach(ClientPlayerData::tick);
             if (tick++ % 20 == 8) {
                 ClientPlayerData.playerList.values().forEach(ClientPlayerData::slowTick);

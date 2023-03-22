@@ -38,7 +38,6 @@ public class HoverScreen extends Screen {
     private Integer oldMX = null;
     private Integer oldMY = null;
     private int index = 0;
-    private static boolean active = false;
     private static int key;
     private List<Button> moveParty = new ArrayList<>();
     private List<Button> menu = new ArrayList<>();
@@ -399,6 +398,7 @@ public class HoverScreen extends Screen {
     }
 
 
+
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
         if (pKeyCode != key) {
             //TODO: Fix when you press escape.
@@ -411,7 +411,6 @@ public class HoverScreen extends Screen {
     @Override
     public void onClose() {
         ColorUtils.colorCycle = false;
-        active = false;
         notEditing = false;
         if (isMoving) {
             revertPos();
@@ -419,5 +418,10 @@ public class HoverScreen extends Screen {
         }
         isArranging = false;
         super.onClose();
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 }
