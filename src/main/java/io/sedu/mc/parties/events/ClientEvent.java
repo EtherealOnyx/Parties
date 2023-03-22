@@ -6,12 +6,9 @@ import io.sedu.mc.parties.client.overlay.gui.HoverScreen;
 import io.sedu.mc.parties.client.overlay.gui.SliderButton;
 import io.sedu.mc.parties.setup.ClientSetup;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.event.TickEvent;
 
 public class ClientEvent {
@@ -41,22 +38,6 @@ public class ClientEvent {
     public static void keyPress(InputEvent.KeyInputEvent event) {
         if (ClientSetup.showMouse.getKey().getValue() == event.getKey() && Minecraft.getInstance().screen == null) {
             Minecraft.getInstance().setScreen(new HoverScreen(ClientSetup.showMouse.getKey().getValue()));
-        }
-    }
-
-    public static void guiOpen(ScreenOpenEvent event) {
-        if (event.getScreen() instanceof HoverScreen || event.getScreen() instanceof ChatScreen || event.getScreen() instanceof DeathScreen) {
-            HoverScreen.activate();
-            return;
-        }
-
-        if (event.getScreen() == null)
-            HoverScreen.disable();
-    }
-
-    public static void guiRender(ScreenEvent.DrawScreenEvent event) {
-        if (HoverScreen.isActive()) {
-            HoverScreen.updateValues(event.getMouseX(), event.getMouseY());
         }
     }
 

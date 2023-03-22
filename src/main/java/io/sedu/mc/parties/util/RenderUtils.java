@@ -14,18 +14,18 @@ import net.minecraft.ReportedException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
@@ -679,7 +679,7 @@ public class RenderUtils {
 
 
     //Player Rendering
-    public static void renderLivingModel(LivingEntityRenderer<LivingEntity, ?> render, LivingEntity pEntity, float pEntityYaw, float pPartialTicks, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight) {
+    public static void renderPlayerModel(LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> render, AbstractClientPlayer pEntity, float pEntityYaw, float pPartialTicks, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight) {
 
         pMatrixStack.pushPose();
         render.getModel().attackTime = pEntity.getAttackAnim(pPartialTicks);
@@ -687,6 +687,7 @@ public class RenderUtils {
         boolean shouldSit = pEntity.isPassenger() && (pEntity.getVehicle() != null && pEntity.getVehicle().shouldRiderSit());
         render.getModel().riding = shouldSit;
         render.getModel().young = pEntity.isBaby();
+        render.getModel().crouching = pEntity.isCrouching();
         float f = Mth.rotLerp(pPartialTicks, pEntity.yBodyRotO, pEntity.yBodyRot);
         float f1 = Mth.rotLerp(pPartialTicks, pEntity.yHeadRotO, pEntity.yHeadRot);
         float f2 = f1 - f;
@@ -764,7 +765,7 @@ public class RenderUtils {
         }
 
         if (!pEntity.isSpectator()) {
-            for (RenderLayer<LivingEntity, ?> renderlayer : render.layers) {
+            for (RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> renderlayer : render.layers) {
                 renderlayer.render(pMatrixStack, pBuffer, pPackedLight, pEntity, f5, f8, pPartialTicks, f7, f2, f6);
             }
         }
@@ -777,7 +778,7 @@ public class RenderUtils {
             float f1 = (float)pEntityLiving.getFallFlyingTicks() + pPartialTicks;
             float f2 = Mth.clamp(f1 * f1 / 100.0F, 0.0F, 1.0F);
             if (!pEntityLiving.isAutoSpinAttack()) {
-                //pMatrixStack.mulPose(Vector3f.XP.rotationDegrees(f2 * (-90.0F)));
+                pMatrixStack.mulPose(Vector3f.XP.rotationDegrees(f2 * (-90.0F)));
             }
 
             Vec3 vec3 = pEntityLiving.getViewVector(pPartialTicks);
@@ -825,9 +826,7 @@ public class RenderUtils {
             pMatrixStack.mulPose(Vector3f.XP.rotationDegrees(-90.0F - pEntityLiving.getXRot()));
             pMatrixStack.mulPose(Vector3f.YP.rotationDegrees(((float)pEntityLiving.tickCount + pPartialTicks) * -75.0F));
         } else if (pose == Pose.SLEEPING) {
-            Direction direction = pEntityLiving.getBedOrientation();
-            float f1 = direction != null ? sleepDirectionToRotation(direction) : pRotationYaw;
-            pMatrixStack.mulPose(Vector3f.YP.rotationDegrees(f1));
+            pMatrixStack.mulPose(Vector3f.YP.rotationDegrees(180F));
             pMatrixStack.mulPose(Vector3f.ZP.rotationDegrees(90F));
             pMatrixStack.mulPose(Vector3f.YP.rotationDegrees(270.0F));
         } else if (isEntityUpsideDown(pEntityLiving)) {
@@ -837,26 +836,13 @@ public class RenderUtils {
 
     }
 
-    private static float sleepDirectionToRotation(Direction pFacing) {
-        switch(pFacing) {
-            case SOUTH:
-                return 90.0F;
-            case WEST:
-                return 0.0F;
-            case NORTH:
-                return 270.0F;
-            case EAST:
-                return 180.0F;
-            default:
-                return 0.0F;
-        }
-    }
-
     public static void renderEntityInInventory(int pPosX, int pPosY, float iScale, int pScale, LivingEntity pLivingEntity, float partialTicks) {
         PoseStack posestack = RenderSystem.getModelViewStack();
         posestack.pushPose();
         float offY = 31*iScale;
-        if (pLivingEntity.isCrouching()) offY -= 2*iScale;
+        if (pLivingEntity.isCrouching()){
+            offY -= 2*iScale;
+        }
         if (pLivingEntity.getPose().equals(Pose.SWIMMING)) offY -= 14*iScale;
 
         posestack.translate(pPosX, pPosY+offY, 1050.0D);
@@ -873,7 +859,7 @@ public class RenderUtils {
         MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
 
         RenderSystem.runAsFancy(() -> {
-            renderLiving(dis, pLivingEntity, 0.0D, 0.0D, 0.0D, 0.0F, partialTicks, posestack1, multibuffersource$buffersource, 15728880);
+            renderPlayer(dis, pLivingEntity, 0.0D, 0.0D, 0.0D, 0.0F, partialTicks, posestack1, multibuffersource$buffersource, 15728880);
         });
         multibuffersource$buffersource.endBatch();
         posestack.popPose();
@@ -882,34 +868,36 @@ public class RenderUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static void renderLiving(EntityRenderDispatcher dis, LivingEntity pEntity, double pX, double pY, double pZ,
+    public static void renderPlayer(EntityRenderDispatcher dis, LivingEntity pEntity, double pX, double pY, double pZ,
                                     float pRotationYaw, float pPartialTicks, PoseStack pMatrixStack,
                                     MultiBufferSource pBuffer, int pPackedLight) {
-        EntityRenderer<LivingEntity> entityrenderer = (EntityRenderer<LivingEntity>) dis.getRenderer(pEntity);
-        try {
-            Vec3 vec3 = entityrenderer.getRenderOffset(pEntity, pPartialTicks);
-            double d2 = pX + vec3.x();
-            double d3 = pY + vec3.y();
-            double d0 = pZ + vec3.z();
-            pMatrixStack.pushPose();
-            pMatrixStack.translate(d2, d3, d0);
-            renderLivingModel((LivingEntityRenderer<LivingEntity, ?>) entityrenderer, pEntity, pRotationYaw, pPartialTicks, pMatrixStack, pBuffer, pPackedLight);
+        if ((pEntity instanceof AbstractClientPlayer p)) {
+            PlayerRenderer entityrenderer = (PlayerRenderer) dis.getRenderer(p);
+            try {
+                Vec3 vec3 = entityrenderer.getRenderOffset(p, pPartialTicks);
+                double d2 = pX + vec3.x();
+                double d3 = pY + vec3.y();
+                double d0 = pZ + vec3.z();
+                pMatrixStack.pushPose();
+                pMatrixStack.translate(d2, d3, d0);
+                renderPlayerModel(entityrenderer, p, pRotationYaw, pPartialTicks, pMatrixStack, pBuffer, pPackedLight);
 
-            pMatrixStack.translate(-vec3.x(), -vec3.y(), -vec3.z());
-            pMatrixStack.popPose();
-            if (pEntity.isOnFire()) {
-                renderFlame(pMatrixStack, pBuffer, pEntity);
+                pMatrixStack.translate(-vec3.x(), -vec3.y(), -vec3.z());
+                pMatrixStack.popPose();
+                if (pEntity.isOnFire()) {
+                    renderFlame(pMatrixStack, pBuffer, pEntity);
+                }
+            } catch (Throwable throwable) {
+                CrashReport crashreport = CrashReport.forThrowable(throwable, "Rendering entity in world");
+                CrashReportCategory crashreportcategory = crashreport.addCategory("Entity being rendered");
+                pEntity.fillCrashReportCategory(crashreportcategory);
+                CrashReportCategory crashreportcategory1 = crashreport.addCategory("Renderer details");
+                crashreportcategory1.setDetail("Assigned renderer", entityrenderer);
+                //crashreportcategory1.setDetail("Location", CrashReportCategory.formatLocation(, pX, pY, pZ));
+                crashreportcategory1.setDetail("Rotation", pRotationYaw);
+                crashreportcategory1.setDetail("Delta", pPartialTicks);
+                throw new ReportedException(crashreport);
             }
-        } catch (Throwable throwable) {
-            CrashReport crashreport = CrashReport.forThrowable(throwable, "Rendering entity in world");
-            CrashReportCategory crashreportcategory = crashreport.addCategory("Entity being rendered");
-            pEntity.fillCrashReportCategory(crashreportcategory);
-            CrashReportCategory crashreportcategory1 = crashreport.addCategory("Renderer details");
-            crashreportcategory1.setDetail("Assigned renderer", entityrenderer);
-            //crashreportcategory1.setDetail("Location", CrashReportCategory.formatLocation(, pX, pY, pZ));
-            crashreportcategory1.setDetail("Rotation", pRotationYaw);
-            crashreportcategory1.setDetail("Delta", pPartialTicks);
-            throw new ReportedException(crashreport);
         }
     }
 

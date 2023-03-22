@@ -10,9 +10,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
-import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.withinBounds;
-
 public class PLeader extends RenderItem implements TooltipItem{
 
     private TranslatableComponent tipName = new TranslatableComponent("ui.sedparties.tooltip.leader");
@@ -30,9 +27,6 @@ public class PLeader extends RenderItem implements TooltipItem{
             setup(partyPath);
             blit(poseStack, x(i), y(i), 0, 0, 9, 9);
             resetColor();
-            if (notEditing() && withinBounds(x(i), y(i), 9, 9,2, scale)) {
-                //renderTooltip(poseStack, gui, 10, 0, "Party Leader", 0xFFF2A9, 0x978B47, 0xFFE554);
-            }
         }
     }
 

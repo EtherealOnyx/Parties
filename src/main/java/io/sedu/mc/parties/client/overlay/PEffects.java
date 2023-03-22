@@ -155,7 +155,7 @@ public abstract class PEffects extends RenderSelfItem {
                 list.add(new ColorComponent(new TextComponent("§oInstant"), 0x88888888));
             else
                 list.add(new ColorComponent(new TextComponent( effect.getDur() + "s"), 0xFFFFFF));
-            renderSingleEffectTooltip(poseStack, gui, 10, 0, list,
+            renderSingleEffectTooltip(poseStack, gui, pMouseX, pMouseY, 10, 0, list,
                                       effect.getEffect().getColor());
         })) {
             renderOverflow(effects, poseStack, gui, pMouseX, pMouseY);

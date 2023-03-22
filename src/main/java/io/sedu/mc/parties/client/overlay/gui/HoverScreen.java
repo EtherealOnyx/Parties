@@ -27,9 +27,6 @@ import static io.sedu.mc.parties.util.RenderUtils.*;
 
 public class HoverScreen extends Screen {
 
-
-    private static int mouseX;
-    private static int mouseY;
     private ArrayList<Integer> fX = new ArrayList<>();
     private ArrayList<Integer> fY = new ArrayList<>();
     private int revertX = 0;
@@ -397,45 +394,10 @@ public class HoverScreen extends Screen {
         moveParty.clear();
     }
 
-    public static boolean withinBounds(int x, int y, int width, int height, int expand, float scale) {
-        return mouseX > x - expand && mouseY > y - expand
-                && mouseX < x + expand + width*scale && mouseY < y + expand + height*scale;
-    }
-
-    public static int mouseX() {
-        return mouseX;
-    }
-
-    public static int mouseY() {
-        return mouseY;
-    }
-
-    public static void updateValues(int x, int y) {
-        mouseX = x;
-        mouseY = y;
-    }
-
-    public static void disable() {
-        active = false;
-        notEditing = false;
-        mouseX = -1;
-        mouseY = -1;
-    }
-
-    public static void activate() {
-        active = true;
-        notEditing = true;
-        mouseX = -1;
-        mouseY = -1;
-    }
-
     public static boolean notEditing() {
         return notEditing;
     }
 
-    public static boolean isActive() {
-        return active;
-    }
 
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
         if (pKeyCode != key) {

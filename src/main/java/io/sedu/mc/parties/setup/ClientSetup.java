@@ -39,8 +39,6 @@ public class ClientSetup {
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::onClientJoin);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::ticker);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::keyPress);
-        MinecraftForge.EVENT_BUS.addListener(ClientEvent::guiOpen);
-        MinecraftForge.EVENT_BUS.addListener(ClientEvent::guiRender);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::mouseReleased);
 
         //Icon above all
