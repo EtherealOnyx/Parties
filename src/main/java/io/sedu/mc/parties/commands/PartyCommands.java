@@ -5,9 +5,11 @@ import com.mojang.brigadier.CommandDispatcher;
 import io.sedu.mc.parties.data.PartyHelper;
 import io.sedu.mc.parties.network.ClientPacketData;
 import io.sedu.mc.parties.network.PartiesPacketHandler;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.TextComponent;
 
 import static io.sedu.mc.parties.data.Util.isLeader;
 
@@ -59,13 +61,17 @@ public class PartyCommands {
                 return Command.SINGLE_SUCCESS;
             }))
             .then(Commands.literal("kick").then(Commands.argument("member", new NotSelfArgument(true)).executes(ctx -> {
-                if (isLeader(ctx.getSource().getPlayerOrException().getUUID()) && PartyHelper.kickPlayer(ctx.getSource().getPlayerOrException().getUUID(), EntityArgument.getPlayer(ctx, "member").getUUID())) {
-                    
-                    return Command.SINGLE_SUCCESS;
-                } else {
-                    
-                    return 0;
+                if (isLeader(ctx.getSource().getPlayerOrException().getUUID())) {
+                    if (PartyHelper.kickPlayer(ctx.getSource().getPlayerOrException().getUUID(), EntityArgument.getPlayer(ctx, "member").getUUID())) {
+
+                        return Command.SINGLE_SUCCESS;
+                    }
                 }
+                else {
+                    ctx.getSource().getPlayerOrException().sendMessage(new TextComponent(
+                            "Only the party leader can kick other players.").withStyle(ChatFormatting.DARK_AQUA), ctx.getSource().getPlayerOrException().getUUID());
+                }
+                return 0;
             })))
             .then(Commands.literal("leave")
                 .executes(ctx -> {

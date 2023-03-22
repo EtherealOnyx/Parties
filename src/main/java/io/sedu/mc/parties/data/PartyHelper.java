@@ -162,19 +162,18 @@ public class PartyHelper {
                     " is already in a party.").withStyle(ChatFormatting.DARK_AQUA)), initiator);
             return false;
         }
-        if (getPlayer(initiator).hasParty() && !isLeader(initiator)) {
-            p.sendMessage(new TextComponent(
-                    "Only the party leader can invite other players.").withStyle(ChatFormatting.DARK_AQUA), initiator);
-            return false;
+        if (getPlayer(initiator).hasParty()) {
+            if (!isLeader(initiator)) {
+                p.sendMessage(new TextComponent(
+                        "Only the party leader can invite other players.").withStyle(ChatFormatting.DARK_AQUA), initiator);
+                return false;
+            }
+            if (getPartyFromMember(initiator).isFull()) {
+                p.sendMessage(new TextComponent(
+                        "Your party is full.").withStyle(ChatFormatting.DARK_AQUA), initiator);
+                return false;
+            }
         }
-
-        if (getPartyFromMember(initiator).isFull()) {
-            p.sendMessage(new TextComponent(
-                    "Your party is full.").withStyle(ChatFormatting.DARK_AQUA), initiator);
-            return false;
-        }
-
-
         return true;
     }
 
