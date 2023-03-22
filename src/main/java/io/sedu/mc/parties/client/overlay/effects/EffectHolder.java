@@ -277,11 +277,11 @@ public class EffectHolder {
     }
 
     public boolean largerBene(int max) {
-        return sortedEffectAll.size() > max;
+        return sortedEffectBene.size() > max;
     }
 
     public boolean largerBad(int max) {
-        return sortedEffectAll.size() > max;
+        return sortedEffectBad.size() > max;
     }
 
 
