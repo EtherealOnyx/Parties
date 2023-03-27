@@ -43,12 +43,13 @@ public class PArmor extends RenderIconTextItem implements TooltipItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        renderArmor(i, poseStack, gui, id.getArmor(), id.alpha);
+        if (!id.isSpectator)
+            renderArmor(i, poseStack, gui, id.getArmor(), id.alpha);
     }
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.isOnline)
+        if (id.isOnline && !id.isSpectator)
             renderArmor(i, poseStack, gui, id.getArmor(), id.alpha);
     }
 
@@ -92,8 +93,8 @@ public class PArmor extends RenderIconTextItem implements TooltipItem {
         c.addColorEntry("tcolor", color);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
-        entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW - frameX), textX));
-        entries.add(c.addSliderEntry("ytpos", 0, () -> Math.max(0, frameEleH - frameY - (int)(minecraft.font.lineHeight*scale)), textY));
+        entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));
+        entries.add(c.addSliderEntry("ytpos", 0, () -> Math.max(0, frameEleH - (int)(minecraft.font.lineHeight*scale)), textY));
         toggleTextAttach(entries);
         return c;
     }

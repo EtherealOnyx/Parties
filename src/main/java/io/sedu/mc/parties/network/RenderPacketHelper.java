@@ -82,4 +82,20 @@ public class RenderPacketHelper {
     public static void setXpBar(UUID player, Float data) {
         ClientPlayerData.playerList.get(player).setXpBar(data);
     }
+
+    public static void setBleeding(UUID player, boolean isBleeding, Integer datum) {
+        ClientPlayerData.playerList.get(player).changeBleeding(isBleeding, datum);
+    }
+
+    public static void setDowned(UUID player, boolean isDowned, Integer datum) {
+        ClientPlayerData.playerList.get(player).changeDownedState(isDowned, datum);
+    }
+
+    public static void setReviveProgress(UUID player, Float data) {
+        ClientPlayerData.playerList.get(player).setReviveProgress(data);
+    }
+
+    public static void setSpectating(UUID player, Boolean data) {
+        ClientPlayerData.playerList.get(player).setSpectator(data);
+    }
 }

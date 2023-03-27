@@ -1,0 +1,12 @@
+{
+  "required": false,
+  "package": "io.sedu.mc.parties.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "sedparties.refmap.json",
+  "mixins": [
+    "MixinHRManager"
+  ],
+  "client": [
+  ],
+  "minVersion": "0.8"
+}

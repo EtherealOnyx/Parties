@@ -49,6 +49,10 @@ public class POffline extends RenderIconTextItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+        if (id.isSpectator) {
+            if (textEnabled)
+                text(gui, poseStack, "§oWatching..", tX(i), tY(i), color);
+        }
     }
 
     @Override
@@ -60,6 +64,11 @@ public class POffline extends RenderIconTextItem {
             }
             if (textEnabled)
                 text(gui, poseStack, "§oOffline...", tX(i), tY(i), color);
+            return;
+        }
+        if (id.isSpectator) {
+            if (textEnabled)
+                text(gui, poseStack, "§oWatching..", tX(i), tY(i), color);
         }
     }
 
@@ -80,7 +89,7 @@ public class POffline extends RenderIconTextItem {
         c.addColorEntry("tcolor", color);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
-        entries.add(c.addSliderEntry("xtpos", 0, () -> frameEleW, textX));
+        entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));
         entries.add(c.addSliderEntry("ytpos", 0, () -> Math.max(0, frameEleH - (int)(minecraft.font.lineHeight*scale)), textY));
         toggleTextAttach(entries);
         return c;

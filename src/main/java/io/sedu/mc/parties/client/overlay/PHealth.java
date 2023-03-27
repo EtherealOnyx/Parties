@@ -47,9 +47,13 @@ public class PHealth extends RenderIconTextItem implements TooltipItem {
     int bColorBot;
     int bAColorTop;
     int bAColorBot;
+    private static Renderer renderLastDimmer;
 
     public PHealth(String name) {
         super(name);
+        renderLastDimmer = (i, id, poseStack) -> {
+
+        };
     }
 
     @Override
@@ -80,14 +84,14 @@ public class PHealth extends RenderIconTextItem implements TooltipItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-
+        if (id.isSpectator) return;
         if (id.isDead) {
             if (iconEnabled) {
                 RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorBot, bColorBot);
                 RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing);
             }
 
-            textCentered(i, tX(i), tY(i), gui, poseStack, "Dead", deadColor);
+            textCentered(tX(i), tY(i), gui, poseStack, "Dead", deadColor);
             return;
         }
         if (iconEnabled) {
@@ -102,15 +106,20 @@ public class PHealth extends RenderIconTextItem implements TooltipItem {
         }
         if (textEnabled)
             if (id.health.absorb > 0) {
-                textCentered(i, tX(i), tY(i), gui, poseStack, id.health.healthText, absorbColor);
+                textCentered(tX(i), tY(i), gui, poseStack, id.health.healthText, absorbColor);
             } else {
-                textCentered(i, tX(i), tY(i), gui, poseStack, id.health.healthText, color);
+                textCentered(tX(i), tY(i), gui, poseStack, id.health.healthText, color);
             }
 
+        renderLastDimmer.render(i, id, poseStack);
+    }
 
-
-
-
+    public void updateRendererForMods() {
+        renderLastDimmer = ((i, id, poseStack) -> {
+            if (id.isBleeding || id.isDowned) {
+                RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 150 << 24);
+            }
+        });
     }
 
     private void renderHealth(int i, PoseStack poseStack, ClientPlayerData id) {
@@ -202,8 +211,8 @@ public class PHealth extends RenderIconTextItem implements TooltipItem {
         c.addSliderEntry("ttype", 0, () -> 2, HealthAnim.type);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
-        entries.add(c.addSliderEntry("xtpos", 0, () -> frameEleW, textX));
-        entries.add(c.addSliderEntry("ytpos", 0, () -> frameEleH, textY));
+        entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));
+        entries.add(c.addSliderEntry("ytpos", 0, () -> Math.max(0, frameEleH - (int)(minecraft.font.lineHeight*scale)), textY));
         toggleTextAttach(entries);
         c.addSpaceEntry();
 
@@ -329,5 +338,9 @@ public class PHealth extends RenderIconTextItem implements TooltipItem {
             renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur + h.absorb) + "/" + h.max, 0xfc807c, 0x4d110f, 0xffbfbd);
 
         }
+    }
+
+    private interface Renderer {
+        void render(int i, ClientPlayerData id, PoseStack poseStack);
     }
 }

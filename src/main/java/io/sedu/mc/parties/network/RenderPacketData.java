@@ -20,13 +20,6 @@ public class RenderPacketData {
         readData(buf);
     }
 
-    /*public RenderPacketData(int i, UUID propOf, float health, float maxHealth, float absorptionAmount, int armorValue, int foodLevel, int experienceLevel) {
-
-        this.type = i;
-        this.player = propOf;
-        data = new Object[]{health, maxHealth, absorptionAmount, armorValue, foodLevel, experienceLevel};
-    }*/
-
     public RenderPacketData(int type, UUID player, Object... data) {
         
         this.type = type;
@@ -36,12 +29,6 @@ public class RenderPacketData {
         else
             this.data = data;
     }
-
-    /*public RenderPacketData(int i, UUID propOf) {
-        this.type = i;
-        this.player = propOf;
-        this.data = null;
-    }*/
 
 
     public RenderPacketData(UUID propOf, ResourceLocation world) {
@@ -70,9 +57,11 @@ public class RenderPacketData {
                 }
                 data = builder.toString();
             }
-            case 1, 2, 3, 14 -> data = buf.readFloat();
+            case 1, 2, 3, 14, 16 -> data = buf.readFloat();
             case 4, 5, 6, 13 -> data = buf.readInt();
             case 12 -> data = new Object[]{buf.readInt(), buf.readInt(), buf.readInt()};
+            case 15, 17 -> data = new Object[]{buf.readBoolean(), buf.readInt()};
+            case 18 -> data = buf.readBoolean();
         }
     }
 
@@ -91,7 +80,7 @@ public class RenderPacketData {
                     buf.writeChar(letter);
                 }
             }
-            case 1, 2, 3, 14 -> //Health, Max Health, Absorb
+            case 1, 2, 3, 14, 16 -> //Health, Max Health, Absorb
             {
                 buf.writeFloat((Float) data);
                 
@@ -107,6 +96,12 @@ public class RenderPacketData {
                 buf.writeInt((Integer) ((Object[]) data)[1]); //Duration
                 buf.writeInt((Integer) ((Object[]) data)[2]); //Amp
             }
+
+            case 15, 17 -> {
+                buf.writeBoolean((Boolean) ((Object[]) data)[0]); //Bleeding/Downed
+                buf.writeInt((Integer) ((Object[]) data)[1]); //Duration
+            }
+            case 18 -> buf.writeBoolean((Boolean) data);
 
         }
     }
@@ -146,6 +141,10 @@ public class RenderPacketData {
                 case 12 -> RenderPacketHelper.addPotionEffect(player, (Integer) ((Object[]) data)[0], (Integer) ((Object[]) data)[1], (Integer) ((Object[]) data)[2]);
                 case 13 -> RenderPacketHelper.removePotionEffect(player, (Integer) data);
                 case 14 -> RenderPacketHelper.setXpBar(player, (Float) data);
+                case 15 -> RenderPacketHelper.setBleeding(player, (Boolean) ((Object[]) data)[0], (Integer) ((Object[]) data)[1]);
+                case 16 -> RenderPacketHelper.setReviveProgress(player, (Float) data);
+                case 17 -> RenderPacketHelper.setDowned(player, (Boolean) ((Object[]) data)[0], (Integer) ((Object[]) data)[1]);
+                case 18 -> RenderPacketHelper.setSpectating(player, (Boolean) data);
                 default -> {
 
                 }

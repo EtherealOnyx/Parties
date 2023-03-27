@@ -4,6 +4,8 @@ import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerConfigData;
+import io.sedu.mc.parties.data.Util;
 import io.sedu.mc.parties.network.ClientPacketHelper;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
@@ -13,6 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.level.GameType;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -21,6 +24,7 @@ import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
@@ -43,6 +47,16 @@ public class PartyEvent {
             }
             getPlayer(id).setServerPlayer((ServerPlayer) event.getPlayer());//.setOnline();
             ServerPacketHelper.sendOnline((ServerPlayer) event.getPlayer());
+            //Send spectating mode
+            Player p = event.getPlayer();
+            boolean spectating = p.isSpectator();
+            InfoPacketHelper.sendSpectating(p.getUUID(), spectating);
+            HashMap<UUID, Boolean> trackers;
+            if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                trackers.forEach((trackId, serverTracked) -> {
+                    InfoPacketHelper.sendSpectating(trackId, p.getUUID(), spectating);
+                });
+            }
         }
     }
 
@@ -140,6 +154,20 @@ public class PartyEvent {
             trackers.keySet().forEach(id -> InfoPacketHelper.sendDim(id, p.getUUID(), event.getTo().location()));
         }
     }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onEntityAttacked(LivingAttackEvent event) {
+        if (!event.getEntity().level.isClientSide()
+                && event.getEntity() instanceof Player p
+                && event.getSource() != null
+                && event.getSource().getEntity() instanceof Player source
+                && !ServerConfigData.friendlyFire.get()
+                && Util.inSameParty(source.getUUID(), p.getUUID())) {
+            event.setCanceled(true);
+        }
+
+    }
+
 
     @SubscribeEvent
     public static void onEntityDamage(LivingDamageEvent event) {
@@ -272,6 +300,7 @@ public class PartyEvent {
     public static void onPotionRemoved(PotionEvent.PotionRemoveEvent event) {
         if (!event.getEntityLiving().level.isClientSide()) {
             if (event.getEntity() instanceof Player p) {
+                if (event.getPotionEffect() == null) return;
                 InfoPacketHelper.sendEffectExpired(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
@@ -284,9 +313,24 @@ public class PartyEvent {
     }
 
     @SubscribeEvent
+    public static void onGamemodeChange(PlayerEvent.PlayerChangeGameModeEvent event) {
+        Player p = event.getPlayer();
+        if (event.getCurrentGameMode() == event.getNewGameMode()) return;
+        boolean spectating = event.getNewGameMode() == GameType.SPECTATOR;
+        InfoPacketHelper.sendSpectating(p.getUUID(), spectating);
+        HashMap<UUID, Boolean> trackers;
+        if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+            trackers.forEach((id, serverTracked) -> {
+                InfoPacketHelper.sendSpectating(id, p.getUUID(), spectating);
+            });
+        }
+    }
+
+    @SubscribeEvent
     public static void onPotionExpired(PotionEvent.PotionExpiryEvent event) {
         if (!event.getEntityLiving().level.isClientSide()) {
             if (event.getEntity() instanceof Player p) {
+                if (event.getPotionEffect() == null) return;
                 InfoPacketHelper.sendEffectExpired(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {

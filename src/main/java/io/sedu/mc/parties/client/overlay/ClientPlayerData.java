@@ -3,6 +3,7 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
@@ -27,12 +28,11 @@ public class ClientPlayerData {
     private static UUID leader;
 
     //Client Information
-    //private static int globalIndex;
-    //private int partyIndex;
     public Player clientPlayer;
 
     //Client-side functionality.
     boolean isOnline;
+    boolean isSpectator;
     private String playerName;
     private boolean trackedOnClient;
     private boolean isLeader;
@@ -44,6 +44,12 @@ public class ClientPlayerData {
     private int xpLevel = 0;
     private float xpBar = 0f;
     boolean isDead = false;
+
+    //PlayerRevive Support
+    boolean isBleeding = false;
+    boolean isDowned = false;
+    int bleedTimer = 0;
+    float reviveProgress = 0;
 
 
     //Default to server tracker.
@@ -176,6 +182,10 @@ public class ClientPlayerData {
         alphaI = 255;
     }
 
+    public void setSpectator(boolean spec) {
+        isSpectator = spec;
+    }
+
     public void setOffline() {
         isOnline = false;
         isDead = false;
@@ -269,6 +279,12 @@ public class ClientPlayerData {
         health.checkHealth(data);
     }
 
+    public float getReviveProgress() {
+        if (isBleeding)
+            return clientPlayer != null ? PRCompatManager.getHandler().getReviveProgress(clientPlayer) : reviveProgress;
+        return reviveProgress;
+    }
+
     public void setAbsorb(float data) {
         health.checkAbsorb(data);
     }
@@ -291,6 +307,8 @@ public class ClientPlayerData {
 
     public void markDead() {
         isDead = true;
+        isBleeding = false;
+        isDowned = false;
         effects.markForRemoval();
     }
 
@@ -326,11 +344,39 @@ public class ClientPlayerData {
     }
 
     public void slowTick() {
-        if (!isDead)
+        if (!isDead) {
             effects.removeIf(ClientEffect::update);
+        }
+
+        if (bleedTimer > 0)
+            bleedTimer--;
     }
 
     public void setXpBar(Float data) {
         this.xpBar = data;
     }
+
+    public void changeBleeding(boolean isBleeding, Integer datum) {
+        this.isBleeding = isBleeding;
+        if (this.isBleeding) {
+            this.isDowned = false;
+        }
+        this.bleedTimer = datum;
+    }
+
+    public void changeDownedState(boolean isDowned, Integer datum) {
+        this.isDowned = isDowned;
+        if (this.isDowned) {
+            this.isBleeding = false;
+        } else {
+            this.reviveProgress = 0;
+        }
+        this.bleedTimer = datum;
+    }
+
+    public void setReviveProgress(Float data) {
+        this.reviveProgress = data;
+    }
+
+    public void getGamemode() {}
 }

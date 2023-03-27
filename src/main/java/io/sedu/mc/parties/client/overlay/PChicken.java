@@ -58,12 +58,13 @@ public class PChicken extends RenderIconTextItem implements TooltipItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        renderChicken(i, gui, poseStack, id.getHungerForced(), id.alpha);
+        if (!id.isSpectator)
+            renderChicken(i, gui, poseStack, id.getHungerForced(), id.alpha);
     }
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.isOnline)
+        if (id.isOnline && !id.isSpectator)
             renderChicken(i, gui, poseStack, id.getHunger(), id.alpha);
 
     }
@@ -122,8 +123,8 @@ public class PChicken extends RenderIconTextItem implements TooltipItem {
         c.addColorEntry("tcolor", color);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
-        entries.add(c.addSliderEntry("xtpos", 0, this::maxX, textX));
-        entries.add(c.addSliderEntry("ytpos", 0, () -> this.maxY() - minecraft.font.lineHeight, textY));
+        entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));
+        entries.add(c.addSliderEntry("ytpos", 0, () -> Math.max(0, frameEleH - (int)(minecraft.font.lineHeight*scale)), textY));
         toggleTextAttach(entries);
         return c;
     }

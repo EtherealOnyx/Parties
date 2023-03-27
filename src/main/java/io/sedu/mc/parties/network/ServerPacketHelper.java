@@ -115,8 +115,6 @@ public class ServerPacketHelper {
     }
 
     public static void trackerToServer(UUID tracker, UUID playerToTrack) {
-        System.out.println("Tracker (" + Util.getName(tracker) + ") is now getting tracking info of player (" + Util.getName(playerToTrack)
-                                   +") from server");
         PlayerData.changeTracker(tracker, playerToTrack, true);
     }
 

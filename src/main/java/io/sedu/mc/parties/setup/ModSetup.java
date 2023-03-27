@@ -1,7 +1,8 @@
 package io.sedu.mc.parties.setup;
 
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.PRCompatManager;
+import io.sedu.mc.parties.api.hardcorerevival.HRCompatManager;
+import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.commands.NotSelfArgument;
 import io.sedu.mc.parties.network.PartiesPacketHandler;
 import net.minecraft.commands.synchronization.ArgumentTypes;
@@ -17,6 +18,7 @@ public class ModSetup {
 
         //Player Revive Support
         event.enqueueWork(PRCompatManager::init);
+        event.enqueueWork(HRCompatManager::init);
 
     }
 }

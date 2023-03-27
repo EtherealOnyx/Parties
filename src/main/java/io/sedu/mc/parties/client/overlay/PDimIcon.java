@@ -63,6 +63,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+        if (id.isSpectator) return;
         if (id.dim.active)  {
             worldAnim(poseStack, i, gui, id, partialTicks);
         } else {

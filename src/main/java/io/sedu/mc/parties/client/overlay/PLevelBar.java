@@ -78,7 +78,7 @@ public class PLevelBar extends RenderIconTextItem implements TooltipItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        //useAlpha(id.alpha);
+        if (id.isSpectator) return;
         renderBar(i, poseStack, id.getXpBarForced(), id.getLevelForced(), gui);
     }
 
@@ -167,8 +167,8 @@ public class PLevelBar extends RenderIconTextItem implements TooltipItem {
         c.addColorEntry("tcolor", color);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
-        entries.add(c.addSliderEntry("xtpos", 0, () -> frameEleW, textX));
-        entries.add(c.addSliderEntry("ytpos", 0, () -> frameEleH - (int)(minecraft.font.lineHeight*scale), textY));
+        entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));
+        entries.add(c.addSliderEntry("ytpos", 0, () -> Math.max(0, frameEleH - (int)(minecraft.font.lineHeight*scale)), textY));
         toggleTextAttach(entries);
         return c;
     }

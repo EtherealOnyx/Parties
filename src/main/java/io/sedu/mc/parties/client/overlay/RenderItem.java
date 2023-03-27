@@ -343,7 +343,7 @@ public abstract class RenderItem {
         gui.getFont().draw(p, text, x, y, color);
     }
 
-    void textCentered(int i, int x, int y, ForgeIngameGui gui, PoseStack p, String text, int color) {
+    void textCentered(int x, int y, ForgeIngameGui gui, PoseStack p, String text, int color) {
         text(gui, p, text, (int) (x - (gui.getFont().width(text)/2f)), (int) (y - (gui.getFont().lineHeight/2f)), color);
     }
 
@@ -674,6 +674,7 @@ public abstract class RenderItem {
         updater.put("genc_y", (n, d) -> n.setYPos((int)d));
 
         updater.put("htype", (n, d) -> {PHead.renderType = (int)d; return null;});
+        updater.put("bleed", (n, d) -> {PHead.renderBleed = (boolean)d; return null;});
     }
 
     public interface Getter {
@@ -744,6 +745,7 @@ public abstract class RenderItem {
         getter.put("genc_x", (n) -> clickArea.x);
         getter.put("genc_y", (n) -> clickArea.y);
         getter.put("htype", (n) -> PHead.renderType);
+        getter.put("bleed", (n) -> PHead.renderBleed);
     }
 
     public static void setDefaultValues() {

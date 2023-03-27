@@ -118,4 +118,36 @@ public class InfoPacketHelper {
     public static void sendClose(ServerPlayer p) {
         PartiesPacketHandler.sendToPlayer(new ClientPacketData(8), p);
     }
+
+    public static void sendBleeding(ServerPlayer p, boolean b, int dur) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(15, p.getUUID(), b, dur), p);
+    }
+
+    public static void sendBleeding(UUID sendTo, UUID propOf, boolean b, int dur) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(15, propOf, b, dur), getServerPlayer(sendTo));
+    }
+
+    public static void sendDowned(ServerPlayer p, boolean b, int dur) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(17, p.getUUID(), b, dur), p);
+    }
+
+    public static void sendDowned(UUID sendTo, UUID propOf, boolean b, int dur) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(17, propOf, b, dur), getServerPlayer(sendTo));
+    }
+
+    public static void sendReviveUpdate(UUID sendTo, UUID propOf, float revive) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(16, propOf, revive), getServerPlayer(sendTo));
+    }
+
+    public static void sendReviveUpdate(UUID sendTo, float revive) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(16, sendTo, revive), getServerPlayer(sendTo));
+    }
+
+    public static void sendSpectating(UUID sendTo, UUID propOf, boolean b) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(18, propOf, b), getServerPlayer(sendTo));
+    }
+
+    public static void sendSpectating(UUID sendTo, boolean b) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(18, sendTo, b), getServerPlayer(sendTo));
+    }
 }

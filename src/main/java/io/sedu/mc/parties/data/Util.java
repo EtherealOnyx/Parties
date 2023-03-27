@@ -42,9 +42,10 @@ public class Util {
     }
 
     public static boolean inSameParty(UUID member1, UUID member2) {
-        if (getPartyFromMember(member1) == null)
+        PartyData p1, p2;
+        if ((p1 = getPartyFromMember(member1)) == null || (p2 = getPartyFromMember(member2)) == null)
             return false;
-        return getPartyFromMember(member1).equals(getPartyFromMember(member2));
+        return p1.equals(p2);
     }
 
     public static PartyData getPartyFromId(UUID partyId) {

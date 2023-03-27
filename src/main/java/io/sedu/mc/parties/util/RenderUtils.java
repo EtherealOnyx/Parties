@@ -368,6 +368,29 @@ public class RenderUtils {
         RenderSystem.enableTexture();
     }
 
+    public static void grayRectForHead(Matrix4f mat, float x, float y, int z, int offset, int width, float height, float rgb, float a)
+    {
+
+
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.enableDepthTest();
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.vertex(mat, x+width-offset,    y+offset, z).color(rgb,rgb,rgb,a).endVertex();
+        buffer.vertex(mat,  x+offset,    y+offset, z).color(rgb,rgb,rgb,a).endVertex();
+        buffer.vertex(mat,  x+offset, y+height-offset, z).color(rgb,rgb,rgb,a).endVertex();
+        buffer.vertex(mat, x+width-offset, y+height-offset, z).color(rgb,rgb,rgb,a).endVertex();
+        tessellator.end();
+
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+    }
+
     public static void rect(Matrix4f mat, int zLevel, float left, float top, float right, float bottom, int startColor, int endColor)
     {
         float startAlpha = (float)(startColor >> 24 & 255) / 255.0F;
@@ -682,6 +705,8 @@ public class RenderUtils {
     public static void renderPlayerModel(LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> render, AbstractClientPlayer pEntity, float pEntityYaw, float pPartialTicks, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight) {
 
         pMatrixStack.pushPose();
+        if (pEntity.isSpectator()) //For when a mod makes a certain limb not render maybe?
+            render.getModel().setAllVisible(true);
         render.getModel().attackTime = pEntity.getAttackAnim(pPartialTicks);
 
         boolean shouldSit = pEntity.isPassenger() && (pEntity.getVehicle() != null && pEntity.getVehicle().shouldRiderSit());
@@ -752,7 +777,8 @@ public class RenderUtils {
         boolean flag2 = minecraft.shouldEntityAppearGlowing(pEntity);
         RenderType rendertype;
         if (flag1) {
-            rendertype = RenderType.itemEntityTranslucentCull(resourcelocation);
+            rendertype =  render.getModel().renderType(resourcelocation);
+            //rendertype = RenderType.itemEntityTranslucentCull(resourcelocation);
         } else if (flag) {
             rendertype =  render.getModel().renderType(resourcelocation);
         } else {
@@ -764,11 +790,11 @@ public class RenderUtils {
             render.getModel().renderToBuffer(pMatrixStack, vertexconsumer, pPackedLight, i, 1.0F, 1.0F, 1.0F, flag1 ? 0.15F : 1.0F);
         }
 
-        if (!pEntity.isSpectator()) {
+        //if (!pEntity.isSpectator()) {
             for (RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> renderlayer : render.layers) {
                 renderlayer.render(pMatrixStack, pBuffer, pPackedLight, pEntity, f5, f8, pPartialTicks, f7, f2, f6);
             }
-        }
+       // }
     }
 
     protected static void setupPlayerRotations(AbstractClientPlayer pEntityLiving, PoseStack pMatrixStack, float pAgeInTicks, float pRotationYaw, float pPartialTicks) {
@@ -867,7 +893,6 @@ public class RenderUtils {
         Lighting.setupFor3DItems();
     }
 
-    @SuppressWarnings("unchecked")
     public static void renderPlayer(EntityRenderDispatcher dis, LivingEntity pEntity, double pX, double pY, double pZ,
                                     float pRotationYaw, float pPartialTicks, PoseStack pMatrixStack,
                                     MultiBufferSource pBuffer, int pPackedLight) {

@@ -33,6 +33,14 @@ public class PlayerData {
     //Player old bar;
     private float xpBar;
 
+    //is Player Downed (Hardcore Revival)
+    private boolean isDowned = false;
+
+    //is Player Bleeding (Player Revive)
+    private boolean isBleeding = false;
+    //Player revive progress;
+    private float reviveProgress;
+
     //The UUID of the party that this player belongs to.
     private UUID party;
 
@@ -127,6 +135,14 @@ public class PlayerData {
         return false;
     }
 
+    public boolean setReviveProg(float reviveProg) {
+        if (reviveProgress != reviveProg) {
+            reviveProgress = reviveProg;
+            return true;
+        }
+        return false;
+    }
+
     public void tickInviters() {
         LinkedHashMap<UUID, Integer> invNew = new LinkedHashMap<>();
         inviters.forEach((uuid, anInt) -> {
@@ -161,6 +177,22 @@ public class PlayerData {
             id = iter.next();
         }
         if (id != null) action.accept(id);
+    }
+
+    public void setBleeding(boolean b) {
+        this.isBleeding = b;
+    }
+
+    public boolean isBleeding() {
+        return this.isBleeding;
+    }
+
+    public void setDowned(boolean b) {
+        this.isDowned = b;
+    }
+
+    public boolean isDowned() {
+        return this.isDowned;
     }
 
     public static class MessageCdHolder {
