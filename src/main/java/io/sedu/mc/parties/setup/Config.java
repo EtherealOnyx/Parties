@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.setup;
 
+import io.sedu.mc.parties.data.ClientConfigData;
 import io.sedu.mc.parties.data.ServerConfigData;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -14,6 +15,7 @@ public class Config {
 
     private static void registerClientConfigs() {
         ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
+        ClientConfigData.registerClientConfig(CLIENT_BUILDER);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_BUILDER.build());
     }
 

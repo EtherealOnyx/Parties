@@ -3,11 +3,16 @@ package io.sedu.mc.parties.client.config;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
+import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
+import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.overlay.GeneralOptions;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.codec.binary.Base64;
@@ -24,6 +29,8 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+
+import static io.sedu.mc.parties.data.ClientConfigData.*;
 
 public class Config {
     public static final Path DEFAULT_PRESET_PATH = FMLPaths.GAMEDIR.get().resolve(FMLConfig.defaultConfigPath()).resolve(Parties.MODID).resolve("presets");
@@ -250,5 +257,17 @@ public class Config {
         JsonElement element = jsonObject.get("general");
         updateValues(GeneralOptions.INSTANCE, element, updater);
         RenderItem.items.forEach((name, item) -> updateValues(item, jsonObject.get(name), updater));
+    }
+
+    public static void reloadClientConfigs() {
+        OverlayRegistry.enableOverlay(ForgeIngameGui.POTION_ICONS_ELEMENT, renderPotionEffects.get());
+        OverlayRegistry.enableOverlay(ForgeIngameGui.EXPERIENCE_BAR_ELEMENT, renderXPBar.get());
+        OverlayRegistry.enableOverlay(ForgeIngameGui.PLAYER_HEALTH_ELEMENT, renderPlayerHealth.get());
+        OverlayRegistry.enableOverlay(ForgeIngameGui.ARMOR_LEVEL_ELEMENT, renderPlayerArmor.get());
+        OverlayRegistry.enableOverlay(ForgeIngameGui.FOOD_LEVEL_ELEMENT, renderHunger.get());
+        TMCompatManager.getHandler().setThirstRender(renderThirst.get());
+        //CSCompatManager.getHandler().setTempRender(renderTemperature.get()); //I cri
+        ANCompatManager.getHandler().setManaRender(renderMana.get());
+        TANCompatManager.getHandler().setRenderers(renderThirst.get(), renderTemperature.get());
     }
 }

@@ -1,8 +1,10 @@
 package io.sedu.mc.parties.api.thirstmod;
 
 import dev.ghen.thirst.foundation.common.capability.IThirstCap;
+import dev.ghen.thirst.foundation.gui.ThirstBarRenderer;
 import io.sedu.mc.parties.Parties;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.client.gui.OverlayRegistry;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -29,5 +31,10 @@ public class TMHandler implements ITMHandler {
             return thirst.getThirst();
         }
         return 0;
+    }
+
+    @Override
+    public void setThirstRender(Boolean aBoolean) {
+        OverlayRegistry.enableOverlay(ThirstBarRenderer.THIRST_OVERLAY, aBoolean);
     }
 }

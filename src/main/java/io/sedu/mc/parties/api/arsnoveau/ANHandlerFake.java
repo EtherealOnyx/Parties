@@ -26,4 +26,9 @@ public class ANHandlerFake implements IANHandler {
     public void getManaValues(Player player, BiConsumer<Float, Integer> action) {
 
     }
+
+    @Override
+    public void setManaRender(Boolean renderMana) {
+
+    }
 }

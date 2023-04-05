@@ -15,4 +15,6 @@ public interface ITANHandler {
     boolean tempExists();
 
     boolean thirstExists();
+
+    void setRenderers(Boolean thirstEnabled, Boolean tempEnabled);
 }

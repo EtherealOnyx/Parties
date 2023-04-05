@@ -32,4 +32,9 @@ public class CSHandlerFake implements ICSHandler {
         return false;
     }
 
+    @Override
+    public void setTempRender(Boolean renderTemp) {
+
+    }
+
 }

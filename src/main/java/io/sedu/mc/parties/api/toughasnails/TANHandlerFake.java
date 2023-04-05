@@ -31,4 +31,9 @@ public class TANHandlerFake implements ITANHandler {
     public boolean thirstExists() {
         return false;
     }
+
+    @Override
+    public void setRenderers(Boolean thirstEnabled, Boolean tempEnabled) {
+
+    }
 }

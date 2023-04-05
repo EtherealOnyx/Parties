@@ -11,7 +11,6 @@ import io.sedu.mc.parties.util.ColorUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ClientRegistry;
-import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import net.minecraftforge.client.gui.OverlayRegistry;
 import net.minecraftforge.common.MinecraftForge;
@@ -76,9 +75,6 @@ public class ClientSetup {
         items.put("bg1", new PRectD("p_bg1"));
         items.put("bgc", new ClickArea("p_bgc"));
         RenderItem.register();
-
-        //Disable Overlays
-        OverlayRegistry.enableOverlay(ForgeIngameGui.POTION_ICONS_ELEMENT, false);
 
         //Register keybinding
 
@@ -161,5 +157,6 @@ public class ClientSetup {
                 ((PTemp)RenderItem.items.get("temp")).updateRendererForTAN();
             }
         });
+        Config.reloadClientConfigs();
     }
 }

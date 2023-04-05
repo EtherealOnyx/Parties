@@ -29,6 +29,12 @@ public class ANHandler implements IANHandler {
         }
     }
 
+    public static boolean manaEnabled = true;
+    @Override
+    public void setManaRender(Boolean renderMana) {
+        manaEnabled = renderMana;
+    }
+
 
     @Override
     public float getCurrentMana(Player player) {

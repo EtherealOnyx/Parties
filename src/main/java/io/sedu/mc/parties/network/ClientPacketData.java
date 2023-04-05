@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.network;
 
+import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.setup.ClientSetup;
@@ -96,6 +97,7 @@ public class ClientPacketData {
             case 7 -> {
                 DimConfig.reload();
                 ClientSetup.saveDefaultPresets(true);
+                Config.reloadClientConfigs();
             }
             case 8 -> {
                 ClientPacketData.closeScreens();

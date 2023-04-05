@@ -25,6 +25,11 @@ public class CSHandler implements ICSHandler {
     }
 
     @Override
+    public void setTempRender(Boolean renderTemp) {
+        //Oh geez
+    }
+
+    @Override
     public float getWorldTemp(Player player) {
         ITemperatureCap temp = player.getCapability(TEMP).orElse(null);
         //noinspection ConstantConditions

@@ -16,4 +16,6 @@ public interface ICSHandler {
     void getClientWorldTemp(Player clientPlayer, TriConsumer<Integer, Integer, Integer> action);
 
     boolean exists();
+
+    void setTempRender(Boolean renderTemp);
 }

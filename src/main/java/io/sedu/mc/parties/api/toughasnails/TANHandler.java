@@ -2,9 +2,12 @@ package io.sedu.mc.parties.api.toughasnails;
 
 import io.sedu.mc.parties.Parties;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.client.gui.OverlayRegistry;
 import toughasnails.api.temperature.TemperatureHelper;
 import toughasnails.api.temperature.TemperatureLevel;
 import toughasnails.api.thirst.ThirstHelper;
+import toughasnails.temperature.TemperatureOverlayHandler;
+import toughasnails.thirst.ThirstOverlayHandler;
 
 import java.util.function.BiConsumer;
 
@@ -59,6 +62,12 @@ public class TANHandler implements ITANHandler {
     @Override
     public boolean thirstExists() {
         return ThirstHelper.isThirstEnabled();
+    }
+
+    @Override
+    public void setRenderers(Boolean thirstEnabled, Boolean tempEnabled) {
+        OverlayRegistry.enableOverlay(ThirstOverlayHandler.THIRST_LEVEL_ELEMENT, thirstEnabled);
+        OverlayRegistry.enableOverlay(TemperatureOverlayHandler.TEMPERATURE_LEVEL_ELEMENT, tempEnabled);
     }
 
 }

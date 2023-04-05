@@ -862,7 +862,7 @@ public class RenderUtils {
 
     }
 
-    public static void renderEntityInInventory(int pPosX, int pPosY, float iScale, int pScale, LivingEntity pLivingEntity, float partialTicks) {
+    public static void renderEntityInInventorys(int pPosX, int pPosY, float iScale, int pScale, LivingEntity pLivingEntity, float partialTicks) {
         PoseStack posestack = RenderSystem.getModelViewStack();
         posestack.pushPose();
         float offY = 31*iScale;
@@ -888,6 +888,40 @@ public class RenderUtils {
             renderPlayer(dis, pLivingEntity, 0.0D, 0.0D, 0.0D, 0.0F, partialTicks, posestack1, multibuffersource$buffersource, 15728880);
         });
         multibuffersource$buffersource.endBatch();
+        posestack.popPose();
+        RenderSystem.applyModelViewMatrix();
+        Lighting.setupFor3DItems();
+    }
+
+    public static void renderEntityInInventoryAttempt2(int pPosX, int pPosY, float iScale, int pScale, LivingEntity pLivingEntity, float partialTicks) {
+        PoseStack posestack = RenderSystem.getModelViewStack();
+        float offY = 31*iScale;
+        if (pLivingEntity.isCrouching()){
+            offY -= 2*iScale;
+        }
+        if (pLivingEntity.getPose().equals(Pose.SWIMMING)) offY -= 14*iScale;
+        posestack.pushPose();
+        posestack.translate(pPosX, pPosY+offY, 1050.0D);
+        posestack.scale(1.0F, 1.0F, -1.0F);
+        RenderSystem.applyModelViewMatrix();
+        PoseStack posestack1 = new PoseStack();
+        posestack1.translate(0.0D, 0.0D, 1000.0D);
+        posestack1.scale((float)pScale, (float)pScale, (float)pScale);
+        Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
+        posestack1.mulPose(quaternion);
+        Lighting.setupForEntityInInventory();
+        EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+        entityrenderdispatcher.setRenderShadow(false);
+        MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
+        RenderSystem.runAsFancy(() -> {
+            entityrenderdispatcher.render(pLivingEntity, 0.0D, 0.0D, 0.0D, 0.0F, partialTicks, posestack1, multibuffersource$buffersource, 15728880);
+            if (pLivingEntity.isOnFire()) {
+                renderFlame(posestack1, multibuffersource$buffersource, pLivingEntity);
+            }
+        });
+        multibuffersource$buffersource.endBatch();
+        entityrenderdispatcher.setRenderShadow(true);
+
         posestack.popPose();
         RenderSystem.applyModelViewMatrix();
         Lighting.setupFor3DItems();

@@ -14,4 +14,6 @@ public interface IANHandler {
     boolean exists();
 
     void getManaValues(Player player, BiConsumer<Float, Integer> action);
+
+    void setManaRender(Boolean renderMana);
 }

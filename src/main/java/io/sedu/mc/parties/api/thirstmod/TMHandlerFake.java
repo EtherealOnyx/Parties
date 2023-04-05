@@ -8,4 +8,9 @@ public class TMHandlerFake implements ITMHandler {
     public int getThirst(Player player) {
         return 0;
     }
+
+    @Override
+    public void setThirstRender(Boolean aBoolean) {
+
+    }
 }
