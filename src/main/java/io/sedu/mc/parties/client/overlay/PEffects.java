@@ -15,7 +15,6 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.OverlayRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +45,7 @@ public abstract class PEffects extends RenderSelfItem {
 
     @Override
     public SmallBound changeVisibility(boolean data) {
-        OverlayRegistry.enableOverlay(this.item, data);
+        this.elementEnabled = data;
         //Prevent tooltip rendering.
         int index = effectItems.indexOf(this);
         if (data) {

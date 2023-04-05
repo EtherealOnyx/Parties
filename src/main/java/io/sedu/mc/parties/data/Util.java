@@ -13,7 +13,10 @@ public class Util {
     Server-side Functions
      */
     public static ServerPlayer getServerPlayer(UUID id) {
-        return getPlayer(id).serverPlayer == null? null : getPlayer(id).serverPlayer.get();
+        PlayerData p;
+        if ((p = getPlayer(id)) == null)
+            return null;
+        return p.serverPlayer == null ? null : p.serverPlayer.get();
     }
     public static PlayerData getPlayer(UUID id) {
         return PlayerData.playerList.get(id);

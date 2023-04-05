@@ -1,12 +1,10 @@
 package io.sedu.mc.parties.api.playerrevive;
 
 import io.sedu.mc.parties.Parties;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.util.LazyOptional;
 import team.creative.playerrevive.PlayerRevive;
 import team.creative.playerrevive.api.IBleeding;
 
@@ -27,29 +25,23 @@ public class PRHandler implements IPRHandler {
     }
 
     private static IBleeding getBleedingCapability(Player player) {
-        if (player == null)
-            return null;
-        MinecraftServer server = player.getServer();
-        if (server == null)
-            return null;
-        LazyOptional<IBleeding> bleeding = player.getCapability(BLEEDING);
-        if (bleeding.isPresent() && server.isPublished())
-            return bleeding.orElseThrow(RuntimeException::new);
-        else
-            return null;
+        return player.getCapability(BLEEDING).orElse(null);
     }
 
     @Override
     public void getBleed(Player player, BiConsumer<Boolean, Integer> action) {
         IBleeding revival = getBleedingCapability(player);
+        //noinspection ConstantConditions
         if (revival != null) {
             action.accept(revival.isBleeding() && revival.timeLeft() > 0, revival.timeLeft()/20);
         }
     }
 
+
     @Override
     public float getReviveProgress(Player clientPlayer) {
        IBleeding bleed = clientPlayer.getCapability(BLEEDING).orElse(null);
+        //noinspection ConstantConditions
        if (bleed == null)
            return 0f;
        return bleed.getProgress() / PlayerRevive.CONFIG.revive.requiredReviveProgress;

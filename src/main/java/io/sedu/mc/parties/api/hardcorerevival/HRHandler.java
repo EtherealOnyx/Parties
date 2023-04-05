@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.api.hardcorerevival;
 
+import io.sedu.mc.parties.Parties;
 import net.blay09.mods.hardcorerevival.HardcoreRevival;
 import net.blay09.mods.hardcorerevival.capability.HardcoreRevivalData;
 import net.blay09.mods.hardcorerevival.config.HardcoreRevivalConfig;
@@ -10,9 +11,14 @@ import java.util.function.BiConsumer;
 
 public class HRHandler implements IHRHandler {
 
+
+    static {
+        Parties.LOGGER.info("Initializing Compatibility with Hardcore Revival.");
+    }
+
     @Override
     public void getDowned(Player player, BiConsumer<Boolean, Integer> action) {
-        action.accept(((HardcoreRevival.getRevivalData(player)).isKnockedOut()), HardcoreRevivalConfig.getActive().ticksUntilDeath/20);
+        action.accept(((HardcoreRevival.getRevivalData(player)).isKnockedOut()), (HardcoreRevivalConfig.getActive().ticksUntilDeath - HardcoreRevival.getRevivalData(player).getKnockoutTicksPassed())/20);
     }
 
     @Override

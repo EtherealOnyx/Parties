@@ -4,6 +4,7 @@ run/
 runC1/
 runC2/
 .gradle/
+libs/
 build/
 gradle-app.setting
 

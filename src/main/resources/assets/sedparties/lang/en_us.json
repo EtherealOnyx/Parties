@@ -17,6 +17,9 @@
   "gui.sedparties.name.p_effects_d":"Debuff Bar Element",
   "gui.sedparties.name.p_effects":"Combined Buff/Debuff Bar Element",
   "gui.sedparties.name.p_bgc":"Clickable Frame Area",
+  "gui.sedparties.name.p_thirst":"Thirst Element",
+  "gui.sedparties.name.p_temp":"Temperature Indicator",
+  "gui.sedparties.name.p_mana":"Mana Indicator",
   "config.sedparties.title.display":"Display Settings",
   "config.sedparties.title.presetd":"Default Presets",
   "config.sedparties.title.presetc":"Custom Presets",
@@ -30,6 +33,7 @@
   "config.sedparties.title.gen_c":"Clickable Frame Settings",
   "config.sedparties.title.bhue":"Main Bar Color",
   "config.sedparties.title.ohue":"Overflow Bar Color",
+  "config.sedparties.title.mhue":"Mana Bar Color",
   "config.sedparties.title.bai": "Gain Anim Gradient",
   "config.sedparties.title.bad": "Lose Anim Gradient",
   "config.sedparties.title.barc":"Bar Color Settings",
@@ -81,6 +85,7 @@
 
   "config.sedparties.name.bhue": "Hue",
   "config.sedparties.name.ohue": "Hue",
+  "config.sedparties.name.mhue": "Hue",
 
   "config.sedparties.name.bcit": "Top",
   "config.sedparties.name.bcib": "Bottom",
@@ -88,6 +93,7 @@
   "config.sedparties.name.bcdt": "Top",
   "config.sedparties.name.bcdb": "Bottom",
   "config.sedparties.name.ttype": "Text Type",
+  "config.sedparties.name.mtype": "Text Type",
   "config.sedparties.name.htype": "Head Icon Type",
   "config.sedparties.name.bleed": "Bleeding/Dying Text",
 
@@ -137,6 +143,7 @@
 
   "config.sedparties.tooltip.bhue": "The hue of bar's main color (example: health)",
   "config.sedparties.tooltip.ohue": "The hue of the bar's overflow color (example: absorption)",
+  "config.sedparties.tooltip.mhue": "The hue of bar's main color (example: mana)",
 
   "config.sedparties.tooltip.bcit": "The top gradient color of the health increase animation",
   "config.sedparties.tooltip.bcib": "The bottom gradient color of the health increase animation",
@@ -144,6 +151,7 @@
   "config.sedparties.tooltip.bcdt": "The top gradient color of the health decrease animation",
   "config.sedparties.tooltip.bcdb": "The bottom gradient color of the health decrease animation",
   "config.sedparties.tooltip.ttype": "Text display type. Options are a ratio, current health only, and a percentage.",
+  "config.sedparties.tooltip.mtype": "Text display type. Options are a ratio, current mana only, and a percentage.",
   "config.sedparties.tooltip.htype": "Changes the head display. 0 for icons, 1 for self model only, 2 for party models.",
   "config.sedparties.tooltip.bleed": "Whether or not to render bleeding text indicator (for PlayerRevive mod).",
 
@@ -196,7 +204,11 @@
   "ui.sedparties.tooltip.armor": "Armor: ",
   "ui.sedparties.tooltip.hunger": "Hunger: ",
   "ui.sedparties.tooltip.health": "Health: ",
-  "ui.sedparties.tooltip.leader": "Party Leader"
+  "ui.sedparties.tooltip.leader": "Party Leader",
+  "ui.sedparties.tooltip.thirst": "Thirst: ",
+  "ui.sedparties.tooltip.temp": "Temperature: ",
+  "ui.sedparties.tooltip.temp2": "Body Heat: ",
+  "ui.sedparties.tooltip.mana": "Mana: "
 
 
 

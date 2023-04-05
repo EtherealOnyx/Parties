@@ -2,6 +2,7 @@ package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.data.Util;
+import io.sedu.mc.parties.events.PartyJoinEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.ClickEvent;
@@ -9,6 +10,7 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +98,8 @@ public class ServerPacketHelper {
             //Tell the online party member who the leader is.
             PartiesPacketHandler.sendToPlayer(
                     new ClientPacketData(3, getPartyFromMember(player.getUUID()).getLeader()), player);
+            //API Helper
+            MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(player));
         }
         if(!player.isDeadOrDying())
             player.getActiveEffects().forEach(effect -> InfoPacketHelper.sendEffect(player.getUUID(), MobEffect.getId(effect.getEffect()), effect.getDuration(), effect.getAmplifier()));

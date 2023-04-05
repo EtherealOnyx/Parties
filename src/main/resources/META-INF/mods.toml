@@ -19,7 +19,7 @@ modId="sedparties" #mandatory
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
 # ${file.jarVersion} will substitute the value of the Implementation-Version as read from the mod's JAR file metadata
 # see the associated build.gradle script for how to populate this completely automatically during a build
-version="1.18.2-0.2.3" #mandatory
+version="1.18.2-0.3.0" #mandatory
  # A display name for the mod
 displayName="Parties" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/
@@ -58,13 +58,15 @@ Special support for other mods will be added over time!
     ⏵ Combined Buff/Debuff Bar
 ✔ Armor Indicator
 ✔ Hunger Indicator
+✔ Thirst Indicator (Mod Support: Thirst Was Taken/Tough as Nails)
+✔ Temperature Indicator (Mod Support: Cold Sweat/Tough as Nails)
 ✔ Experience Bar
 ✔ Health Bar/Animation
+✔ Mana Bar/Animation (Mod Support: Ars Noveau)
 ✔ Offline Indicator
 ✔ Dead Indicator
 ✔ Transparent Box Background
 ⏳Clickable Box Area
-⏳Mana Bar (Mod Support: Ars Noveau)
 
 ⭐ NOTE: Items marked with ⏳ are not implemented yet and/or are still a work in progress.
 '''

@@ -41,6 +41,17 @@ public class PlayerData {
     //Player revive progress;
     private float reviveProgress;
 
+    //Player Thirst (Thirst was Taken)
+    private int thirst;
+
+    //World Temp and Body Temp (Cold Sweat)
+    private float worldTemp;
+    private float bodyTemp;
+
+    //Mana (Ars Noveau)
+    private float mana;
+    private int maxMana;
+
     //The UUID of the party that this player belongs to.
     private UUID party;
 
@@ -181,6 +192,9 @@ public class PlayerData {
 
     public void setBleeding(boolean b) {
         this.isBleeding = b;
+        if (!b) {
+            this.reviveProgress = 0;
+        }
     }
 
     public boolean isBleeding() {
@@ -189,10 +203,72 @@ public class PlayerData {
 
     public void setDowned(boolean b) {
         this.isDowned = b;
+        if (!b)
+            this.reviveProgress = 0;
     }
 
-    public boolean isDowned() {
-        return this.isDowned;
+    public boolean setThirst(int thirst) {
+        if (this.thirst != thirst) {
+            this.thirst = thirst;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setWorldTemp(float v) {
+        if (this.worldTemp != v) {
+            this.worldTemp = v;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setBodyTemp(float v) {
+        if (this.bodyTemp != v) {
+            this.bodyTemp = v;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setMana(float v) {
+        if (this.mana != v) {
+            this.mana = v;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setMax(int v) {
+        if (this.maxMana != v) {
+            this.maxMana = v;
+            return true;
+        }
+        return false;
+    }
+
+    public int getThirst() {
+        return thirst;
+    }
+
+    public float getWorldTemp() {
+        return worldTemp;
+    }
+
+    public float getReviveProg() {
+        return reviveProgress;
+    }
+
+    public float getBodyTemp() {
+        return bodyTemp;
+    }
+
+    public float getCurrentMana() {
+        return mana;
+    }
+
+    public int getMaxMana() {
+        return maxMana;
     }
 
     public static class MessageCdHolder {

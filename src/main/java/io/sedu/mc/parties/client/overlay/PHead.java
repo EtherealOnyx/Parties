@@ -234,7 +234,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
         c.addSliderEntry("ypos", 0, this::maxY, this.y);
         c.addSliderEntry("zpos", 0, () -> 10, zPos);
         c.addSliderEntry("scale", 1, () -> 3, getScale(), true);
-        c.addBooleanEntry("bleed", isEnabled());
+        c.addBooleanEntry("bleed", renderBleed);
         return c;
     }
 

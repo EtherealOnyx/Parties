@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.api.hardcorerevival;
 
 import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import net.blay09.mods.hardcorerevival.api.PlayerKnockedOutEvent;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,7 +40,7 @@ public class HREventHandler {
     @SubscribeEvent
     public static void onEntityTick(TickEvent.PlayerTickEvent e) {
         if (e.side == LogicalSide.SERVER && e.phase == TickEvent.Phase.END) {
-            if (e.player.tickCount % playerUpdateInterval.get() == 6) {
+            if (e.player.tickCount % playerUpdateInterval.get() == 3) {
                 AtomicReference<HashMap<UUID, Boolean>> trackers = new AtomicReference<>();
                 HRCompatManager.getHandler().getReviveProgress(e.player, (revive, targetPlayer) -> {
                     InfoPacketHelper.sendReviveUpdate(targetPlayer.getUUID(), revive);
@@ -53,6 +54,19 @@ public class HREventHandler {
                 });
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onPartyJoin(PartyJoinEvent event) {
+        event.forTrackersAndSelf((sendTo, propOf, propPlayer) -> {
+            HRCompatManager.getHandler().getDowned(propPlayer, (isBleeding, duration) -> {
+                if (isBleeding) {
+                    InfoPacketHelper.sendDowned(sendTo, propOf, true, duration);
+                    InfoPacketHelper.sendHealth(sendTo, propOf, propPlayer.getHealth());
+                    InfoPacketHelper.sendReviveUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getReviveProg());
+                }
+            });
+        });
     }
 
     public static void sendWakeUpEffect(Player p) {

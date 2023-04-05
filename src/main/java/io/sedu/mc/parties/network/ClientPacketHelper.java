@@ -106,7 +106,6 @@ public class ClientPacketHelper {
 
     public static void dropParty() {
         ClientPlayerData.reset();
-        //BoundsEntry.elements.clear();
         msg(new TextComponent("You left the party.").withStyle(ChatFormatting.DARK_AQUA));
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
         HoverScreen.reInit();
@@ -119,15 +118,12 @@ public class ClientPacketHelper {
 
     private static void remove(UUID id) {
         playerList.remove(id);
-        //int i = playerOrderedList.indexOf(id);
         playerOrderedList.remove(id);
-        //if (i >= 0) BoundsEntry.elements.values().forEach(boundsEntries -> boundsEntries.remove(i));
         HoverScreen.reInit();
     }
 
     public static void dropPartyKicked() {
         ClientPlayerData.reset();
-        //BoundsEntry.elements.clear();
         msg(new TextComponent("You have been kicked from the party.").withStyle(ChatFormatting.AQUA));
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
         HoverScreen.reInit();
@@ -140,7 +136,6 @@ public class ClientPacketHelper {
 
     public static void disbandParty() {
         ClientPlayerData.reset();
-        //BoundsEntry.elements.clear();
         msg(new TextComponent("Party disbanded.").withStyle(ChatFormatting.AQUA));
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
         HoverScreen.reInit();

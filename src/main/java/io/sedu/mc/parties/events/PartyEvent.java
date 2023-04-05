@@ -149,7 +149,6 @@ public class PartyEvent {
     public static void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) {
         HashMap<UUID, Boolean> trackers;
         Player p;
-        Parties.LOGGER.error(event.getTo().location());
         if ((trackers = PlayerData.playerTrackers.get((p = event.getPlayer()).getUUID())) != null) {
             trackers.keySet().forEach(id -> InfoPacketHelper.sendDim(id, p.getUUID(), event.getTo().location()));
         }

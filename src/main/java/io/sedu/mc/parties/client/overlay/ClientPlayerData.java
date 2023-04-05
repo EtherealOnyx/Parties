@@ -3,9 +3,14 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
+import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
+import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
+import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
+import io.sedu.mc.parties.client.overlay.anim.ManaAnim;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import net.minecraft.client.Minecraft;
@@ -20,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 
 public class ClientPlayerData {
     public static HashMap<UUID, ClientPlayerData> playerList = new HashMap<>();
@@ -45,11 +51,22 @@ public class ClientPlayerData {
     private float xpBar = 0f;
     boolean isDead = false;
 
-    //PlayerRevive Support
+    //PlayerRevive Support, HardcoreRevival Support
     boolean isBleeding = false;
     boolean isDowned = false;
     int bleedTimer = 0;
     float reviveProgress = 0;
+
+    //Thirst Was Taken Support
+    int thirst = 0;
+
+    //Cold Sweat Support
+    int worldTemp = 0;
+    int bodyTemp = 0;
+    int severity = 0;
+
+    //TAN Support
+    String tempType = "";
 
 
     //Default to server tracker.
@@ -63,11 +80,13 @@ public class ClientPlayerData {
     //Health Animation
     public HealthAnim health = new HealthAnim(20, true);
 
+    //Mana Animation
+    public ManaAnim mana = new ManaAnim(20, true);
+
     //Potion Effects
     public EffectHolder effects = new EffectHolder();
 
     private int hunger = 20;
-    private final int mana = 1000;
 
 
 
@@ -149,6 +168,13 @@ public class ClientPlayerData {
 
     public static void markEffectsDirty() {
         ClientPlayerData.playerList.values().forEach(c -> c.effects.refresh());
+    }
+
+    public static void forEachOrdered(BiConsumer<Integer, ClientPlayerData> action) {
+        for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++) {
+            action.accept(i,
+                          ClientPlayerData.playerList.get(playerOrderedList.get(i)));
+        }
     }
 
 
@@ -263,9 +289,6 @@ public class ClientPlayerData {
 
     public float getXpBar() {return xpBar;}
 
-    public int getMana() {
-        return mana;
-    }
 
     public int getXpLevel() {
         return xpLevel;
@@ -371,12 +394,101 @@ public class ClientPlayerData {
         } else {
             this.reviveProgress = 0;
         }
-        this.bleedTimer = datum;
+        this.bleedTimer = datum - 2;
     }
 
     public void setReviveProgress(Float data) {
         this.reviveProgress = data;
     }
 
-    public void getGamemode() {}
+    public int getThirst() {
+        return thirst;
+    }
+
+    public void setThirst(Integer data) {
+        this.thirst = data;
+    }
+
+    public void setWorldTemp(Float data) {
+        CSCompatManager.getHandler().convertTemp(data, (temp, sev) -> {
+            this.worldTemp = temp;
+            this.severity = sev;
+        });
+    }
+
+    public void setBodyTemp(float data) {
+        this.bodyTemp = (int) data;
+    }
+
+    public void updateTemperatures() {
+        if (clientPlayer != null) {
+            CSCompatManager.getHandler().getClientWorldTemp(clientPlayer, (temp, sev, body) -> {
+                this.worldTemp = temp;
+                this.severity = sev;
+                this.bodyTemp = body;
+            });
+        }
+    }
+
+    public void updateTemperaturesTAN() {
+        if (clientPlayer != null) {
+            TANCompatManager.getHandler().getPlayerTemp(clientPlayer, (temp, text) -> {
+                this.worldTemp = temp;
+                this.tempType = text;
+                if (temp == 0 || temp == 4) {
+                    severity = 1;
+                } else {
+                    severity = 0;
+                }
+            });
+        }
+    }
+
+    public void updateThirst() {
+        if (clientPlayer != null) {
+            this.thirst = TMCompatManager.getHandler().getThirst(clientPlayer);
+        }
+    }
+
+    public void updateThirstTAN() {
+        if (clientPlayer != null) {
+            this.thirst = TANCompatManager.getHandler().getPlayerThirst(clientPlayer);
+        }
+    }
+
+    public void setWorldTempTAN(int data) {
+        this.worldTemp = data;
+        this.tempType = getTempType(data);
+        if (data == 0 || data == 4) {
+            severity = 1;
+        } else {
+            severity = 0;
+        }
+    }
+
+    private String getTempType(int data) {
+        return switch(data) {
+            case 0 -> "Icy";
+            case 1 -> "Cold";
+            case 2 -> "Cool";
+            case 3 -> "Warm";
+            default -> "Hot";
+        };
+    }
+
+    public void updateMana() {
+        if (clientPlayer != null) {
+            ANCompatManager.getHandler().getManaValues(clientPlayer, mana::checkValues);
+        }
+    }
+
+    public void setMana(float data) {
+        mana.checkHealth(data);
+    }
+
+    public void setMaxMana(int data) {
+        mana.checkMax(data);
+    }
 }
+
+//TODO: Check max health updates for server tracked player.

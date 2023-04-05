@@ -98,4 +98,28 @@ public class RenderPacketHelper {
     public static void setSpectating(UUID player, Boolean data) {
         ClientPlayerData.playerList.get(player).setSpectator(data);
     }
+
+    public static void setThirst(UUID player, Integer data) {
+        ClientPlayerData.playerList.get(player).setThirst(data);
+    }
+
+    public static void setWorldTemp(UUID player, Float data) {
+        ClientPlayerData.playerList.get(player).setWorldTemp(data);
+    }
+
+    public static void setBodyTemp(UUID player, Float data) {
+        ClientPlayerData.playerList.get(player).setBodyTemp(data);
+    }
+
+    public static void setWorldTempTAN(UUID player, float data) {
+        ClientPlayerData.playerList.get(player).setWorldTempTAN((int)data);
+    }
+
+    public static void setMana(UUID player, float data) {
+        ClientPlayerData.playerList.get(player).setMana(data);
+    }
+
+    public static void setMaxMana(UUID player, int data) {
+        ClientPlayerData.playerList.get(player).setMaxMana(data);
+    }
 }

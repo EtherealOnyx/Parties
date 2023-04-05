@@ -150,4 +150,29 @@ public class InfoPacketHelper {
     public static void sendSpectating(UUID sendTo, boolean b) {
         PartiesPacketHandler.sendToPlayer(new RenderPacketData(18, sendTo, b), getServerPlayer(sendTo));
     }
+
+    public static void sendThirstUpdate(UUID sendTo, UUID propOf, int thirst) {
+            sendData(getServerPlayer(sendTo), propOf, 19, thirst);
+    }
+
+    public static void sendWorldTempUpdate(UUID sendTo, UUID propOf, float worldTemp) {
+        sendData(getServerPlayer(sendTo), propOf, 20, worldTemp);
+    }
+
+    public static void sendBodyTempUpdate(UUID sendTo, UUID propOf, float bodyTemp) {
+        sendData(getServerPlayer(sendTo), propOf, 21, bodyTemp);
+    }
+
+    public static void sendWorldTempUpdateTAN(UUID sendTo, UUID propOf, float worldTemp) {
+        System.out.println(getName(propOf) + "--->" + getName(sendTo) + " | " + worldTemp);
+        sendData(getServerPlayer(sendTo), propOf, 22, worldTemp);
+    }
+
+    public static void sendManaUpdate(UUID sendTo, UUID propOf, float mana) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(23, propOf, mana), getServerPlayer(sendTo));
+    }
+
+    public static void sendMaxManaUpdate(UUID sendTo, UUID propOf, int maxMana) {
+        sendData(getServerPlayer(sendTo), propOf, 24, maxMana);
+    }
 }

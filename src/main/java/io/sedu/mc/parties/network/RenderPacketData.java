@@ -57,8 +57,8 @@ public class RenderPacketData {
                 }
                 data = builder.toString();
             }
-            case 1, 2, 3, 14, 16 -> data = buf.readFloat();
-            case 4, 5, 6, 13 -> data = buf.readInt();
+            case 1, 2, 3, 14, 16, 20, 21, 22, 23 -> data = buf.readFloat();
+            case 4, 5, 6, 13, 19, 24 -> data = buf.readInt();
             case 12 -> data = new Object[]{buf.readInt(), buf.readInt(), buf.readInt()};
             case 15, 17 -> data = new Object[]{buf.readBoolean(), buf.readInt()};
             case 18 -> data = buf.readBoolean();
@@ -80,13 +80,13 @@ public class RenderPacketData {
                     buf.writeChar(letter);
                 }
             }
-            case 1, 2, 3, 14, 16 -> //Health, Max Health, Absorb
+            case 1, 2, 3, 14, 16, 20, 21, 22, 23 -> //Health, Max Health, Absorb
             {
                 buf.writeFloat((Float) data);
                 
             }
 
-            case 4, 5, 6, 13 -> //Armor, Hunger, XP Level
+            case 4, 5, 6, 13, 19, 24 -> //Armor, Hunger, XP Level
             {
                 buf.writeInt((Integer) data);
                 
@@ -145,6 +145,12 @@ public class RenderPacketData {
                 case 16 -> RenderPacketHelper.setReviveProgress(player, (Float) data);
                 case 17 -> RenderPacketHelper.setDowned(player, (Boolean) ((Object[]) data)[0], (Integer) ((Object[]) data)[1]);
                 case 18 -> RenderPacketHelper.setSpectating(player, (Boolean) data);
+                case 19 -> RenderPacketHelper.setThirst(player, (Integer) data);
+                case 20 -> RenderPacketHelper.setWorldTemp(player, (Float) data);
+                case 21 -> RenderPacketHelper.setBodyTemp(player, (Float) data);
+                case 22 -> RenderPacketHelper.setWorldTempTAN(player, (Float) data);
+                case 23 -> RenderPacketHelper.setMana(player, (Float) data);
+                case 24 -> RenderPacketHelper.setMaxMana(player, (Integer) data);
                 default -> {
 
                 }

@@ -1,16 +1,18 @@
 package io.sedu.mc.parties.data;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.ServerPacketHelper;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
-import static io.sedu.mc.parties.data.ServerConfigData.partySize;
 import static io.sedu.mc.parties.data.PlayerData.addTracker;
 import static io.sedu.mc.parties.data.PlayerData.removeTracker;
+import static io.sedu.mc.parties.data.ServerConfigData.partySize;
 
 public class PartyData {
 
@@ -57,10 +59,11 @@ public class PartyData {
         ServerPacketHelper.sendNewMember(futureMember, party);
         
         party.add(futureMember);
-        
-        Util.getPlayer(futureMember).addParty(partyId);
-        
 
+        Util.getPlayer(futureMember).addParty(partyId);
+
+        //API Helper
+        MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(Util.getServerPlayer(futureMember)));
     }
 
     public ArrayList<UUID> getMembers() {

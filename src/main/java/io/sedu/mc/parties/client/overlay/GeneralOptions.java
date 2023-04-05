@@ -52,11 +52,6 @@ public class GeneralOptions extends RenderItem {
     }
 
     @Override
-    public void register() {
-        //Fake item :)
-    }
-
-    @Override
     protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
         ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
         c.addTitleEntry("gen_f");

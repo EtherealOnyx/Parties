@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.api.playerrevive;
 
 import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -59,9 +60,22 @@ public class PREventHandler {
     }
 
     @SubscribeEvent
+    public static void onPartyJoin(PartyJoinEvent event) {
+        event.forTrackersAndSelf((sendTo, propOf, propPlayer) -> {
+            PRCompatManager.getHandler().getBleed(propPlayer, (isBleeding, duration) -> {
+                if (isBleeding) {
+                    InfoPacketHelper.sendBleeding(sendTo, propOf, true, duration);
+                    InfoPacketHelper.sendHealth(sendTo, propOf, propPlayer.getHealth());
+                    InfoPacketHelper.sendReviveUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getReviveProg());
+                }
+            });
+        });
+    }
+
+    @SubscribeEvent
     public static void onEntityTick(TickEvent.PlayerTickEvent e) {
         if (e.side == LogicalSide.SERVER && e.phase == TickEvent.Phase.END) {
-            if (e.player.tickCount % playerUpdateInterval.get() == 6) {
+            if (e.player.tickCount % playerUpdateInterval.get() == 1) {
                 if (!PlayerData.playerList.get(e.player.getUUID()).isBleeding()) return;
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {

@@ -20,7 +20,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.18.2-0.2.3'
+version = '1.18.2-0.3.0'
 group = 'io.sedu.mc.sedparties' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'sedparties'
 
@@ -191,14 +191,28 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
     implementation fg.deobf("mezz.jei:jei-${jei_version}")
 
+    //PlayerRevive Mod
     implementation fg.deobf("curse.maven:playerrevive-266890:3759779")
     runtimeOnly fg.deobf("curse.maven:creativecore-257814:3834521")
 
-    implementation fg.deobf("curse.maven:playerrevive-266890:3759779")
-    runtimeOnly fg.deobf("curse.maven:creativecore-257814:3834521")
-
+    //Hardcore Revival Mod
     implementation fg.deobf("curse.maven:hardcorerevival-274036:3830873")
     implementation fg.deobf("curse.maven:balm-531761:4442615")
+
+    //Thirst Mod - Local file, also can't test in dev environment...
+    compileOnly files("libs/Thirst--1.18.2-1.2.3.jar")
+
+    //Cold Sweat
+    implementation fg.deobf("curse.maven:coldsweat-506194:4459981")
+
+    //Tough as Nails
+    implementation fg.deobf("curse.maven:toughasnails-246391:3804267")
+
+    //Ars Noveau Support
+    implementation fg.deobf("curse.maven:arsnoveau-401955:4052851")
+    runtimeOnly fg.deobf("curse.maven:patchouli-306770:3846086")
+    runtimeOnly fg.deobf("curse.maven:curios-309927:4418032")
+
 }
 
 mixin {

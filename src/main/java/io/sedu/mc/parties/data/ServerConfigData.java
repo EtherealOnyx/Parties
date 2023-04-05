@@ -4,6 +4,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ServerConfigData {
     public static ForgeConfigSpec.IntValue playerUpdateInterval;
+    public static ForgeConfigSpec.IntValue playerSlowUpdateInterval;
     public static ForgeConfigSpec.IntValue playerAcceptTimer;
 
     //This needs to sync with clients if it is a config...
@@ -16,6 +17,8 @@ public class ServerConfigData {
 
         playerUpdateInterval = SERVER_BUILDER.comment("Delay (in ticks) for player packet syncing (hunger, xp)")
                                              .defineInRange("playerUpdateInterval", 10, 10, 200);
+        playerSlowUpdateInterval = SERVER_BUILDER.comment("Delay (in ticks) for player packet syncing for less frequent items (World Temp, etc)")
+                .defineInRange("playerSlowUpdateInterval", 40, 40, 800);
         playerAcceptTimer = SERVER_BUILDER.comment("Delay (in seconds) for player to accept invite before it automatically expires.")
                                           .defineInRange("playerAcceptTimer", 30, 5, 60);
         partySize = SERVER_BUILDER.comment("Max size for a party")

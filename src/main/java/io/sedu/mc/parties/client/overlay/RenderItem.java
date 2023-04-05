@@ -1,11 +1,13 @@
 package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Matrix4f;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
+import io.sedu.mc.parties.client.overlay.anim.ManaAnim;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
@@ -26,10 +28,12 @@ import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import net.minecraftforge.client.gui.OverlayRegistry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
 
 import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 
@@ -39,7 +43,9 @@ public abstract class RenderItem {
     public static RenderItem clickArea;
 
     public static final LinkedHashMap<String, RenderItem> items = new LinkedHashMap<>();
-    public static final List<RenderItem> tooltipItems = new ArrayList<>();
+    private static final List<RenderSelfItem> selfItems = new ArrayList<>();
+    private static final List<RenderItem> memberItems = new ArrayList<>();
+    private static final List<RenderItem> tooltipItems = new ArrayList<>();
     public static ArrayList<String> parser = new ArrayList<>();
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
 
@@ -55,6 +61,8 @@ public abstract class RenderItem {
     protected int y;
     protected int width;
     protected int height;
+    protected boolean elementEnabled = false;
+    public static boolean isDirty = false;
 
     float scale = 1f;
     float scalePos = 0f;
@@ -68,6 +76,32 @@ public abstract class RenderItem {
             if (t.isInBound(posX, posY) && t.isEnabled())
                 action.accept((TooltipItem) t);
         });
+    }
+
+    public static void syncItems() {
+        selfItems.clear();
+        memberItems.clear();
+        tooltipItems.clear();
+        items.forEach((name, item) -> {
+            if (item.isEnabled()) {
+                if (item instanceof RenderSelfItem selfItem) {
+                    selfItems.add(selfItem);
+                } else {
+                    memberItems.add(item);
+                }
+                if (item instanceof TooltipItem) {
+                    tooltipItems.add(item);
+                }
+            }
+        });
+    }
+
+    public boolean isEnabled() {
+        return elementEnabled;
+    }
+
+    public static void markDirty() {
+        isDirty = true;
     }
 
     boolean isInBound(int mouseX, int mouseY) {
@@ -182,17 +216,6 @@ public abstract class RenderItem {
     abstract void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
 
     String name;
-    IIngameOverlay item;
-
-    public void initItem() {
-        item = (gui, poseStack, partialTicks, width, height) -> {
-            for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++) {
-                itemStart(poseStack);
-                renderMember(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack, partialTicks);
-                itemEnd(poseStack);
-            }
-        };
-    }
 
     protected void itemStart(PoseStack poseStack) {
         poseStack.pushPose();
@@ -218,14 +241,43 @@ public abstract class RenderItem {
         this.name = name;
     }
 
-    public void register() {
-        initItem();
-        OverlayRegistry.registerOverlayAbove(HOTBAR_ELEMENT, name, item);
+    public static void register() {
+        IIngameOverlay overlay = (gui, poseStack, partialTicks, width, height) -> {
+            if (ClientPlayerData.playerOrderedList.size() == 0) return;
+
+            ClientPlayerData.forEachOrdered((i, id) -> {
+                if (RenderSelfItem.isSelf(i)) {
+                    for (RenderSelfItem item : selfItems) {
+                        item.itemStart(poseStack);
+                        item.renderSelf(i, id, gui, poseStack, partialTicks);
+                        item.itemEnd(poseStack);
+                    }
+                } else {
+                    for (RenderSelfItem item : selfItems) {
+                        item.itemStart(poseStack);
+                        item.renderMember(i, id, gui, poseStack, partialTicks);
+                        item.itemEnd(poseStack);
+                    }
+                }
+                for (RenderItem item : memberItems) {
+                    item.itemStart(poseStack);
+                    item.renderMember(i, id, gui, poseStack, partialTicks);
+                    item.itemEnd(poseStack);
+                }
+            });
+            if (isDirty) {
+                syncItems();
+                isDirty = false;
+            }
+        };
+        OverlayRegistry.registerOverlayAbove(HOTBAR_ELEMENT, "parties_hud", overlay);
     }
 
 
+
+
     public RenderItem setEnabled(boolean enabled) {
-        OverlayRegistry.enableOverlay(item, enabled);
+        this.elementEnabled = enabled;
         return this;
     }
 
@@ -257,6 +309,22 @@ public abstract class RenderItem {
     void blit(PoseStack p, int x, int y, int u, int v, int w, int h) {
         RenderSystem.enableDepthTest();
         GuiUtils.drawTexturedModalRect(p, x, y, u, v, w, h, zPos);
+    }
+
+    void blit(PoseStack p, int x, int y, int u, int v, int w, int h, int truew, int trueh) {
+        RenderSystem.enableDepthTest();
+        final float uScale = 1f / 0x100;
+        final float vScale = 1f / 0x100;
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder wr = tessellator.getBuilder();
+        wr.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        Matrix4f matrix = p.last().pose();
+        wr.vertex(matrix, x        , y + h, zPos).uv( u          * uScale, ((v + trueh) * vScale)).endVertex();
+        wr.vertex(matrix, x + w, y + h, zPos).uv((u + truew) * uScale, ((v + trueh) * vScale)).endVertex();
+        wr.vertex(matrix, x + w, y         , zPos).uv((u + truew) * uScale, ( v           * vScale)).endVertex();
+        wr.vertex(matrix, x        , y         , zPos).uv( u          * uScale, ( v           * vScale)).endVertex();
+        tessellator.end();
     }
 
 
@@ -481,21 +549,12 @@ public abstract class RenderItem {
 
     abstract void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b);
 
-    public boolean isEnabled() {
-        return OverlayRegistry.getEntry(this.item).isEnabled();
-    }
+
 
     public SmallBound changeVisibility(boolean data) {
-        OverlayRegistry.enableOverlay(this.item, data);
+        elementEnabled = data;
         //Prevent tooltip rendering.
-        int index = tooltipItems.indexOf(this);
-        if (data) {
-            if (this instanceof TooltipItem && index == -1) tooltipItems.add(this);
-        } else {
-            if (index == -1) return null;
-            tooltipItems.remove(index);
-        }
-
+        isDirty = true;
         return null;
     }
 
@@ -633,9 +692,11 @@ public abstract class RenderItem {
         updater.put("width", (n, d) -> n.setWidth((int)d));
         updater.put("height", (n, d) -> n.setHeight((int)d));
         updater.put("ttype", (n,d) -> HealthAnim.setTextType((int)d));
+        updater.put("mtype", (n,d) -> ManaAnim.setTextType((int)d));
         updater.put("tcolor", (n, d) -> n.setColor(0, (int)d));
         updater.put("bhue", (n,d) -> ((PHealth)n).setMainHue((int) d));
         updater.put("ohue", (n,d) -> ((PHealth)n).setOverflowHue((int) d));
+        updater.put("mhue", (n,d) -> ((PMana)n).setMainHue((int) d));
 
 
 
@@ -691,7 +752,7 @@ public abstract class RenderItem {
 
     public static void initGetter(HashMap<String, Getter> getter) {
         //Make this be per item instead.
-        getter.put("display", (n) -> Objects.requireNonNull(OverlayRegistry.getEntry(n.item)).isEnabled());
+        getter.put("display", (n) -> n.elementEnabled);
         getter.put("tshadow", (n) -> n.textShadow);
         getter.put("idisplay", (n) -> n.iconEnabled);
         getter.put("tdisplay", (n) -> n.textEnabled);
@@ -707,9 +768,11 @@ public abstract class RenderItem {
         getter.put("width", (n) -> n.width);
         getter.put("height", (n) -> n.height);
         getter.put("ttype", (n) -> HealthAnim.getTextType());
+        getter.put("mtype", (n) -> ManaAnim.getTextType());
         getter.put("tcolor", (n) -> n.getColor(0));
         getter.put("bhue", (n) -> ((PHealth)n).hue);
         getter.put("ohue", (n) -> ((PHealth)n).oHue);
+        getter.put("mhue", (n) -> ((PMana)n).hue);
 
         getter.put("bcit", (n) -> n.getColor(0));
         getter.put("bcib", (n) -> n.getColor(1));
@@ -757,6 +820,7 @@ public abstract class RenderItem {
         HashMap<String, Update> updater = new HashMap<>();
         RenderItem.initUpdater(updater);
         items.values().forEach(item -> item.getDefaults().forEachEntry((s, v) -> updater.get(s.getName()).onUpdate(item, v)));
+        syncItems();
     }
 
     public static void setElementDefaults(RenderItem item, HashMap<String, Update> updater) {

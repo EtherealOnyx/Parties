@@ -18,24 +18,6 @@ public abstract class RenderSelfItem extends RenderItem {
     abstract void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
                              float partialTicks);
 
-
-    @Override
-    public void initItem() {
-        //If forced items are required and different (i.e, chicken)
-        item = (gui, poseStack, partialTicks, width, height) -> {
-            if (ClientPlayerData.playerOrderedList.size() == 0) return;
-
-            for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++) {
-                itemStart(poseStack);
-                if (isSelf(i))
-                    renderSelf(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack, partialTicks);
-                else
-                    renderMember(i, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(i)), gui, poseStack, partialTicks);
-                itemEnd(poseStack);
-            }
-        };
-    }
-
     public static boolean isSelf(int index) {
         return index == selfIndex;
     }
