@@ -208,8 +208,42 @@
   "ui.sedparties.tooltip.thirst": "Thirst: ",
   "ui.sedparties.tooltip.temp": "Temperature: ",
   "ui.sedparties.tooltip.temp2": "Body Heat: ",
-  "ui.sedparties.tooltip.mana": "Mana: "
+  "ui.sedparties.tooltip.mana": "Mana: ",
 
+
+  "messages.sedparties.command.kickfail": "Only the party leader can kick other players.",
+  "messages.sedparties.api.partiesprefix": "[Parties] ",
+  "messages.sedparties.api.coldsweatunload": "Cold Sweat needs to be version 2.2 or higher! Support has been disabled.",
+  "messages.sedparties.phandler.declineinvite": "You have declined a party invite from %s.",
+  "messages.sedparties.phandler.declineinviteauto": "Your party invite has been automatically declined",
+  "messages.sedparties.phandler.declineinviteauto2": "%s took too long to respond. Invite cancelled.",
+  "messages.sedparties.phandler.declineinviteauto3": "You took too long to respond to a party request from %s",
+  "messages.sedparties.phandler.invitedeclined": "%s has declined your party invite.",
+  "messages.sedparties.phandler.receivedinvite": "%s invites you to a party!",
+  "messages.sedparties.phandler.receivedinvite2": "You can click the following to respond: ",
+  "messages.sedparties.phandler.receivedinvite3": "Accept",
+  "messages.sedparties.phandler.accepttooltip": "Accept Party Invite",
+  "messages.sedparties.phandler.receivedinvite4": "Decline",
+  "messages.sedparties.phandler.declinetooltip": "Decline Party Invite",
+  "messages.sedparties.phandler.receivedinvite5": "You can also type: ",
+  "messages.sedparties.phandler.sendinvite": "You have sent a party invite to %s.",
+  "messages.sedparties.phandler.alreadyhasparty": "%s is already in a party.",
+  "messages.sedparties.phandler.noinviteperms": "Only the party leader can invite other players",
+  "messages.sedparties.phandler.partyfull": "Your party is full.",
+  "messages.sedparties.phandler.joinparty": "You join the party.",
+  "messages.sedparties.phandler.changeleader": "%s is now the party leader.",
+  "messages.sedparties.phandler.changeleader2": "You are now the party leader.",
+  "messages.sedparties.phandler.dropparty": "You left the party.",
+  "messages.sedparties.phandler.leftparty": "%s left the party.",
+  "messages.sedparties.phandler.kickedfromparty": "You have been kicked from the party.",
+  "messages.sedparties.phandler.kickedfrompartyother": "%s has been kicked from the party.",
+  "messages.sedparties.phandler.partydisband": "Party disbanded.",
+
+  "messages.sedparties.preset.loadsuccess": "Preset (%s) has been loaded successfully.",
+  "messages.sedparties.preset.notfound": "Preset (%s) not found.",
+  "messages.sedparties.preset.deletesuccess": "Preset (%s) was deleted successfully.",
+
+  "ui.sedparties.tooltip.effectinstant": "Instant"
 
 
 }

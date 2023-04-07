@@ -2,9 +2,10 @@ package io.sedu.mc.parties.data;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class Util {
@@ -35,13 +36,42 @@ public class Util {
         return null;
     }
 
-    public static List<String> getPartyNamesWithout(UUID memberId) {
-        ArrayList<String> listWithout = new ArrayList<>();
-        getPartyFromMember(memberId).getMembers().forEach(id -> {
-           if (!id.equals(memberId))
-               listWithout.add(getName(id));
-        });
-        return listWithout;
+    public static ArrayList<Player> getOnlineMembersWithoutSelf(UUID memberId) {
+        ArrayList<Player> players = new ArrayList<>();
+        PartyData p;
+        if ((p = getPartyFromMember(memberId)) != null) {
+            Player player;
+            for (UUID member : p.getMembers()) {
+                if (!member.equals(memberId) && (player = getServerPlayer(member)) != null) {
+                    players.add(player);
+                }
+            }
+        }
+        return players;
+    }
+
+    public static ArrayList<Player> getNearMembersWithoutSelf(UUID memberId) {
+        ArrayList<Player> players = new ArrayList<>();
+        PartyData p;
+        if ((p = getPartyFromMember(memberId)) != null) {
+            Player player;
+            for (UUID member : p.getMembers()) {
+
+                //not self check && is online check && is in range check
+                if (!member.equals(memberId) && (player = getServerPlayer(member)) != null && isClientTracked(memberId, member)) {
+                    players.add(player);
+                }
+            }
+        }
+        return players;
+    }
+
+    private static boolean isClientTracked(UUID tracker, UUID toTrack) {
+        HashMap<UUID, Boolean> trackers;
+        Boolean serverTracked;
+        if ((trackers = PlayerData.playerTrackers.get(toTrack)) != null && (serverTracked = trackers.get(tracker)) != null)
+            return !serverTracked;
+        return false;
     }
 
     public static boolean inSameParty(UUID member1, UUID member2) {
@@ -80,4 +110,5 @@ public class Util {
     public static boolean isOnline(UUID id) {
         return getServerPlayer(id) != null;
     }
+
 }

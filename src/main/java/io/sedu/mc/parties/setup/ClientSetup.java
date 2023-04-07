@@ -1,6 +1,5 @@
 package io.sedu.mc.parties.setup;
 
-import com.google.gson.JsonObject;
 import io.sedu.mc.parties.api.hardcorerevival.HRHandler;
 import io.sedu.mc.parties.api.playerrevive.PRHandler;
 import io.sedu.mc.parties.client.config.Config;
@@ -85,14 +84,11 @@ public class ClientSetup {
 
         //DimConfig.init();
         Config.init();
-        saveDefaultPresets(false);
+        saveDefaultPresets();
+        Config.loadDefaultPreset();
     }
 
-    public static void saveDefaultPresets(boolean saveCurrent) {
-        JsonObject json = null;
-        if (saveCurrent) {
-            json = Config.savePresetToObject();
-        }
+    public static void saveDefaultPresets() {
         RenderItem.setDefaultValues();
         Config.saveDefaultPreset("standard", "The standard preset of the mod. UI is rpg-like.");
         final HashMap<String, RenderItem.Update> updater = new HashMap<>();
@@ -132,17 +128,6 @@ public class ClientSetup {
                {"general":{"gen_x":16,"gen_y":16,"gen_w":168,"gen_h":65,"gen_pw":0,"gen_ph":64},"head":{"display":true,"htype":1,"xpos":8,"ypos":8,"zpos":0,"scale":2,"bleed":true},"name":{"display":true,"tshadow":true,"tcolor":14545919,"tmax":16,"xpos":46,"ypos":7,"zpos":0,"scale":2},"leader":{"display":true,"xpos":34,"ypos":33,"zpos":2,"scale":2},"dim":{"display":true,"tdisplay":true,"danim":true,"xpos":4,"ypos":32,"zpos":1},"effects":{"display":true,"tdisplay":true,"bsize":1,"buffg":11134463,"buffb":16755113,"flash":16777215,"xpos":46,"ypos":43,"zpos":0,"scale":2,"idisplay":true,"spacex":30,"spacey":44,"rowmax":8,"totalmax":8,"bsep":false,"dfirst":true,"dlim":4,"blim":3},"effects_b":{"display":false,"tdisplay":true,"bsize":1,"buffg":11134463,"flash":16777215,"xpos":46,"ypos":43,"zpos":0,"scale":2,"idisplay":true,"spacex":30,"spacey":44,"rowmax":8,"totalmax":8},"effects_d":{"display":false,"tdisplay":true,"bsize":1,"buffb":16755113,"flash":16777215,"xpos":46,"ypos":43,"zpos":0,"scale":2,"idisplay":true,"spacex":30,"spacey":44,"rowmax":8,"totalmax":8},"armor":{"display":true,"scale":2,"zpos":0,"idisplay":true,"xpos":46,"ypos":16,"tdisplay":true,"tshadow":false,"tcolor":14545919,"tattached":true,"xtpos":0,"ytpos":0},"chicken":{"display":true,"scale":2,"zpos":0,"idisplay":true,"xpos":143,"ypos":16,"tdisplay":true,"tshadow":false,"tcolor":14545919,"tattached":true,"xtpos":0,"ytpos":0},"thirst":{"display":true,"scale":2,"zpos":0,"idisplay":true,"xpos":118,"ypos":16,"tdisplay":true,"tshadow":false,"tcolor":14545919,"tattached":true,"xtpos":0,"ytpos":0},"temp":{"display":true,"scale":2,"zpos":0,"idisplay":true,"xpos":80,"ypos":16,"tdisplay":true,"tshadow":true,"tattached":true,"xtpos":0,"ytpos":0},"lvlbar":{"display":true,"scale":2,"zpos":0,"idisplay":true,"xpos":4,"ypos":44,"width":40,"tdisplay":true,"tshadow":true,"tcolor":8454027,"tattached":true,"xtpos":0,"ytpos":0},"health":{"display":true,"scale":2,"zpos":0,"idisplay":true,"xpos":46,"ypos":26,"width":120,"height":10,"tdisplay":true,"tshadow":true,"ttype":0,"tattached":true,"xtpos":0,"ytpos":0,"bhue":0,"ohue":11,"bcit":12976069,"bcib":7143276,"bcdt":16762309,"bcdb":16739436},"mana":{"display":true,"scale":1,"zpos":0,"idisplay":true,"xpos":46,"ypos":35,"width":240,"height":12,"tdisplay":true,"tshadow":true,"mtype":0,"tattached":true,"xtpos":0,"ytpos":0,"mhue":60,"bcit":10275583,"bcib":7123199,"bcdt":6787286,"bcdb":1915756},"offline":{"display":true,"scale":2,"zpos":0,"idisplay":true,"xpos":156,"ypos":8,"tdisplay":true,"tshadow":false,"tcolor":14545919,"tattached":false,"xtpos":86,"ytpos":20},"dead":{"display":true,"scale":2,"zpos":1,"idisplay":true,"xpos":157,"ypos":9,"tdisplay":true,"tshadow":true,"tcolor":12543590,"tattached":false,"xtpos":25,"ytpos":20},"bg1":{"display":true,"xpos":44,"ypos":5,"width":124,"height":38},"bgc":{"xpos":6,"ypos":6,"width":162,"height":36}}
                """;
         Config.saveDefaultPresetFromString(updater, "standard-mana", "The standard preset of the mod with support for a mana bar. UI is rpg-like.", load);
-
-        if (saveCurrent) {
-            Config.loadPresetFromObject(json, updater);
-            RenderItem.markDirty();
-        } else {
-            if (ModList.get().isLoaded("ars_nouveau")) {
-                Config.loadPreset("standard-mana", true, updater);
-            } else {
-                RenderItem.setDefaultValues();
-            }
-        }
     }
 
     public static void postInit(FMLLoadCompleteEvent event) {

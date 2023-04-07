@@ -164,7 +164,6 @@ public class InfoPacketHelper {
     }
 
     public static void sendWorldTempUpdateTAN(UUID sendTo, UUID propOf, float worldTemp) {
-        System.out.println(getName(propOf) + "--->" + getName(sendTo) + " | " + worldTemp);
         sendData(getServerPlayer(sendTo), propOf, 22, worldTemp);
     }
 

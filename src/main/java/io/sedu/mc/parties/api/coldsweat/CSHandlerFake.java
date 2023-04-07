@@ -23,7 +23,7 @@ public class CSHandlerFake implements ICSHandler {
     }
 
     @Override
-    public void getClientWorldTemp(Player clientPlayer, TriConsumer<Integer, Integer, Integer> action) {
+    public void getClientWorldTemp(Player player, TriConsumer<Integer, Integer, Integer> triConsumer) {
 
     }
 

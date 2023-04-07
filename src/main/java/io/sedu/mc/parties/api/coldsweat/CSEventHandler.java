@@ -24,29 +24,43 @@ public class CSEventHandler {
             if (e.player.tickCount % playerUpdateInterval.get() == 9) {
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
-                    UUID player;
-                    float temp;
-                    //Body
-                    boolean update = PlayerData.playerList.get(player = e.player.getUUID()).setBodyTemp(temp = CSCompatManager.getHandler().getBodyTemp(e.player));
-                    if (update)
-                        trackers.forEach((id, serverTracked) -> {
-                            if (serverTracked)
-                                InfoPacketHelper.sendBodyTempUpdate(id, player, temp);
-                        });
+                    try {
+                        UUID player;
+                        float temp;
+                        boolean update;
+                        update = PlayerData.playerList.get(player = e.player.getUUID()).setBodyTemp(temp = CSCompatManager.getHandler().getBodyTemp(e.player));
+                        //Body
+                        if (update)
+                            trackers.forEach((id, serverTracked) -> {
+                                if (serverTracked)
+                                    InfoPacketHelper.sendBodyTempUpdate(id, player, temp);
+                            });
+                    } catch (Throwable t) {
+                        CSCompatManager.changeHandler();
+                        onEntityTick(e);
+                    }
+
+
                 }
             }
             if (e.player.tickCount % playerSlowUpdateInterval.get() == 9) {
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
-                    UUID player;
-                    float temp;
-                    //World
-                    boolean update = PlayerData.playerList.get(player = e.player.getUUID()).setWorldTemp(temp = CSCompatManager.getHandler().getWorldTemp(e.player));
-                    if (update)
-                        trackers.forEach((id, serverTracked) -> {
-                            if (serverTracked)
-                                InfoPacketHelper.sendWorldTempUpdate(id, player, temp);
-                        });
+                    try {
+                        UUID player;
+                        float temp;
+                        //World
+                        boolean update = PlayerData.playerList.get(player = e.player.getUUID()).setWorldTemp(temp = CSCompatManager.getHandler()
+                                                                                                                                   .getWorldTemp(e.player));
+                        if (update)
+                            trackers.forEach((id, serverTracked) -> {
+                                if (serverTracked)
+                                    InfoPacketHelper.sendWorldTempUpdate(id, player, temp);
+                            });
+                    } catch (Throwable t) {
+                        CSCompatManager.changeHandler();
+                        onEntityTick(e);
+                    }
                 }
             }
         }

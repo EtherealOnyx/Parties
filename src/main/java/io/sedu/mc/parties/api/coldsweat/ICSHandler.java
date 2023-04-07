@@ -6,7 +6,6 @@ import net.minecraft.world.entity.player.Player;
 import java.util.function.BiConsumer;
 
 public interface ICSHandler {
-
     float getWorldTemp(Player player);
 
     float getBodyTemp(Player player);

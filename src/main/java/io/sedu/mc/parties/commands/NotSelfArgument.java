@@ -7,16 +7,22 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
+import io.sedu.mc.parties.data.PartyData;
+import io.sedu.mc.parties.data.Util;
+import io.sedu.mc.parties.mixin.EntitySelectorMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.selector.EntitySelector;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import net.minecraft.commands.synchronization.ArgumentSerializer;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class NotSelfArgument extends EntityArgument {
@@ -31,6 +37,7 @@ public class NotSelfArgument extends EntityArgument {
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> pContext, SuggestionsBuilder pBuilder) {
         if (pContext.getSource() instanceof ClientSuggestionProvider provider) {
             if (partyOnly && ClientPlayerData.partySize() == 0) {
+
                 return Suggestions.empty();
             }
 
@@ -81,5 +88,18 @@ public class NotSelfArgument extends EntityArgument {
         public void serializeToJson(NotSelfArgument pArgument, JsonObject pJson) {
             pJson.addProperty("partyonly", pArgument.partyOnly ? "yes" : "no");
         }
+    }
+
+    public static UUID getPlayerUUID(CommandContext<CommandSourceStack> pContext, String pName, UUID senderId) throws CommandSyntaxException {
+        return findPlayer(Util.getPartyFromMember(senderId), ((EntitySelectorMixin)pContext.getArgument(pName, EntitySelector.class)).getPlayerName());
+    }
+
+    private static UUID findPlayer(PartyData party, String pName) {
+        for (UUID member : party.getMembers()) {
+            if (Util.getPlayer(member).getName().equals(pName)) {
+                return member;
+            }
+        };
+        return null;
     }
 }

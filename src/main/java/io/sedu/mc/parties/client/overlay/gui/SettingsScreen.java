@@ -209,6 +209,7 @@ public class SettingsScreen extends Screen {
         PresetOptions.icon = null;
         nameHolder = nameBox.getValue().isEmpty() ? null : nameBox.getValue();
         descHolder = descBox.getValue().isEmpty() ? null : descBox.getValue();
+        Config.saveCurrentPresetAsDefault(getter);
         super.onClose();
     }
 

@@ -11,6 +11,8 @@ public class ServerConfigData {
     public static Integer playerMessageCooldown = 10;
     public static ForgeConfigSpec.IntValue partySize;
     public static ForgeConfigSpec.BooleanValue friendlyFire;
+    public static ForgeConfigSpec.BooleanValue globalShare;
+    public static ForgeConfigSpec.BooleanValue enableShare;
 
     public static void registerServerConfig(ForgeConfigSpec.Builder SERVER_BUILDER) {
         SERVER_BUILDER.comment("Server Party Settings").push("party");
@@ -25,6 +27,11 @@ public class ServerConfigData {
                                   .defineInRange("partySize", 5, 2, Integer.MAX_VALUE);
         friendlyFire = SERVER_BUILDER.comment("Allow players to attack each other in parties")
                                      .define("friendlyFire", false);
+        enableShare = SERVER_BUILDER.comment("Allow players to share XP in a party.")
+                .define("enableShare", true);
+        globalShare = SERVER_BUILDER.comment("Enables XP Sharing between party members regardless of distance from each other.")
+                                    .define("globalShare", true);
+
         SERVER_BUILDER.pop();
     }
 }

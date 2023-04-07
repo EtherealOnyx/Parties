@@ -3,6 +3,7 @@ package io.sedu.mc.parties.data;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.ServerPacketHelper;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.util.ArrayList;
@@ -26,6 +27,8 @@ public class PartyData {
     private final ArrayList<UUID> party;
 
     private final UUID partyId;
+
+    private int xpOverflow = 0;
 
     //This party is created by the initiator.
     //They automatically get lead and get added to a party.
@@ -105,6 +108,13 @@ public class PartyData {
     }
 
     public void disband() {
+        if (party.size() >= 1) {
+            Player p = Util.getServerPlayer(party.get(0));
+            if (p != null) {
+                //Give the last member any remaining XP stored in the party.
+                p.giveExperiencePoints(xpOverflow);
+            }
+        }
         ServerPacketHelper.disband(party);
         //To avoid concurrent modification....
         Iterator<UUID> i = party.iterator();
@@ -133,5 +143,13 @@ public class PartyData {
 
     public boolean isFull() {
         return party.size() >= partySize.get();
+    }
+
+    public int getXpOverflow() {
+        return xpOverflow;
+    }
+
+    public void setXpOverflow(int i) {
+        xpOverflow = i;
     }
 }

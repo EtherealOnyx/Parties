@@ -8,13 +8,16 @@ import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
 import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
+import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import io.sedu.mc.parties.client.overlay.anim.ManaAnim;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
@@ -410,10 +413,20 @@ public class ClientPlayerData {
     }
 
     public void setWorldTemp(Float data) {
-        CSCompatManager.getHandler().convertTemp(data, (temp, sev) -> {
-            this.worldTemp = temp;
-            this.severity = sev;
-        });
+        try {
+            CSCompatManager.getHandler().convertTemp(data, (temp, sev) -> {
+                this.worldTemp = temp;
+                this.severity = sev;
+            });
+        } catch (Throwable t) {
+            CSCompatManager.changeHandler();
+            Config.loadDefaultPreset(); //Forces refresh.
+            if (Minecraft.getInstance().player != null)
+                Minecraft.getInstance().player.sendMessage(
+                        new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(
+                                new TranslatableComponent("messages.sedparties.api.coldsweatunload").withStyle(ChatFormatting.RED))
+                        , Minecraft.getInstance().player.getUUID());
+        }
     }
 
     public void setBodyTemp(float data) {
@@ -422,11 +435,22 @@ public class ClientPlayerData {
 
     public void updateTemperatures() {
         if (clientPlayer != null) {
-            CSCompatManager.getHandler().getClientWorldTemp(clientPlayer, (temp, sev, body) -> {
-                this.worldTemp = temp;
-                this.severity = sev;
-                this.bodyTemp = body;
-            });
+            try {
+                CSCompatManager.getHandler().getClientWorldTemp(clientPlayer, (temp, sev, body) -> {
+                    this.worldTemp = temp;
+                    this.severity = sev;
+                    this.bodyTemp = body;
+                });
+            } catch (Throwable t) {
+                CSCompatManager.changeHandler();
+                Config.loadDefaultPreset(); //Forces refresh.
+                if (Minecraft.getInstance().player != null)
+                    Minecraft.getInstance().player.sendMessage(
+                            new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(
+                            new TranslatableComponent("messages.sedparties.api.coldsweatunload").withStyle(ChatFormatting.RED))
+                            , Minecraft.getInstance().player.getUUID());
+            }
+
         }
     }
 

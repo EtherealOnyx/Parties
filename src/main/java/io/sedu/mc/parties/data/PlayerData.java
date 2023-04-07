@@ -1,6 +1,8 @@
 package io.sedu.mc.parties.data;
 
+import io.sedu.mc.parties.Parties;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -17,6 +19,10 @@ public class PlayerData {
     //Boolean true = server side tracking, false = client side tracking.
     //Inner UUID belongs to ID that is tracking the outer player.
     public static HashMap<UUID,HashMap<UUID, Boolean>> playerTrackers = new HashMap<>();
+
+    private List<Player> nearMembers = new ArrayList<>();
+    private List<Player> globalMembers = new ArrayList<>();
+    private boolean listDirty = true;
 
     //Player Entity
     protected WeakReference<ServerPlayer> serverPlayer;
@@ -123,6 +129,11 @@ public class PlayerData {
             playerTrackers.put(toTrack, new HashMap<>());
         }
         playerTrackers.get(toTrack).put(trackerHost, true);
+        Util.getPlayer(trackerHost).markDirty();
+    }
+
+    private void markDirty() {
+        listDirty = true;
     }
 
     public static void removeTracker(UUID trackerHost, UUID toTrack) {
@@ -132,10 +143,12 @@ public class PlayerData {
         playerTrackers.get(toTrack).remove(trackerHost);
         if (playerTrackers.get(toTrack).size() == 0)
             playerTrackers.remove(toTrack);
+        Util.getPlayer(trackerHost).markDirty();
     }
 
     public static void changeTracker(UUID trackerHost, UUID toTrack, boolean serverTracked) {
         playerTrackers.get(toTrack).put(trackerHost, serverTracked);
+        Util.getPlayer(trackerHost).markDirty();
     }
 
     public boolean setHunger(int hunger) {
@@ -282,5 +295,22 @@ public class PlayerData {
         public boolean tick() {
             return cooldown-- <= 0;
         }
+    }
+
+    public List<Player> getNearbyMembers() {
+        if (listDirty) redoList(getPlayer().getUUID());
+        return nearMembers;
+    }
+
+    public List<Player> getOnlineMembers() {
+        if (listDirty) redoList(getPlayer().getUUID());
+        return globalMembers;
+    }
+
+    private void redoList(UUID id) {
+        Parties.LOGGER.debug("Refreshing members for XP share!");
+        nearMembers = Util.getNearMembersWithoutSelf(id);
+        globalMembers = Util.getOnlineMembersWithoutSelf(id);
+        listDirty = false;
     }
 }

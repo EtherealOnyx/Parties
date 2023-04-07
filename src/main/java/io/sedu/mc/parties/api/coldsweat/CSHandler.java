@@ -42,7 +42,7 @@ public class CSHandler implements ICSHandler {
     @Override
     public float getBodyTemp(Player player) {
         ITemperatureCap temp = player.getCapability(TEMP).orElse(null);
-        //noinspection ConstantConditions
+            //noinspection ConstantConditions
         if (temp != null ) {
             return (float) temp.getTemp(Temperature.Type.BODY);
         }
@@ -56,6 +56,7 @@ public class CSHandler implements ICSHandler {
 
     @Override
     public void getClientWorldTemp(Player clientPlayer, TriConsumer<Integer, Integer, Integer> action) {
+
         convertTemp(getWorldTemp(clientPlayer), (temp, sev) -> {
             action.accept(temp, sev, (int) getBodyTemp(clientPlayer));
         });

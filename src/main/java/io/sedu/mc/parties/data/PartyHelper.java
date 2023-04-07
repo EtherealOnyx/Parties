@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.UUID;
@@ -44,13 +45,10 @@ public class PartyHelper {
             return false;
         ServerPlayer p;
         if ((p = getPlayer(initiator).getPlayer()) != null) {
-            p.sendMessage(new TextComponent(getName(futureMember)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(
-                    " has declined your party invite.").withStyle(ChatFormatting.DARK_AQUA)), initiator);
+            p.sendMessage(new TranslatableComponent("messages.sedparties.phandler.invitedeclined", getName(futureMember)).withStyle(ChatFormatting.DARK_AQUA), initiator);
         }
         if ((p = getPlayer(futureMember).getPlayer()) != null) {
-            p.sendMessage(new TextComponent("You have declined a party invite from ").withStyle(ChatFormatting.DARK_AQUA)
-                                                                                     .append(new TextComponent(getName(initiator)).withStyle(ChatFormatting.YELLOW
-                                                                                     )).append(new TextComponent(".").withStyle(ChatFormatting.DARK_AQUA)), futureMember);
+            p.sendMessage(new TranslatableComponent("messages.sedparties.phandler.declineinvite", getName(initiator)).withStyle(ChatFormatting.DARK_AQUA), futureMember);
         }
         getPlayer(futureMember).removeInviter(initiator);
         return true;
@@ -72,7 +70,6 @@ public class PartyHelper {
     //Kicks player from party.
     public static boolean kickPlayer(UUID initiator, UUID removedMember) {
         if (!inSameParty(initiator, removedMember)) {
-            
             return false;
         }
         return removePlayerFromParty(removedMember, true);
@@ -104,46 +101,43 @@ public class PartyHelper {
             getPlayer(futureMember).addInviter(initiator);
             //Sends message to futureMember.
             getPlayer(futureMember).getPlayer().sendMessage(
-                    new TextComponent(getName(initiator)).withStyle(ChatFormatting.YELLOW
-                    ).append(new TextComponent(" invites you to a party!").withStyle(ChatFormatting.DARK_AQUA)
-                    ), futureMember);
+                    new TranslatableComponent("messages.sedparties.phandler.receivedinvite", getName(initiator)).withStyle(ChatFormatting.DARK_AQUA)
+                    , futureMember);
 
             getPlayer(futureMember).getPlayer().sendMessage(
-                    new TextComponent("You can click the following to respond: ").withStyle(ChatFormatting.DARK_AQUA)
-                                                                                 .append(new TextComponent("Accept").withStyle(
+                    new TranslatableComponent("messages.sedparties.phandler.receivedinvite2").withStyle(ChatFormatting.DARK_AQUA)
+                                                                                 .append(new TranslatableComponent("messages.sedparties.phandler.receivedinvite3").withStyle(
                             style -> style.withColor(ChatFormatting.GREEN)
                                           .withUnderlined(true)
                                           .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                                                          "/party accept " + getName(initiator)))
                                           .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                                                         new TextComponent("Accept Party Invite"))))
+                                                                         new TranslatableComponent("messages.sedparties.phandler.accepttooltip"))))
                     ).append(" "
                     ).append(
-                            new TextComponent("Decline").withStyle(
+                            new TranslatableComponent("messages.sedparties.phandler.receivedinvite4").withStyle(
                                     style -> style.withColor(ChatFormatting.RED)
                                                   .withUnderlined(true)
                                                   .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                                                                  "/party decline " + getName(initiator)))
                                                   .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                                                                 new TextComponent("Decline Party Invite")))
+                                                                                 new TranslatableComponent("messages.sedparties.phandler.declinetooltip")))
                             )
                     )
                     , futureMember);
 
             //TODO: Support changing /party to /p, etc
             getPlayer(futureMember).getPlayer().sendMessage(
-                    new TextComponent("You can also type ").withStyle(ChatFormatting.DARK_AQUA)
+                    new TranslatableComponent("messages.sedparties.phandler.receivedinvite5").withStyle(ChatFormatting.DARK_AQUA)
                             .append(new TextComponent("/party accept").withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(true)))
-                            .append(new TextComponent(" or ").withStyle(ChatFormatting.DARK_AQUA))
+                            .append(new TextComponent(" | ").withStyle(ChatFormatting.DARK_AQUA))
                             .append(new TextComponent("/party decline").withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(true)))
-                            .append(new TextComponent(".").withStyle(ChatFormatting.DARK_AQUA))
                     , futureMember);
 
 
 
-            getPlayer(initiator).getPlayer().sendMessage(new TextComponent("You have sent a party invite to ").withStyle(ChatFormatting.DARK_AQUA)
-                                                                                     .append(new TextComponent(getName(futureMember)).withStyle(ChatFormatting.YELLOW
-                                                                                     )).append(new TextComponent(".").withStyle(ChatFormatting.DARK_AQUA)), initiator);
+            getPlayer(initiator).getPlayer().sendMessage(new TranslatableComponent("messages.sedparties.phandler.sendinvite",
+                                                                                   getName(futureMember)).withStyle(ChatFormatting.DARK_AQUA), initiator);
         }
 
 
@@ -158,19 +152,19 @@ public class PartyHelper {
         
         //This checks if the target is currently in a party.
         if (getPlayer(futureMember).hasParty()) {
-            p.sendMessage(new TextComponent(getPlayer(futureMember).getName()).withStyle(ChatFormatting.YELLOW).append(new TextComponent(
-                    " is already in a party.").withStyle(ChatFormatting.DARK_AQUA)), initiator);
+            p.sendMessage(new TranslatableComponent(
+                    "messages.sedparties.phandler.alreadyhasparty", getName(futureMember)).withStyle(ChatFormatting.DARK_AQUA), initiator);
             return false;
         }
         if (getPlayer(initiator).hasParty()) {
             if (!isLeader(initiator)) {
-                p.sendMessage(new TextComponent(
-                        "Only the party leader can invite other players.").withStyle(ChatFormatting.DARK_AQUA), initiator);
+                p.sendMessage(new TranslatableComponent(
+                        "messages.sedparties.phandler.noinviteperms").withStyle(ChatFormatting.DARK_AQUA), initiator);
                 return false;
             }
             if (getPartyFromMember(initiator).isFull()) {
-                p.sendMessage(new TextComponent(
-                        "Your party is full.").withStyle(ChatFormatting.DARK_AQUA), initiator);
+                p.sendMessage(new TranslatableComponent(
+                        "messages.sedparties.phandler.partyfull").withStyle(ChatFormatting.DARK_AQUA), initiator);
                 return false;
             }
         }
@@ -180,8 +174,8 @@ public class PartyHelper {
     public static void dismissInvite(UUID initiator) {
         ServerPlayer p;
         if ((p = getServerPlayer(initiator)) != null) {
-            p.sendMessage(new TextComponent(
-                    "Your party invite has been automatically declined.").withStyle(ChatFormatting.DARK_AQUA), p.getUUID());
+            p.sendMessage(new TranslatableComponent(
+                    "messages.sedparties.phandler.declineinviteauto").withStyle(ChatFormatting.DARK_AQUA), p.getUUID());
         }
 
     }
@@ -189,12 +183,12 @@ public class PartyHelper {
     public static void dismissInvite(PlayerData playerData, UUID initiator) {
         ServerPlayer p;
         if ((p = getServerPlayer(initiator)) != null) {
-            p.sendMessage(new TextComponent(playerData.getName()).withStyle(ChatFormatting.YELLOW).append(new TextComponent(
-                    " took too long to respond. Invite cancelled.").withStyle(ChatFormatting.DARK_AQUA)), initiator);
+            p.sendMessage(new TranslatableComponent(
+                    "messages.sedparties.phandler.declineinviteauto2", playerData.getName()).withStyle(ChatFormatting.DARK_AQUA), initiator);
         }
 
         if ((p = playerData.getPlayer()) != null) {
-            p.sendMessage(new TextComponent("You took too long to respond to a party request from ").withStyle(ChatFormatting.DARK_AQUA).append(new TextComponent(getName(initiator)).withStyle(ChatFormatting.YELLOW)), initiator);
+            p.sendMessage(new TranslatableComponent("messages.sedparties.phandler.declineinviteauto3", getName(initiator)).withStyle(ChatFormatting.DARK_AQUA), initiator);
         }
     }
 }

@@ -12,6 +12,7 @@ public class ClientConfigData {
     public static ForgeConfigSpec.BooleanValue renderThirst;
     public static ForgeConfigSpec.BooleanValue renderTemperature;
     public static ForgeConfigSpec.BooleanValue renderMana;
+    public static ForgeConfigSpec.ConfigValue<String> defaultPreset;
     public static void registerClientConfig(ForgeConfigSpec.Builder CLIENT_BUILDER) {
         CLIENT_BUILDER.comment("Client Party Settings | Type /party reload in-game to reload this configuration.").push("party");
 
@@ -31,6 +32,8 @@ public class ClientConfigData {
                                      .define("renderTemperature", true);
         renderMana = CLIENT_BUILDER.comment("Enable the Mana Display (Ars Nouveau)")
                                           .define("renderMana", true);
+        defaultPreset = CLIENT_BUILDER.comment("The default preset to load on the client. It's automatically set to load your last preset used.")
+                .define("defaultPreset", "");
         CLIENT_BUILDER.pop();
     }
 }

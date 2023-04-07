@@ -6,6 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 
@@ -42,7 +43,6 @@ public class ClientPacketHelper {
         list.forEach(uuid -> {
             try {
                 getClientPlayer(uuid).setOnline();
-                //BoundsEntry.setupBounds(playerOrderedList.indexOf(uuid));
                 msgDebug(new TextComponent(getName(uuid)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" is now online.").withStyle(ChatFormatting.AQUA)));
             } catch (NullPointerException e) {
                 error();
@@ -57,7 +57,6 @@ public class ClientPacketHelper {
         list.forEach(uuid -> {
             try {
                 getClientPlayer(uuid).setOffline();
-                //BoundsEntry.removeOfflineBounds(playerOrderedList.indexOf(uuid));
                 msgDebug(new TextComponent(getName(uuid)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" is now offline.").withStyle(ChatFormatting.AQUA)));
             } catch (NullPointerException e) {
                 error();
@@ -78,7 +77,7 @@ public class ClientPacketHelper {
             error();
             e.printStackTrace();
         }
-        msg(new TextComponent("You join the party.").withStyle(ChatFormatting.AQUA));
+        msg(new TranslatableComponent("messages.sedparties.phandler.joinparty").withStyle(ChatFormatting.AQUA));
         //Try to see if we can track any of our new members on the client.
         Minecraft.getInstance().level.players().forEach(player -> {
             if (ClientPlayerData.playerList.containsKey(player.getUUID())) {
@@ -99,20 +98,20 @@ public class ClientPacketHelper {
     public static void changeLeader(ArrayList<UUID> list) {
         //list should always be size 1 here.
         ClientPlayerData.changeLeader(list.get(0));
-        msg(new TextComponent(getName(list.get(0))).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" is now the party leader.").withStyle(ChatFormatting.AQUA)));
+        msg((new TranslatableComponent("messages.sedparties.phandler.changeleader", getName(list.get(0))).withStyle(ChatFormatting.AQUA)));
         Minecraft.getInstance().player.playSound(SoundEvents.NOTE_BLOCK_XYLOPHONE, .5f, 1f);
         Minecraft.getInstance().player.playSound(SoundEvents.NOTE_BLOCK_CHIME, .5f, 1.25f);
     }
 
     public static void dropParty() {
         ClientPlayerData.reset();
-        msg(new TextComponent("You left the party.").withStyle(ChatFormatting.DARK_AQUA));
+        msg(new TranslatableComponent("messages.sedparties.phandler.dropparty").withStyle(ChatFormatting.DARK_AQUA));
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
         HoverScreen.reInit();
     }
 
     public static void removePartyMemberDropped(UUID uuid) {
-        msg(new TextComponent(getName(uuid)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" left the party.").withStyle(ChatFormatting.AQUA)));
+        msg(new TranslatableComponent("messages.sedparties.phandler.leftparty", getName(uuid)).withStyle(ChatFormatting.AQUA));
         remove(uuid);
     }
 
@@ -124,19 +123,19 @@ public class ClientPacketHelper {
 
     public static void dropPartyKicked() {
         ClientPlayerData.reset();
-        msg(new TextComponent("You have been kicked from the party.").withStyle(ChatFormatting.AQUA));
+        msg(new TranslatableComponent("messages.sedparties.phandler.kickedfromparty").withStyle(ChatFormatting.AQUA));
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
         HoverScreen.reInit();
     }
 
     public static void removePartyMemberKicked(UUID uuid) {
-        msg(new TextComponent(getName(uuid)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" was kicked from the party.").withStyle(ChatFormatting.AQUA)));
+        msg(new TranslatableComponent("messages.sedparties.phandler.kickedfrompartyother", getName(uuid)).withStyle(ChatFormatting.AQUA));
         remove(uuid);
     }
 
     public static void disbandParty() {
         ClientPlayerData.reset();
-        msg(new TextComponent("Party disbanded.").withStyle(ChatFormatting.AQUA));
+        msg(new TranslatableComponent("messages.sedparties.phandler.partydisband").withStyle(ChatFormatting.AQUA));
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
         HoverScreen.reInit();
     }
@@ -159,6 +158,6 @@ public class ClientPacketHelper {
 
     public static void setLeader() {
         ClientPlayerData.changeLeader(Minecraft.getInstance().player.getUUID());
-        msg(new TextComponent("You are now the party leader.").withStyle(ChatFormatting.AQUA));
+        msg(new TranslatableComponent("messages.sedparties.phandler.changeleader2").withStyle(ChatFormatting.AQUA));
     }
 }

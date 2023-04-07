@@ -751,9 +751,9 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             loadPreset = new SmallButton(0, 0, "⬇", pButton -> {
                 assert minecraft.player != null;
                 if (Config.loadPreset(file, isDefault, s.updater)) {
-                    minecraft.player.sendMessage(new TextComponent("Preset (").withStyle(ChatFormatting.DARK_AQUA).append(new TextComponent(fileName).withStyle(ChatFormatting.YELLOW)).append(new TextComponent(") has been loaded successfully.").withStyle(ChatFormatting.DARK_AQUA)), minecraft.player.getUUID());
+                    minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.preset.loadsuccess", fileName).withStyle(ChatFormatting.DARK_AQUA), minecraft.player.getUUID());
                 } else {
-                    minecraft.player.sendMessage(new TextComponent("Preset (").withStyle(ChatFormatting.DARK_AQUA).append(new TextComponent(fileName).withStyle(ChatFormatting.YELLOW)).append(new TextComponent(") was not found.").withStyle(ChatFormatting.DARK_AQUA)), minecraft.player.getUUID());
+                    minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.preset.notfound", fileName).withStyle(ChatFormatting.DARK_AQUA), minecraft.player.getUUID());
                     s.selectButton(-1);
                 }
 
@@ -761,9 +761,9 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             deletePreset = new SmallButton(0, 0, "x", pButton -> {
                 assert minecraft.player != null;
                 if (Config.deletePreset(file)) {
-                    minecraft.player.sendMessage(new TextComponent("Preset (").withStyle(ChatFormatting.DARK_AQUA).append(new TextComponent(fileName).withStyle(ChatFormatting.YELLOW)).append(new TextComponent(") was deleted successfully.").withStyle(ChatFormatting.DARK_AQUA)), minecraft.player.getUUID());
+                    minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.preset.deletesuccess", fileName).withStyle(ChatFormatting.DARK_AQUA), minecraft.player.getUUID());
                 } else {
-                    minecraft.player.sendMessage(new TextComponent("Preset (").withStyle(ChatFormatting.DARK_AQUA).append(new TextComponent(fileName).withStyle(ChatFormatting.YELLOW)).append(new TextComponent(") was not found.").withStyle(ChatFormatting.DARK_AQUA)), minecraft.player.getUUID());
+                    minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.preset.notfound", fileName).withStyle(ChatFormatting.DARK_AQUA), minecraft.player.getUUID());
                 }
                 s.selectButton(-1);
             }, RenderUtils.transTip(s, new TranslatableComponent("gui.sedparties.tooltip.delpresetb")), 1f, .5f, .5f, .5f);

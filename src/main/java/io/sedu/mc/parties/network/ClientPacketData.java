@@ -96,8 +96,9 @@ public class ClientPacketData {
             //#7 Reload config
             case 7 -> {
                 DimConfig.reload();
-                ClientSetup.saveDefaultPresets(true);
+                ClientSetup.saveDefaultPresets();
                 Config.reloadClientConfigs();
+                Config.loadDefaultPreset();
             }
             case 8 -> {
                 ClientPacketData.closeScreens();

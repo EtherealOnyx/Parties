@@ -8,11 +8,13 @@ import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
 import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.overlay.GeneralOptions;
 import io.sedu.mc.parties.client.overlay.RenderItem;
+import io.sedu.mc.parties.data.ClientConfigData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.OverlayRegistry;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.codec.binary.Base64;
@@ -195,6 +197,7 @@ public class Config {
         return true;
     }
 
+
     private static void parseBinaryString(char[] bits, HashMap<String, RenderItem.Update> updater) {
         int index = 0;
         index = GeneralOptions.INSTANCE.getDefaults().readBits(index, bits, (name, value) -> updater.get(name).onUpdate(GeneralOptions.INSTANCE, value));
@@ -269,5 +272,53 @@ public class Config {
         //CSCompatManager.getHandler().setTempRender(renderTemperature.get()); //I cri
         ANCompatManager.getHandler().setManaRender(renderMana.get());
         TANCompatManager.getHandler().setRenderers(renderThirst.get(), renderTemperature.get());
+    }
+
+    public static void loadDefaultPreset() {
+        Minecraft minecraft = Minecraft.getInstance();
+        assert minecraft.player != null;
+        HashMap<String, RenderItem.Update> updater = new HashMap<>();
+        RenderItem.initUpdater(updater);
+        try {
+
+            String bits = ClientConfigData.defaultPreset.get();
+            if (bits.equals("") || Integer.parseInt(bits.substring(0, bits.indexOf('|'))) != Parties.ENCODE_VERSION) {
+                saveDefaultPresetString(updater);
+                return;
+            }
+            bits = bits.substring(bits.indexOf('|') + 1);
+            int parse = Integer.parseInt(bits.substring(0, bits.indexOf('|')));
+            bits = new BigInteger(1, Base64.decodeBase64(bits.substring(bits.indexOf('|') + 1))).toString(2);
+            if (parse > 0) {
+                bits = bits.substring(parse);
+            } else {
+                bits = String.format("%" + (bits.length() + Math.abs(parse)) + "s", bits).replace(' ', '0');
+            }
+            parseBinaryString(bits.toCharArray(), updater);
+        } catch (Exception e) {
+            saveDefaultPresetString(updater);
+        }
+    }
+
+    private static void saveDefaultPresetString(HashMap<String, RenderItem.Update> updater) {
+        Parties.LOGGER.info("Filling the default preset in the client configuration and using it.");
+        if (ModList.get().isLoaded("ars_nouveau")) {
+            if (!Config.loadPreset("standard-mana", true, updater))
+                RenderItem.setDefaultValues();
+        } else {
+            RenderItem.setDefaultValues();
+        }
+        saveCurrentPresetAsDefault();
+    }
+
+    private static void saveCurrentPresetAsDefault() {
+        HashMap<String, RenderItem.Getter> getter = new HashMap<>();
+        RenderItem.initGetter(getter);
+        saveCurrentPresetAsDefault(getter);
+    }
+
+    public static void saveCurrentPresetAsDefault(HashMap<String, RenderItem.Getter> getter) {
+        ClientConfigData.defaultPreset.set(getPresetString(getter));
+        Parties.LOGGER.debug("Updated default preset for this instance.");
     }
 }

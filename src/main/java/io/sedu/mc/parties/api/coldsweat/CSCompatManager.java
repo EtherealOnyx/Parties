@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.api.coldsweat;
 
 import dev.momostudios.coldsweat.config.ColdSweatConfig;
+import io.sedu.mc.parties.Parties;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
@@ -24,5 +25,15 @@ public class CSCompatManager {
             ColdSweatConfig.getInstance().setRequireThermometer(false);
         }
 
+    }
+
+    public static void disableSupport() {
+        handler = new CSHandlerFake();
+        MinecraftForge.EVENT_BUS.unregister(CSEventHandler.class);
+    }
+
+    public static void changeHandler() {
+        Parties.LOGGER.error("Cold Sweat API wasn't found. Disabling support...");
+        disableSupport();
     }
 }

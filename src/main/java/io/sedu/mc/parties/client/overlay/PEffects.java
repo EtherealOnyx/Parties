@@ -42,6 +42,7 @@ public abstract class PEffects extends RenderSelfItem {
     private int eleHeight;
 
     private static final List<PEffects> effectItems = new ArrayList<>();
+    private TranslatableComponent instantText = new TranslatableComponent("ui.sedparties.tooltip.effectinstant");
 
     @Override
     public SmallBound changeVisibility(boolean data) {
@@ -151,7 +152,7 @@ public abstract class PEffects extends RenderSelfItem {
             list.add(new ColorComponent(new TranslatableComponent(effect.getEffect().getDescriptionId()).append(" ").append(effect.getRoman()), effect.getEffect().isBeneficial() ? beneColor : badColor));
             //TODO: Support descriptions via datapacks :)
             if (effect.isInstant())
-                list.add(new ColorComponent(new TextComponent("§oInstant"), 0x88888888));
+                list.add(new ColorComponent(instantText, 0x88888888));
             else
                 list.add(new ColorComponent(new TextComponent( effect.getDur() + "s"), 0xFFFFFF));
             renderSingleEffectTooltip(poseStack, gui, pMouseX, pMouseY, 10, 0, list,
