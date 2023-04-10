@@ -694,9 +694,9 @@ public abstract class RenderItem {
         updater.put("ttype", (n,d) -> HealthAnim.setTextType((int)d));
         updater.put("mtype", (n,d) -> ManaAnim.setTextType((int)d));
         updater.put("tcolor", (n, d) -> n.setColor(0, (int)d));
-        updater.put("bhue", (n,d) -> ((PHealth)n).setMainHue((int) d));
+        updater.put("bhue", (n,d) -> ((BarBase)n).setMainHue((int) d));
         updater.put("ohue", (n,d) -> ((PHealth)n).setOverflowHue((int) d));
-        updater.put("mhue", (n,d) -> ((PMana)n).setMainHue((int) d));
+        updater.put("mhue", (n,d) -> ((BarBase)n).setMainHue((int) d));
 
 
 
@@ -770,9 +770,8 @@ public abstract class RenderItem {
         getter.put("ttype", (n) -> HealthAnim.getTextType());
         getter.put("mtype", (n) -> ManaAnim.getTextType());
         getter.put("tcolor", (n) -> n.getColor(0));
-        getter.put("bhue", (n) -> ((PHealth)n).hue);
+        getter.put("bhue", (n) -> ((BarBase)n).hue);
         getter.put("ohue", (n) -> ((PHealth)n).oHue);
-        getter.put("mhue", (n) -> ((PMana)n).hue);
 
         getter.put("bcit", (n) -> n.getColor(0));
         getter.put("bcib", (n) -> n.getColor(1));
