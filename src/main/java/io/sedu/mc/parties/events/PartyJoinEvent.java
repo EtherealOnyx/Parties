@@ -24,7 +24,7 @@ public class PartyJoinEvent extends PlayerEvent {
     public void forTrackersAndSelf(TriConsumer<UUID, UUID, Player> action) {
         if (trackers != null) {
             trackers.forEach((id, serverTracked) -> {
-                action.accept(this.id, id, getServerPlayer(id));
+                getServerPlayer(id, (serverPlayer) -> action.accept(this.id, id, serverPlayer));
                 action.accept(id, this.id, getPlayer());
             });
         }

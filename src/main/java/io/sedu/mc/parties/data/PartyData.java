@@ -3,7 +3,6 @@ package io.sedu.mc.parties.data;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.ServerPacketHelper;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.util.ArrayList;
@@ -39,7 +38,8 @@ public class PartyData {
         partyList.put(partyId, this);
 
         party.add(initiator);
-        Util.getPlayer(initiator).addParty(partyId);
+        //The player MUST exist here.
+        Util.getPlayer(initiator, (playerData) -> playerData.addParty(partyId));
         updateLeaderNew(initiator);
     }
 
@@ -63,10 +63,10 @@ public class PartyData {
         
         party.add(futureMember);
 
-        Util.getPlayer(futureMember).addParty(partyId);
+        Util.getPlayer(futureMember, (playerData) -> playerData.addParty(partyId));
 
         //API Helper
-        MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(Util.getServerPlayer(futureMember)));
+        Util.getServerPlayer(futureMember, (serverPlayer) -> MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(serverPlayer)));
     }
 
     public ArrayList<UUID> getMembers() {
@@ -85,8 +85,9 @@ public class PartyData {
         if (!party.remove(removedMember))
             Parties.LOGGER.error("Error removing a party member from party!");
             //Some error occured!
-            
-        Util.getPlayer(removedMember).removeParty();
+
+
+        Util.getPlayer(removedMember, PlayerData::removeParty);
         ServerPacketHelper.sendRemoveMember(removedMember, party, wasKicked);
         //Remove previous member from party's trackers.
         party.forEach(id -> {
@@ -109,18 +110,16 @@ public class PartyData {
 
     public void disband() {
         if (party.size() >= 1) {
-            Player p = Util.getServerPlayer(party.get(0));
-            if (p != null) {
-                //Give the last member any remaining XP stored in the party.
-                p.giveExperiencePoints(xpOverflow);
-            }
+            Util.getServerPlayer(party.get(0), (player) -> {
+                player.giveExperiencePoints(xpOverflow);
+            });
         }
         ServerPacketHelper.disband(party);
         //To avoid concurrent modification....
         Iterator<UUID> i = party.iterator();
         while (i.hasNext()) {
             UUID member = i.next();
-            Util.getPlayer(member).removeParty();
+            Util.getPlayer(member, PlayerData::removeParty);
             PlayerData.playerTrackers.remove(member);
             i.remove();
         }

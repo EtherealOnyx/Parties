@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.mixin;
 
 import io.sedu.mc.parties.data.PartyData;
+import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.data.ServerConfigData;
 import io.sedu.mc.parties.data.Util;
 import net.minecraft.util.Mth;
@@ -18,7 +19,9 @@ public abstract class PlayerMixin {
     private int modifiedExperiencePoints(int pXpPoints) {
         if (pXpPoints < 0 ) return pXpPoints;
         if (!ServerConfigData.enableShare.get()) return pXpPoints;
-        List<Player> members = ServerConfigData.globalShare.get() ? Util.getPlayer(((Player)(Object)this).getUUID()).getOnlineMembers() : Util.getPlayer(((Player)(Object)this).getUUID()).getNearbyMembers();
+        PlayerData pd;
+        if ((pd = Util.getNormalPlayer(((Player)(Object)this).getUUID())) == null) return pXpPoints;
+        List<Player> members = ServerConfigData.globalShare.get() ? pd.getOnlineMembers() : pd.getNearbyMembers();
         if (members.size() > 0) { //Has party
             PartyData party = Util.getPartyFromMember(((Player)(Object)this).getUUID());
             assert party != null;

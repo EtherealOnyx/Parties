@@ -6,13 +6,12 @@ import net.minecraft.world.effect.MobEffect;
 
 import java.util.UUID;
 
-import static io.sedu.mc.parties.data.Util.getName;
-import static io.sedu.mc.parties.data.Util.getServerPlayer;
+import static io.sedu.mc.parties.data.Util.*;
 
 public class InfoPacketHelper {
 
     public static void sendName(UUID sendTo, UUID nameOf) {
-        sendData(getServerPlayer(sendTo), nameOf, 0, getName(nameOf));
+        sendData(getNormalServerPlayer(sendTo), nameOf, 0, getName(nameOf));
     }
 
     public static void sendName(ServerPlayer sendTo, UUID nameOf) {
@@ -27,35 +26,35 @@ public class InfoPacketHelper {
     }
 
     public static void sendHealth(UUID sendTo, UUID healthOf, float health) {
-        sendData(getServerPlayer(sendTo), healthOf, 1, health);
+        sendData(getNormalServerPlayer(sendTo), healthOf, 1, health);
     }
 
     public static void sendMaxHealth(UUID sendTo, UUID absorbOf, float max) {
-        sendData(getServerPlayer(sendTo), absorbOf, 2, max);
+        sendData(getNormalServerPlayer(sendTo), absorbOf, 2, max);
     }
 
     public static void sendAbsorb(UUID sendTo, UUID absorbOf, float absorb) {
-        sendData(getServerPlayer(sendTo), absorbOf, 3, absorb);
+        sendData(getNormalServerPlayer(sendTo), absorbOf, 3, absorb);
     }
 
     public static void sendArmor(UUID sendTo, UUID armorOf, int armorValue) {
-        sendData(getServerPlayer(sendTo), armorOf, 4, armorValue);
+        sendData(getNormalServerPlayer(sendTo), armorOf, 4, armorValue);
     }
 
     public static void sendFood(UUID sendTo, UUID armorOf, int foodLevel) {
-        sendData(getServerPlayer(sendTo), armorOf, 5, foodLevel);
+        sendData(getNormalServerPlayer(sendTo), armorOf, 5, foodLevel);
     }
 
     public static void sendXp(UUID sendTo, UUID levelOf, int levels) {
-        sendData(getServerPlayer(sendTo), levelOf, 6, levels);
+        sendData(getNormalServerPlayer(sendTo), levelOf, 6, levels);
     }
 
     public static void forceUpdate(UUID sendTo, UUID propOf, boolean withDim) {
         if (sendTo.equals(propOf))
             return;
         ServerPlayer p;
-        if ((p = getServerPlayer(propOf)) != null) {
-            InfoPacketHelper.sendData(getServerPlayer(sendTo), propOf, p.getHealth(), p.getMaxHealth(), p.getAbsorptionAmount(), p.getArmorValue(), p.getFoodData().getFoodLevel(), p.experienceLevel);
+        if ((p = getNormalServerPlayer(propOf)) != null) {
+            InfoPacketHelper.sendData(getNormalServerPlayer(sendTo), propOf, p.getHealth(), p.getMaxHealth(), p.getAbsorptionAmount(), p.getArmorValue(), p.getFoodData().getFoodLevel(), p.experienceLevel);
             if (withDim)
                 InfoPacketHelper.sendDim(sendTo, propOf, p.level.dimension().location());
             if (p.isDeadOrDying())
@@ -74,15 +73,15 @@ public class InfoPacketHelper {
     }
 
     public static void sendDeath(UUID sendTo, UUID propOf) {
-        PartiesPacketHandler.sendToPlayer(new RenderPacketData(7, propOf), getServerPlayer(sendTo));
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(7, propOf), getNormalServerPlayer(sendTo));
     }
 
     public static void sendAlive(UUID sendTo, UUID propOf) {
-        PartiesPacketHandler.sendToPlayer(new RenderPacketData(8, propOf), getServerPlayer(sendTo));
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(8, propOf), getNormalServerPlayer(sendTo));
     }
 
     public static void sendDim(UUID sendTo, UUID propOf, ResourceLocation world) {
-        PartiesPacketHandler.sendToPlayer(new RenderPacketData(propOf, world), getServerPlayer(sendTo));
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(propOf, world), getNormalServerPlayer(sendTo));
     }
 
     public static void sendDeath(ServerPlayer p) {
@@ -95,12 +94,12 @@ public class InfoPacketHelper {
 
     public static void sendEffectExpired(UUID sendTo, UUID propOf, int potionEffect) {
 
-        PartiesPacketHandler.sendToPlayer(new RenderPacketData(13, propOf, potionEffect), getServerPlayer(sendTo));
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(13, propOf, potionEffect), getNormalServerPlayer(sendTo));
 
     }
 
     public static void sendEffect(UUID sendTo, UUID propOf, int type, int duration, int amp) {
-        PartiesPacketHandler.sendToPlayer(new RenderPacketData(12, propOf, type, duration, amp), getServerPlayer(sendTo));
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(12, propOf, type, duration, amp), getNormalServerPlayer(sendTo));
     }
 
     public static void sendEffectExpired(UUID sendTo, int id) {
@@ -112,7 +111,7 @@ public class InfoPacketHelper {
     }
 
     public static void sendXpBar(UUID sendTo, UUID propOf, float bar) {
-        sendData(getServerPlayer(sendTo), propOf, 14, bar);
+        sendData(getNormalServerPlayer(sendTo), propOf, 14, bar);
     }
 
     public static void sendClose(ServerPlayer p) {
@@ -124,7 +123,7 @@ public class InfoPacketHelper {
     }
 
     public static void sendBleeding(UUID sendTo, UUID propOf, boolean b, int dur) {
-        PartiesPacketHandler.sendToPlayer(new RenderPacketData(15, propOf, b, dur), getServerPlayer(sendTo));
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(15, propOf, b, dur), getNormalServerPlayer(sendTo));
     }
 
     public static void sendDowned(ServerPlayer p, boolean b, int dur) {
@@ -132,46 +131,46 @@ public class InfoPacketHelper {
     }
 
     public static void sendDowned(UUID sendTo, UUID propOf, boolean b, int dur) {
-        PartiesPacketHandler.sendToPlayer(new RenderPacketData(17, propOf, b, dur), getServerPlayer(sendTo));
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(17, propOf, b, dur), getNormalServerPlayer(sendTo));
     }
 
     public static void sendReviveUpdate(UUID sendTo, UUID propOf, float revive) {
-        PartiesPacketHandler.sendToPlayer(new RenderPacketData(16, propOf, revive), getServerPlayer(sendTo));
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(16, propOf, revive), getNormalServerPlayer(sendTo));
     }
 
     public static void sendReviveUpdate(UUID sendTo, float revive) {
-        PartiesPacketHandler.sendToPlayer(new RenderPacketData(16, sendTo, revive), getServerPlayer(sendTo));
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(16, sendTo, revive), getNormalServerPlayer(sendTo));
     }
 
     public static void sendSpectating(UUID sendTo, UUID propOf, boolean b) {
-        PartiesPacketHandler.sendToPlayer(new RenderPacketData(18, propOf, b), getServerPlayer(sendTo));
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(18, propOf, b), getNormalServerPlayer(sendTo));
     }
 
     public static void sendSpectating(UUID sendTo, boolean b) {
-        PartiesPacketHandler.sendToPlayer(new RenderPacketData(18, sendTo, b), getServerPlayer(sendTo));
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(18, sendTo, b), getNormalServerPlayer(sendTo));
     }
 
     public static void sendThirstUpdate(UUID sendTo, UUID propOf, int thirst) {
-            sendData(getServerPlayer(sendTo), propOf, 19, thirst);
+            sendData(getNormalServerPlayer(sendTo), propOf, 19, thirst);
     }
 
     public static void sendWorldTempUpdate(UUID sendTo, UUID propOf, float worldTemp) {
-        sendData(getServerPlayer(sendTo), propOf, 20, worldTemp);
+        sendData(getNormalServerPlayer(sendTo), propOf, 20, worldTemp);
     }
 
     public static void sendBodyTempUpdate(UUID sendTo, UUID propOf, float bodyTemp) {
-        sendData(getServerPlayer(sendTo), propOf, 21, bodyTemp);
+        sendData(getNormalServerPlayer(sendTo), propOf, 21, bodyTemp);
     }
 
     public static void sendWorldTempUpdateTAN(UUID sendTo, UUID propOf, float worldTemp) {
-        sendData(getServerPlayer(sendTo), propOf, 22, worldTemp);
+        sendData(getNormalServerPlayer(sendTo), propOf, 22, worldTemp);
     }
 
     public static void sendManaUpdate(UUID sendTo, UUID propOf, float mana) {
-        PartiesPacketHandler.sendToPlayer(new RenderPacketData(23, propOf, mana), getServerPlayer(sendTo));
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(23, propOf, mana), getNormalServerPlayer(sendTo));
     }
 
     public static void sendMaxManaUpdate(UUID sendTo, UUID propOf, int maxMana) {
-        sendData(getServerPlayer(sendTo), propOf, 24, maxMana);
+        sendData(getNormalServerPlayer(sendTo), propOf, 24, maxMana);
     }
 }

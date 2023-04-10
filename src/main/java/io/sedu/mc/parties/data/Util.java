@@ -4,27 +4,42 @@ import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class Util {
 
     /*
     Server-side Functions
      */
-    public static ServerPlayer getServerPlayer(UUID id) {
-        PlayerData p;
-        if ((p = getPlayer(id)) == null)
-            return null;
-        return p.serverPlayer == null ? null : p.serverPlayer.get();
+    public static void getServerPlayer(UUID id, Consumer<ServerPlayer> action) {
+        getPlayer(id, (playerData) -> {
+            if (playerData.getPlayer() != null)
+                action.accept(playerData.getPlayer());
+        });
     }
-    public static PlayerData getPlayer(UUID id) {
+
+    public static ServerPlayer getNormalServerPlayer(UUID id) {
+        PlayerData p;
+        return (p = getNormalPlayer(id)) != null ? p.getPlayer() : null;
+    }
+    public static void getPlayer(UUID id, Consumer<PlayerData> action) {
+        PlayerData.playerList.computeIfPresent(id, (uuid, playerData) -> {
+            action.accept(playerData);
+            return playerData;
+        });
+    }
+
+    public static @Nullable PlayerData getNormalPlayer(UUID id) {
         return PlayerData.playerList.get(id);
     }
 
     public static String getName(UUID id) {
-        return getPlayer(id).getName();
+        PlayerData p;
+        return (p = getNormalPlayer(id)) != null ? p.getName() : "";
     }
 
     public static PartyData getPartyFromMember(UUID playerId) {
@@ -40,10 +55,9 @@ public class Util {
         ArrayList<Player> players = new ArrayList<>();
         PartyData p;
         if ((p = getPartyFromMember(memberId)) != null) {
-            Player player;
             for (UUID member : p.getMembers()) {
-                if (!member.equals(memberId) && (player = getServerPlayer(member)) != null) {
-                    players.add(player);
+                if (!member.equals(memberId)) {
+                    getServerPlayer(member, players::add);
                 }
             }
         }
@@ -58,8 +72,8 @@ public class Util {
             for (UUID member : p.getMembers()) {
 
                 //not self check && is online check && is in range check
-                if (!member.equals(memberId) && (player = getServerPlayer(member)) != null && isClientTracked(memberId, member)) {
-                    players.add(player);
+                if (!member.equals(memberId) && isClientTracked(memberId, member)) {
+                    getServerPlayer(member, players::add);
                 }
             }
         }
@@ -108,7 +122,7 @@ public class Util {
     }
 
     public static boolean isOnline(UUID id) {
-        return getServerPlayer(id) != null;
+        return getNormalServerPlayer(id) != null;
     }
 
 }

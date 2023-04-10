@@ -24,7 +24,7 @@ public class ServerPacketHelper {
     public static void sendNewMember(UUID futureMember, ArrayList<UUID> party) {
         //Send each member to future party member.
         
-        PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, party), getServerPlayer(futureMember));
+        PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, party), getNormalServerPlayer(futureMember));
         //Send each member's properties to future party member.
         party.forEach(id -> {
             InfoPacketHelper.sendName(futureMember, id);
@@ -33,18 +33,18 @@ public class ServerPacketHelper {
         //Send future member to each party member.
         party.forEach(id -> {
             
-            PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, futureMember), getServerPlayer(id));
+            PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, futureMember), getNormalServerPlayer(id));
             //Send future member properties to each party member.
             InfoPacketHelper.sendName(id, futureMember);
             //Tell party member that new member is Online
             if (isOnline(futureMember)) {
-                PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, futureMember), getServerPlayer(id));
+                PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, futureMember), getNormalServerPlayer(id));
                 InfoPacketHelper.forceUpdate(id, futureMember, true);
             }
 
             //Tell newly online player that this other member is also online.
             if (isOnline(id)) {
-                PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, id), getServerPlayer(futureMember));
+                PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, id), getNormalServerPlayer(futureMember));
                 InfoPacketHelper.forceUpdate(futureMember, id, true);
             }
 
@@ -53,26 +53,26 @@ public class ServerPacketHelper {
         //Send leader to future party member.
         
         PartiesPacketHandler.sendToPlayer(new ClientPacketData(3, getPartyFromMember(party.get(0)).getLeader()),
-                                          getServerPlayer(futureMember));
+                                          getNormalServerPlayer(futureMember));
     }
 
     public static void sendRemoveMember(UUID removedMember, ArrayList<UUID> party, boolean wasKicked) {
         int i = (wasKicked) ? 5 : 4;
         party.forEach(id -> {
-            PartiesPacketHandler.sendToPlayer(new ClientPacketData(i, removedMember), getServerPlayer(id));
+            PartiesPacketHandler.sendToPlayer(new ClientPacketData(i, removedMember), getNormalServerPlayer(id));
         });
-        PartiesPacketHandler.sendToPlayer(new ClientPacketData(i), getServerPlayer(removedMember));
+        PartiesPacketHandler.sendToPlayer(new ClientPacketData(i), getNormalServerPlayer(removedMember));
     }
 
     public static void disband(ArrayList<UUID> party) {
         party.forEach(id -> {
-            PartiesPacketHandler.sendToPlayer(new ClientPacketData(6), getServerPlayer(id));
+            PartiesPacketHandler.sendToPlayer(new ClientPacketData(6), getNormalServerPlayer(id));
         });
     }
 
     public static void sendNewLeader(UUID newLeader, ArrayList<UUID> party) {
         party.forEach(id -> {
-            PartiesPacketHandler.sendToPlayer(new ClientPacketData(3, newLeader), getServerPlayer(id));
+            PartiesPacketHandler.sendToPlayer(new ClientPacketData(3, newLeader), getNormalServerPlayer(id));
         });
     }
 
@@ -86,7 +86,7 @@ public class ServerPacketHelper {
                 //Tell online player the current party member's name.
                 InfoPacketHelper.sendName(player, id);
                 //Tell party members that this player is now online.
-                PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, player.getUUID()), getServerPlayer(id));
+                PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, player.getUUID()), getNormalServerPlayer(id));
                 InfoPacketHelper.forceUpdate(id, player.getUUID(), true);
                 //Tell newly online player that this other member is also online.
                 if (isOnline(id)) {
@@ -108,7 +108,7 @@ public class ServerPacketHelper {
     public static void sendOffline(UUID player) {
         if (Util.hasParty(player)) {
             Util.getPartyFromMember(player).getMembers().forEach(id -> {
-                PartiesPacketHandler.sendToPlayer(new ClientPacketData(1, player), getServerPlayer(id));
+                PartiesPacketHandler.sendToPlayer(new ClientPacketData(1, player), getNormalServerPlayer(id));
             });
         }
     }
@@ -123,7 +123,7 @@ public class ServerPacketHelper {
     }
 
     public static void sendNewLeader(UUID initiator) {
-        PartiesPacketHandler.sendToPlayer(new ClientPacketData(3), getServerPlayer(initiator));
+        PartiesPacketHandler.sendToPlayer(new ClientPacketData(3), getNormalServerPlayer(initiator));
     }
 
     public static void sendMessageToAll(List<ServerPlayer> playerList, ServerPlayer sender, String data) {

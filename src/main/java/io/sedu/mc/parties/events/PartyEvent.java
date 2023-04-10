@@ -42,10 +42,11 @@ public class PartyEvent {
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!event.getPlayer().level.isClientSide) {
             UUID id = event.getPlayer().getUUID();
-            if (getPlayer(id) == null) {
-                new PlayerData(id);
+            PlayerData pD;
+            if ((pD = Util.getNormalPlayer(id)) == null) {
+                pD = new PlayerData(id);
             }
-            getPlayer(id).setServerPlayer((ServerPlayer) event.getPlayer());//.setOnline();
+            pD.setServerPlayer((ServerPlayer) event.getPlayer());//.setOnline();
             ServerPacketHelper.sendOnline((ServerPlayer) event.getPlayer());
             //Send spectating mode
             Player p = event.getPlayer();
@@ -53,9 +54,7 @@ public class PartyEvent {
             InfoPacketHelper.sendSpectating(p.getUUID(), spectating);
             HashMap<UUID, Boolean> trackers;
             if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
-                trackers.forEach((trackId, serverTracked) -> {
-                    InfoPacketHelper.sendSpectating(trackId, p.getUUID(), spectating);
-                });
+                trackers.forEach((trackId, serverTracked) -> InfoPacketHelper.sendSpectating(trackId, p.getUUID(), spectating));
             }
         }
     }
@@ -63,7 +62,7 @@ public class PartyEvent {
     @SubscribeEvent
     public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
         if (!event.getPlayer().level.isClientSide) {
-            getPlayer(event.getPlayer().getUUID()).removeServerPlayer().removeInviters();
+            getPlayer(event.getPlayer().getUUID(), (playerData) -> playerData.removeServerPlayer().removeInviters());
             ServerPacketHelper.sendOffline(event.getPlayer().getUUID());
         }
     }
@@ -71,8 +70,7 @@ public class PartyEvent {
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
         if (!event.getPlayer().level.isClientSide) {
-            getPlayer(event.getPlayer().getUUID()).setServerPlayer((ServerPlayer) event.getPlayer());//.setOffline();
-            
+            getPlayer(event.getPlayer().getUUID(), (playerData) -> playerData.setServerPlayer((ServerPlayer) event.getPlayer()));
         }
     }
 

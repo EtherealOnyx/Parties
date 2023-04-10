@@ -19,6 +19,7 @@ import net.minecraft.commands.arguments.selector.EntitySelector;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import net.minecraft.commands.synchronization.ArgumentSerializer;
 import net.minecraft.network.FriendlyByteBuf;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +35,7 @@ public class NotSelfArgument extends EntityArgument {
     }
 
     @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> pContext, SuggestionsBuilder pBuilder) {
+    public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(CommandContext<S> pContext, @NotNull SuggestionsBuilder pBuilder) {
         if (pContext.getSource() instanceof ClientSuggestionProvider provider) {
             if (partyOnly && ClientPlayerData.partySize() == 0) {
 
@@ -48,7 +49,7 @@ public class NotSelfArgument extends EntityArgument {
 
             try {
                 entityselectorparser.parse();
-            } catch (CommandSyntaxException commandsyntaxexception) {
+            } catch (CommandSyntaxException ignored) {
             }
 
             return entityselectorparser.fillSuggestions(pBuilder, (p_91457_) -> {
@@ -61,6 +62,7 @@ public class NotSelfArgument extends EntityArgument {
                     iterable = names;
                 } else {
                     Collection<String> collection = provider.getOnlinePlayerNames();
+                    assert Minecraft.getInstance().player != null;
                     collection.remove(Minecraft.getInstance().player.getName().getContents());
                     iterable = collection;
                 }
@@ -72,7 +74,7 @@ public class NotSelfArgument extends EntityArgument {
     }
 
     public static class Serializer implements ArgumentSerializer<NotSelfArgument> {
-        public void serializeToNetwork(NotSelfArgument pArgument, FriendlyByteBuf pBuffer) {
+        public void serializeToNetwork(NotSelfArgument pArgument, @NotNull FriendlyByteBuf pBuffer) {
             byte b0 = 0;
             if (pArgument.partyOnly) {
                 b0 = (byte)(b0 | 1);
@@ -80,7 +82,7 @@ public class NotSelfArgument extends EntityArgument {
             pBuffer.writeByte(b0);
         }
 
-        public NotSelfArgument deserializeFromNetwork(FriendlyByteBuf pBuffer) {
+        public @NotNull NotSelfArgument deserializeFromNetwork(FriendlyByteBuf pBuffer) {
             byte b0 = pBuffer.readByte();
             return new NotSelfArgument((b0 & 1) != 0);
         }
@@ -91,12 +93,14 @@ public class NotSelfArgument extends EntityArgument {
     }
 
     public static UUID getPlayerUUID(CommandContext<CommandSourceStack> pContext, String pName, UUID senderId) throws CommandSyntaxException {
-        return findPlayer(Util.getPartyFromMember(senderId), ((EntitySelectorMixin)pContext.getArgument(pName, EntitySelector.class)).getPlayerName());
+        PartyData pD;
+        if ((pD = Util.getPartyFromMember(senderId)) == null) return UUID.randomUUID();
+        return findPlayer(pD, ((EntitySelectorMixin)pContext.getArgument(pName, EntitySelector.class)).getPlayerName());
     }
 
     private static UUID findPlayer(PartyData party, String pName) {
         for (UUID member : party.getMembers()) {
-            if (Util.getPlayer(member).getName().equals(pName)) {
+            if (Util.getName(member).equals(pName)) {
                 return member;
             }
         };

@@ -129,7 +129,7 @@ public class PlayerData {
             playerTrackers.put(toTrack, new HashMap<>());
         }
         playerTrackers.get(toTrack).put(trackerHost, true);
-        Util.getPlayer(trackerHost).markDirty();
+        Util.getPlayer(trackerHost, PlayerData::markDirty);
     }
 
     private void markDirty() {
@@ -143,12 +143,12 @@ public class PlayerData {
         playerTrackers.get(toTrack).remove(trackerHost);
         if (playerTrackers.get(toTrack).size() == 0)
             playerTrackers.remove(toTrack);
-        Util.getPlayer(trackerHost).markDirty();
+        Util.getPlayer(trackerHost, PlayerData::markDirty);
     }
 
     public static void changeTracker(UUID trackerHost, UUID toTrack, boolean serverTracked) {
         playerTrackers.get(toTrack).put(trackerHost, serverTracked);
-        Util.getPlayer(trackerHost).markDirty();
+        Util.getPlayer(trackerHost, PlayerData::markDirty);
     }
 
     public boolean setHunger(int hunger) {
