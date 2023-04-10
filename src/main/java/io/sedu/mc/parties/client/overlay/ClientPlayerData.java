@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+import static io.sedu.mc.parties.client.overlay.RenderSelfItem.selfIndex;
 
 public class ClientPlayerData {
     public static HashMap<UUID, ClientPlayerData> playerList = new HashMap<>();
@@ -99,8 +102,15 @@ public class ClientPlayerData {
         playerName = "???";
     }
 
-    public static ClientPlayerData getOrderedPlayer(int index) {
-        return playerList.get(playerOrderedList.get(index));
+    public static void getOrderedPlayer(int index, Consumer<ClientPlayerData> action) {
+        UUID id;
+        ClientPlayerData data;
+        if (playerOrderedList.size() > 0 && (id = playerOrderedList.get(index)) != null && (data = playerList.get(id)) != null)
+            action.accept(data);
+    }
+
+    public static void getSelf(Consumer<ClientPlayerData> action) {
+        getOrderedPlayer(selfIndex, action);
     }
 
     public static void addClientMember(UUID uuid) {
@@ -151,7 +161,7 @@ public class ClientPlayerData {
     public static void resetOnly() {
         playerList.clear();
         playerOrderedList.clear();
-        RenderSelfItem.selfIndex = 0;
+        selfIndex = 0;
         leader = null;
     }
 
@@ -434,6 +444,7 @@ public class ClientPlayerData {
     }
 
     public void updateTemperatures() {
+
         if (clientPlayer != null) {
             try {
                 CSCompatManager.getHandler().getClientWorldTemp(clientPlayer, (temp, sev, body) -> {

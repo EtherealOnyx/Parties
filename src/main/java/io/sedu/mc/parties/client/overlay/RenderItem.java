@@ -696,8 +696,6 @@ public abstract class RenderItem {
         updater.put("tcolor", (n, d) -> n.setColor(0, (int)d));
         updater.put("bhue", (n,d) -> ((BarBase)n).setMainHue((int) d));
         updater.put("ohue", (n,d) -> ((PHealth)n).setOverflowHue((int) d));
-        updater.put("mhue", (n,d) -> ((BarBase)n).setMainHue((int) d));
-
 
 
         updater.put("bcit", (n, d) -> n.setColor(0, (int)d));
@@ -818,7 +816,10 @@ public abstract class RenderItem {
         framePosH = 63;
         HashMap<String, Update> updater = new HashMap<>();
         RenderItem.initUpdater(updater);
-        items.values().forEach(item -> item.getDefaults().forEachEntry((s, v) -> updater.get(s.getName()).onUpdate(item, v)));
+        items.values().forEach(item -> item.getDefaults().forEachEntry((s, v) -> {
+            System.out.println(s.getName());
+            updater.get(s.getName()).onUpdate(item, v);
+        }));
         syncItems();
     }
 

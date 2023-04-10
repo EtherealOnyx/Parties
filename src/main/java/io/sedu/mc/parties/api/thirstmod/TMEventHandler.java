@@ -28,7 +28,6 @@ public class TMEventHandler {
                     boolean update = PlayerData.playerList.get(player = e.player.getUUID()).setThirst(thirst = TMCompatManager.getHandler().getThirst(e.player));
                     if (update)
                        trackers.forEach((id, serverTracked) -> {
-                           if (serverTracked)
                             InfoPacketHelper.sendThirstUpdate(id, player, thirst);
                        });
                 }
@@ -48,7 +47,7 @@ public class TMEventHandler {
         if (event.phase == TickEvent.Phase.END) {
             if (Minecraft.getInstance().isPaused()) return;
             if (ClientEvent.tick % 10 == 2) {
-                ClientPlayerData.playerList.values().forEach(ClientPlayerData::updateThirst);
+                ClientPlayerData.getSelf(ClientPlayerData::updateThirst);
             }
         }
     }

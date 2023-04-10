@@ -143,7 +143,6 @@
 
   "config.sedparties.tooltip.bhue": "The hue of bar's main color (example: health)",
   "config.sedparties.tooltip.ohue": "The hue of the bar's overflow color (example: absorption)",
-  "config.sedparties.tooltip.mhue": "The hue of bar's main color (example: mana)",
 
   "config.sedparties.tooltip.bcit": "The top gradient color of the health increase animation",
   "config.sedparties.tooltip.bcib": "The bottom gradient color of the health increase animation",

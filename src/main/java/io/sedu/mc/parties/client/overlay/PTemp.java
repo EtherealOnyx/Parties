@@ -158,16 +158,12 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
     }
 
     public void updateRendererForTAN() {
-        render = (i, id, gui, poseStack, partialTicks) -> {
-            renderTANTemp(i, id, gui, poseStack, id.severity == 1 ? id.alpha * (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks)/4f)/3f) : id.alpha);
-        };
-        tooltip = (poseStack, gui, index, mouseX, mouseY) -> {
-            ClientPlayerData p;
-            if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
+        render = (i, id, gui, poseStack, partialTicks) -> renderTANTemp(i, id, gui, poseStack, id.severity == 1 ? id.alpha * (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks)/4f)/3f) : id.alpha);
+        tooltip = (poseStack, gui, index, mouseX, mouseY) -> ClientPlayerData.getOrderedPlayer(index, p -> {
+            if (p.isOnline && !p.isSpectator) {
                 renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + p.tempType, 0xD6E9D9, 0x88938A, getTANColor(p.worldTemp));
-
             }
-        };
+        });
     }
 
     private interface Renderer {
@@ -200,13 +196,11 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
                 renderTemp(i, gui, poseStack, id.worldTemp, id.severity, id.alpha * (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks)/3f)/3f), true);
             }
         };
-        tooltip = (poseStack, gui, index, mouseX, mouseY) -> {
-            ClientPlayerData p;
-            if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
+        tooltip = (poseStack, gui, index, mouseX, mouseY) -> ClientPlayerData.getOrderedPlayer(index, p -> {
+            if (p.isOnline && !p.isSpectator) {
                 renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + p.worldTemp + "°", 0xD6E9D9, 0x88938A, getSevColor(p.severity));
                 renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName2.getString() + p.bodyTemp + "", 0xD6E9D9, 0x88938A, getSevColor(p.severity));
-
             }
-        };
+        });
     }
 }

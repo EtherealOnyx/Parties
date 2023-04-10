@@ -2,7 +2,6 @@ package io.sedu.mc.parties.api.arsnoveau;
 
 import com.hollingsworth.arsnouveau.api.event.SpellCastEvent;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.client.overlay.RenderSelfItem;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.events.ClientEvent;
 import io.sedu.mc.parties.events.PartyJoinEvent;
@@ -77,7 +76,7 @@ public class ANEventHandler {
             if (Minecraft.getInstance().isPaused()) return;
             if (ClientEvent.tick % 20 == 2) {
                 if (ClientPlayerData.playerList.size() > 0) {
-                    ClientPlayerData.getOrderedPlayer(RenderSelfItem.selfIndex).updateMana();
+                    ClientPlayerData.getSelf(ClientPlayerData::updateMana);
                 }
             }
         }

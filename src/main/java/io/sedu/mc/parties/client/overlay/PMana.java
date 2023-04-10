@@ -6,12 +6,10 @@ import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.anim.ManaAnim;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
-import io.sedu.mc.parties.util.ColorUtils;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.fml.ModList;
 
@@ -19,47 +17,14 @@ import java.util.ArrayList;
 
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 
-public class PMana extends RenderIconTextItem implements TooltipItem {
-
-    private final TranslatableComponent tipName = new TranslatableComponent("ui.sedparties.tooltip.mana");
-
-    int hue = 0;
-
-    int deadColor;
-
-    int colorTop;
-    int colorBot;
-    int colorTopMissing;
-    int colorBotMissing;
-
-    int colorIncTop;
-    int colorIncBot;
-    int colorDecTop;
-    int colorDecBot;
-
-    int bColorTop;
-    int bColorBot;
-    private static Renderer renderLastDimmer;
+public class PMana extends BarBase {
 
     public PMana(String name) {
-        super(name);
-        renderLastDimmer = (i, id, poseStack) -> {
-
-        };
+        super(name, new TranslatableComponent("ui.sedparties.tooltip.mana"));
     }
 
     @Override
-    int getColor() {
-        return colorTop;
-    }
-
-    @Override
-    public String getType() {
-        return "Bar";
-    }
-
-    @Override
-    void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
+    protected void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+7, b.y+5, 0, 14, 7, bColorTop, bColorBot);
         RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+8, b.y+6, 0, 12, 5, colorTop, colorBot);
         setup(partyPath);
@@ -68,21 +33,13 @@ public class PMana extends RenderIconTextItem implements TooltipItem {
     }
 
     @Override
-    void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.isOnline)
-            renderSelf(i, id, gui, poseStack, partialTicks);
-    }
-
-    @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.isSpectator) return;
+    protected void renderSelfBar(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
+                                 float partialTicks) {
         if (id.isDead) {
             if (iconEnabled) {
                 RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorBot, bColorBot);
                 RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing);
             }
-
-            //textCentered(tX(i), tY(i), gui, poseStack, "Dead", deadColor);
             return;
         }
         if (iconEnabled) {
@@ -96,15 +53,16 @@ public class PMana extends RenderIconTextItem implements TooltipItem {
             RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 255 - id.alphaI << 24);
         }
         if (textEnabled)
-                textCentered(tX(i), tY(i), gui, poseStack, id.mana.manaText, color);
+            textCentered(tX(i), tY(i), gui, poseStack, id.mana.manaText, color);
 
-        renderLastDimmer.render(i, id, poseStack);
     }
 
-    public void updateRendererForMods() {
-        renderLastDimmer = ((i, id, poseStack) -> {
-            if (id.isBleeding || id.isDowned) {
-                RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 150 << 24);
+    @Override
+    public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
+        ClientPlayerData.getOrderedPlayer(index, p -> {
+            if (p.isOnline && !p.isSpectator) {
+                ManaAnim h = p.mana;
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur) + "/" + h.max, 0x9D7CFC, 0x310F4D, 0xFFE187);
             }
         });
     }
@@ -115,17 +73,7 @@ public class PMana extends RenderIconTextItem implements TooltipItem {
         hB = id.mana.getPercent();
         RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorTop, bColorBot);
         RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
-        rectRNoA(poseStack, i, zPos, hB, colorTop, colorBot); //Mana
-    }
-
-    private void rectRNoA(PoseStack p, int i, int zLevel, float rightPosition, int startColor, int endColor ) {
-        RenderUtils.sizeRectNoA(p.last().pose(), x(i)+1, y(i)+1, zLevel, Math.min(width - 1, ((width-2)*rightPosition)), height-2, startColor, endColor);
-    }
-
-    private void rectAnim(PoseStack p, int i, int zLevel, float leftPosition, float rightPosition, int startColor, int endColor ) {
-        //Left Pos: x + offset + (width - offset*2)*leftPos | Right Pos: x + offset + (
-        RenderUtils.rectNoA(p.last().pose(), zPos, Math.max(x(i), x(i) + (width-2)*leftPosition)+1, y(i)+1, Math.min(x(i)+width-1, x(i)+1 + (width-2)*rightPosition), y(i)+height-1, startColor, endColor);
-        //Render.rectNoA(p.last().pose(), zLevel, l(i)+width*leftPosition-1, t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
+        rectRNoA(poseStack, i, hB, colorTop, colorBot); //Mana
     }
 
     private void renderManaAnim(int i, PoseStack poseStack, ClientPlayerData id, float partialTicks) {
@@ -134,26 +82,15 @@ public class PMana extends RenderIconTextItem implements TooltipItem {
         }
 
         if (id.mana.hInc) {
-            rectAnim(poseStack, i, zPos, id.mana.oldH, id.mana.curH, colorIncTop, colorIncBot);
+            rectAnim(poseStack, i, id.mana.oldH, id.mana.curH, colorIncTop, colorIncBot);
         } else {
-            rectAnim(poseStack, i, zPos, id.mana.curH, id.mana.oldH, colorDecTop, colorDecBot);
+            rectAnim(poseStack, i, id.mana.curH, id.mana.oldH, colorDecTop, colorDecBot);
         }
-    }
-
-
-    @Override
-    protected int attachedX(int pOffset) {
-        return x(pOffset) + (width>>1);
-    }
-
-    @Override
-    protected int attachedY(int pOffset) {
-        return y(pOffset) + (height>>1) + 1;
     }
 
     @Override
     protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
-        ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
+        ConfigOptionsList c = new ConfigOptionsList(this::getColor, s, minecraft, x, y, w, h, parse);
         c.addTitleEntry("general");
         c.addBooleanEntry("display", elementEnabled);
         c.addSliderEntry("scale", 1, () -> 3, getScale(), true);
@@ -176,7 +113,7 @@ public class PMana extends RenderIconTextItem implements TooltipItem {
         c.addSpaceEntry();
 
         c.addTitleEntry("bhue");
-        c.addSliderEntry("mhue", 0, () -> 100, hue, false);
+        c.addSliderEntry("bhue", 0, () -> 100, hue, false);
         c.addTitleEntry("bai");
         c.addColorEntry("bcit", colorIncTop);
         c.addColorEntry("bcib", colorIncBot);
@@ -185,57 +122,6 @@ public class PMana extends RenderIconTextItem implements TooltipItem {
         c.addColorEntry("bcdb", colorDecBot);
 
         return c;
-    }
-
-
-    @Override
-    protected void updateValues() {
-        x = Mth.clamp(x, 0, maxX());
-        y = Mth.clamp(y, 0, maxY());
-        width = Mth.clamp(width, 0, maxW());
-        height = Mth.clamp(height, 0, maxH());
-    }
-
-    protected int maxW() {
-        return (int) Math.ceil(frameEleW/scale);
-    }
-
-    protected int maxH() {
-        return (int) Math.ceil(frameEleH/scale);
-    }
-
-    protected void setMainColors() {
-        float hue = this.hue/100f;
-        bColorTop = ColorUtils.HSBtoRGB(hue, .5f, .25f);
-        bColorBot = ColorUtils.HSBtoRGB(hue, .25f, .5f);
-        color = ColorUtils.HSBtoRGB(hue, .2f, 1f);
-        deadColor = ColorUtils.HSBtoRGB(hue, .25f, .75f);
-        colorTop = ColorUtils.HSBtoRGB(hue, .8f, .77f);
-        colorBot = ColorUtils.HSBtoRGB(hue, .88f, .42f);
-        colorTopMissing = ColorUtils.HSBtoRGB(hue, .97f, .27f);
-        colorBotMissing = ColorUtils.HSBtoRGB(hue, .91f, .38f);
-    }
-
-    @Override
-    public SmallBound setColor(int type, int data) {
-        switch(type) {
-            case 0 -> colorIncTop = data;
-            case 1 -> colorIncBot = data;
-            case 2 -> colorDecTop = data;
-            case 3 -> colorDecBot = data;
-        }
-        return null;
-    }
-
-    @Override
-    public int getColor(int type) {
-        switch(type) {
-            case 0 -> {return colorIncTop;}
-            case 1 -> {return colorIncBot;}
-            case 2 -> {return colorDecTop;}
-            case 3 -> {return colorDecBot;}
-        }
-        return 0;
     }
 
     @Override
@@ -255,32 +141,12 @@ public class PMana extends RenderIconTextItem implements TooltipItem {
         e.addEntry("tattached", true, 1);
         e.addEntry("xtpos", 0, 12);
         e.addEntry("ytpos", 0, 12);
-        e.addEntry("mhue", 60, 7);
+        e.addEntry("bhue", 60, 7);
         e.addEntry("bcit", 0x9ccaff, 24);
         e.addEntry("bcib", 0x6cb0ff, 24);
         e.addEntry("bcdt", 0x6790d6, 24);
         e.addEntry("bcdb", 0x1d3b6c, 24);
         return e;
-    }
-
-    protected SmallBound setMainHue(int d) {
-        this.hue = d;
-        setMainColors();
-        return null;
-    }
-
-    @Override
-    public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
-        ClientPlayerData p;
-        if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
-            ManaAnim h = p.mana;
-            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur) + "/" + h.max, 0x9D7CFC, 0x310F4D, 0xFFE187);
-
-        }
-    }
-
-    private interface Renderer {
-        void render(int i, ClientPlayerData id, PoseStack poseStack);
     }
 
     @Override

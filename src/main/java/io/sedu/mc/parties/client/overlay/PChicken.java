@@ -149,11 +149,10 @@ public class PChicken extends RenderIconTextItem implements TooltipItem {
 
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
-        ClientPlayerData p;
-        if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
-            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (isSelf(index) ? p.getHungerForced() : p.getHunger()), 0xb88458, 0x613c1b, 0xffd5b0);
-
-        }
+        ClientPlayerData.getOrderedPlayer(index, p -> {
+            if (p.isOnline && !p.isSpectator)
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (isSelf(index) ? p.getHungerForced() : p.getHunger()), 0xb88458, 0x613c1b, 0xffd5b0);
+        });
     }
 
 }

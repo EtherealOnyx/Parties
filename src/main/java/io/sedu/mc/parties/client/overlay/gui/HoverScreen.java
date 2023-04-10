@@ -316,7 +316,7 @@ public class HoverScreen extends Screen {
         assert minecraft != null;
         RenderItem.getCurrentMouseFrame(mX, mY, (index, posX, posY) -> {
             RenderItem.checkTooltip(posX, posY, (tooltipItem) -> tooltipItem.renderTooltip(poseStack, (ForgeIngameGui) minecraft.gui, index, mX, mY));
-            PEffects.checkEffectTooltip(posX, posY, (effectItem, buffIndex) -> effectItem.renderTooltip(poseStack, (ForgeIngameGui) minecraft.gui, ClientPlayerData.getOrderedPlayer(index).effects, buffIndex, mX, mY));
+            ClientPlayerData.getOrderedPlayer(index, player -> PEffects.checkEffectTooltip(posX, posY, (effectItem, buffIndex) -> effectItem.renderTooltip(poseStack, (ForgeIngameGui) minecraft.gui, player.effects, buffIndex, mX, mY)));
         });
     }
 

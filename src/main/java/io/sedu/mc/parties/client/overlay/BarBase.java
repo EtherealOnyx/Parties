@@ -1,16 +1,19 @@
 package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
+import io.sedu.mc.parties.client.config.ConfigEntry;
+import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
+import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.util.ColorUtils;
 import io.sedu.mc.parties.util.RenderUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 public abstract class BarBase extends RenderIconTextItem implements TooltipItem {
-    private final TranslatableComponent tipName;
+    protected final TranslatableComponent tipName;
 
     int hue = 0;
 
@@ -49,7 +52,7 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
     }
 
     @Override
-    abstract void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b);
+    protected abstract void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b);
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
@@ -64,7 +67,8 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
         renderLastDimmer.render(i, id, poseStack, this);
     }
 
-    abstract void renderSelfBar(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
+    protected abstract void renderSelfBar(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
+                                          float partialTicks);
 
     public static void updateRendererForMods() {
         renderLastDimmer = ((i, id, poseStack, barItem) -> {
@@ -74,8 +78,8 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
         });
     }
 
-    protected void rectRNoA(PoseStack p, int i, int zLevel, float rightPosition, int startColor, int endColor ) {
-        RenderUtils.sizeRectNoA(p.last().pose(), x(i)+1, y(i)+1, zLevel, Math.min(width - 1, ((width-2)*rightPosition)), height-2, startColor, endColor);
+    protected void rectRNoA(PoseStack p, int i, float rightPosition, int startColor, int endColor ) {
+        RenderUtils.sizeRectNoA(p.last().pose(), x(i)+1, y(i)+1, zPos, Math.min(width - 1, ((width-2)*rightPosition)), height-2, startColor, endColor);
     }
 
     protected void rectB(PoseStack p, int i, float leftPosition, float rightPosition, int startColor, int endColor ) {
@@ -158,14 +162,13 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
     }
 
     @Override
-    public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
-        ClientPlayerData p;
-        if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
-            HealthAnim h = p.health;
-            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur + h.absorb) + "/" + h.max, 0xfc807c, 0x4d110f, 0xffbfbd);
+    public abstract void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY);
 
-        }
-    }
+    @Override
+    public abstract ConfigEntry getDefaults();
+
+    @Override
+    protected abstract ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse);
 
     private interface Renderer {
         void render(int i, ClientPlayerData id, PoseStack poseStack, BarBase barItem);

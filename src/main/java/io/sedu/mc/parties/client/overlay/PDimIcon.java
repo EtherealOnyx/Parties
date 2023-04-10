@@ -268,13 +268,13 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
-        ClientPlayerData p;
-        if ((p = ClientPlayerData.getOrderedPlayer(index)).isOnline) {
-            int color = DimConfig.color(p.dim.dimension);
-            int darkCol = (color & 0xfefefe) >> 1;
-            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.dim.dimNorm, darkCol, color, 0, darkCol, color);
-        }
-
+        ClientPlayerData.getOrderedPlayer(index, p -> {
+            if (p.isOnline && !p.isSpectator) {
+                int color = DimConfig.color(p.dim.dimension);
+                int darkCol = (color & 0xfefefe) >> 1;
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.dim.dimNorm, darkCol, color, 0, darkCol, color);
+            }
+        });
     }
 
     @Override

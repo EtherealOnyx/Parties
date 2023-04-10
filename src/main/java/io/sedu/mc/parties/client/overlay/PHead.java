@@ -11,7 +11,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
-import static io.sedu.mc.parties.client.overlay.ClientPlayerData.getOrderedPlayer;
 import static io.sedu.mc.parties.util.RenderUtils.renderEntityInInventoryAttempt2;
 
 public class PHead extends RenderSelfItem implements TooltipItem {
@@ -242,7 +241,9 @@ public class PHead extends RenderSelfItem implements TooltipItem {
 
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
-        renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, getOrderedPlayer(index).getName(), 0xDDDDDD, 0xAAAAAA, 0xFFFFFF);
+        ClientPlayerData.getOrderedPlayer(index, p -> {
+            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.getName(), 0xDDDDDD, 0xAAAAAA, 0xFFFFFF);
+        });
     }
 
     private interface Renderer {

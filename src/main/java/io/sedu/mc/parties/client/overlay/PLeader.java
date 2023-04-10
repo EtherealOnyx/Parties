@@ -68,7 +68,10 @@ public class PLeader extends RenderItem implements TooltipItem{
 
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
-        if (ClientPlayerData.getOrderedPlayer(index).isLeader())
-            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName, 0xFFF2A9, 0x978B47, 0xFFE554);
+        ClientPlayerData.getOrderedPlayer(index, p -> {
+            if (p.isLeader()) {
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName, 0xFFF2A9, 0x978B47, 0xFFE554);
+            }
+        });
     }
 }

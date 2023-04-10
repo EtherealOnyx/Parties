@@ -59,10 +59,10 @@ public class TANEventHandler {
         if (event.phase == TickEvent.Phase.END) {
             if (Minecraft.getInstance().isPaused()) return;
             if (ClientEvent.tick % 40 == 2) {
-                ClientPlayerData.playerList.values().forEach(ClientPlayerData::updateTemperaturesTAN);
+                ClientPlayerData.getSelf(ClientPlayerData::updateTemperaturesTAN);
             }
             if (ClientEvent.tick % 10 == 2) {
-                ClientPlayerData.playerList.values().forEach(ClientPlayerData::updateThirstTAN);
+                ClientPlayerData.getSelf(ClientPlayerData::updateThirstTAN);
             }
         }
     }

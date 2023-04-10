@@ -13,6 +13,7 @@ import net.minecraftforge.fml.LogicalSide;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static io.sedu.mc.parties.client.overlay.RenderSelfItem.selfIndex;
 import static io.sedu.mc.parties.data.ServerConfigData.playerSlowUpdateInterval;
 import static io.sedu.mc.parties.data.ServerConfigData.playerUpdateInterval;
 
@@ -32,8 +33,7 @@ public class CSEventHandler {
                         //Body
                         if (update)
                             trackers.forEach((id, serverTracked) -> {
-                                if (serverTracked)
-                                    InfoPacketHelper.sendBodyTempUpdate(id, player, temp);
+                                InfoPacketHelper.sendBodyTempUpdate(id, player, temp);
                             });
                     } catch (Throwable t) {
                         CSCompatManager.changeHandler();
@@ -54,8 +54,7 @@ public class CSEventHandler {
                                                                                                                                    .getWorldTemp(e.player));
                         if (update)
                             trackers.forEach((id, serverTracked) -> {
-                                if (serverTracked)
-                                    InfoPacketHelper.sendWorldTempUpdate(id, player, temp);
+                                InfoPacketHelper.sendWorldTempUpdate(id, player, temp);
                             });
                     } catch (Throwable t) {
                         CSCompatManager.changeHandler();
@@ -80,7 +79,7 @@ public class CSEventHandler {
         if (event.phase == TickEvent.Phase.END) {
             if (Minecraft.getInstance().isPaused()) return;
             if (ClientEvent.tick % 20 == 2) {
-                ClientPlayerData.playerList.values().forEach(ClientPlayerData::updateTemperatures);
+                ClientPlayerData.getOrderedPlayer(selfIndex, ClientPlayerData::updateTemperatures);
             }
         }
     }

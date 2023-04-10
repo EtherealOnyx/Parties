@@ -22,9 +22,10 @@ public abstract class ChatScreenMixin extends Screen {
 
     @Inject(at = @At("RETURN"), method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V")
     private void render(PoseStack poseStack, int mX, int mY, float partialTick, CallbackInfo callback) {
+        assert minecraft != null;
         RenderItem.getCurrentMouseFrame(mX, mY, (index, posX, posY) -> {
-            RenderItem.checkTooltip(posX, posY, (tooltipItem) -> tooltipItem.renderTooltip(poseStack, (ForgeIngameGui) this.getMinecraft().gui, index, mX, mY));
-            PEffects.checkEffectTooltip(posX, posY, (effectItem, buffIndex) -> effectItem.renderTooltip(poseStack, (ForgeIngameGui) this.getMinecraft().gui, ClientPlayerData.getOrderedPlayer(index).effects, buffIndex, mX, mY));
+            RenderItem.checkTooltip(posX, posY, (tooltipItem) -> tooltipItem.renderTooltip(poseStack, (ForgeIngameGui) minecraft.gui, index, mX, mY));
+            ClientPlayerData.getOrderedPlayer(index, player -> PEffects.checkEffectTooltip(posX, posY, (effectItem, buffIndex) -> effectItem.renderTooltip(poseStack, (ForgeIngameGui) minecraft.gui, player.effects, buffIndex, mX, mY)));
         });
     }
 
