@@ -3,11 +3,11 @@ package io.sedu.mc.parties.client.overlay.anim;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 
-public class ManaAnim extends AnimHandler {
+public class StaminAnim extends AnimHandler {
 
     public float cur = 0f;
-    public int max = 20;
-    public String manaText = "";
+    public int max = 15;
+    public String stamText = "";
     public static int type;
 
     public float oldH, curH = 0f;
@@ -15,14 +15,14 @@ public class ManaAnim extends AnimHandler {
     public int oldMax = 100;
     public boolean hInc = true;
 
-    public ManaAnim(int length, boolean enabled) {
+    public StaminAnim(int length, boolean enabled) {
         super(length, enabled);
         updateText();
     }
 
     public static RenderItem.SmallBound setTextType(int d) {
         type = d;
-        ClientPlayerData.playerList.values().forEach(c -> c.getMana(ManaAnim::updateText));
+        ClientPlayerData.playerList.values().forEach(c -> c.getStaminaEF(StaminAnim::updateText));
         return null;
     }
 
@@ -63,9 +63,9 @@ public class ManaAnim extends AnimHandler {
 
     private void updateText() {
         switch (type) {
-            case 0 -> manaText = (int) Math.ceil(cur) + "/" + max;
-            case 1 -> manaText = String.valueOf((int) Math.ceil(cur));
-            case 2 -> manaText = (int) Math.ceil((cur / max) * 100) + "%";
+            case 0 -> stamText = (int) Math.ceil(cur) + "/" + max;
+            case 1 -> stamText = String.valueOf((int) Math.ceil(cur));
+            case 2 -> stamText = (int) Math.ceil((cur / max) * 100) + "%";
         }
     }
 
@@ -124,16 +124,16 @@ public class ManaAnim extends AnimHandler {
         }
     }
 
-    public void checkValues(float currentMana, int maxMana) {
-        if (currentMana != cur || maxMana != max) {
+    public void checkValues(float current, int max) {
+        if (current != cur || max != this.max) {
             if (active) {
-                reset(currentMana, maxMana);
+                reset(current, max);
             } else {
-                activate(currentMana, maxMana);
+                activate(current, max);
                 return;
             }
-            max = maxMana;
-            cur = currentMana;
+            this.max = max;
+            cur = current;
             updateText();
         }
     }

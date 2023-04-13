@@ -26,19 +26,9 @@ public class ANEventHandler {
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
-                    float mana;
-                    boolean update = PlayerData.playerList.get(player = e.player.getUUID()).setMana(mana = ANCompatManager.getHandler().getCurrentMana(e.player));
-                    if (update)
-                        trackers.forEach((id, serverTracked) -> {
-                                InfoPacketHelper.sendManaUpdate(id, player, mana);
-                        });
-
-                    int max;
-                    boolean update2 = PlayerData.playerList.get(player).setMax(max = ANCompatManager.getHandler().getMaxMana(e.player));
-                    if (update2)
-                        trackers.forEach((id, serverTracked) -> {
-                                InfoPacketHelper.sendMaxManaUpdate(id, player, max);
-                        });
+                    PlayerData pD;
+                    (pD = PlayerData.playerList.get(player = e.player.getUUID())).setMana(ANCompatManager.getHandler().getCurrentMana(e.player), mana -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendManaUpdate(id, player, mana)));
+                    pD.setMaxMana(ANCompatManager.getHandler().getMaxMana(e.player), max -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendMaxManaUpdate(id, player, max)));
                 }
             }
         }
@@ -56,16 +46,16 @@ public class ANEventHandler {
     @SubscribeEvent
     public static void castEvent(SpellCastEvent event) {
         if (event.getEntity() instanceof Player p) {
-            HashMap<UUID, Boolean> trackers;
-            float mana;
+            HashMap<UUID, Boolean> trackers = PlayerData.playerTrackers.get(p.getUUID());
             UUID player;
-            PlayerData.playerList.get(player = p.getUUID()).setMana(mana = Math.max(0, ANCompatManager.getHandler().getCurrentMana(p) - event.spell.getCastingCost()));
-            InfoPacketHelper.sendManaUpdate(player, player, mana);
-            if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
-                trackers.forEach((id, serverTracked) -> {
-                        InfoPacketHelper.sendManaUpdate(id, player, mana);
-                });
-            }
+            PlayerData.playerList.get(player = p.getUUID()).setMana(Math.max(0, ANCompatManager.getHandler().getCurrentMana(p) - event.spell.getCastingCost()), mana -> {
+                InfoPacketHelper.sendManaUpdate(player, player, mana);
+                if (trackers != null) {
+                    trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendManaUpdate(id, player, mana));
+                }
+            });
+
+
         }
 
     }

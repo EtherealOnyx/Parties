@@ -87,7 +87,7 @@ public class PDead extends RenderIconTextItem {
                 }
                 return;
             }
-            if (id.isBleeding) {
+            if (id.getBleeding()) {
                 if (iconEnabled) {
                     setup(Gui.GUI_ICONS_LOCATION);
                     blit(poseStack,x(i), y(i), 16, 0, 9, 9);
@@ -98,11 +98,11 @@ public class PDead extends RenderIconTextItem {
 
 
                 if (textEnabled) {
-                    textCentered(tX(i), tY(i), gui, poseStack, String.valueOf(id.bleedTimer), color);
+                    textCentered(tX(i), tY(i), gui, poseStack, String.valueOf(id.getTimer()), color);
                 }
 
             }
-            if (id.isDowned) {
+            if (id.getDowned()) {
                 if (iconEnabled) {
                     setup(Gui.GUI_ICONS_LOCATION);
                     blit(poseStack,x(i), y(i), 16, 0, 9, 9);
@@ -111,7 +111,7 @@ public class PDead extends RenderIconTextItem {
                     RenderItem.resetColor();
                 }
                 if (textEnabled) {
-                    textCentered(tX(i), tY(i), gui, poseStack, String.valueOf(id.bleedTimer), color);
+                    textCentered(tX(i), tY(i), gui, poseStack, String.valueOf(id.getTimer()), color);
                 }
 
             }

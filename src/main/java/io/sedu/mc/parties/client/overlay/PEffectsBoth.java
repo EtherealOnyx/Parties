@@ -8,7 +8,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.Registry;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
@@ -99,7 +98,7 @@ public class PEffectsBoth extends PEffects {
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         final HashMap<String, ConfigOptionsList.SliderEntry> sliders = new HashMap<>();
         sliders.put("rowmax", c.addSliderWithUpdater("rowmax", 1, () -> maxSize, maxPerRow, () -> updateAffectedSliders(sliders), false));
-        sliders.put("totalmax", c.addSliderWithUpdater("totalmax", maxPerRow, Registry.MOB_EFFECT::size, maxSize, () -> updateAffectedSliders(sliders), false));
+        sliders.put("totalmax", c.addSliderWithUpdater("totalmax", maxPerRow, () -> 32, maxSize, () -> updateAffectedSliders(sliders), false));
 
         c.addBooleanEntry("bsep", prioDur, () -> toggleLimSliders(entries));
         c.addSpaceEntry();

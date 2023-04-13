@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static io.sedu.mc.parties.data.ServerConfigData.playerAcceptTimer;
+import static io.sedu.mc.parties.data.DataType.*;
 
 public class PlayerData {
 
@@ -27,36 +28,11 @@ public class PlayerData {
     //Player Entity
     protected WeakReference<ServerPlayer> serverPlayer;
 
-    //Player Entity name
-    private String name;
+    private final HashMap<DataType, Object> dataItems = new HashMap<>();
+
 
     //Invite tracker
     private LinkedHashMap<UUID, Integer> inviters = new LinkedHashMap<>();
-
-    //Player old hunger;
-    private int oldHunger;
-
-    //Player old bar;
-    private float xpBar;
-
-    //is Player Downed (Hardcore Revival)
-    private boolean isDowned = false;
-
-    //is Player Bleeding (Player Revive)
-    private boolean isBleeding = false;
-    //Player revive progress;
-    private float reviveProgress;
-
-    //Player Thirst (Thirst was Taken)
-    private int thirst;
-
-    //World Temp and Body Temp (Cold Sweat)
-    private float worldTemp;
-    private float bodyTemp;
-
-    //Mana (Ars Noveau)
-    private float mana;
-    private int maxMana;
 
     //The UUID of the party that this player belongs to.
     private UUID party;
@@ -111,12 +87,13 @@ public class PlayerData {
 
     public PlayerData setServerPlayer(ServerPlayer player) {
         serverPlayer = new WeakReference<>(player);
-        name = player.getName().getContents();
+        dataItems.put(DataType.NAME, player.getName().getContents());
         return this;
     }
 
     public String getName() {
-        return serverPlayer != null && serverPlayer.get() != null ? serverPlayer.get().getName().getContents() : name;
+
+        return serverPlayer != null && serverPlayer.get() != null ? serverPlayer.get().getName().getContents() : (String) dataItems.get(NAME);
     }
 
     public PlayerData removeServerPlayer() {
@@ -151,20 +128,18 @@ public class PlayerData {
         Util.getPlayer(trackerHost, PlayerData::markDirty);
     }
 
-    public boolean setHunger(int hunger) {
-        if (oldHunger != hunger) {
-            oldHunger = hunger;
-            return true;
+    public void setHunger(int hunger, Consumer<Integer> action) {
+        if ((int) dataItems.getOrDefault(HUNGER, 0) != hunger) {
+            dataItems.put(HUNGER, hunger);
+            action.accept(hunger);
         }
-        return false;
     }
 
-    public boolean setReviveProg(float reviveProg) {
-        if (reviveProgress != reviveProg) {
-            reviveProgress = reviveProg;
-            return true;
+    public void setReviveProg(float data, Runnable action) {
+        if ((int) dataItems.getOrDefault(REVIVE, 0) != data) {
+            dataItems.put(REVIVE, data);
+            action.run();
         }
-        return false;
     }
 
     public void tickInviters() {
@@ -186,12 +161,11 @@ public class PlayerData {
         inviters.clear();
     }
 
-    public boolean setXpBar(float v) {
-        if (xpBar != v) {
-            xpBar = v;
-            return true;
+    public void setXpBar(float xpprog, Consumer<Float> action) {
+        if ((float) dataItems.getOrDefault(XPPROG, 0) != xpprog) {
+            dataItems.put(XPPROG, xpprog);
+            action.accept(xpprog);
         }
-        return false;
     }
 
     public void ifInviterExists(Consumer<UUID> action) {
@@ -204,84 +178,101 @@ public class PlayerData {
     }
 
     public void setBleeding(boolean b) {
-        this.isBleeding = b;
+        dataItems.put(BLEED, b);
         if (!b) {
-            this.reviveProgress = 0;
+            dataItems.put(REVIVE, 0);
         }
     }
 
     public boolean isBleeding() {
-        return this.isBleeding;
+        return (boolean) dataItems.getOrDefault(BLEED, false);
     }
 
     public void setDowned(boolean b) {
-        this.isDowned = b;
+        dataItems.put(DOWNED, b);
         if (!b)
-            this.reviveProgress = 0;
+            dataItems.put(REVIVE, 0);
     }
 
-    public boolean setThirst(int thirst) {
-        if (this.thirst != thirst) {
-            this.thirst = thirst;
-            return true;
+    public void setThirst(int v, Consumer<Integer> action) {
+        if ((int) dataItems.getOrDefault(THIRST, 0) != v) {
+            dataItems.put(THIRST, v);
+            action.accept(v);
         }
-        return false;
     }
 
-    public boolean setWorldTemp(float v) {
-        if (this.worldTemp != v) {
-            this.worldTemp = v;
-            return true;
+    public void setWorldTemp(float v, Consumer<Float> action) {
+        if ((float) dataItems.getOrDefault(WORLDTEMP, 0f) != v) {
+            dataItems.put(WORLDTEMP, v);
+            action.accept(v);
         }
-        return false;
     }
 
-    public boolean setBodyTemp(float v) {
-        if (this.bodyTemp != v) {
-            this.bodyTemp = v;
-            return true;
+    public void setBodyTemp(float v, Consumer<Float> action) {
+        if ((float) dataItems.getOrDefault(BODYTEMP, 0f) != v) {
+            dataItems.put(BODYTEMP, v);
+            action.accept(v);
         }
-        return false;
     }
 
-    public boolean setMana(float v) {
-        if (this.mana != v) {
-            this.mana = v;
-            return true;
+    public void setMana(float v, Consumer<Float> action) {
+        if ((float) dataItems.getOrDefault(MANA, 0f) != v) {
+            dataItems.put(MANA, v);
+            action.accept(v);
         }
-        return false;
     }
 
-    public boolean setMax(int v) {
-        if (this.maxMana != v) {
-            this.maxMana = v;
-            return true;
+    public void setMaxMana(int v, Consumer<Integer> action) {
+        if ((int) dataItems.getOrDefault(MAXMANA, 0) != v) {
+            dataItems.put(MAXMANA, v);
+            action.accept(v);
         }
-        return false;
     }
 
     public int getThirst() {
-        return thirst;
+        return (int) dataItems.getOrDefault(THIRST, 0);
     }
 
     public float getWorldTemp() {
-        return worldTemp;
+        return (float) dataItems.getOrDefault(WORLDTEMP, 0f);
     }
 
     public float getReviveProg() {
-        return reviveProgress;
+        return (float) dataItems.getOrDefault(REVIVE, 0f);
     }
 
     public float getBodyTemp() {
-        return bodyTemp;
+        return (float) dataItems.getOrDefault(BODYTEMP, 0f);
     }
 
     public float getCurrentMana() {
-        return mana;
+        return  (float) dataItems.getOrDefault(MANA, 0f);
     }
 
     public int getMaxMana() {
-        return maxMana;
+        return (int) dataItems.getOrDefault(MAXMANA, 0);
+    }
+
+    public void setStamina(float v, Runnable action) {
+        if ((float) dataItems.getOrDefault(STAM, 0f) != v) {
+            dataItems.put(STAM, v);
+            action.run();
+        }
+    }
+
+    public void setMaxStamina(int v, Runnable action) {
+        if ((int) dataItems.getOrDefault(MAXSTAM, 0) != v) {
+            dataItems.put(MAXSTAM, v);
+            action.run();
+        }
+    }
+
+    public float getStamina() {
+        return (float) dataItems.getOrDefault(STAM, 0f);
+    }
+
+    public int getMaxStamina() {
+        return (int) dataItems.getOrDefault(MAXSTAM, 0);
     }
 
     public static class MessageCdHolder {

@@ -47,9 +47,7 @@ public class HREventHandler {
                     trackers.set(PlayerData.playerTrackers.get(targetPlayer.getUUID()));
                     if (trackers.get() != null) {
                         UUID player;
-                        boolean update = PlayerData.playerList.get(player = targetPlayer.getUUID()).setReviveProg(revive);
-                        if (update)
-                            trackers.get().forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, revive));
+                        PlayerData.playerList.get(player = targetPlayer.getUUID()).setReviveProg(revive, () -> trackers.get().forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, revive)));
                     }
                 });
             }
@@ -58,15 +56,13 @@ public class HREventHandler {
 
     @SubscribeEvent
     public static void onPartyJoin(PartyJoinEvent event) {
-        event.forTrackersAndSelf((sendTo, propOf, propPlayer) -> {
-            HRCompatManager.getHandler().getDowned(propPlayer, (isBleeding, duration) -> {
-                if (isBleeding) {
-                    InfoPacketHelper.sendDowned(sendTo, propOf, true, duration);
-                    InfoPacketHelper.sendHealth(sendTo, propOf, propPlayer.getHealth());
-                    InfoPacketHelper.sendReviveUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getReviveProg());
-                }
-            });
-        });
+        event.forTrackersAndSelf((sendTo, propOf, propPlayer) -> HRCompatManager.getHandler().getDowned(propPlayer, (isBleeding, duration) -> {
+            if (isBleeding) {
+                InfoPacketHelper.sendDowned(sendTo, propOf, true, duration);
+                InfoPacketHelper.sendHealth(sendTo, propOf, propPlayer.getHealth());
+                InfoPacketHelper.sendReviveUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getReviveProg());
+            }
+        }));
     }
 
     public static void sendWakeUpEffect(Player p) {
@@ -89,9 +85,7 @@ public class HREventHandler {
             HashMap<UUID, Boolean> trackers = PlayerData.playerTrackers.get(rescueTarget.getUUID());
             if (trackers != null) {
                 UUID player;
-                boolean update = PlayerData.playerList.get(player = rescueTarget.getUUID()).setReviveProg(0);
-                if (update)
-                    trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, 0));
+                PlayerData.playerList.get(player = rescueTarget.getUUID()).setReviveProg(0, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, 0)));
             }
         }
     }

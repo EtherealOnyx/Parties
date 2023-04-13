@@ -60,9 +60,7 @@ public class InfoPacketHelper {
             if (p.isDeadOrDying())
                 InfoPacketHelper.sendDeath(sendTo, propOf);
             else
-                p.getActiveEffects().forEach(effect -> {
-                   sendEffect(sendTo, propOf, MobEffect.getId(effect.getEffect()), effect.getDuration(), effect.getAmplifier());
-                });
+                p.getActiveEffects().forEach(effect -> sendEffect(sendTo, propOf, MobEffect.getId(effect.getEffect()), effect.getDuration(), effect.getAmplifier()));
         }
     }
 
@@ -172,5 +170,13 @@ public class InfoPacketHelper {
 
     public static void sendMaxManaUpdate(UUID sendTo, UUID propOf, int maxMana) {
         sendData(getNormalServerPlayer(sendTo), propOf, 24, maxMana);
+    }
+
+    public static void sendStaminaUpdate(UUID sendTo, UUID propOf, float currentStamina) {
+        sendData(getNormalServerPlayer(sendTo), propOf, 25, currentStamina);
+    }
+
+    public static void sendMaxStaminaUpdate(UUID sendTo, UUID propOf, int maxStamina) {
+        sendData(getNormalServerPlayer(sendTo), propOf, 26, maxStamina);
     }
 }

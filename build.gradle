@@ -216,6 +216,9 @@ dependencies {
     //Customizable Player Models
     //runTimeOnly fg.deobf("curse.maven:custommodels-439870:4439327")
 
+    //Epic Fight
+    implementation fg.deobf("curse.maven:epicfight-405076:4447075")
+
 }
 
 mixin {

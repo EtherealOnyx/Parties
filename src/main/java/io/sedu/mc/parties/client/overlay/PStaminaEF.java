@@ -2,8 +2,9 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.api.epicfight.EFCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
-import io.sedu.mc.parties.client.overlay.anim.ManaAnim;
+import io.sedu.mc.parties.client.overlay.anim.StaminAnim;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.util.RenderUtils;
@@ -11,16 +12,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.fml.ModList;
 
 import java.util.ArrayList;
 
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 
-public class PMana extends BarBase {
+public class PStaminaEF extends BarBase {
 
-    public PMana(String name) {
-        super(name, new TranslatableComponent("ui.sedparties.tooltip.mana"));
+    public PStaminaEF(String name) {
+        super(name, new TranslatableComponent("ui.sedparties.tooltip.stamina"));
     }
 
     @Override
@@ -35,7 +35,7 @@ public class PMana extends BarBase {
     @Override
     protected void renderSelfBar(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
                                  float partialTicks) {
-        id.getMana(mana -> {
+        id.getStaminaEF(staminAnim -> {
             if (id.isDead) {
                 if (iconEnabled) {
                     RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorBot, bColorBot);
@@ -44,9 +44,9 @@ public class PMana extends BarBase {
                 return;
             }
             if (iconEnabled) {
-                renderMana(i, poseStack, mana);
-                if (mana.active)
-                    renderManaAnim(i, poseStack, mana, partialTicks);
+                renderStam(i, poseStack, staminAnim);
+                if (staminAnim.active)
+                    renderStamAnim(i, poseStack, staminAnim, partialTicks);
 
 
 
@@ -54,7 +54,7 @@ public class PMana extends BarBase {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 255 - id.alphaI << 24);
             }
             if (textEnabled)
-                textCentered(tX(i), tY(i), gui, poseStack, mana.manaText, color);
+                textCentered(tX(i), tY(i), gui, poseStack, staminAnim.stamText, color);
         });
     }
 
@@ -62,29 +62,28 @@ public class PMana extends BarBase {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                p.getMana(h -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur) + "/" + h.max, 0x9D7CFC, 0x310F4D, 0xFFE187));
+                p.getStaminaEF(h -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur) + "/" + h.max, 0xF1E786, 0xB8AC39, 0xFFFBB8));
             }
         });
     }
 
-    private void renderMana(int i, PoseStack poseStack, ManaAnim mana) {
-
+    private void renderStam(int i, PoseStack poseStack, StaminAnim stam) {
         float hB;
-        hB = mana.getPercent();
+        hB = stam.getPercent();
         RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorTop, bColorBot);
         RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
         rectRNoA(poseStack, i, hB, colorTop, colorBot); //Mana
     }
 
-    private void renderManaAnim(int i, PoseStack poseStack, ManaAnim mana, float partialTicks) {
-        if (mana.animTime - partialTicks < 10) {
-            mana.oldH += (mana.curH - mana.oldH) * animPos(10 - mana.animTime, partialTicks, true, 10, 1);
+    private void renderStamAnim(int i, PoseStack poseStack, StaminAnim stam, float partialTicks) {
+        if (stam.animTime - partialTicks < 10) {
+            stam.oldH += (stam.curH - stam.oldH) * animPos(10 - stam.animTime, partialTicks, true, 10, 1);
         }
 
-        if (mana.hInc) {
-            rectAnim(poseStack, i, mana.oldH, mana.curH, colorIncTop, colorIncBot);
+        if (stam.hInc) {
+            rectAnim(poseStack, i, stam.oldH, stam.curH, colorIncTop, colorIncBot);
         } else {
-            rectAnim(poseStack, i, mana.curH, mana.oldH, colorDecTop, colorDecBot);
+            rectAnim(poseStack, i, stam.curH, stam.oldH, colorDecTop, colorDecBot);
         }
     }
 
@@ -104,7 +103,7 @@ public class PMana extends BarBase {
         c.addTitleEntry("text");
         c.addBooleanEntry("tdisplay", textEnabled);
         c.addBooleanEntry("tshadow", textShadow);
-        c.addSliderEntry("ttype", 0, () -> 2, ManaAnim.type);
+        c.addSliderEntry("ttype", 0, () -> 2, StaminAnim.type);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
         entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));
@@ -126,41 +125,41 @@ public class PMana extends BarBase {
 
     @Override
     public SmallBound setTextType(int d) {
-        return ManaAnim.setTextType(d);
+        return StaminAnim.setTextType(d);
     }
 
     @Override
     public int getTextType() {
-        return ManaAnim.getTextType();
+        return StaminAnim.getTextType();
     }
 
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
         e.addEntry("display", false, 1);
-        e.addEntry("scale", 2, 2);
+        e.addEntry("scale", 1, 2);
         e.addEntry("zpos", 0, 4);
         e.addEntry("idisplay", true, 1);
         e.addEntry("xpos", 46, 12);
-        e.addEntry("ypos", 29, 12);
+        e.addEntry("ypos", 35, 12);
         e.addEntry("width", 120, 12);
-        e.addEntry("height", 10, 12);
+        e.addEntry("height", 12, 12);
         e.addEntry("tdisplay", true, 1);
         e.addEntry("tshadow", true, 1);
         e.addEntry("ttype", 0, 4);
         e.addEntry("tattached", true, 1);
         e.addEntry("xtpos", 0, 12);
         e.addEntry("ytpos", 0, 12);
-        e.addEntry("bhue", 60, 7);
-        e.addEntry("bcit", 0x9ccaff, 24);
-        e.addEntry("bcib", 0x6cb0ff, 24);
-        e.addEntry("bcdt", 0x6790d6, 24);
-        e.addEntry("bcdb", 0x1d3b6c, 24);
+        e.addEntry("bhue", 45, 7);
+        e.addEntry("bcit", 0xaff6d6, 24);
+        e.addEntry("bcib", 0x54e5a4, 24);
+        e.addEntry("bcdt", 0x66ce9f, 24);
+        e.addEntry("bcdb", 0x3d9d72, 24);
         return e;
     }
 
     @Override
     public boolean isEnabled() {
-        return elementEnabled && ModList.get().isLoaded("ars_nouveau");
+        return elementEnabled && EFCompatManager.active();
     }
 }

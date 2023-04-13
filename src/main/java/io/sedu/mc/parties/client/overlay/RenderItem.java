@@ -6,8 +6,6 @@ import com.mojang.math.Matrix4f;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
-import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
-import io.sedu.mc.parties.client.overlay.anim.ManaAnim;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
@@ -98,10 +96,6 @@ public abstract class RenderItem {
 
     public boolean isEnabled() {
         return elementEnabled;
-    }
-
-    public static void markDirty() {
-        isDirty = true;
     }
 
     boolean isInBound(int mouseX, int mouseY) {
@@ -691,8 +685,7 @@ public abstract class RenderItem {
         updater.put("tmax", (n, d) -> ((PName)n).setMaxTextSize((int) d));
         updater.put("width", (n, d) -> n.setWidth((int)d));
         updater.put("height", (n, d) -> n.setHeight((int)d));
-        updater.put("ttype", (n,d) -> HealthAnim.setTextType((int)d));
-        updater.put("mtype", (n,d) -> ManaAnim.setTextType((int)d));
+        updater.put("ttype", (n,d) ->((BarBase)n).setTextType((int) d));
         updater.put("tcolor", (n, d) -> n.setColor(0, (int)d));
         updater.put("bhue", (n,d) -> ((BarBase)n).setMainHue((int) d));
         updater.put("ohue", (n,d) -> ((PHealth)n).setOverflowHue((int) d));
@@ -765,8 +758,7 @@ public abstract class RenderItem {
         getter.put("tmax", (n) -> ((PName)n).length);
         getter.put("width", (n) -> n.width);
         getter.put("height", (n) -> n.height);
-        getter.put("ttype", (n) -> HealthAnim.getTextType());
-        getter.put("mtype", (n) -> ManaAnim.getTextType());
+        getter.put("ttype", (n) -> ((BarBase)n).getTextType());
         getter.put("tcolor", (n) -> n.getColor(0));
         getter.put("bhue", (n) -> ((BarBase)n).hue);
         getter.put("ohue", (n) -> ((PHealth)n).oHue);
@@ -817,7 +809,6 @@ public abstract class RenderItem {
         HashMap<String, Update> updater = new HashMap<>();
         RenderItem.initUpdater(updater);
         items.values().forEach(item -> item.getDefaults().forEachEntry((s, v) -> {
-            System.out.println(s.getName());
             updater.get(s.getName()).onUpdate(item, v);
         }));
         syncItems();

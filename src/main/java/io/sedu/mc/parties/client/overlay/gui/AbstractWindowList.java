@@ -29,7 +29,7 @@ import java.util.function.Predicate;
 public abstract class AbstractWindowList<E extends AbstractWindowList.Entry<E>> extends AbstractContainerEventHandler implements Widget, NarratableEntry {
     protected final Minecraft minecraft;
     protected int itemHeight;
-    private final List<E> children = new AbstractWindowList.TrackedList();
+    private final TrackedList children = new TrackedList();
     protected int width;
     protected int height;
     protected int top;

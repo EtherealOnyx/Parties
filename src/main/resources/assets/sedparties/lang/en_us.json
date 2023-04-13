@@ -17,9 +17,10 @@
   "gui.sedparties.name.p_effects_d":"Debuff Bar Element",
   "gui.sedparties.name.p_effects":"Combined Buff/Debuff Bar Element",
   "gui.sedparties.name.p_bgc":"Clickable Frame Area",
-  "gui.sedparties.name.p_thirst":"Thirst Element",
-  "gui.sedparties.name.p_temp":"Temperature Indicator",
-  "gui.sedparties.name.p_mana":"Mana Indicator",
+  "gui.sedparties.name.p_thirst":"Thirst Element (TaN, Thirst was Taken)",
+  "gui.sedparties.name.p_temp":"Temperature Element (TaN, Cold Sweat)",
+  "gui.sedparties.name.p_mana":"Mana Element (Ars Nouveau)",
+  "gui.sedparties.name.p_stam_ef":"Stamina Element (Epic Fight Mod)",
   "config.sedparties.title.display":"Display Settings",
   "config.sedparties.title.presetd":"Default Presets",
   "config.sedparties.title.presetc":"Custom Presets",
@@ -93,7 +94,6 @@
   "config.sedparties.name.bcdt": "Top",
   "config.sedparties.name.bcdb": "Bottom",
   "config.sedparties.name.ttype": "Text Type",
-  "config.sedparties.name.mtype": "Text Type",
   "config.sedparties.name.htype": "Head Icon Type",
   "config.sedparties.name.bleed": "Bleeding/Dying Text",
 
@@ -115,7 +115,7 @@
   "config.sedparties.tooltip.tdisplay": "Enable the text of the element.",
   "config.sedparties.tooltip.danim": "Enable an animation when party members switch dimensions.",
   "config.sedparties.tooltip.width": "The element's (or icon's) width.",
-  "config.sedparties.tooltip.height": "The element's (or icon's height",
+  "config.sedparties.tooltip.height": "The element's (or icon's) height",
   "config.sedparties.tooltip.spacex": "Horizontal spacing between effects icons.",
   "config.sedparties.tooltip.spacey": "Vertical spacing between effects icons.",
   "config.sedparties.tooltip.rowmax": "The maximum number of buffs in one row.",
@@ -149,8 +149,7 @@
 
   "config.sedparties.tooltip.bcdt": "The top gradient color of the health decrease animation",
   "config.sedparties.tooltip.bcdb": "The bottom gradient color of the health decrease animation",
-  "config.sedparties.tooltip.ttype": "Text display type. Options are a ratio, current health only, and a percentage.",
-  "config.sedparties.tooltip.mtype": "Text display type. Options are a ratio, current mana only, and a percentage.",
+  "config.sedparties.tooltip.ttype": "Text display type. Options are a ratio, current amount only, and a percentage.",
   "config.sedparties.tooltip.htype": "Changes the head display. 0 for icons, 1 for self model only, 2 for party models.",
   "config.sedparties.tooltip.bleed": "Whether or not to render bleeding text indicator (for PlayerRevive mod).",
 
@@ -242,7 +241,8 @@
   "messages.sedparties.preset.notfound": "Preset (%s) not found.",
   "messages.sedparties.preset.deletesuccess": "Preset (%s) was deleted successfully.",
 
-  "ui.sedparties.tooltip.effectinstant": "Instant"
+  "ui.sedparties.tooltip.effectinstant": "Instant",
+  "ui.sedparties.tooltip.stamina": "Stamina: "
 
 
 }

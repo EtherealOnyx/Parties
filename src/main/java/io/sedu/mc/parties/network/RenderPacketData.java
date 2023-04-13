@@ -57,8 +57,8 @@ public class RenderPacketData {
                 }
                 data = builder.toString();
             }
-            case 1, 2, 3, 14, 16, 20, 21, 22, 23 -> data = buf.readFloat();
-            case 4, 5, 6, 13, 19, 24 -> data = buf.readInt();
+            case 1, 2, 3, 14, 16, 20, 21, 22, 23, 25 -> data = buf.readFloat();
+            case 4, 5, 6, 13, 19, 24, 26 -> data = buf.readInt();
             case 12 -> data = new Object[]{buf.readInt(), buf.readInt(), buf.readInt()};
             case 15, 17 -> data = new Object[]{buf.readBoolean(), buf.readInt()};
             case 18 -> data = buf.readBoolean();
@@ -80,17 +80,11 @@ public class RenderPacketData {
                     buf.writeChar(letter);
                 }
             }
-            case 1, 2, 3, 14, 16, 20, 21, 22, 23 -> //Health, Max Health, Absorb
-            {
-                buf.writeFloat((Float) data);
-                
-            }
+            case 1, 2, 3, 14, 16, 20, 21, 22, 23, 25 -> //Health, Max Health, Absorb
+                    buf.writeFloat((Float) data);
 
-            case 4, 5, 6, 13, 19, 24 -> //Armor, Hunger, XP Level
-            {
-                buf.writeInt((Integer) data);
-                
-            }
+            case 4, 5, 6, 13, 19, 24, 26 -> //Armor, Hunger, XP Level
+                    buf.writeInt((Integer) data);
             case 12 -> {
                 buf.writeInt((Integer) ((Object[]) data)[0]); //Type
                 buf.writeInt((Integer) ((Object[]) data)[1]); //Duration
@@ -151,6 +145,8 @@ public class RenderPacketData {
                 case 22 -> RenderPacketHelper.setWorldTempTAN(player, (Float) data);
                 case 23 -> RenderPacketHelper.setMana(player, (Float) data);
                 case 24 -> RenderPacketHelper.setMaxMana(player, (Integer) data);
+                case 25 -> RenderPacketHelper.setCurrentStamina(player, (Float) data);
+                case 26 -> RenderPacketHelper.setMaxStamina(player, (Integer) data);
                 default -> {
 
                 }

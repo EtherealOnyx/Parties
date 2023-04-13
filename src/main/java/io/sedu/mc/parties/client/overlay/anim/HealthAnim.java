@@ -25,11 +25,11 @@ public class HealthAnim extends AnimHandler {
 
     public static RenderItem.SmallBound setTextType(int d) {
         type = d;
-        ClientPlayerData.playerList.values().forEach(c -> c.health.updateText());
+        ClientPlayerData.playerList.values().forEach(c -> c.getHealth().updateText());
         return null;
     }
 
-    public static Object getTextType() {
+    public static int getTextType() {
         return type;
     }
 
@@ -139,10 +139,6 @@ public class HealthAnim extends AnimHandler {
         return cur / Math.max(absorb+cur, max);
     }
 
-    public float getPercentE() {
-        return (cur+absorb) / Math.max(absorb+cur, max);
-    }
-
     public float getPercentA() {
         return absorb / Math.max(absorb+cur, max);
     }
@@ -153,10 +149,6 @@ public class HealthAnim extends AnimHandler {
 
     public static float getPercentE(float cur, float max, float absorb) {
         return (cur+absorb) / Math.max(absorb+cur, max);
-    }
-
-    public static float getPercentA(float cur, float max, float absorb) {
-        return absorb / Math.max(absorb+cur, max);
     }
 
     public boolean effH() {

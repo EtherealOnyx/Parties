@@ -25,22 +25,16 @@ public class TANEventHandler {
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
-                    int thirst;
                     //Thirst
-                    boolean update = PlayerData.playerList.get(player = e.player.getUUID()).setThirst(thirst = TANCompatManager.getHandler().getPlayerThirst(e.player));
-                    if (update)
-                        trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendThirstUpdate(id, player, thirst));
+                    PlayerData.playerList.get(player = e.player.getUUID()).setThirst(TANCompatManager.getHandler().getPlayerThirst(e.player), thirst -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendThirstUpdate(id, player, thirst)));
                 }
             }
             if (e.player.tickCount % playerSlowUpdateInterval.get() == 9) {
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
-                    int temp;
                     //Temperature
-                    boolean update = PlayerData.playerList.get(player = e.player.getUUID()).setWorldTemp(temp = TANCompatManager.getHandler().getPlayerTemp(e.player));
-                    if (update)
-                        trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendWorldTempUpdateTAN(id, player, temp));
+                    PlayerData.playerList.get(player = e.player.getUUID()).setWorldTemp(TANCompatManager.getHandler().getPlayerTemp(e.player), temp -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendWorldTempUpdateTAN(id, player, temp)));
                 }
             }
         }

@@ -45,6 +45,7 @@ public class PHealth extends BarBase {
     @Override
     protected void renderSelfBar(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
                                  float partialTicks) {
+        HealthAnim hA = id.getHealth();
         if (id.isDead) {
             if (iconEnabled) {
                 RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorBot, bColorBot);
@@ -55,9 +56,9 @@ public class PHealth extends BarBase {
             return;
         }
         if (iconEnabled) {
-            renderHealth(i, poseStack, id);
-            if (id.health.active)
-                renderHealthAnim(i, poseStack, id, partialTicks);
+            renderHealth(i, poseStack, hA);
+            if (hA.active)
+                renderHealthAnim(i, poseStack, hA, partialTicks);
 
 
 
@@ -65,22 +66,22 @@ public class PHealth extends BarBase {
             RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 255 - id.alphaI << 24);
         }
         if (textEnabled)
-            if (id.health.absorb > 0) {
-                textCentered(tX(i), tY(i), gui, poseStack, id.health.healthText, absorbColor);
+            if (hA.absorb > 0) {
+                textCentered(tX(i), tY(i), gui, poseStack, hA.healthText, absorbColor);
             } else {
-                textCentered(tX(i), tY(i), gui, poseStack, id.health.healthText, color);
+                textCentered(tX(i), tY(i), gui, poseStack, hA.healthText, color);
             }
 
     }
 
-    private void renderHealth(int i, PoseStack poseStack, ClientPlayerData id) {
+    private void renderHealth(int i, PoseStack poseStack, HealthAnim health) {
 
         float hB, aB;
-        hB = id.health.getPercent();
-        if (id.health.absorb > 0) {
+        hB = health.getPercent();
+        if (health.absorb > 0) {
             RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bAColorTop, bAColorBot);
             RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
-            aB = hB + id.health.getPercentA();
+            aB = hB + health.getPercentA();
             rectRNoA(poseStack, i, hB, colorTop, colorBot); //Health
             rectB(poseStack, i, hB, aB, colorTopAbsorb, colorBotAbsorb); //Absorb
         } else {
@@ -90,30 +91,30 @@ public class PHealth extends BarBase {
         }
     }
 
-    private void renderHealthAnim(int i, PoseStack poseStack, ClientPlayerData id, float partialTicks) {
-        if (id.health.animTime - partialTicks < 10) {
-            id.health.oldH += (id.health.curH - id.health.oldH) * animPos(10 - id.health.animTime, partialTicks, true, 10, 1);
-            id.health.oldA += (id.health.curA - id.health.oldA) * animPos(10 - id.health.animTime, partialTicks, true, 10, 1);
+    private void renderHealthAnim(int i, PoseStack poseStack, HealthAnim health, float partialTicks) {
+        if (health.animTime - partialTicks < 10) {
+            health.oldH += (health.curH - health.oldH) * animPos(10 - health.animTime, partialTicks, true, 10, 1);
+            health.oldA += (health.curA - health.oldA) * animPos(10 - health.animTime, partialTicks, true, 10, 1);
         }
 
-        if (id.health.hInc) {
-            if (id.health.effHOld())
-                rectAnim(poseStack, i, id.health.oldH, id.health.curH, colorAbsTop, colorAbsBot);
+        if (health.hInc) {
+            if (health.effHOld())
+                rectAnim(poseStack, i, health.oldH, health.curH, colorAbsTop, colorAbsBot);
             else
-                rectAnim(poseStack, i, id.health.oldH, id.health.curH, colorIncTop, colorIncBot);
+                rectAnim(poseStack, i, health.oldH, health.curH, colorIncTop, colorIncBot);
 
         } else {
-            if (id.health.effH())
-                rectAnim(poseStack, i, id.health.curH, id.health.oldH, colorAbsTop, colorAbsBot);
+            if (health.effH())
+                rectAnim(poseStack, i, health.curH, health.oldH, colorAbsTop, colorAbsBot);
             else
-                rectAnim(poseStack, i, id.health.curH, id.health.oldH, colorDecTop, colorDecBot);
+                rectAnim(poseStack, i, health.curH, health.oldH, colorDecTop, colorDecBot);
 
         }
 
-        if (id.health.aInc)
-            rectAnim(poseStack, i, id.health.oldA, id.health.curA, colorAbsTop, colorAbsBot);
+        if (health.aInc)
+            rectAnim(poseStack, i, health.oldA, health.curA, colorAbsTop, colorAbsBot);
         else
-            rectAnim(poseStack, i, id.health.curA, id.health.oldA, colorAbsTop, colorAbsBot);
+            rectAnim(poseStack, i, health.curA, health.oldA, colorAbsTop, colorAbsBot);
 
     }
 
@@ -121,7 +122,7 @@ public class PHealth extends BarBase {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                HealthAnim h = p.health;
+                HealthAnim h = p.getHealth();
                 renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur + h.absorb) + "/" + h.max, 0xfc807c, 0x4d110f, 0xffbfbd);
             }
         });
@@ -207,5 +208,15 @@ public class PHealth extends BarBase {
         c.addColorEntry("bcdb", colorDecBot);
 
         return c;
+    }
+
+    @Override
+    public SmallBound setTextType(int d) {
+        return HealthAnim.setTextType(d);
+    }
+
+    @Override
+    public int getTextType() {
+        return HealthAnim.getTextType();
     }
 }

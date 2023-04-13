@@ -61,15 +61,13 @@ public class PREventHandler {
 
     @SubscribeEvent
     public static void onPartyJoin(PartyJoinEvent event) {
-        event.forTrackersAndSelf((sendTo, propOf, propPlayer) -> {
-            PRCompatManager.getHandler().getBleed(propPlayer, (isBleeding, duration) -> {
-                if (isBleeding) {
-                    InfoPacketHelper.sendBleeding(sendTo, propOf, true, duration);
-                    InfoPacketHelper.sendHealth(sendTo, propOf, propPlayer.getHealth());
-                    InfoPacketHelper.sendReviveUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getReviveProg());
-                }
-            });
-        });
+        event.forTrackersAndSelf((sendTo, propOf, propPlayer) -> PRCompatManager.getHandler().getBleed(propPlayer, (isBleeding, duration) -> {
+            if (isBleeding) {
+                InfoPacketHelper.sendBleeding(sendTo, propOf, true, duration);
+                InfoPacketHelper.sendHealth(sendTo, propOf, propPlayer.getHealth());
+                InfoPacketHelper.sendReviveUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getReviveProg());
+            }
+        }));
     }
 
     @SubscribeEvent
@@ -81,9 +79,9 @@ public class PREventHandler {
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
                     float revive;
-                    boolean update = PlayerData.playerList.get(player = e.player.getUUID()).setReviveProg(revive = PRCompatManager.getHandler().getReviveProgress(e.player));
-                    if (update)
-                        trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, revive));
+                    PlayerData.playerList.get(player = e.player.getUUID())
+                                         .setReviveProg(revive = PRCompatManager.getHandler().getReviveProgress(e.player),
+                                                        () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, revive)));
                 }
             }
         }

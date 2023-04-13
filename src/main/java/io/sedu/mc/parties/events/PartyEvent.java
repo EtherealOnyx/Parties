@@ -94,13 +94,9 @@ public class PartyEvent {
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
-                    int hunger;
-                    boolean update = PlayerData.playerList.get(player = e.player.getUUID()).setHunger(hunger = (e.player.getFoodData().getFoodLevel()));
-                    if (update)
-                        trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendFood(id, player, hunger));
-                    update = PlayerData.playerList.get(player).setXpBar(e.player.experienceProgress);
-                    if (update)
-                        trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendXpBar(id, player, e.player.experienceProgress));
+                    PlayerData pD;
+                    (pD = PlayerData.playerList.get(player = e.player.getUUID())).setHunger(e.player.getFoodData().getFoodLevel(), hunger -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendFood(id, player, hunger)));
+                    pD.setXpBar(e.player.experienceProgress, (xp) -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendXpBar(id, player, xp)));
                 }
             }
             if (e.player.tickCount % 20 == 7) {
@@ -284,11 +280,9 @@ public class PartyEvent {
                                             event.getPotionEffect().getAmplifier());
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
-                    trackers.forEach((id, serverTracked) -> {
-                        InfoPacketHelper.sendEffect(id, p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()),
-                                                    event.getPotionEffect().getDuration(),
-                                                    event.getPotionEffect().getAmplifier());
-                    });
+                    trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendEffect(id, p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()),
+                                                                                    event.getPotionEffect().getDuration(),
+                                                                                    event.getPotionEffect().getAmplifier()));
                 }
             }
         }
@@ -301,9 +295,7 @@ public class PartyEvent {
                 InfoPacketHelper.sendEffectExpired(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
-                   trackers.forEach((id, serverTracked) -> {
-                        InfoPacketHelper.sendEffectExpired(id, p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
-                    });
+                   trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendEffectExpired(id, p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect())));
                 }
             }
         }
@@ -317,9 +309,7 @@ public class PartyEvent {
         InfoPacketHelper.sendSpectating(p.getUUID(), spectating);
         HashMap<UUID, Boolean> trackers;
         if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
-            trackers.forEach((id, serverTracked) -> {
-                InfoPacketHelper.sendSpectating(id, p.getUUID(), spectating);
-            });
+            trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendSpectating(id, p.getUUID(), spectating));
         }
     }
 
@@ -331,9 +321,7 @@ public class PartyEvent {
                 InfoPacketHelper.sendEffectExpired(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
-                    trackers.forEach((id, serverTracked) -> {
-                        InfoPacketHelper.sendEffectExpired(id, p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
-                    });
+                    trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendEffectExpired(id, p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect())));
                 }
             }
         }

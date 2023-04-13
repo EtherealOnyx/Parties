@@ -24,12 +24,7 @@ public class TMEventHandler {
                 HashMap<UUID, Boolean> trackers;
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
-                    int thirst;
-                    boolean update = PlayerData.playerList.get(player = e.player.getUUID()).setThirst(thirst = TMCompatManager.getHandler().getThirst(e.player));
-                    if (update)
-                       trackers.forEach((id, serverTracked) -> {
-                            InfoPacketHelper.sendThirstUpdate(id, player, thirst);
-                       });
+                    PlayerData.playerList.get(player = e.player.getUUID()).setThirst(TMCompatManager.getHandler().getThirst(e.player), thirst -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendThirstUpdate(id, player, thirst)));
                 }
             }
         }
@@ -37,9 +32,7 @@ public class TMEventHandler {
 
     @SubscribeEvent
     public static void onPartyJoin(PartyJoinEvent event) {
-        event.forTrackersAndSelf((sendTo, propOf) -> {
-            InfoPacketHelper.sendThirstUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getThirst());
-        });
+        event.forTrackersAndSelf((sendTo, propOf) -> InfoPacketHelper.sendThirstUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getThirst()));
     }
 
     @SubscribeEvent

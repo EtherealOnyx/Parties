@@ -54,18 +54,21 @@ public class RenderPacketHelper {
     }
 
     public static void setDim(UUID player, String data) {
-        if (RenderItem.items.get("dim").isEnabled()) ClientPlayerData.playerList.get(player).dim.activate(data, false);
+        if (RenderItem.items.get("dim").isEnabled()) ClientPlayerData.playerList.get(player).getDim().activate(data, false);
     }
 
     public static void markDeath() {
         if (ClientPlayerData.partySize() > 0) {
+            assert Minecraft.getInstance().player != null;
             markDeath(Minecraft.getInstance().player.getUUID());
         }
     }
 
     public static void markLife() {
         if (ClientPlayerData.partySize() > 0) {
+            assert Minecraft.getInstance().player != null;
             markLife(Minecraft.getInstance().player.getUUID());
+            assert Minecraft.getInstance().level != null;
             setDim(Minecraft.getInstance().player.getUUID(), String.valueOf(Minecraft.getInstance().level.dimension().location()));
         }
     }
@@ -121,5 +124,13 @@ public class RenderPacketHelper {
 
     public static void setMaxMana(UUID player, int data) {
         ClientPlayerData.playerList.get(player).setMaxMana(data);
+    }
+
+    public static void setCurrentStamina(UUID player, Float data) {
+        ClientPlayerData.playerList.get(player).setCurrentStamina(data);
+    }
+
+    public static void setMaxStamina(UUID player, Integer data) {
+        ClientPlayerData.playerList.get(player).setMaxStamina(data);
     }
 }

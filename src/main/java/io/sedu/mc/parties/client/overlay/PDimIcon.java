@@ -17,7 +17,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
@@ -64,24 +63,21 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isSpectator) return;
-        if (id.dim.active)  {
-            worldAnim(poseStack, i, gui, id, partialTicks);
+        if (id.getDim().active)  {
+            worldAnim(poseStack, i, gui, id.getDim(), partialTicks);
         } else {
-            world(poseStack, i, gui, id);
+            world(i, id);
         }
     }
 
 
-    private void world(PoseStack poseStack, int pI, ForgeIngameGui gui, ClientPlayerData id) {
-        DimConfig.entry(id.dim.dimension, (icon, color) -> {
-            renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale);
-
-        });
+    private void world(int pI, ClientPlayerData id) {
+        DimConfig.entry(id.getDim().dimension, (icon, color) -> renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale));
 
     }
 
     protected void renderGuiItem(ItemStack iStack, int pX, int pY, float scale, float scalePos) {
-        BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, (Level)null, Minecraft.getInstance().player, 0);
+        BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, null, Minecraft.getInstance().player, 0);
         Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
         RenderSystem.enableBlend();
@@ -108,7 +104,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
     }
 
     protected void renderGuiItem(ItemStack iStack, int pX, int pY, float x, float y, float scale, float scalePos) {
-        BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, (Level)null, Minecraft.getInstance().player, 0);
+        BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, null, Minecraft.getInstance().player, 0);
         Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
         RenderSystem.enableBlend();
@@ -135,7 +131,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         RenderSystem.applyModelViewMatrix();
     }
 
-    private void worldAnim(PoseStack poseStack, int pI, ForgeIngameGui gui, ClientPlayerData id, float partialTicks) {
+    private void worldAnim(PoseStack poseStack, int pI, ForgeIngameGui gui, DimAnim dim, float partialTicks) {
         int currTick = 0;
         float translateX = (head.x - x);
         float translateY = (head.y - y);
@@ -143,8 +139,8 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         float scalePos = 16*head.scale;
         boolean renderText = false;
         float offY = 0;
-        if (id.dim.animTime > 90) {
-            currTick = 10 - (id.dim.animTime - 90); //0-10
+        if (dim.animTime > 90) {
+            currTick = 10 - (dim.animTime - 90); //0-10
             float curPos = animPos(currTick, partialTicks, true, 10, 2);
             translateX = (head.x - x)*curPos;
             translateY = (head.y - y)*curPos;
@@ -153,11 +149,11 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
             offY += 25;
             scale = .75f + (1.25f)*curPos;
             scalePos = (5F + 11F*curPos)*head.scale;
-        } else if (id.dim.animTime > 10) {
-            currTick = id.dim.animTime - 10; //80 - 0
+        } else if (dim.animTime > 10) {
+            currTick = dim.animTime - 10; //80 - 0
             renderText = true;
         } else { //10 - 0
-            float curPos = animPos(id.dim.animTime, partialTicks, false, 10, 2);
+            float curPos = animPos(dim.animTime, partialTicks, false, 10, 2);
             translateX = (head.x - x)*curPos;
             translateY = (head.y - y)*curPos;
             scale = .75f + (1.25f)*curPos;
@@ -165,11 +161,11 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         }
         translateY += offY;
 
-        renderGuiItem(DimConfig.item(id.dim.dimension), x(pI), y(pI), translateX, translateY, scale, scalePos);
+        renderGuiItem(DimConfig.item(dim.dimension), x(pI), y(pI), translateX, translateY, scale, scalePos);
 
         if (renderText)
             //TODO: Extract sounds to their own implementation
-            doTextRender(pI, gui, poseStack, currTick, partialTicks, id.dim, DimConfig.color(id.dim.dimension));
+            doTextRender(pI, gui, poseStack, currTick, partialTicks, dim, DimConfig.color(dim.dimension));
         resetColor();
     }
 
@@ -270,9 +266,9 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                int color = DimConfig.color(p.dim.dimension);
+                int color = DimConfig.color(p.getDim().dimension);
                 int darkCol = (color & 0xfefefe) >> 1;
-                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.dim.dimNorm, darkCol, color, 0, darkCol, color);
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.getDim().dimNorm, darkCol, color, 0, darkCol, color);
             }
         });
     }

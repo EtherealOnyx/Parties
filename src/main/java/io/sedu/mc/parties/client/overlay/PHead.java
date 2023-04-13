@@ -27,7 +27,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
         width = 32;
         height = 32;
         renderSelf = (i, id, gui, poseStack, partialTicks) -> {
-            if (renderType != 0 && id.clientPlayer != null && !id.dim.active)  {
+            if (renderType != 0 && id.clientPlayer != null && !id.getDim().active)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, partialTicks);
 
@@ -70,7 +70,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
 
     public void updateRendererForMods() {
         renderSelf = (i, id, gui, poseStack, partialTicks) -> {
-            if (id.isBleeding) {
+            if (id.getBleeding()) {
                 resetColor();
                 RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, 1f, 0.5f, 1f);
                 setup(id.getHead());
@@ -91,7 +91,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 poseStack.popPose();
                 return;
             }
-            if (id.isDowned) {
+            if (id.getDowned()) {
                 resetColor();
                 RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, 1f, 0.5f, 1f);
                 setup(id.getHead());
@@ -112,7 +112,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 poseStack.popPose();
                 return;
             }
-            if (renderType != 0 && id.clientPlayer != null && !id.dim.active)  {
+            if (renderType != 0 && id.clientPlayer != null && !id.getDim().active)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) ((y(i))*scale), scale, (int) (15*scale), id.clientPlayer, partialTicks);
                 return;
@@ -128,7 +128,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             resetColor();
         };
         renderMember = (i, id, gui, poseStack, partialTicks) -> {
-            if (id.isBleeding) {
+            if (id.getBleeding()) {
                 resetColor();
                 RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, 1f, 0.5f, 1f);
                 setup(id.getHead());
@@ -150,7 +150,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 resetColor();
                 return;
             }
-            if (id.isDowned) {
+            if (id.getDowned()) {
                 resetColor();
                 RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, 1f, 0.5f, 1f);
                 setup(id.getHead());
@@ -241,9 +241,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
 
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
-        ClientPlayerData.getOrderedPlayer(index, p -> {
-            renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.getName(), 0xDDDDDD, 0xAAAAAA, 0xFFFFFF);
-        });
+        ClientPlayerData.getOrderedPlayer(index, p -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.getName(), 0xDDDDDD, 0xAAAAAA, 0xFFFFFF));
     }
 
     private interface Renderer {

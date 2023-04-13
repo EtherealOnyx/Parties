@@ -5,6 +5,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
+import io.sedu.mc.parties.api.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
 import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
@@ -12,6 +13,7 @@ import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import io.sedu.mc.parties.client.overlay.anim.ManaAnim;
+import io.sedu.mc.parties.client.overlay.anim.StaminAnim;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import net.minecraft.ChatFormatting;
@@ -31,6 +33,7 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static io.sedu.mc.parties.client.overlay.DataType.*;
 import static io.sedu.mc.parties.client.overlay.RenderSelfItem.selfIndex;
 
 public class ClientPlayerData {
@@ -51,57 +54,34 @@ public class ClientPlayerData {
     //Skin ResourceLocation
     private ResourceLocation skinLoc = null;
 
-    //PlayerData
-    private int armor = 0;
-    private int xpLevel = 0;
-    private float xpBar = 0f;
+    private final HashMap<DataType, Object> data = new HashMap<>();
     boolean isDead = false;
-
-    //PlayerRevive Support, HardcoreRevival Support
-    boolean isBleeding = false;
-    boolean isDowned = false;
-    int bleedTimer = 0;
-    float reviveProgress = 0;
-
-    //Thirst Was Taken Support
-    int thirst = 0;
-
-    //Cold Sweat Support
-    int worldTemp = 0;
-    int bodyTemp = 0;
-    int severity = 0;
-
-    //TAN Support
-    String tempType = "";
 
 
     //Default to server tracker.
     float alpha = .6f;
     public int alphaI = 216;
 
-    //Dimension Animation
-    public DimAnim dim = new DimAnim(100, this);
     public boolean shouldRenderModel = false;
-
-    //Health Animation
-    public HealthAnim health = new HealthAnim(20, true);
-
-    //Mana Animation
-    public ManaAnim mana = new ManaAnim(20, true);
 
     //Potion Effects
     public EffectHolder effects = new EffectHolder();
-
-    private int hunger = 20;
-
-
 
     //Client constructor.
     public ClientPlayerData() {
         trackedOnClient = false;
         playerName = "???";
+        initData();
     }
 
+    private void initData() {
+        data.put(DIM, new DimAnim(100, this));
+        data.put(HEALTH, new HealthAnim(20, true));
+        if (ANCompatManager.getHandler().exists())
+            data.put(MANA, new ManaAnim(20, true));
+        if (EFCompatManager.active())
+            data.put(EF_STAM, new StaminAnim(20, true));
+    }
     public static void getOrderedPlayer(int index, Consumer<ClientPlayerData> action) {
         UUID id;
         ClientPlayerData data;
@@ -133,10 +113,14 @@ public class ClientPlayerData {
         if (showSelf & (p = Minecraft.getInstance().player) != null)
         {
             ClientPlayerData.addClientMember(p.getUUID());
-            if (RenderItem.items.get("dim").isEnabled()) playerList.get(p.getUUID()).setClientPlayer(p).dim.activate(String.valueOf(p.level.dimension().location()), true);
+            if (RenderItem.items.get("dim").isEnabled()) playerList.get(p.getUUID()).setClientPlayer(p).getDim().activate(String.valueOf(p.level.dimension().location()), true);
             playerList.get(p.getUUID()).isOnline = true;
 
         }
+    }
+
+    public DimAnim getDim() {
+        return (DimAnim) data.get(DIM);
     }
 
     public static void changeLeader(UUID uuid) {
@@ -155,7 +139,9 @@ public class ClientPlayerData {
     }
 
     public static void addSelfParty() {
-        ClientPlayerData.addClientMember(Minecraft.getInstance().player.getUUID());
+        Player p = Minecraft.getInstance().player;
+        if (p != null)
+            ClientPlayerData.addClientMember(p.getUUID());
     }
 
     public static void resetOnly() {
@@ -166,10 +152,10 @@ public class ClientPlayerData {
     }
 
     public static void updateSelfDim(String data) {
-        if(ClientPlayerData.playerOrderedList.size() > 0) {
+        getSelf(playerData -> {
             if (RenderItem.items.get("dim").isEnabled())
-                playerList.get(Minecraft.getInstance().player.getUUID()).dim.activate(data, false);
-        }
+                playerData.getDim().activate(data, false);
+        });
     }
 
     public static void swap(int f, int s) {
@@ -245,15 +231,19 @@ public class ClientPlayerData {
         if (skinLoc == null) {
             setSkin(playerName);
         }
-        health.activate(entity.getHealth(), entity.getMaxHealth(), entity.getAbsorptionAmount());
-        armor = entity.getArmorValue();
-        if (health.cur > 0f)
+        getHealth().activate(entity.getHealth(), entity.getMaxHealth(), entity.getAbsorptionAmount());
+        data.put(ARMOR, entity.getArmorValue());
+        if (getHealth().cur > 0f)
             markAlive();
         else
             markDead();
         alpha = 1f;
         alphaI = 255;
         return this;
+    }
+
+    public HealthAnim getHealth() {
+        return (HealthAnim) data.get(HEALTH);
     }
 
     public void removeClientPlayer() {
@@ -283,11 +273,11 @@ public class ClientPlayerData {
 
 
     public int getArmor() {
-        return clientPlayer!= null ? clientPlayer.getArmorValue() : armor;
+        return clientPlayer!= null ? clientPlayer.getArmorValue() : (int) data.getOrDefault(ARMOR, 0);
     }
 
     public int getHunger() {
-        return hunger;
+        return (int) data.getOrDefault(HUNGER, 0);
     }
 
     public int getHungerForced() {
@@ -300,11 +290,11 @@ public class ClientPlayerData {
 
     public float getXpBarForced() { return clientPlayer != null ? clientPlayer.experienceProgress : 0;}
 
-    public float getXpBar() {return xpBar;}
+    public float getXpBar() {return (float) data.getOrDefault(XPPROGRESS, 0f);}
 
 
     public int getXpLevel() {
-        return xpLevel;
+        return (int) data.getOrDefault(XPLEVEL, 0f);
     }
 
     public boolean isLeader() {
@@ -312,39 +302,39 @@ public class ClientPlayerData {
     }
 
     public void setHealth(float data) {
-        health.checkHealth(data);
+        getHealth().checkHealth(data);
     }
 
     public float getReviveProgress() {
-        if (isBleeding)
-            return clientPlayer != null ? PRCompatManager.getHandler().getReviveProgress(clientPlayer) : reviveProgress;
-        return reviveProgress;
+        if ((boolean) data.getOrDefault(BLEEDING, false))
+            return clientPlayer != null ? PRCompatManager.getHandler().getReviveProgress(clientPlayer) : (float) data.getOrDefault(REVIVEPROG, 0f);
+        return (float) data.getOrDefault(REVIVEPROG, 0f);
     }
 
     public void setAbsorb(float data) {
-        health.checkAbsorb(data);
+        getHealth().checkAbsorb(data);
     }
 
     public void setArmor(int data) {
-        armor = data;
+        this.data.put(ARMOR, data);
     }
 
     public void setFood(int data) {
-        hunger = data;
+        this.data.put(HUNGER, data);
     }
 
     public void setXp(int data) {
-        xpLevel = data;
+        this.data.put(XPLEVEL, data);
     }
 
     public void setMaxHealth(float max) {
-        health.checkMax(max);
+        getHealth().checkMax(max);
     }
 
     public void markDead() {
         isDead = true;
-        isBleeding = false;
-        isDowned = false;
+        data.put(BLEEDING, false);
+        data.put(DOWNED, false);
         effects.markForRemoval();
     }
 
@@ -352,20 +342,12 @@ public class ClientPlayerData {
         isDead = false;
     }
 
-    public boolean isDead() {
-        return isDead;
-    }
-
-    public boolean isAlive() {
-        return !isDead;
-    }
-
     public void addEffect(int type, int duration, int amp) {
         effects.add(type, (int) Math.ceil(duration/20f), amp);
         if (MobEffect.byId(type) == MobEffects.ABSORPTION) {
             float absorb = (amp+1)*4f;
-            if (health.getAbsorb() < absorb)
-                health.checkAbsorb(absorb);
+            if (getHealth().getAbsorb() < absorb)
+                getHealth().checkAbsorb(absorb);
         }
 
     }
@@ -376,57 +358,57 @@ public class ClientPlayerData {
 
     public void tick() {
         if (trackedOnClient)
-            health.checkAnim(clientPlayer.getHealth(), clientPlayer.getMaxHealth(), clientPlayer.getAbsorptionAmount());
+            getHealth().checkAnim(clientPlayer.getHealth(), clientPlayer.getMaxHealth(), clientPlayer.getAbsorptionAmount());
     }
 
     public void slowTick() {
         if (!isDead) {
             effects.removeIf(ClientEffect::update);
         }
-
+        int bleedTimer = (int) data.getOrDefault(BLEEDTIMER, 0);
         if (bleedTimer > 0)
-            bleedTimer--;
+            data.put(BLEEDTIMER, --bleedTimer);
     }
 
     public void setXpBar(Float data) {
-        this.xpBar = data;
+        this.data.put(XPPROGRESS, data);
     }
 
     public void changeBleeding(boolean isBleeding, Integer datum) {
-        this.isBleeding = isBleeding;
-        if (this.isBleeding) {
-            this.isDowned = false;
+        data.put(BLEEDING, isBleeding);
+        if (isBleeding) {
+            data.put(DOWNED, false);
         }
-        this.bleedTimer = datum;
+        data.put(BLEEDTIMER, datum);
     }
 
     public void changeDownedState(boolean isDowned, Integer datum) {
-        this.isDowned = isDowned;
-        if (this.isDowned) {
-            this.isBleeding = false;
+        data.put(DOWNED, isDowned);
+        if (isDowned) {
+            data.put(BLEEDING, false);
         } else {
-            this.reviveProgress = 0;
+            data.put(REVIVEPROG, 0);
         }
-        this.bleedTimer = datum - 2;
+        data.put(BLEEDTIMER, datum - 2);
     }
 
     public void setReviveProgress(Float data) {
-        this.reviveProgress = data;
+        this.data.put(REVIVEPROG, data);
     }
 
     public int getThirst() {
-        return thirst;
+        return (int) data.get(THIRST);
     }
 
     public void setThirst(Integer data) {
-        this.thirst = data;
+        this.data.put(THIRST, data);
     }
 
     public void setWorldTemp(Float data) {
         try {
             CSCompatManager.getHandler().convertTemp(data, (temp, sev) -> {
-                this.worldTemp = temp;
-                this.severity = sev;
+                this.data.put(WORLDTEMP, temp);
+                this.data.put(SEVERITY, sev);
             });
         } catch (Throwable t) {
             CSCompatManager.changeHandler();
@@ -440,7 +422,7 @@ public class ClientPlayerData {
     }
 
     public void setBodyTemp(float data) {
-        this.bodyTemp = (int) data;
+        this.data.put(BODYTEMP, data);
     }
 
     public void updateTemperatures() {
@@ -448,9 +430,9 @@ public class ClientPlayerData {
         if (clientPlayer != null) {
             try {
                 CSCompatManager.getHandler().getClientWorldTemp(clientPlayer, (temp, sev, body) -> {
-                    this.worldTemp = temp;
-                    this.severity = sev;
-                    this.bodyTemp = body;
+                    data.put(WORLDTEMP, temp);
+                    data.put(SEVERITY, sev);
+                    data.put(BODYTEMP, body);
                 });
             } catch (Throwable t) {
                 CSCompatManager.changeHandler();
@@ -468,12 +450,11 @@ public class ClientPlayerData {
     public void updateTemperaturesTAN() {
         if (clientPlayer != null) {
             TANCompatManager.getHandler().getPlayerTemp(clientPlayer, (temp, text) -> {
-                this.worldTemp = temp;
-                this.tempType = text;
+                data.put(WORLDTEMP, temp);
                 if (temp == 0 || temp == 4) {
-                    severity = 1;
+                    data.put(SEVERITY, 1);
                 } else {
-                    severity = 0;
+                    data.put(SEVERITY, 0);
                 }
             });
         }
@@ -481,23 +462,23 @@ public class ClientPlayerData {
 
     public void updateThirst() {
         if (clientPlayer != null) {
-            this.thirst = TMCompatManager.getHandler().getThirst(clientPlayer);
+            data.put(THIRST, TMCompatManager.getHandler().getThirst(clientPlayer));
         }
     }
 
     public void updateThirstTAN() {
         if (clientPlayer != null) {
-            this.thirst = TANCompatManager.getHandler().getPlayerThirst(clientPlayer);
+            data.put(THIRST, TANCompatManager.getHandler().getPlayerThirst(clientPlayer));
         }
     }
 
     public void setWorldTempTAN(int data) {
-        this.worldTemp = data;
-        this.tempType = getTempType(data);
+        this.data.put(WORLDTEMP, data);
+        this.data.put(TEMPTYPE, getTempType(data));
         if (data == 0 || data == 4) {
-            severity = 1;
+            this.data.put(SEVERITY, 1);
         } else {
-            severity = 0;
+            this.data.put(SEVERITY, 0);
         }
     }
 
@@ -513,16 +494,78 @@ public class ClientPlayerData {
 
     public void updateMana() {
         if (clientPlayer != null) {
-            ANCompatManager.getHandler().getManaValues(clientPlayer, mana::checkValues);
+            ANCompatManager.getHandler().getManaValues(clientPlayer, (f1, f2) -> getMana(mana -> mana.checkValues(f1, f2)));
         }
     }
 
+    public void getMana(Consumer<ManaAnim> action) {
+        data.computeIfPresent(MANA, (data, mana) -> {
+            action.accept((ManaAnim) mana);
+            return mana;
+        });
+    }
+
+
+
     public void setMana(float data) {
-        mana.checkHealth(data);
+        getMana(mana -> mana.checkHealth(data));
     }
 
     public void setMaxMana(int data) {
-        mana.checkMax(data);
+        getMana(mana -> mana.checkMax(data));
+    }
+
+    public boolean bleedOrDowned() {
+        return (boolean) data.getOrDefault(BLEEDING, false) || (boolean) data.getOrDefault(DOWNED, false);
+    }
+
+    public boolean getBleeding() {
+        return (boolean) data.getOrDefault(BLEEDING, false);
+    }
+
+    public boolean getDowned() {
+        return (boolean) data.getOrDefault(DOWNED, false);
+    }
+
+    public int getTimer() {
+        return (int) data.getOrDefault(BLEEDTIMER, 0);
+    }
+
+    public int getWorldTemp() {
+        return (int) data.getOrDefault(WORLDTEMP, 0);
+    }
+
+    public int getBodyTemp() {
+        return (int) data.getOrDefault(BODYTEMP, 0);
+    }
+
+    public String getTempType() {
+        return (String) data.getOrDefault(TEMPTYPE, "");
+    }
+
+    public int getSeverity() {
+        return (int) data.getOrDefault(SEVERITY, 0);
+    }
+
+    public void getStaminaEF(Consumer<StaminAnim> action) {
+        data.computeIfPresent(EF_STAM, (data, stam) -> {
+            action.accept((StaminAnim) stam);
+            return stam;
+        });
+    }
+
+    public void updateStamEF() {
+        if (clientPlayer != null) {
+            EFCompatManager.getHandler().getClientValues(clientPlayer, (f1, f2) -> getStaminaEF(stam -> stam.checkValues(f1, f2)));
+        }
+    }
+
+    public void setCurrentStamina(float stamina) {
+        getStaminaEF(stam -> stam.checkHealth(stamina));
+    }
+
+    public void setMaxStamina(int stamina) {
+        getStaminaEF(stam -> stam.checkMax(stamina));
     }
 }
 

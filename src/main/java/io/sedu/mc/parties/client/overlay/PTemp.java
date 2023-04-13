@@ -78,11 +78,11 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
             setup(partyPath);
             useAlpha(alpha);
             RenderSystem.enableDepthTest();
-            blit(poseStack, x(i), y(i), id.worldTemp*18, 18, 9, 9, 18, 18);
+            blit(poseStack, x(i), y(i), id.getWorldTemp()*18, 18, 9, 9, 18, 18);
             resetColor();
         }
         if (textEnabled)
-            text(gui, poseStack, id.tempType, tX(i), tY(i), getTANColor(id.worldTemp));
+            text(gui, poseStack, id.getTempType(), tX(i), tY(i), getTANColor(id.getWorldTemp()));
     }
 
     private int getSevColor(int sev) {
@@ -158,10 +158,10 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
     }
 
     public void updateRendererForTAN() {
-        render = (i, id, gui, poseStack, partialTicks) -> renderTANTemp(i, id, gui, poseStack, id.severity == 1 ? id.alpha * (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks)/4f)/3f) : id.alpha);
+        render = (i, id, gui, poseStack, partialTicks) -> renderTANTemp(i, id, gui, poseStack, id.getSeverity() == 1 ? id.alpha * (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks)/4f)/3f) : id.alpha);
         tooltip = (poseStack, gui, index, mouseX, mouseY) -> ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + p.tempType, 0xD6E9D9, 0x88938A, getTANColor(p.worldTemp));
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + p.getTempType(), 0xD6E9D9, 0x88938A, getTANColor(p.getWorldTemp()));
             }
         });
     }
@@ -188,18 +188,18 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
 
     private void updateRendererForDefault() {
         render = (i, id, gui, poseStack, partialTicks) -> {
-            if (Math.abs(id.bodyTemp) < 20) {
-                renderTemp(i, gui, poseStack, id.worldTemp, id.severity, id.alpha, false);
-            } else if (Math.abs(id.bodyTemp) < 60) {
-                renderTemp(i, gui, poseStack, id.worldTemp, id.severity, id.alpha * (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks)/8f)/3f), true);
+            if (Math.abs(id.getBodyTemp()) < 20) {
+                renderTemp(i, gui, poseStack, id.getWorldTemp(), id.getSeverity(), id.alpha, false);
+            } else if (Math.abs(id.getBodyTemp()) < 60) {
+                renderTemp(i, gui, poseStack, id.getWorldTemp(), id.getSeverity(), id.alpha * (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks)/8f)/3f), true);
             } else {
-                renderTemp(i, gui, poseStack, id.worldTemp, id.severity, id.alpha * (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks)/3f)/3f), true);
+                renderTemp(i, gui, poseStack, id.getWorldTemp(), id.getSeverity(), id.alpha * (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks)/3f)/3f), true);
             }
         };
         tooltip = (poseStack, gui, index, mouseX, mouseY) -> ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + p.worldTemp + "°", 0xD6E9D9, 0x88938A, getSevColor(p.severity));
-                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName2.getString() + p.bodyTemp + "", 0xD6E9D9, 0x88938A, getSevColor(p.severity));
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + p.getWorldTemp() + "°", 0xD6E9D9, 0x88938A, getSevColor(p.getSeverity()));
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName2.getString() + p.getBodyTemp() + "", 0xD6E9D9, 0x88938A, getSevColor(p.getSeverity()));
             }
         });
     }

@@ -3,6 +3,7 @@ package io.sedu.mc.parties.setup;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
+import io.sedu.mc.parties.api.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.hardcorerevival.HRCompatManager;
 import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
@@ -37,6 +38,9 @@ public class ModSetup {
 
         //Ars Noveau Support
         event.enqueueWork(ANCompatManager::init);
+
+        //Epic Fight Support
+        event.enqueueWork(EFCompatManager::init);
 
 
     }

@@ -72,7 +72,7 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
 
     public static void updateRendererForMods() {
         renderLastDimmer = ((i, id, poseStack, barItem) -> {
-            if (id.isBleeding || id.isDowned) {
+            if (id.bleedOrDowned()) {
                 RenderUtils.sizeRect(poseStack.last().pose(), barItem.x(i), barItem.y(i), barItem.zPos, barItem.width, barItem.height, 150 << 24);
             }
         });
@@ -169,6 +169,10 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
 
     @Override
     protected abstract ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse);
+
+    public abstract SmallBound setTextType(int d);
+
+    public abstract int getTextType();
 
     private interface Renderer {
         void render(int i, ClientPlayerData id, PoseStack poseStack, BarBase barItem);
