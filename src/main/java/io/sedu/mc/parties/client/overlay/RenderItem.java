@@ -103,7 +103,7 @@ public abstract class RenderItem {
                 && mouseX < x + 2 + width*scale && mouseY < y + 2 + height*scale;
     }
 
-    public class ItemBound {
+    public static class ItemBound {
 
         int x;
         int y;
@@ -135,7 +135,7 @@ public abstract class RenderItem {
 
     }
 
-    public class SmallBound {
+    public static class SmallBound {
         int type;
         int value;
         public SmallBound(int type, int value) {
@@ -384,11 +384,11 @@ public abstract class RenderItem {
             p.translate(0,0,-.5);
             return;
         }
-        text(gui,p,text,x(i), y(i),color);
+        text(x(i), y(i), gui, p, text, color);
         p.translate(0,0,-.5);
     }
 
-    void text(ForgeIngameGui gui, PoseStack p, String s, int x, int y, int color) {
+    void text(int x, int y, ForgeIngameGui gui, PoseStack p, String s, int color) {
         p.translate(0,0,zPos);
         if (textShadow) {
             textS(gui,p,s,x,y,color);
@@ -406,7 +406,7 @@ public abstract class RenderItem {
     }
 
     void textCentered(int x, int y, ForgeIngameGui gui, PoseStack p, String text, int color) {
-        text(gui, p, text, (int) (x - (gui.getFont().width(text)/2f)), (int) (y - (gui.getFont().lineHeight/2f)), color);
+        text((int) (x - (gui.getFont().width(text)/2f)), (int) (y - (gui.getFont().lineHeight/2f)), gui, p, text, color);
     }
 
     static void useAlpha(float alpha) {
@@ -529,7 +529,7 @@ public abstract class RenderItem {
     }
 
     public ItemBound getRenderItemBound() {
-        return new ItemBound(frameX + x, frameY + y, (int) (width*scale), (int) (height*scale));
+        return new ItemBound(frameX + x, frameY + y, (int) (width * scale), (int) (height * scale));
     }
 
     protected ResourceLocation getItemBackground() {
@@ -611,12 +611,12 @@ public abstract class RenderItem {
 
     protected SmallBound setWidth(Integer d) {
         this.width = d;
-        return new SmallBound(2, (int) (width*scale));
+        return new SmallBound(2, (int) (width * scale));
     }
 
     protected SmallBound setHeight(Integer d) {
         this.height = d;
-        return new SmallBound(3, (int) (height*scale));
+        return new SmallBound(3, (int) (height * scale));
     }
 
     protected void updateValues() {
@@ -687,6 +687,7 @@ public abstract class RenderItem {
         updater.put("height", (n, d) -> n.setHeight((int)d));
         updater.put("ttype", (n,d) ->((BarBase)n).setTextType((int) d));
         updater.put("tcolor", (n, d) -> n.setColor(0, (int)d));
+        updater.put("barmode", (n, d) ->  ((BarBase)n).toggleBarMode((boolean) d));
         updater.put("bhue", (n,d) -> ((BarBase)n).setMainHue((int) d));
         updater.put("ohue", (n,d) -> ((PHealth)n).setOverflowHue((int) d));
 
@@ -760,6 +761,7 @@ public abstract class RenderItem {
         getter.put("height", (n) -> n.height);
         getter.put("ttype", (n) -> ((BarBase)n).getTextType());
         getter.put("tcolor", (n) -> n.getColor(0));
+        getter.put("barmode", (n) -> ((BarBase)n).isBarMode());
         getter.put("bhue", (n) -> ((BarBase)n).hue);
         getter.put("ohue", (n) -> ((PHealth)n).oHue);
 

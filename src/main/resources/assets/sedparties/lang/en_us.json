@@ -84,6 +84,7 @@
   "config.sedparties.name.genc_x": "X Pos",
   "config.sedparties.name.genc_y": "Y Pos",
 
+  "config.sedparties.name.barmode": "Bar Mode",
   "config.sedparties.name.bhue": "Hue",
   "config.sedparties.name.ohue": "Hue",
   "config.sedparties.name.mhue": "Hue",
@@ -141,6 +142,7 @@
   "config.sedparties.tooltip.genc_x": "The x position of the clickable area (which bounded within the frame)",
   "config.sedparties.tooltip.genc_y": "The y position of the clickable area (which bounded within the frame)",
 
+  "config.sedparties.tooltip.barmode": "Displays a bar instead of an icon. Width and Height are only used in bar mode.",
   "config.sedparties.tooltip.bhue": "The hue of bar's main color (example: health)",
   "config.sedparties.tooltip.ohue": "The hue of the bar's overflow color (example: absorption)",
 

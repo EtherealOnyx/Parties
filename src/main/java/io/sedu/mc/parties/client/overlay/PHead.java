@@ -87,7 +87,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 poseStack.pushPose();
                 poseStack.scale(.5f,.5f,1f);
                 resetColor();
-                text(gui, poseStack, "§lBleeding", (x(i)+4)*2, (y(i))*2, 0xa15252);
+                text((x(i)+4)*2, (y(i))*2, gui, poseStack, "§lBleeding", 0xa15252);
                 poseStack.popPose();
                 return;
             }
@@ -108,7 +108,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 poseStack.pushPose();
                 poseStack.scale(.5f,.5f,1f);
                 resetColor();
-                text(gui, poseStack, "§lK.O'd", (x(i)+10)*2, (y(i))*2, 0xa15252);
+                text((x(i)+10)*2, (y(i))*2, gui, poseStack, "§lK.O'd", 0xa15252);
                 poseStack.popPose();
                 return;
             }
@@ -145,7 +145,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 poseStack.pushPose();
                 poseStack.scale(.5f,.5f,1f);
                 useAlpha(alpha);
-                text(gui, poseStack, "§lBleeding", (x(i)+4)*2, (y(i))*2, 0xa15252);
+                text((x(i)+4)*2, (y(i))*2, gui, poseStack, "§lBleeding", 0xa15252);
                 poseStack.popPose();
                 resetColor();
                 return;
@@ -167,7 +167,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 poseStack.pushPose();
                 poseStack.scale(.5f,.5f,1f);
                 resetColor();
-                text(gui, poseStack, "§lK.O'd", (x(i)+10)*2, (y(i))*2, 0xa15252);
+                text((x(i)+10)*2, (y(i))*2, gui, poseStack, "§lK.O'd", 0xa15252);
                 poseStack.popPose();
                 return;
             }

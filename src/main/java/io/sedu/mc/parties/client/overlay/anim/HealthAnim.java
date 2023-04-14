@@ -139,6 +139,10 @@ public class HealthAnim extends AnimHandler {
         return cur / Math.max(absorb+cur, max);
     }
 
+    public float getPercentE() {
+        return (cur + absorb) / Math.max(absorb + cur, max);
+    }
+
     public float getPercentA() {
         return absorb / Math.max(absorb+cur, max);
     }

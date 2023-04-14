@@ -119,7 +119,7 @@ public class PDead extends RenderIconTextItem {
     }
 
     void textCentered(int x, int y, ForgeIngameGui gui, PoseStack p, String text, int color) {
-        text(gui, p, text, (int) (x - (gui.getFont().width(text)/2f)), y, color);
+        text((int) (x - (gui.getFont().width(text)/2f)), y, gui, p, text, color);
     }
 
     @Override

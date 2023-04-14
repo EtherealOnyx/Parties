@@ -259,7 +259,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
     }
 
     public ItemBound getRenderItemBound() {
-        return new ItemBound(frameX + x, frameY + y, (int) (width*head.scale), (int) (height*head.scale));
+        return new ItemBound(frameX + x, frameY + y, (int) (width * head.scale), (int) (height * head.scale));
     }
 
     @Override

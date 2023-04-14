@@ -61,7 +61,7 @@ public class PArmor extends RenderIconTextItem implements TooltipItem {
             resetColor();
         }
         if (textEnabled)
-            text(gui, poseStack, String.valueOf(armor), tX(i), tY(i), color);
+            text(tX(i), tY(i), gui, poseStack, String.valueOf(armor), color);
     }
 
 

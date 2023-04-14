@@ -29,7 +29,7 @@ public class PStaminaEF extends BarBase {
         RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+8, b.y+6, 0, 12, 5, colorTop, colorBot);
         setup(partyPath);
         RenderSystem.enableDepthTest();
-        blit(poseStack,b.x+3, b.y+4, 9, 0, 9, 9);
+        blit(poseStack,b.x+3, b.y+4, 18, 0, 9, 9);
     }
 
     @Override
@@ -55,6 +55,20 @@ public class PStaminaEF extends BarBase {
             }
             if (textEnabled)
                 textCentered(tX(i), tY(i), gui, poseStack, staminAnim.stamText, color);
+        });
+    }
+
+    @Override
+    protected void renderSelfIcon(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
+                                  float partialTicks) {
+        id.getStaminaEF(stam -> {
+            if (iconEnabled) {
+                setup(partyPath);
+                blit(poseStack,x(i), y(i), 18, 0, 9, 9);
+            }
+
+            if (textEnabled)
+                text(tXI(i), tYI(i), gui, poseStack, stam.stamText, color);
         });
     }
 
@@ -92,6 +106,7 @@ public class PStaminaEF extends BarBase {
         ConfigOptionsList c = new ConfigOptionsList(this::getColor, s, minecraft, x, y, w, h, parse);
         c.addTitleEntry("general");
         c.addBooleanEntry("display", elementEnabled);
+        c.addBooleanEntry("barmode", isBarMode());
         c.addSliderEntry("scale", 1, () -> 3, getScale(), true);
         c.addSliderEntry("zpos", 0, () -> 10, zPos);
         c.addTitleEntry("icon");
@@ -110,7 +125,6 @@ public class PStaminaEF extends BarBase {
         entries.add(c.addSliderEntry("ytpos", 0, () -> Math.max(0, frameEleH - (int)(minecraft.font.lineHeight*scale)), textY));
         toggleTextAttach(entries);
         c.addSpaceEntry();
-
         c.addTitleEntry("bhue");
         c.addSliderEntry("bhue", 0, () -> 100, hue, false);
         c.addTitleEntry("bai");
@@ -137,6 +151,7 @@ public class PStaminaEF extends BarBase {
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
         e.addEntry("display", false, 1);
+        e.addEntry("barmode", true, 1);
         e.addEntry("scale", 1, 2);
         e.addEntry("zpos", 0, 4);
         e.addEntry("idisplay", true, 1);

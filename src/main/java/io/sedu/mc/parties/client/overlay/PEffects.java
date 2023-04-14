@@ -232,7 +232,7 @@ public abstract class PEffects extends RenderSelfItem {
         this.width = d;
         this.xOff = (width-26)/2;
         this.eleWidth = ((width * maxPerRow) / 2);
-        return new SmallBound(2, (int) (width/2*maxPerRow*scale));
+        return new SmallBound(2, (int) (width / 2 * maxPerRow * scale));
     }
 
 
@@ -240,7 +240,7 @@ public abstract class PEffects extends RenderSelfItem {
         this.height = d;
         this.yOff = (height-26)/2;
         this.eleHeight = (int) (height * Math.ceil(maxSize / (float)maxPerRow) / 2); //why is this off by 1...
-        return new SmallBound(3, (int) ((height/2)*Math.ceil(1f*maxSize/maxPerRow)*scale));
+        return new SmallBound(3, (int) ((height / 2) * Math.ceil(1f * maxSize / maxPerRow) * scale));
     }
 
     protected int maxX() {
@@ -339,7 +339,8 @@ public abstract class PEffects extends RenderSelfItem {
 
     @Override
     public ItemBound getRenderItemBound() {
-        return new ItemBound(frameX + x, frameY + y, (int) (width/2*maxPerRow*scale), (int) ((height/2)*Math.ceil(1f*maxSize/maxPerRow)*scale));
+        return new ItemBound(frameX + x, frameY + y, (int) (width / 2 * maxPerRow * scale),
+                             (int) ((height / 2) * Math.ceil(1f * maxSize / maxPerRow) * scale));
     }
 
     @Override

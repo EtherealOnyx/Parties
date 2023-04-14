@@ -51,7 +51,7 @@ public class POffline extends RenderIconTextItem {
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isSpectator) {
             if (textEnabled)
-                text(gui, poseStack, "§oWatching..", tX(i), tY(i), color);
+                text(tX(i), tY(i), gui, poseStack, "§oWatching..", color);
         }
     }
 
@@ -63,12 +63,12 @@ public class POffline extends RenderIconTextItem {
                 blit(poseStack, x(i), y(i), 0, 216, 10, 8);
             }
             if (textEnabled)
-                text(gui, poseStack, "§oOffline...", tX(i), tY(i), color);
+                text(tX(i), tY(i), gui, poseStack, "§oOffline...", color);
             return;
         }
         if (id.isSpectator) {
             if (textEnabled)
-                text(gui, poseStack, "§oWatching..", tX(i), tY(i), color);
+                text(tX(i), tY(i), gui, poseStack, "§oWatching..", color);
         }
     }
 

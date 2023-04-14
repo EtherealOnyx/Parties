@@ -28,6 +28,7 @@ public class PHealth extends BarBase {
     int colorAbsTop;
     int colorAbsBot;
 
+
     public PHealth(String name) {
         super(name, new TranslatableComponent("ui.sedparties.tooltip.health"));
     }
@@ -72,6 +73,35 @@ public class PHealth extends BarBase {
                 textCentered(tX(i), tY(i), gui, poseStack, hA.healthText, color);
             }
 
+    }
+
+    @Override
+    protected void renderSelfIcon(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
+                                  float partialTicks) {
+        HealthAnim hA = id.getHealth();
+        if (iconEnabled) {
+            setup(GUI_ICONS_LOCATION);
+            float percent = hA.getPercentE();
+            if (percent > .8f) {
+                blit(poseStack,x(i), y(i), 16, 0, 9, 9);
+                blit(poseStack,x(i), y(i), 52, 0, 9, 9);
+            } else if (percent > .6f) {
+                blit(poseStack,x(i), y(i), 16, 0, 9, 9);
+                blit(poseStack, x(i), y(i), 61 - (gui.getGuiTicks() >> 4 & 1)*9, 0, 9, 9);
+            } else if (percent > .2f) {
+                blit(poseStack, x(i), y(i), 16, 0, 9, 9);
+                if ((gui.getGuiTicks() >> 4 & 1) == 0)
+                    blit(poseStack, x(i), y(i), 61, 0, 9, 9);
+            } else
+                blit(poseStack, x(i), y(i), 16 + (gui.getGuiTicks() >> 3 & 1)*9, 0, 9, 9);
+        }
+
+        if (textEnabled)
+            if (hA.absorb > 0) {
+                text(tXI(i), tYI(i), gui, poseStack, hA.healthText, absorbColor);
+            } else {
+                text(tXI(i), tYI(i), gui, poseStack, hA.healthText, color);
+            }
     }
 
     private void renderHealth(int i, PoseStack poseStack, HealthAnim health) {
@@ -132,6 +162,7 @@ public class PHealth extends BarBase {
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
         e.addEntry("display", true, 1);
+        e.addEntry("barmode", true, 1);
         e.addEntry("scale", 2, 2);
         e.addEntry("zpos", 0, 4);
         e.addEntry("idisplay", true, 1);
@@ -176,7 +207,8 @@ public class PHealth extends BarBase {
                                                  boolean parse) {
         ConfigOptionsList c = new ConfigOptionsList(this::getColor, s, minecraft, x, y, w, h, parse);
         c.addTitleEntry("general");
-        c.addBooleanEntry("display", isEnabled());
+        c.addBooleanEntry("display", elementEnabled);
+        c.addBooleanEntry("barmode", isBarMode());
         c.addSliderEntry("scale", 1, () -> 3, getScale(), true);
         c.addSliderEntry("zpos", 0, () -> 10, zPos);
         c.addTitleEntry("icon");
@@ -209,6 +241,8 @@ public class PHealth extends BarBase {
 
         return c;
     }
+
+
 
     @Override
     public SmallBound setTextType(int d) {

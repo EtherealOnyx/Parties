@@ -12,6 +12,8 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.function.BiConsumer;
+
 public abstract class BarBase extends RenderIconTextItem implements TooltipItem {
     protected final TranslatableComponent tipName;
 
@@ -32,12 +34,18 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
     int bColorTop;
     int bColorBot;
     private static BarBase.Renderer renderLastDimmer;
+    BarBase.BarMode renderBar;
+    boolean barMode;
 
     public BarBase(String name, TranslatableComponent c) {
         super(name);
         this.tipName = c;
         renderLastDimmer = (i, id, poseStack, barBase) -> {
 
+        };
+        renderBar = (i, id, gui, poseStack, partialTicks) -> {
+            renderSelfBar(i, id, gui, poseStack, partialTicks);
+            renderLastDimmer.render(i, id, poseStack, this);
         };
     }
 
@@ -63,12 +71,13 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isSpectator) return;
-        renderSelfBar(i, id, gui, poseStack, partialTicks);
-        renderLastDimmer.render(i, id, poseStack, this);
+        renderBar.render(i, id, gui, poseStack, partialTicks);
     }
 
     protected abstract void renderSelfBar(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
                                           float partialTicks);
+
+    protected abstract void renderSelfIcon(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
 
     public static void updateRendererForMods() {
         renderLastDimmer = ((i, id, poseStack, barItem) -> {
@@ -102,6 +111,24 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
     @Override
     protected int attachedY(int pOffset) {
         return y(pOffset) + (height>>1) + 1;
+    }
+
+    public int tXI(int pOffset) {
+        return textAttached ? attachedXIcon(pOffset)  : (int) ((frameX + textX + wOffset(pOffset))/scale);
+    }
+
+    public int tYI(int pOffset) {
+        return textAttached ? attachedYIcon(pOffset)  : (int) ((frameY + textY + hOffset(pOffset))/scale);
+    }
+
+
+    protected int attachedXIcon(int pOffset) {
+        return x(pOffset) + 11;
+    }
+
+
+    protected int attachedYIcon(int pOffset) {
+        return y(pOffset) + 1;
     }
 
 
@@ -174,7 +201,43 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
 
     public abstract int getTextType();
 
+    public boolean isBarMode() {
+        return barMode;
+    }
+
+    public SmallBound toggleBarMode(boolean b) {
+        barMode = b;
+        if (b) {
+            renderBar = (i, id, gui, poseStack, partialTicks) -> {
+                renderSelfBar(i, id, gui, poseStack, partialTicks);
+                renderLastDimmer.render(i, id, poseStack, this);
+            };
+            return new SmallBound(2, (int) (width * scale)) {
+                @Override
+                public void update(BiConsumer<Integer, Integer> action) {
+                    action.accept(type, value);
+                    action.accept(3, (int) (height * scale));
+                }
+            };
+        } else {
+            renderBar = this::renderSelfIcon;
+
+            return new SmallBound(2, (int) (9 * scale)) {
+                @Override
+                public void update(BiConsumer<Integer, Integer> action) {
+                    action.accept(type, value);
+                    action.accept(3, (int) (9 * scale));
+                }
+            };
+        }
+    }
+
     private interface Renderer {
         void render(int i, ClientPlayerData id, PoseStack poseStack, BarBase barItem);
+    }
+
+    interface BarMode {
+        void render(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
+                    float partialTicks);
     }
 }

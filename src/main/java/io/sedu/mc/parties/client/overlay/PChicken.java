@@ -39,21 +39,8 @@ public class PChicken extends RenderIconTextItem implements TooltipItem {
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         setup(GUI_ICONS_LOCATION);
         RenderSystem.enableDepthTest();
-        assert Minecraft.getInstance().player != null;
-        int hunger = Minecraft.getInstance().player.getFoodData().getFoodLevel();
-        if (hunger > 16) {
-            blit(poseStack, b.x+8, b.y+3, 16, 27, 9, 9);
-            blit(poseStack, b.x+8, b.y+3, 52, 27, 9, 9);
-        }
-        else if (hunger > 12) {
-            blit(poseStack, b.x+8, b.y+3, 16, 27, 9, 9);
-            blit(poseStack, b.x+8, b.y+3, 61 - (gui.getGuiTicks() >> 4 & 1)*9, 27, 9, 9);
-        } else if (hunger > 4) {
-            blit(poseStack, b.x+8, b.y+3, 16, 27, 9, 9);
-            if ((gui.getGuiTicks() >> 4 & 1) == 0)
-                blit(poseStack, b.x+8,b.y+3, 61, 27, 9, 9);
-        } else
-            blit(poseStack, b.x+8, b.y+3, 16 + (gui.getGuiTicks() >> 3 & 1)*9, 27, 9, 9);
+        blit(poseStack, b.x+8, b.y+3, 16, 27, 9, 9);
+        blit(poseStack, b.x+8, b.y+3, 52, 27, 9, 9);
     }
 
     @Override
@@ -65,7 +52,7 @@ public class PChicken extends RenderIconTextItem implements TooltipItem {
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isOnline && !id.isSpectator)
-            renderChicken(i, gui, poseStack, id.getHunger(), id.alpha);
+            renderChicken(i, gui, poseStack, id.getHunger(i), id.alpha);
 
     }
 
@@ -93,7 +80,7 @@ public class PChicken extends RenderIconTextItem implements TooltipItem {
             resetColor();
         }
         if (textEnabled)
-            text(gui, poseStack, String.valueOf(hunger), tX(i), tY(i), color);
+            text(tX(i), tY(i), gui, poseStack, String.valueOf(hunger), color);
     }
 
     @Override
@@ -151,7 +138,7 @@ public class PChicken extends RenderIconTextItem implements TooltipItem {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator)
-                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (isSelf(index) ? p.getHungerForced() : p.getHunger()), 0xb88458, 0x613c1b, 0xffd5b0);
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (isSelf(index) ? p.getHungerForced() : p.getHunger(i)), 0xb88458, 0x613c1b, 0xffd5b0);
         });
     }
 

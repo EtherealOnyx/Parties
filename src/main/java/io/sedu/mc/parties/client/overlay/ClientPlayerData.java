@@ -276,12 +276,8 @@ public class ClientPlayerData {
         return clientPlayer!= null ? clientPlayer.getArmorValue() : (int) data.getOrDefault(ARMOR, 0);
     }
 
-    public int getHunger() {
-        return (int) data.getOrDefault(HUNGER, 0);
-    }
-
-    public int getHungerForced() {
-        return clientPlayer != null ? clientPlayer.getFoodData().getFoodLevel() : 20;
+    public int getHunger(int i) {
+        return i == selfIndex ? clientPlayer != null ? clientPlayer.getFoodData().getFoodLevel() : 20 : (int) data.getOrDefault(HUNGER, 0);
     }
 
     public int getLevelForced() {

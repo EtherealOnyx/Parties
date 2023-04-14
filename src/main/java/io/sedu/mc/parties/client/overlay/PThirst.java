@@ -72,7 +72,7 @@ public class PThirst extends RenderIconTextItem implements TooltipItem {
             resetColor();
         }
         if (textEnabled)
-            text(gui, poseStack, String.valueOf(thirst), tX(i), tY(i), color);
+            text(tX(i), tY(i), gui, poseStack, String.valueOf(thirst), color);
     }
 
     @Override

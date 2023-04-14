@@ -74,8 +74,13 @@ public class PName extends RenderItem {
     public SmallBound setMaxTextSize(int data) {
         this.length = data;
         if (ClientPlayerData.playerOrderedList.size() > 0)
-            return new SmallBound(2, (int)(Minecraft.getInstance().font.width(ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0)).getName().substring(0, Math.min(length, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0)).getName().length())))*scale));
-        return new SmallBound(2, (int)(width*scale));
+            return new SmallBound(2,
+                                  (int) (Minecraft.getInstance().font.width(ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0))
+                                                                                                          .getName()
+                                                                                                          .substring(0, Math.min(length, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0))
+                                                                                                                                                                    .getName()
+                                                                                                                                                                    .length()))) * scale));
+        return new SmallBound(2, (int) (width * scale));
     }
 
 
@@ -96,8 +101,13 @@ public class PName extends RenderItem {
     @Override
     public ItemBound getRenderItemBound() {
         if (ClientPlayerData.playerOrderedList.size() > 0)
-            return new ItemBound(frameX + x, frameY + y-1, (int)(Minecraft.getInstance().font.width(ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0)).getName().substring(0, Math.min(length, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0)).getName().length())))*scale), (int)(height*scale));
-        return new ItemBound(frameX + x, frameY + y-1, (int)(width*scale), (int)(height*scale));
+            return new ItemBound(frameX + x, frameY + y - 1,
+                                 (int) (Minecraft.getInstance().font.width(ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0))
+                                                                                                                                  .getName()
+                                                                                                                                  .substring(0, Math.min(length, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0))
+                                                                                                                                                                                            .getName()
+                                                                                                                                                                                            .length()))) * scale), (int) (height * scale));
+        return new ItemBound(frameX + x, frameY + y - 1, (int) (width * scale), (int) (height * scale));
     }
 
 }

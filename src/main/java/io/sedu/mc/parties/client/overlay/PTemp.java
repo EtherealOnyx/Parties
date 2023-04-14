@@ -70,7 +70,7 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
             resetColor();
         }
         if (textEnabled)
-            text(gui, poseStack, worldTemp + "°", tX(i), tY(i), getSevColor(sev));
+            text(tX(i), tY(i), gui, poseStack, worldTemp + "°", getSevColor(sev));
     }
 
     void renderTANTemp(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float alpha) {
@@ -82,7 +82,7 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
             resetColor();
         }
         if (textEnabled)
-            text(gui, poseStack, id.getTempType(), tX(i), tY(i), getTANColor(id.getWorldTemp()));
+            text(tX(i), tY(i), gui, poseStack, id.getTempType(), getTANColor(id.getWorldTemp()));
     }
 
     private int getSevColor(int sev) {
