@@ -3,7 +3,7 @@ package io.sedu.mc.parties.client.overlay;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.config.ConfigEntry;
-import io.sedu.mc.parties.client.overlay.anim.ManaAnim;
+import io.sedu.mc.parties.client.overlay.anim.HungerAnim;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.util.RenderUtils;
@@ -15,12 +15,13 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
+import static io.sedu.mc.parties.util.AnimUtils.animPos;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
 public class PHunger extends BarBase {
 
-    public PHunger(String name, TranslatableComponent c) {
-        super(name, c);
+    public PHunger(String name) {
+        super(name, new TranslatableComponent("ui.sedparties.tooltip.hunger"));
     }
 
     @Override
@@ -35,44 +36,88 @@ public class PHunger extends BarBase {
 
     @Override
     protected void renderSelfBar(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+        id.getHunger(hunger -> {
+            if (id.isDead) {
+                if (iconEnabled) {
+                    RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorBot, bColorBot);
+                    RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing);
+                }
+                return;
+            }
+            if (iconEnabled) {
+                renderHunger(i, poseStack, hunger);
+                if (hunger.active)
+                    renderHungerAnim(i, poseStack, hunger, partialTicks);
 
+
+
+                //Dimmer
+                RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 255 - id.alphaI << 24);
+            }
+            if (textEnabled)
+                textCentered(tX(i), tY(i), gui, poseStack, hunger.hungerText, color);
+        });
+    }
+
+    private void renderHungerAnim(int i, PoseStack poseStack, HungerAnim hunger, float partialTicks) {
+        if (hunger.animTime - partialTicks < 10) {
+            hunger.oldH += (hunger.curH - hunger.oldH) * animPos(10 - hunger.animTime, partialTicks, true, 10, 1);
+        }
+
+        if (hunger.hInc) {
+            rectAnim(poseStack, i, hunger.oldH, hunger.curH, colorIncTop, colorIncBot);
+        } else {
+            rectAnim(poseStack, i, hunger.curH, hunger.oldH, colorDecTop, colorDecBot);
+        }
+    }
+
+    private void renderHunger(int i, PoseStack poseStack, HungerAnim hunger) {
+        float hB;
+        hB = hunger.getPercent();
+        RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorTop, bColorBot);
+        RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Hunger
+        rectRNoA(poseStack, i, hB, colorTop, colorBot); //Hunger
     }
 
     @Override
     protected void renderSelfIcon(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        int hunger = id.getHunger(i);
-        if (iconEnabled) {
-            useAlpha(id.alpha);
-            setup(Gui.GUI_ICONS_LOCATION);
-            RenderSystem.enableDepthTest();
+        id.getHunger(hunger -> {
+            if (iconEnabled) {
+                useAlpha(id.alpha);
+                setup(Gui.GUI_ICONS_LOCATION);
+                RenderSystem.enableDepthTest();
 
-            if (hunger > 16) {
-                blit(poseStack, x(i), y(i), 16, 27, 9, 9);
-                blit(poseStack, x(i), y(i), 52, 27, 9, 9);
+                if (hunger.cur > 16) {
+                    blit(poseStack, x(i), y(i), 16, 27, 9, 9);
+                    blit(poseStack, x(i), y(i), 52, 27, 9, 9);
+                }
+                else if (hunger.cur > 12) {
+                    blit(poseStack, x(i), y(i), 16, 27, 9, 9);
+                    blit(poseStack, x(i), y(i), 61 - (gui.getGuiTicks() >> 4 & 1)*9, 27, 9, 9);
+                } else if (hunger.cur > 4) {
+                    blit(poseStack, x(i), y(i), 16, 27, 9, 9);
+                    if ((gui.getGuiTicks() >> 4 & 1) == 0)
+                        blit(poseStack, x(i), y(i), 61, 27, 9, 9);
+                } else
+                    blit(poseStack, x(i), y(i), 16 + (gui.getGuiTicks() >> 3 & 1)*9, 27, 9, 9);
+
+
+                resetColor();
             }
-            else if (hunger > 12) {
-                blit(poseStack, x(i), y(i), 16, 27, 9, 9);
-                blit(poseStack, x(i), y(i), 61 - (gui.getGuiTicks() >> 4 & 1)*9, 27, 9, 9);
-            } else if (hunger > 4) {
-                blit(poseStack, x(i), y(i), 16, 27, 9, 9);
-                if ((gui.getGuiTicks() >> 4 & 1) == 0)
-                    blit(poseStack, x(i), y(i), 61, 27, 9, 9);
-            } else
-                blit(poseStack, x(i), y(i), 16 + (gui.getGuiTicks() >> 3 & 1)*9, 27, 9, 9);
+            if (textEnabled)
+                text(tXI(i), tYI(i), gui, poseStack, hunger.hungerText, color);
+        });
 
-
-            resetColor();
-        }
-        if (textEnabled)
-            text(tXI(i), tYI(i), gui, poseStack, String.valueOf(hunger), color);
     }
 
 
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
-            if (p.isOnline && !p.isSpectator)
-                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + p.getHunger(index), 0xb88458, 0x613c1b, 0xffd5b0);
+            if (p.isOnline && !p.isSpectator) {
+                p.getHunger(hunger -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + hunger.cur, 0xb88458, 0x613c1b, 0xffd5b0));
+            }
+
         });
     }
 
@@ -85,8 +130,8 @@ public class PHunger extends BarBase {
         e.addEntry("zpos", 0, 4);
         e.addEntry("idisplay", true, 1);
         e.addEntry("xpos", 143, 12);
-        e.addEntry("ypos", 19, 12);
-        e.addEntry("width", 20, 12);
+        e.addEntry("ypos", 16, 12);
+        e.addEntry("width", 23, 12);
         e.addEntry("height", 10, 12);
         e.addEntry("tdisplay", true, 1);
         e.addEntry("tshadow", false, 1);
@@ -94,11 +139,11 @@ public class PHunger extends BarBase {
         e.addEntry("tattached", true, 1);
         e.addEntry("xtpos", 0, 12);
         e.addEntry("ytpos", 0, 12);
-        e.addEntry("bhue", 24, 7);
-        e.addEntry("bcit", 0x9ccaff, 24);
-        e.addEntry("bcib", 0x6cb0ff, 24);
-        e.addEntry("bcdt", 0x6790d6, 24);
-        e.addEntry("bcdb", 0x1d3b6c, 24);
+        e.addEntry("bhue", 9, 7);
+        e.addEntry("bcit", 0xffce83, 24);
+        e.addEntry("bcib", 0xbc8532, 24);
+        e.addEntry("bcdt", 0x9b5e00, 24);
+        e.addEntry("bcdb", 0x7e4c00, 24);
         return e;
     }
 
@@ -120,7 +165,7 @@ public class PHunger extends BarBase {
         c.addTitleEntry("text");
         c.addBooleanEntry("tdisplay", textEnabled);
         c.addBooleanEntry("tshadow", textShadow);
-        c.addSliderEntry("ttype", 0, () -> 2, ManaAnim.type);
+        c.addSliderEntry("ttype", 0, () -> 2, HungerAnim.type);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
         entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));
@@ -141,11 +186,11 @@ public class PHunger extends BarBase {
 
     @Override
     public SmallBound setTextType(int d) {
-        return null;
+        return HungerAnim.setTextType(d);
     }
 
     @Override
     public int getTextType() {
-        return 0;
+        return HungerAnim.getTextType();
     }
 }

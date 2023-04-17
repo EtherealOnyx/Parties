@@ -22,4 +22,9 @@ public enum DataType {
     //Epic Fight
     STAM,
     MAXSTAM,
+
+    //Spells and Shields
+    SSMANA,
+    SSMANAMAX,
+    SSMANAABS,
 }

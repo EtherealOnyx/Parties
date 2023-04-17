@@ -179,4 +179,16 @@ public class InfoPacketHelper {
     public static void sendMaxStaminaUpdate(UUID sendTo, UUID propOf, int maxStamina) {
         sendData(getNormalServerPlayer(sendTo), propOf, 26, maxStamina);
     }
+
+    public static void sendManaUpdateSS(UUID sendTo, UUID propOf, float curMana) {
+        sendData(getNormalServerPlayer(sendTo), propOf, 27, curMana);
+    }
+
+    public static void sendMaxManaUpdateSS(UUID sendTo, UUID propOf, float mana) {
+        sendData(getNormalServerPlayer(sendTo), propOf, 28, mana);
+    }
+
+    public static void sendExtraManaUpdateSS(UUID sendTo, UUID propOf, float mana) {
+        sendData(getNormalServerPlayer(sendTo), propOf, 29, mana);
+    }
 }

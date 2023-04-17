@@ -10,7 +10,8 @@
     "PlayerMixin"
   ],
   "client": [
-    "ChatScreenMixin"
+    "ChatScreenMixin",
+    "ClientMessageHandlerMixin"
   ],
   "minVersion": "0.8"
 }

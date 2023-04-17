@@ -1,0 +1,11 @@
+package io.sedu.mc.parties.api.spellsandshields;
+
+import io.sedu.mc.parties.util.TriConsumer;
+import net.minecraft.world.entity.player.Player;
+
+public interface ISSHandler {
+
+    void getAllMana(Player player, TriConsumer<Float, Float, Float> action);
+
+    float getMax(Player player);
+}

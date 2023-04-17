@@ -254,14 +254,14 @@ public class PlayerData {
     }
 
     public void setStamina(float v, Runnable action) {
-        if ((float) dataItems.getOrDefault(STAM, 0f) != v) {
+        if (getStamina() != v) {
             dataItems.put(STAM, v);
             action.run();
         }
     }
 
     public void setMaxStamina(int v, Runnable action) {
-        if ((int) dataItems.getOrDefault(MAXSTAM, 0) != v) {
+        if (getMaxStamina() != v) {
             dataItems.put(MAXSTAM, v);
             action.run();
         }
@@ -274,6 +274,30 @@ public class PlayerData {
     public int getMaxStamina() {
         return (int) dataItems.getOrDefault(MAXSTAM, 0);
     }
+
+    public void setManaSS(float v, Runnable action) {
+        if (getManaSS() != v) {
+            dataItems.put(SSMANA, v);
+            action.run();
+        }
+    }
+
+    public void setMaxManaSS(float v, Runnable action) {
+        if (getMaxManaSS() != v) {
+            dataItems.put(SSMANAMAX, v);
+            action.run();
+        }
+    }
+
+    public void setExtraManaSS(float v, Runnable action) {
+        if (getExtraManaSS() != v) {
+            dataItems.put(SSMANAABS, v);
+            action.run();
+        }
+    }
+    public float getManaSS() { return (float) dataItems.getOrDefault(SSMANA, 0f);}
+    public float getMaxManaSS() { return (float) dataItems.getOrDefault(SSMANAMAX, 0f);}
+    public float getExtraManaSS() { return (float) dataItems.getOrDefault(SSMANAABS, 0f);}
 
     public static class MessageCdHolder {
         UUID id;

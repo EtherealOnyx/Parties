@@ -45,14 +45,14 @@ public class PChicken extends RenderIconTextItem implements TooltipItem {
 
     @Override
     void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (!id.isSpectator)
-            renderChicken(i, gui, poseStack, id.getHungerForced(), id.alpha);
+        //if (!id.isSpectator)
+            //renderChicken(i, gui, poseStack, id.getHungerForced(), id.alpha);
     }
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.isOnline && !id.isSpectator)
-            renderChicken(i, gui, poseStack, id.getHunger(i), id.alpha);
+        //if (id.isOnline && !id.isSpectator)
+            //renderChicken(i, gui, poseStack, id.getHunger(i), id.alpha);
 
     }
 
@@ -137,8 +137,8 @@ public class PChicken extends RenderIconTextItem implements TooltipItem {
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
-            if (p.isOnline && !p.isSpectator)
-                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (isSelf(index) ? p.getHungerForced() : p.getHunger(i)), 0xb88458, 0x613c1b, 0xffd5b0);
+            //if (p.isOnline && !p.isSpectator)
+                //renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (isSelf(index) ? p.getHungerForced() : p.getHunger(i)), 0xb88458, 0x613c1b, 0xffd5b0);
         });
     }
 

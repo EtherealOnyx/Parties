@@ -42,7 +42,7 @@ public class ClientPacketHelper {
     public static void markOnline(ArrayList<UUID> list) {
         list.forEach(uuid -> {
             try {
-                getClientPlayer(uuid).setOnline();
+                getClientPlayer(uuid, ClientPlayerData::setOnline);
                 msgDebug(new TextComponent(getName(uuid)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" is now online.").withStyle(ChatFormatting.AQUA)));
             } catch (NullPointerException e) {
                 error();
@@ -56,7 +56,7 @@ public class ClientPacketHelper {
     public static void markOffline(ArrayList<UUID> list) {
         list.forEach(uuid -> {
             try {
-                getClientPlayer(uuid).setOffline();
+                getClientPlayer(uuid, ClientPlayerData::setOffline);
                 msgDebug(new TextComponent(getName(uuid)).withStyle(ChatFormatting.YELLOW).append(new TextComponent(" is now offline.").withStyle(ChatFormatting.AQUA)));
             } catch (NullPointerException e) {
                 error();

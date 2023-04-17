@@ -32,6 +32,7 @@ public class ClientEvent {
             ClientPlayerData.playerList.values().forEach(ClientPlayerData::tick);
             if (tick++ % 20 == 8) {
                 ClientPlayerData.playerList.values().forEach(ClientPlayerData::slowTick);
+                ClientPlayerData.getSelf(ClientPlayerData::checkHunger);
             }
         }
     }

@@ -25,4 +25,7 @@ public enum DataType {
     TEMPTYPE,
     //Epic Fight
     EF_STAM,
+
+    //Spells and Shields
+    SSMANA
 }

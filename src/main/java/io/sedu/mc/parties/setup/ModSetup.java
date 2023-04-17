@@ -6,6 +6,7 @@ import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.hardcorerevival.HRCompatManager;
 import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
+import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
 import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.commands.NotSelfArgument;
@@ -21,27 +22,22 @@ public class ModSetup {
         PartiesPacketHandler.register();
         ArgumentTypes.register(Parties.MODID + ":notself", NotSelfArgument.class, new NotSelfArgument.Serializer());
 
-        //Player Revive Support
-        event.enqueueWork(PRCompatManager::init);
-
-        //Hardcore Revival Support
-        event.enqueueWork(HRCompatManager::init);
-
-        //TAN Support
-        event.enqueueWork(TANCompatManager::init);
-
-        //Thirst Was Taken Support
-        event.enqueueWork(TMCompatManager::init);
-
-        //Cold Sweat Support
-        event.enqueueWork(CSCompatManager::init);
-
-        //Ars Noveau Support
-        event.enqueueWork(ANCompatManager::init);
-
-        //Epic Fight Support
-        event.enqueueWork(EFCompatManager::init);
+        //Init Mod Support
+        event.enqueueWork(ModSetup::initSupport);
 
 
+    }
+
+    private static void initSupport() {
+        Parties.LOGGER.info("Initializing mod support...");
+        PRCompatManager.init(); //Player Revive Support
+        HRCompatManager.init(); //Hardcore Revival Support
+        TANCompatManager.init();//Tough as Nails Support
+        TMCompatManager.init(); //Thirst was Taken Support
+        CSCompatManager.init(); //Cold Sweat Support
+        ANCompatManager.init(); //Ars Nouveau Support
+        EFCompatManager.init(); //Epic Fight Support
+        SSCompatManager.init(); //Spells and Shield Support
+        Parties.LOGGER.info("Mod support initialization complete!");
     }
 }

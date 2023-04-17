@@ -219,6 +219,9 @@ dependencies {
     //Epic Fight
     implementation fg.deobf("curse.maven:epicfight-405076:4447075")
 
+    //Spells and Shields
+    implementation fg.deobf("curse.maven:spellsnshields-582301:4454956")
+
 }
 
 mixin {

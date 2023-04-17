@@ -53,18 +53,22 @@ public class ClientSetup {
         items.put("effects", new PEffectsBoth("p_effects"));
         items.put("effects_b", new PEffectsBene("p_effects_b"));
         items.put("effects_d", new PEffectsBad("p_effects_d"));
+        items.put("offline", new POffline("p_offline"));
+        items.put("dead", new PDead("p_dead"));
 
-        items.put("armor", new PArmor("p_armor"));
-        items.put("chicken", new PChicken("p_chicken"));
         items.put("thirst", new PThirst("p_thirst"));
         items.put("temp", new PTemp("p_temp"));
+        items.put("bg1", new PRectD("p_bg1"));
+        items.put("bgc", new ClickArea("p_bgc"));
+        items.put("armor", new PArmor("p_armor"));
+
         items.put("lvlbar", new PLevelBar("p_lvlbar"));
+        items.put("chicken", new PHunger("p_chicken"));
         items.put("health", new PHealth("p_health"));
         items.put("mana", new PMana("p_mana"));
+        items.put("mana_ss", new PManaSS("p_mana_ss"));
         items.put("stam_ef", new PStaminaEF("p_stam_ef"));
-        items.put("offline", new POffline("p_offline"));
 
-        items.put("dead", new PDead("p_dead"));
 
 
 
@@ -72,8 +76,7 @@ public class ClientSetup {
 
 
 
-        items.put("bg1", new PRectD("p_bg1"));
-        items.put("bgc", new ClickArea("p_bgc"));
+
         RenderItem.register();
 
         //Register keybinding

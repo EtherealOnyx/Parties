@@ -36,6 +36,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class RenderUtils {
 
             }
 
-            public void narrateTooltip(Consumer<Component> p_169456_) {
+            public void narrateTooltip(@NotNull Consumer<Component> p_169456_) {
                 p_169456_.accept(this.text);
             }
         };
@@ -68,7 +69,6 @@ public class RenderUtils {
     public static Button.OnTooltip transTip(Screen s, TranslatableComponent t) {
         return new Button.OnTooltip() {
             private final Component text = t;
-
             public void onTooltip(Button b, PoseStack p, int mX, int mY) {
                 if (b.active) {
                     s.renderTooltip(p, text, mX, mY+16);

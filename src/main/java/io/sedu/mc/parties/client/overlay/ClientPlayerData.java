@@ -7,13 +7,11 @@ import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
+import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
 import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.config.Config;
-import io.sedu.mc.parties.client.overlay.anim.DimAnim;
-import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
-import io.sedu.mc.parties.client.overlay.anim.ManaAnim;
-import io.sedu.mc.parties.client.overlay.anim.StaminAnim;
+import io.sedu.mc.parties.client.overlay.anim.*;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import net.minecraft.ChatFormatting;
@@ -77,10 +75,14 @@ public class ClientPlayerData {
     private void initData() {
         data.put(DIM, new DimAnim(100, this));
         data.put(HEALTH, new HealthAnim(20, true));
+        data.put(HUNGER, new HungerAnim(20, true));
         if (ANCompatManager.getHandler().exists())
             data.put(MANA, new ManaAnim(20, true));
         if (EFCompatManager.active())
             data.put(EF_STAM, new StaminAnim(20, true));
+        if (SSCompatManager.active())
+            data.put(SSMANA, new ManaSSAnim(20, true));
+
     }
     public static void getOrderedPlayer(int index, Consumer<ClientPlayerData> action) {
         UUID id;
@@ -276,8 +278,11 @@ public class ClientPlayerData {
         return clientPlayer!= null ? clientPlayer.getArmorValue() : (int) data.getOrDefault(ARMOR, 0);
     }
 
-    public int getHunger(int i) {
-        return i == selfIndex ? clientPlayer != null ? clientPlayer.getFoodData().getFoodLevel() : 20 : (int) data.getOrDefault(HUNGER, 0);
+    public void getHunger(Consumer<HungerAnim> action) {
+        data.computeIfPresent(HUNGER, (data, hunger) -> {
+            action.accept((HungerAnim) hunger);
+            return hunger;
+        });
     }
 
     public int getLevelForced() {
@@ -316,7 +321,7 @@ public class ClientPlayerData {
     }
 
     public void setFood(int data) {
-        this.data.put(HUNGER, data);
+        getHunger(hunger -> hunger.checkHealth(data));
     }
 
     public void setXp(int data) {
@@ -345,7 +350,6 @@ public class ClientPlayerData {
             if (getHealth().getAbsorb() < absorb)
                 getHealth().checkAbsorb(absorb);
         }
-
     }
 
     public void removeEffect(int type) {
@@ -562,6 +566,50 @@ public class ClientPlayerData {
 
     public void setMaxStamina(int stamina) {
         getStaminaEF(stam -> stam.checkMax(stamina));
+    }
+
+    public void checkHunger() {
+        if (clientPlayer != null) {
+            getHunger(hunger -> hunger.checkHealth(clientPlayer.getFoodData().getFoodLevel()));
+        }
+    }
+
+    public void getManaSS(Consumer<ManaSSAnim> action) {
+        data.computeIfPresent(SSMANA, (data, mana) -> {
+            action.accept((ManaSSAnim) mana);
+            return mana;
+        });
+    }
+
+    public void updateManaSS() {
+        if (clientPlayer != null) {
+            getManaSS(mana -> SSCompatManager.getHandler().getAllMana(clientPlayer, mana::checkAnim));
+        }
+
+    }
+
+    public void checkMaxManaSS() {
+        if (clientPlayer != null) {
+            getManaSS(mana -> mana.checkMax(SSCompatManager.getHandler().getMax(clientPlayer)));
+        }
+    }
+
+    public void setManaSS(Float data) {
+        if (clientPlayer != null) {
+            getManaSS(mana -> mana.checkHealth(data));
+        }
+    }
+
+    public void setMaxManaSS(Float data) {
+        if (clientPlayer != null) {
+            getManaSS(mana -> mana.checkMax(data));
+        }
+    }
+
+    public void setExtraManaSS(Float data) {
+        if (clientPlayer != null) {
+            getManaSS(mana -> mana.checkAbsorb(data));
+        }
     }
 }
 

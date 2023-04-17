@@ -689,7 +689,7 @@ public abstract class RenderItem {
         updater.put("tcolor", (n, d) -> n.setColor(0, (int)d));
         updater.put("barmode", (n, d) ->  ((BarBase)n).toggleBarMode((boolean) d));
         updater.put("bhue", (n,d) -> ((BarBase)n).setMainHue((int) d));
-        updater.put("ohue", (n,d) -> ((PHealth)n).setOverflowHue((int) d));
+        updater.put("ohue", (n,d) -> ((OverflowBarBase)n).setOverflowHue((int) d));
 
 
         updater.put("bcit", (n, d) -> n.setColor(0, (int)d));
@@ -763,7 +763,7 @@ public abstract class RenderItem {
         getter.put("tcolor", (n) -> n.getColor(0));
         getter.put("barmode", (n) -> ((BarBase)n).isBarMode());
         getter.put("bhue", (n) -> ((BarBase)n).hue);
-        getter.put("ohue", (n) -> ((PHealth)n).oHue);
+        getter.put("ohue", (n) -> ((OverflowBarBase)n).oHue);
 
         getter.put("bcit", (n) -> n.getColor(0));
         getter.put("bcib", (n) -> n.getColor(1));

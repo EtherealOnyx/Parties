@@ -105,7 +105,7 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
 
     @Override
     protected int attachedX(int pOffset) {
-        return x(pOffset) + (width>>1);
+        return x(pOffset) + (width>>1)+1;
     }
 
     @Override

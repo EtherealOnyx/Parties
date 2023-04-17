@@ -112,8 +112,10 @@ public class Util {
     Client-Side Functions
      */
 
-    public static ClientPlayerData getClientPlayer(UUID player) {
-        return ClientPlayerData.playerList.get(player);
+    public static void getClientPlayer(UUID player, Consumer<ClientPlayerData> action) {
+        ClientPlayerData p;
+        if ((p = ClientPlayerData.playerList.get(player)) != null)
+            action.accept(p);
     }
 
 
