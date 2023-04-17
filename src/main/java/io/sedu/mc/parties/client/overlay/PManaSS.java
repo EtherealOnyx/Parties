@@ -43,8 +43,6 @@ public class PManaSS extends OverflowBarBase {
                     RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorBot, bColorBot);
                     RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing);
                 }
-
-                textCentered(tX(i), tY(i), gui, poseStack, "Dead", deadColor);
                 return;
             }
             if (iconEnabled) {
@@ -78,7 +76,11 @@ public class PManaSS extends OverflowBarBase {
             }
 
             if (textEnabled)
-                text(tXI(i), tYI(i), gui, poseStack, mana.manaText, color);
+                if (mana.absorb > 0) {
+                    text(tXI(i), tYI(i), gui, poseStack, mana.manaText, absorbColor);
+                } else {
+                    text(tXI(i), tYI(i), gui, poseStack, mana.manaText, color);
+                }
         });
 
     }

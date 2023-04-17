@@ -148,8 +148,11 @@ public class RenderPacketHelper {
     }
 
     public static void setExtraMana(UUID player, Float data) {
-        getClientPlayer(player, p -> p.setAbsorb(data));
+        getClientPlayer(player, p -> p.setExtraManaSS(data));
     }
 
 
+    public static void setExtraStam(UUID player, Integer data) {
+        getClientPlayer(player, p -> p.setExtraStam(data));
+    }
 }

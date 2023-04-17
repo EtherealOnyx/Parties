@@ -1,20 +1,20 @@
-package io.sedu.mc.parties.api.spellsandshields;
+package io.sedu.mc.parties.api.feathers;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
-public class SSCompatManager {
+public class FCompatManager {
     public static boolean enableOverlay = true;
-    private static ISSHandler handler = new SSHandlerFake();
+    private static IFHandler handler = new FHandlerFake();
     private static boolean active = false;
 
 
-    public static ISSHandler getHandler() {
+    public static IFHandler getHandler() {
         return handler;
     }
 
     public static void init() {
-        if (ModList.get().isLoaded("spells_and_shields")) initCompat();
+        if (ModList.get().isLoaded("feathers")) initCompat();
     }
 
     public static boolean active() {
@@ -22,10 +22,10 @@ public class SSCompatManager {
     }
 
     private static void initCompat() {
-        if (SSHandler.exists()) {
+        if (FHandler.exists()) {
             active = true;
-            handler = new SSHandler();
-            MinecraftForge.EVENT_BUS.register(SSEventHandler.class);
+            handler = new FHandler();
+            MinecraftForge.EVENT_BUS.register(FEventHandler.class);
         }
 
     }

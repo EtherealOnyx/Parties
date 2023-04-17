@@ -12,6 +12,9 @@ public class ClientConfigData {
     public static ForgeConfigSpec.BooleanValue renderThirst;
     public static ForgeConfigSpec.BooleanValue renderTemperature;
     public static ForgeConfigSpec.BooleanValue renderMana;
+    public static ForgeConfigSpec.BooleanValue renderSSMana;
+    public static ForgeConfigSpec.BooleanValue renderFeathers;
+    //public static ForgeConfigSpec.BooleanValue renderStamina;
     public static ForgeConfigSpec.ConfigValue<String> defaultPreset;
     public static void registerClientConfig(ForgeConfigSpec.Builder CLIENT_BUILDER) {
         CLIENT_BUILDER.comment("Client Party Settings | Type /party reload in-game to reload this configuration.").push("party");
@@ -32,6 +35,12 @@ public class ClientConfigData {
                                      .define("renderTemperature", true);
         renderMana = CLIENT_BUILDER.comment("Enable the Mana Display (Ars Nouveau)")
                                           .define("renderMana", true);
+        renderSSMana = CLIENT_BUILDER.comment("Enable the Mana Display (Spells and Shields)")
+                                     .define("renderSSMana", true);
+        renderFeathers = CLIENT_BUILDER.comment("Enable the Stamina display (Feathers Mod)")
+                                   .define("renderFeathers", true);
+        //renderStamina = CLIENT_BUILDER.comment("Enable the Stamina display (Epic Fight Mod)")
+                                       //.define("renderStamina", true);
         defaultPreset = CLIENT_BUILDER.comment("The default preset to load on the client. It's automatically set to load your last preset used.")
                 .define("defaultPreset", "");
         CLIENT_BUILDER.pop();

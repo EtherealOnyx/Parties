@@ -20,7 +20,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.18.2-0.3.3'
+version = '1.18.2-0.3.4'
 group = 'io.sedu.mc.sedparties' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'sedparties'
 
@@ -221,6 +221,10 @@ dependencies {
 
     //Spells and Shields
     implementation fg.deobf("curse.maven:spellsnshields-582301:4454956")
+
+    //Feathers
+    implementation fg.deobf("curse.maven:feathers-699933:4416859")
+    runtimeOnly fg.deobf("curse.maven:elenaidodge2-442962:4127737")
 
 }
 

@@ -6,6 +6,7 @@ import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.epicfight.EFCompatManager;
+import io.sedu.mc.parties.api.feathers.FCompatManager;
 import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
@@ -78,7 +79,7 @@ public class ClientPlayerData {
         data.put(HUNGER, new HungerAnim(20, true));
         if (ANCompatManager.getHandler().exists())
             data.put(MANA, new ManaAnim(20, true));
-        if (EFCompatManager.active())
+        if (EFCompatManager.active() || FCompatManager.active())
             data.put(EF_STAM, new StaminAnim(20, true));
         if (SSCompatManager.active())
             data.put(SSMANA, new ManaSSAnim(20, true));
@@ -556,7 +557,7 @@ public class ClientPlayerData {
 
     public void updateStamEF() {
         if (clientPlayer != null) {
-            EFCompatManager.getHandler().getClientValues(clientPlayer, (f1, f2) -> getStaminaEF(stam -> stam.checkValues(f1, f2)));
+            EFCompatManager.getHandler().getClientValues(clientPlayer, (f1, f2) -> getStaminaEF(stam -> stam.checkAnim(f1, f2, 0f)));
         }
     }
 
@@ -610,6 +611,14 @@ public class ClientPlayerData {
         if (clientPlayer != null) {
             getManaSS(mana -> mana.checkAbsorb(data));
         }
+    }
+
+    public void checkStamF() {
+        FCompatManager.getHandler().getClientFeathers((cur, max, abs) -> getStaminaEF(staminAnim -> staminAnim.checkAnim(Math.min(max, cur), max, abs)));
+    }
+
+    public void setExtraStam(Integer data) {
+        getStaminaEF(stam -> stam.checkAbsorb(data));
     }
 }
 

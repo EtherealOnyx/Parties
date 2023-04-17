@@ -8,4 +8,6 @@ public interface ISSHandler {
     void getAllMana(Player player, TriConsumer<Float, Float, Float> action);
 
     float getMax(Player player);
+
+    void setManaRender(Boolean aBoolean);
 }

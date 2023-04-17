@@ -67,7 +67,7 @@ public class ClientSetup {
         items.put("health", new PHealth("p_health"));
         items.put("mana", new PMana("p_mana"));
         items.put("mana_ss", new PManaSS("p_mana_ss"));
-        items.put("stam_ef", new PStaminaEF("p_stam_ef"));
+        items.put("stam_ef", new PStamina("p_stam_ef"));
 
 
 

@@ -37,4 +37,9 @@ public class SSHandler implements ISSHandler {
         return p != null ? p.getMaxMana() : 20;
     }
 
+    @Override
+    public void setManaRender(Boolean aBoolean) {
+        SSCompatManager.enableOverlay = aBoolean;
+    }
+
 }

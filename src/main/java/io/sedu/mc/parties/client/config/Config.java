@@ -4,6 +4,8 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
+import io.sedu.mc.parties.api.feathers.FCompatManager;
+import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
 import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.overlay.GeneralOptions;
@@ -272,6 +274,8 @@ public class Config {
         //CSCompatManager.getHandler().setTempRender(renderTemperature.get()); //I cri
         ANCompatManager.getHandler().setManaRender(renderMana.get());
         TANCompatManager.getHandler().setRenderers(renderThirst.get(), renderTemperature.get());
+        SSCompatManager.getHandler().setManaRender(renderSSMana.get());
+        FCompatManager.getHandler().setFeathersRender(renderFeathers.get());
     }
 
     public static void loadDefaultPreset() {

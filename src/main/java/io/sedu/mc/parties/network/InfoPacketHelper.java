@@ -191,4 +191,8 @@ public class InfoPacketHelper {
     public static void sendExtraManaUpdateSS(UUID sendTo, UUID propOf, float mana) {
         sendData(getNormalServerPlayer(sendTo), propOf, 29, mana);
     }
+
+    public static void sendExtraStamUpdate(UUID sendTo, UUID propOf, int extra) {
+        sendData(getNormalServerPlayer(sendTo), propOf, 30, extra);
+    }
 }

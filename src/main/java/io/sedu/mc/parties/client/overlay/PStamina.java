@@ -3,6 +3,7 @@ package io.sedu.mc.parties.client.overlay;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.api.epicfight.EFCompatManager;
+import io.sedu.mc.parties.api.feathers.FCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.anim.StaminAnim;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
@@ -17,9 +18,10 @@ import java.util.ArrayList;
 
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 
-public class PStaminaEF extends BarBase {
+public class PStamina extends OverflowBarBase {
 
-    public PStaminaEF(String name) {
+
+    public PStamina(String name) {
         super(name, new TranslatableComponent("ui.sedparties.tooltip.stamina"));
     }
 
@@ -44,9 +46,9 @@ public class PStaminaEF extends BarBase {
                 return;
             }
             if (iconEnabled) {
-                renderStam(i, poseStack, staminAnim);
+                renderHealth(i, poseStack, staminAnim);
                 if (staminAnim.active)
-                    renderStamAnim(i, poseStack, staminAnim, partialTicks);
+                    renderHealthAnim(i, poseStack, staminAnim, partialTicks);
 
 
 
@@ -54,55 +56,125 @@ public class PStaminaEF extends BarBase {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 255 - id.alphaI << 24);
             }
             if (textEnabled)
-                textCentered(tX(i), tY(i), gui, poseStack, staminAnim.stamText, color);
+                if (staminAnim.absorb > 0) {
+                    textCentered(tX(i), tY(i), gui, poseStack, staminAnim.stamText, absorbColor);
+                } else {
+                    textCentered(tX(i), tY(i), gui, poseStack, staminAnim.stamText, color);
+                }
         });
+
+
     }
 
     @Override
     protected void renderSelfIcon(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
                                   float partialTicks) {
-        id.getStaminaEF(stam -> {
+        id.getStaminaEF(staminAnim -> {
             if (iconEnabled) {
                 setup(partyPath);
                 blit(poseStack,x(i), y(i), 18, 0, 9, 9);
             }
 
             if (textEnabled)
-                text(tXI(i), tYI(i), gui, poseStack, stam.stamText, color);
+                if (staminAnim.absorb > 0) {
+                    text(tXI(i), tYI(i), gui, poseStack, staminAnim.stamText, absorbColor);
+                } else {
+                    text(tXI(i), tYI(i), gui, poseStack, staminAnim.stamText, color);
+                }
         });
+
+    }
+
+    private void renderHealth(int i, PoseStack poseStack, StaminAnim staminAnim) {
+
+        float hB, aB;
+        hB = staminAnim.getPercent();
+        if (staminAnim.absorb > 0) {
+            RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bAColorTop, bAColorBot);
+            RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
+            aB = hB + staminAnim.getPercentA();
+            rectRNoA(poseStack, i, hB, colorTop, colorBot); //Health
+            rectB(poseStack, i, hB, aB, colorTopAbsorb, colorBotAbsorb); //Absorb
+        } else {
+            RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorTop, bColorBot);
+            RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
+            rectRNoA(poseStack, i, hB, colorTop, colorBot); //Health
+        }
+    }
+
+    private void renderHealthAnim(int i, PoseStack poseStack, StaminAnim staminAnim, float partialTicks) {
+        if (staminAnim.animTime - partialTicks < 10) {
+            staminAnim.oldH += (staminAnim.curH - staminAnim.oldH) * animPos(10 - staminAnim.animTime, partialTicks, true, 10, 1);
+            staminAnim.oldA += (staminAnim.curA - staminAnim.oldA) * animPos(10 - staminAnim.animTime, partialTicks, true, 10, 1);
+        }
+
+        if (staminAnim.hInc) {
+            if (staminAnim.effHOld())
+                rectAnim(poseStack, i, staminAnim.oldH, staminAnim.curH, colorAbsTop, colorAbsBot);
+            else
+                rectAnim(poseStack, i, staminAnim.oldH, staminAnim.curH, colorIncTop, colorIncBot);
+
+        } else {
+            if (staminAnim.effH())
+                rectAnim(poseStack, i, staminAnim.curH, staminAnim.oldH, colorAbsTop, colorAbsBot);
+            else
+                rectAnim(poseStack, i, staminAnim.curH, staminAnim.oldH, colorDecTop, colorDecBot);
+
+        }
+
+        if (staminAnim.aInc)
+            rectAnim(poseStack, i, staminAnim.oldA, staminAnim.curA, colorAbsTop, colorAbsBot);
+        else
+            rectAnim(poseStack, i, staminAnim.curA, staminAnim.oldA, colorAbsTop, colorAbsBot);
+
     }
 
     @Override
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                p.getStaminaEF(h -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur) + "/" + h.max, 0xF1E786, 0xB8AC39, 0xFFFBB8));
+                p.getStaminaEF(h -> {
+                    renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur + h.absorb) + "/" + h.max, 0x66BFAA, 0x005555, 0x55E4CC);
+                });
+
             }
         });
     }
 
-    private void renderStam(int i, PoseStack poseStack, StaminAnim stam) {
-        float hB;
-        hB = stam.getPercent();
-        RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorTop, bColorBot);
-        RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
-        rectRNoA(poseStack, i, hB, colorTop, colorBot); //Mana
+    @Override
+    public ConfigEntry getDefaults() {
+        ConfigEntry e = new ConfigEntry();
+        e.addEntry("display", false, 1);
+        e.addEntry("barmode", true, 1);
+        e.addEntry("scale", 1, 2);
+        e.addEntry("zpos", 0, 4);
+        e.addEntry("idisplay", true, 1);
+        e.addEntry("xpos", 46, 12);
+        e.addEntry("ypos", 36, 12);
+        e.addEntry("width", 240, 12);
+        e.addEntry("height", 12, 12);
+        e.addEntry("tdisplay", true, 1);
+        e.addEntry("tshadow", true, 1);
+        e.addEntry("ttype", 0, 4);
+        e.addEntry("tattached", true, 1);
+        e.addEntry("xtpos", 0, 12);
+        e.addEntry("ytpos", 0, 12);
+        e.addEntry("bhue", 45, 7);
+        e.addEntry("ohue", 62, 7);
+        e.addEntry("bcit", 0xaff6d6, 24);
+        e.addEntry("bcib", 0x54e5a4, 24);
+        e.addEntry("bcdt", 0x66ce9f, 24);
+        e.addEntry("bcdb", 0x3d9d72, 24);
+        return e;
     }
 
-    private void renderStamAnim(int i, PoseStack poseStack, StaminAnim stam, float partialTicks) {
-        if (stam.animTime - partialTicks < 10) {
-            stam.oldH += (stam.curH - stam.oldH) * animPos(10 - stam.animTime, partialTicks, true, 10, 1);
-        }
 
-        if (stam.hInc) {
-            rectAnim(poseStack, i, stam.oldH, stam.curH, colorIncTop, colorIncBot);
-        } else {
-            rectAnim(poseStack, i, stam.curH, stam.oldH, colorDecTop, colorDecBot);
-        }
-    }
+
+
 
     @Override
-    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
+    protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h,
+                                                 boolean parse) {
         ConfigOptionsList c = new ConfigOptionsList(this::getColor, s, minecraft, x, y, w, h, parse);
         c.addTitleEntry("general");
         c.addBooleanEntry("display", elementEnabled);
@@ -127,6 +199,8 @@ public class PStaminaEF extends BarBase {
         c.addSpaceEntry();
         c.addTitleEntry("bhue");
         c.addSliderEntry("bhue", 0, () -> 100, hue, false);
+        c.addTitleEntry("ohue");
+        c.addSliderEntry("ohue", 0, () -> 100, oHue, false);
         c.addTitleEntry("bai");
         c.addColorEntry("bcit", colorIncTop);
         c.addColorEntry("bcib", colorIncBot);
@@ -136,6 +210,8 @@ public class PStaminaEF extends BarBase {
 
         return c;
     }
+
+
 
     @Override
     public SmallBound setTextType(int d) {
@@ -148,33 +224,7 @@ public class PStaminaEF extends BarBase {
     }
 
     @Override
-    public ConfigEntry getDefaults() {
-        ConfigEntry e = new ConfigEntry();
-        e.addEntry("display", false, 1);
-        e.addEntry("barmode", true, 1);
-        e.addEntry("scale", 1, 2);
-        e.addEntry("zpos", 0, 4);
-        e.addEntry("idisplay", true, 1);
-        e.addEntry("xpos", 46, 12);
-        e.addEntry("ypos", 35, 12);
-        e.addEntry("width", 120, 12);
-        e.addEntry("height", 12, 12);
-        e.addEntry("tdisplay", true, 1);
-        e.addEntry("tshadow", true, 1);
-        e.addEntry("ttype", 0, 4);
-        e.addEntry("tattached", true, 1);
-        e.addEntry("xtpos", 0, 12);
-        e.addEntry("ytpos", 0, 12);
-        e.addEntry("bhue", 45, 7);
-        e.addEntry("bcit", 0xaff6d6, 24);
-        e.addEntry("bcib", 0x54e5a4, 24);
-        e.addEntry("bcdt", 0x66ce9f, 24);
-        e.addEntry("bcdb", 0x3d9d72, 24);
-        return e;
-    }
-
-    @Override
     public boolean isEnabled() {
-        return elementEnabled && EFCompatManager.active();
+        return elementEnabled && (EFCompatManager.active() || FCompatManager.active());
     }
 }

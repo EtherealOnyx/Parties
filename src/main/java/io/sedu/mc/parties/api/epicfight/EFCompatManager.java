@@ -13,7 +13,7 @@ public class EFCompatManager {
     }
 
     public static void init() {
-        if (ModList.get().isLoaded("epicfight")) initCompat();
+        if (ModList.get().isLoaded("epicfight") && !ModList.get().isLoaded("feathers")) initCompat();
     }
 
     public static boolean active() {

@@ -4,6 +4,7 @@ import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.epicfight.EFCompatManager;
+import io.sedu.mc.parties.api.feathers.FCompatManager;
 import io.sedu.mc.parties.api.hardcorerevival.HRCompatManager;
 import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
@@ -37,6 +38,7 @@ public class ModSetup {
         CSCompatManager.init(); //Cold Sweat Support
         ANCompatManager.init(); //Ars Nouveau Support
         EFCompatManager.init(); //Epic Fight Support
+        FCompatManager.init(); //Feathers Support
         SSCompatManager.init(); //Spells and Shield Support
         Parties.LOGGER.info("Mod support initialization complete!");
     }

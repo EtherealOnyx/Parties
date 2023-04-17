@@ -58,7 +58,7 @@ public class RenderPacketData {
                 data = builder.toString();
             }
             case 1, 2, 3, 14, 16, 20, 21, 22, 23, 25, 27, 28, 29 -> data = buf.readFloat();
-            case 4, 5, 6, 13, 19, 24, 26 -> data = buf.readInt();
+            case 4, 5, 6, 13, 19, 24, 26, 30 -> data = buf.readInt();
             case 12 -> data = new Object[]{buf.readInt(), buf.readInt(), buf.readInt()};
             case 15, 17 -> data = new Object[]{buf.readBoolean(), buf.readInt()};
             case 18 -> data = buf.readBoolean();
@@ -83,7 +83,7 @@ public class RenderPacketData {
             case 1, 2, 3, 14, 16, 20, 21, 22, 23, 25, 27, 28, 29 -> //Health, Max Health, Absorb
                     buf.writeFloat((Float) data);
 
-            case 4, 5, 6, 13, 19, 24, 26 -> //Armor, Hunger, XP Level
+            case 4, 5, 6, 13, 19, 24, 26, 30 -> //Armor, Hunger, XP Level
                     buf.writeInt((Integer) data);
             case 12 -> {
                 buf.writeInt((Integer) ((Object[]) data)[0]); //Type
@@ -150,6 +150,7 @@ public class RenderPacketData {
                 case 27 -> RenderPacketHelper.setManaSS(player, (Float) data);
                 case 28 -> RenderPacketHelper.setMaxManaSS(player, (Float) data);
                 case 29 -> RenderPacketHelper.setExtraMana(player, (Float) data);
+                case 30 -> RenderPacketHelper.setExtraStam(player, (Integer) data);
                 default -> {
 
                 }

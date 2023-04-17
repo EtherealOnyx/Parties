@@ -16,6 +16,10 @@ public class SSHandlerFake implements ISSHandler {
         return 20f;
     }
 
+    @Override
+    public void setManaRender(Boolean aBoolean) {
+
+    }
 
 
 }

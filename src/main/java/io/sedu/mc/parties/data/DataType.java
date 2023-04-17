@@ -23,6 +23,9 @@ public enum DataType {
     STAM,
     MAXSTAM,
 
+    //Feathers
+    EXTRASTAM,
+
     //Spells and Shields
     SSMANA,
     SSMANAMAX,
