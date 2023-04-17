@@ -14,14 +14,14 @@ import net.minecraftforge.fml.LogicalSide;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static io.sedu.mc.parties.data.ServerConfigData.playerSlowUpdateInterval;
+import static io.sedu.mc.parties.data.ServerConfigData.playerUpdateInterval;
 
 public class FEventHandler {
 
     @SubscribeEvent
     public static void onEntityTick(TickEvent.PlayerTickEvent e) {
         if (e.side == LogicalSide.SERVER && e.phase == TickEvent.Phase.END) {
-            if (e.player.tickCount % playerSlowUpdateInterval.get() == 8) {
+            if (e.player.tickCount % playerUpdateInterval.get() == 2) {
                 FCompatManager.getHandler().getServerFeathers((ServerPlayer) e.player, (cur, max, abs) -> {
                     HashMap<UUID, Boolean> trackers;
                     if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {

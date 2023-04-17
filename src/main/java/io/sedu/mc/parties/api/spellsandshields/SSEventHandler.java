@@ -23,7 +23,6 @@ public class SSEventHandler {
             if (e.player.tickCount % playerSlowUpdateInterval.get() == 8) {
                 SSCompatManager.getHandler().getAllMana(e.player, (cur, max, absorb) -> {
                     HashMap<UUID, Boolean> trackers;
-
                     if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                         UUID player;
                         PlayerData pd;

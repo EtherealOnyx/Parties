@@ -371,7 +371,7 @@ public class ClientPlayerData {
             data.put(BLEEDTIMER, --bleedTimer);
     }
 
-    public void setXpBar(Float data) {
+    public void setXpBar(float data) {
         this.data.put(XPPROGRESS, data);
     }
 
@@ -388,7 +388,7 @@ public class ClientPlayerData {
         if (isDowned) {
             data.put(BLEEDING, false);
         } else {
-            data.put(REVIVEPROG, 0);
+            data.put(REVIVEPROG, 0f);
         }
         data.put(BLEEDTIMER, datum - 2);
     }
@@ -398,7 +398,7 @@ public class ClientPlayerData {
     }
 
     public int getThirst() {
-        return (int) data.get(THIRST);
+        return (int) data.getOrDefault(THIRST, 0);
     }
 
     public void setThirst(Integer data) {
@@ -408,8 +408,8 @@ public class ClientPlayerData {
     public void setWorldTemp(Float data) {
         try {
             CSCompatManager.getHandler().convertTemp(data, (temp, sev) -> {
-                this.data.put(WORLDTEMP, temp);
-                this.data.put(SEVERITY, sev);
+                this.data.put(WORLDTEMP, (int) temp);
+                this.data.put(SEVERITY, (int) sev);
             });
         } catch (Throwable t) {
             CSCompatManager.changeHandler();
@@ -423,7 +423,7 @@ public class ClientPlayerData {
     }
 
     public void setBodyTemp(float data) {
-        this.data.put(BODYTEMP, data);
+        this.data.put(BODYTEMP, (int) data);
     }
 
     public void updateTemperatures() {
@@ -596,21 +596,15 @@ public class ClientPlayerData {
     }
 
     public void setManaSS(Float data) {
-        if (clientPlayer != null) {
-            getManaSS(mana -> mana.checkHealth(data));
-        }
+        getManaSS(mana -> mana.checkHealth(data));
     }
 
     public void setMaxManaSS(Float data) {
-        if (clientPlayer != null) {
-            getManaSS(mana -> mana.checkMax(data));
-        }
+        getManaSS(mana -> mana.checkMax(data));
     }
 
     public void setExtraManaSS(Float data) {
-        if (clientPlayer != null) {
-            getManaSS(mana -> mana.checkAbsorb(data));
-        }
+        getManaSS(mana -> mana.checkAbsorb(data));
     }
 
     public void checkStamF() {

@@ -130,7 +130,7 @@ public class PHunger extends BarBase {
         e.addEntry("zpos", 0, 4);
         e.addEntry("idisplay", true, 1);
         e.addEntry("xpos", 143, 12);
-        e.addEntry("ypos", 16, 12);
+        e.addEntry("ypos", 19, 12);
         e.addEntry("width", 23, 12);
         e.addEntry("height", 10, 12);
         e.addEntry("tdisplay", true, 1);

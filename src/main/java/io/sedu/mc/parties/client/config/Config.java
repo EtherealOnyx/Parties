@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
+import io.sedu.mc.parties.api.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.feathers.FCompatManager;
 import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
@@ -304,14 +305,63 @@ public class Config {
         }
     }
 
+    public static boolean loadDefaultPreset(String bits) {
+        Minecraft minecraft = Minecraft.getInstance();
+        assert minecraft.player != null;
+        HashMap<String, RenderItem.Update> updater = new HashMap<>();
+        RenderItem.initUpdater(updater);
+        try {
+            if (bits.equals("") || Integer.parseInt(bits.substring(0, bits.indexOf('|'))) != Parties.ENCODE_VERSION) {
+                saveDefaultPresetString(updater);
+                return false;
+            }
+            bits = bits.substring(bits.indexOf('|') + 1);
+            int parse = Integer.parseInt(bits.substring(0, bits.indexOf('|')));
+            bits = new BigInteger(1, Base64.decodeBase64(bits.substring(bits.indexOf('|') + 1))).toString(2);
+            if (parse > 0) {
+                bits = bits.substring(parse);
+            } else {
+                bits = String.format("%" + (bits.length() + Math.abs(parse)) + "s", bits).replace(' ', '0');
+            }
+            parseBinaryString(bits.toCharArray(), updater);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private static void saveDefaultPresetString(HashMap<String, RenderItem.Update> updater) {
         Parties.LOGGER.info("Filling the default preset in the client configuration and using it.");
+        String defaultLoad = "4|-7|AIAIBUAgAAAf0AgAgL7vn/wAuAJCgRAQlcAQCAcanl//+pqf///wLgKQo8WBAQggGjU8v////+BcBSFHiwICEf+pqf///wLgKQKPFgQEYITgBFu+f+BWAUwwnQCe/ZmYAyApgg7AJ275/8AAADBBQAT4AAAEAcAcKECIAcAcJ8CLBAuATt3z/4AAAGCAIBYBRwH/FwAAAKCEeAmAuAVDAAAAE/+dB3kKZTa8APyYAcEC4B0HgArCAAAAAF4v/itn+2f+Li/7Y2KEC4CQPAAzCAAAA+nMr/bLD/Z5DWHTtsUIFwEgeABmEAAABxLnMr/bLD/EmubDElqUIFwEgeABmEAAABa+r/bWVOWkZs6fPZ1y";
         if (ModList.get().isLoaded("ars_nouveau")) {
-            if (!Config.loadPreset("standard-mana", true, updater))
-                RenderItem.setDefaultValues();
+            if (SSCompatManager.active()) { // Ars & SS
+                if (FCompatManager.active() || EFCompatManager.active()) { //Ars & SS & Stam
+                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2aEC4CQFAAzCAAAA8nMr/bLD/Z5DWHTts0IPwEgKABmEAAABxLnMr/bLD/EmubDElq0IKwEgKABmEAAABaor/bWVOWkZs6fPZ1y";
+                } else {//Ars & SS
+                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2aEC4CQHgAzCAAAA8nMr/bLD/Z5DWHTts0INQEgPABmEAAABxLnMr/bLD/EmubDElqUIFwEgeABmEAAABaor/bWVOWkZs6fPZ1y";
+                }
+            } else {//Ars
+                if (FCompatManager.active() || EFCompatManager.active()) { //Ars & Stam
+                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2aEC4CQHgAzCAAAA8nMr/bLD/Z5DWHTtsUINQEgPABmEAAABxLnMr/bLD/EmubDElq0INQEgPABmEAAABaor/bWVOWkZs6fPZ1y";
+                } else { //Ars
+                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2aEC4CQPAAzCAAAA8nMr/bLD/Z5DWHTtsUIFwEgeABmEAAABxLnMr/bLD/EmubDElqUIFwEgeABmEAAABaor/bWVOWkZs6fPZ1y";
+                }
+            }
         } else {
-            RenderItem.setDefaultValues();
+            if (SSCompatManager.active()) { //SS
+                if (FCompatManager.active() || EFCompatManager.active()) {//SS & Stam
+                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2KEC4CQHgAzCAAAA8nMr/bLD/Z5DWHTts0IFwEgPABmEAAABxLnMr/bLD/EmubDElq0INQEgPABmEAAABaor/bWVOWkZs6fPZ1y";
+                } else { //SS
+                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2KEC4CQHgAzCAAAA8nMr/bLD/Z5DWHTts0IFwEgeABmEAAABxLnMr/bLD/EmubDElqUINQEYPABmEAAABaor/bWVOWkZs6fPZ1y";
+                }
+            } else {
+                if (FCompatManager.active() || EFCompatManager.active()) { //Stam
+                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2KEC4CQPAAzCAAAA8nMr/bLD/Z5DWHTtsUIFwEgeABmEAAABxLnMr/bLD/EmubDElq0IFwEgeABmEAAABaor/bWVOWkZs6fPZ1y";
+                }
+            }
         }
+        if (!loadDefaultPreset(defaultLoad))
+            RenderItem.setDefaultValues();
         saveCurrentPresetAsDefault();
     }
 

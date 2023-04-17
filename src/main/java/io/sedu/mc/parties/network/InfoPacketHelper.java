@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.network;
 
+import io.sedu.mc.parties.Parties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -181,6 +182,7 @@ public class InfoPacketHelper {
     }
 
     public static void sendManaUpdateSS(UUID sendTo, UUID propOf, float curMana) {
+        Parties.LOGGER.debug("Sending mana update:" + curMana);
         sendData(getNormalServerPlayer(sendTo), propOf, 27, curMana);
     }
 

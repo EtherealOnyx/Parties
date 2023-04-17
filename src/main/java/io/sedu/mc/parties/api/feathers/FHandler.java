@@ -40,7 +40,7 @@ public class FHandler implements IFHandler {
 
     @Override
     public void getServerFeathers(ServerPlayer player, TriConsumer<Integer, Integer, Integer> action) {
-        int weight = ClientFeathersData.getWeight();
+        int weight = FeathersHelper.getPlayerWeight(player);
         action.accept(Math.max(0, FeathersHelper.getFeathers(player) - weight), Math.max(0, 20 - weight), FeathersHelper.getEndurance(player));
 
     }

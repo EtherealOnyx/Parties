@@ -162,7 +162,7 @@ public class PlayerData {
     }
 
     public void setXpBar(float xpprog, Consumer<Float> action) {
-        if ((float) dataItems.getOrDefault(XPPROG, 0) != xpprog) {
+        if ((float) dataItems.getOrDefault(XPPROG, 0f) != xpprog) {
             dataItems.put(XPPROG, xpprog);
             action.accept(xpprog);
         }

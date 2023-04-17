@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.network;
 
+import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import net.minecraft.client.Minecraft;
@@ -136,6 +137,7 @@ public class RenderPacketHelper {
     }
 
     public static void setMaxStamina(UUID player, Integer data) {
+        Parties.LOGGER.debug("Setting max stamina..." + data);
         getClientPlayer(player, p -> p.setMaxStamina(data));
     }
 
@@ -153,6 +155,7 @@ public class RenderPacketHelper {
 
 
     public static void setExtraStam(UUID player, Integer data) {
+        Parties.LOGGER.debug("Setting extra stamina...");
         getClientPlayer(player, p -> p.setExtraStam(data));
     }
 }
