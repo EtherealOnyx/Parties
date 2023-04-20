@@ -3,6 +3,7 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.epicfight.EFCompatManager;
@@ -452,6 +453,7 @@ public class ClientPlayerData {
         if (clientPlayer != null) {
             TANCompatManager.getHandler().getPlayerTemp(clientPlayer, (temp, text) -> {
                 data.put(WORLDTEMP, temp);
+                this.data.put(TEMPTYPE, text);
                 if (temp == 0 || temp == 4) {
                     data.put(SEVERITY, 1);
                 } else {
@@ -484,6 +486,7 @@ public class ClientPlayerData {
     }
 
     private String getTempType(int data) {
+        Parties.LOGGER.debug("Setting temperature for: " + data);
         return switch(data) {
             case 0 -> "Icy";
             case 1 -> "Cold";

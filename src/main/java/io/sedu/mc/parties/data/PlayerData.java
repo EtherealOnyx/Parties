@@ -136,7 +136,7 @@ public class PlayerData {
     }
 
     public void setReviveProg(float data, Runnable action) {
-        if ((int) dataItems.getOrDefault(REVIVE, 0) != data) {
+        if ((float) dataItems.getOrDefault(REVIVE, 0f) != data) {
             dataItems.put(REVIVE, data);
             action.run();
         }
@@ -180,7 +180,7 @@ public class PlayerData {
     public void setBleeding(boolean b) {
         dataItems.put(BLEED, b);
         if (!b) {
-            dataItems.put(REVIVE, 0);
+            dataItems.put(REVIVE, 0f);
         }
     }
 
@@ -191,7 +191,7 @@ public class PlayerData {
     public void setDowned(boolean b) {
         dataItems.put(DOWNED, b);
         if (!b)
-            dataItems.put(REVIVE, 0);
+            dataItems.put(REVIVE, 0f);
     }
 
     public void setThirst(int v, Consumer<Integer> action) {

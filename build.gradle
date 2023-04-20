@@ -20,7 +20,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.18.2-0.4.0'
+version = '1.18.2-0.4.1'
 group = 'io.sedu.mc.sedparties' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'sedparties'
 
@@ -193,20 +193,20 @@ dependencies {
 
     //PlayerRevive Mod
     compileOnly fg.deobf("curse.maven:playerrevive-266890:3759779") //impl
-    //runtimeOnly fg.deobf("curse.maven:creativecore-257814:3834521") //runtime
+    compileOnly fg.deobf("curse.maven:creativecore-257814:3834521") //runtime
 
     //Hardcore Revival Mod
-    compileOnly fg.deobf("curse.maven:hardcorerevival-274036:3830873")
-    compileOnly fg.deobf("curse.maven:balm-531761:4442615")
+    implementation fg.deobf("curse.maven:hardcorerevival-274036:3830873")
+    implementation fg.deobf("curse.maven:balm-531761:4442615")
 
     //Thirst Mod - Local file, also can't test in dev environment...
     compileOnly files("libs/Thirst--1.18.2-1.2.3.jar")
 
     //Cold Sweat
-    implementation fg.deobf("curse.maven:coldsweat-506194:4459981")
+    compileOnly fg.deobf("curse.maven:coldsweat-506194:4459981")
 
     //Tough as Nails
-    compileOnly fg.deobf("curse.maven:toughasnails-246391:3804267") //impl
+    implementation fg.deobf("curse.maven:toughasnails-246391:3804267") //impl
 
     //Ars Nouveau Support
     implementation fg.deobf("curse.maven:arsnoveau-401955:4052851") //impl
