@@ -93,14 +93,14 @@ public class ManaSSAnim extends AnimHandler {
 
     private void updateText() {
         switch (type) {
-            case 0 -> manaText = (int) Math.ceil(cur + absorb) + "/" + (int) max;
+            case 0 -> manaText = DF.format(cur + absorb) + "/" + DF.format(max);
             case 1 -> {
                 if (absorb > 0)
-                    manaText = (int) Math.ceil(cur) + " (" + (int) Math.ceil(absorb) + ")";
+                    manaText = DF.format(cur) + " (" + DF.format(absorb) + ")";
                 else
-                    manaText = String.valueOf((int) Math.ceil(cur));
+                    manaText = DF.format(cur);
             }
-            case 2 -> manaText = (int) Math.ceil(((cur + absorb) / max) * 100) + "%";
+            case 2 -> manaText = DF.format(((cur + absorb) / max) * 100) + "%";
         }
     }
 

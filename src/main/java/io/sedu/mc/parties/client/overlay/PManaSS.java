@@ -16,6 +16,7 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
+import static io.sedu.mc.parties.client.overlay.anim.AnimHandler.DF;
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 
 public class PManaSS extends OverflowBarBase {
@@ -134,7 +135,7 @@ public class PManaSS extends OverflowBarBase {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
                 p.getManaSS(h -> {
-                    renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur + h.absorb) + "/" + h.max, 0x66BFFF, 0x005591, 0xBEE4FF);
+                    renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(h.cur + h.absorb) + "/" + DF.format(h.max), 0x66BFFF, 0x005591, 0xBEE4FF);
                 });
 
             }

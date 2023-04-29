@@ -98,7 +98,7 @@ public class SettingsScreen extends Screen {
     public int messageCooldown = 0;
     public int revertCooldown = 0;
     private boolean triggeredPrompt = false;
-    private boolean isPresetOnly;
+    private final boolean isPresetOnly;
 
 
 
@@ -114,7 +114,7 @@ public class SettingsScreen extends Screen {
 
     private void resetAll() {
         if (isConfirmed) {
-            RenderItem.setDefaultValues();
+            Config.saveDefaultPresetString();
             isConfirmed = false;
             revertCooldown = 0;
             ((SmallButton)miscButtons.get(6)).setColor(1f, 1f, .5f);

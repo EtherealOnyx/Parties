@@ -2,6 +2,7 @@ package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.config.DimConfig;
+import io.sedu.mc.parties.client.overlay.RenderItem;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.setup.ClientSetup;
 import net.minecraft.client.Minecraft;
@@ -9,6 +10,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -102,6 +104,15 @@ public class ClientPacketData {
             }
             case 8 -> {
                 ClientPacketData.closeScreens();
+            }
+
+            case 9 -> {
+                Minecraft mc = Minecraft.getInstance();
+                HashMap<String, RenderItem.Update> updater = new HashMap<>();
+                RenderItem.initUpdater(updater);
+                Config.pastePreset(mc, updater);
+                //TODO: Figure out how to delete said message.
+
             }
             default -> {
                 return false;

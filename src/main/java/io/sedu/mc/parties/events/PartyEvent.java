@@ -3,6 +3,7 @@ package io.sedu.mc.parties.events;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.commands.PartyCommands;
+import io.sedu.mc.parties.data.PartySaveData;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.data.ServerConfigData;
 import io.sedu.mc.parties.data.Util;
@@ -11,11 +12,13 @@ import io.sedu.mc.parties.network.InfoPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -23,6 +26,7 @@ import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -330,6 +334,19 @@ public class PartyEvent {
     @SubscribeEvent
     public static void RegisterCommands(RegisterCommandsEvent event) {
         PartyCommands.register(event.getDispatcher());
+    }
+
+    @SubscribeEvent
+    public static void onServerStart(ServerStartedEvent event) {
+        //This should always be server side...
+        ServerLevel l = event.getServer().getLevel(Level.OVERWORLD);
+        if (l != null) {
+            PartySaveData.globalLevel = l;
+            Parties.LOGGER.debug("Level saved successfully...");
+            PartySaveData.get(); //Load it into cache.
+        }
+
+
     }
 
 }

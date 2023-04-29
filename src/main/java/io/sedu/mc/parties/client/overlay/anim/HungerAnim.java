@@ -59,9 +59,9 @@ public class HungerAnim extends AnimHandler {
 
     private void updateText() {
         switch (type) {
-            case 0 -> hungerText = (int) Math.ceil(cur) + "/" + 20;
-            case 1 -> hungerText = String.valueOf((int) Math.ceil(cur));
-            case 2 -> hungerText = (int) Math.ceil((cur / 20) * 100) + "%";
+            case 0 -> hungerText = DF.format(cur) + "/" + 20;
+            case 1 -> hungerText = DF.format(cur);
+            case 2 -> hungerText = DF.format((cur / 20) * 100) + "%";
         }
     }
 

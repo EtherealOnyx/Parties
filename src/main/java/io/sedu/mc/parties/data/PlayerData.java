@@ -41,6 +41,12 @@ public class PlayerData {
         playerList.put(id, this);
     }
 
+    public PlayerData(UUID playerId, UUID partyId, String name) {
+        this.party = partyId;
+        setName(name);
+        playerList.put(playerId, this);
+    }
+
     public static boolean isOnMessageCd(UUID uuid) {
         for (MessageCdHolder h : messageCd) {
             if (h.id == uuid)
@@ -87,13 +93,17 @@ public class PlayerData {
 
     public PlayerData setServerPlayer(ServerPlayer player) {
         serverPlayer = new WeakReference<>(player);
-        dataItems.put(DataType.NAME, player.getName().getContents());
+        setName(player.getName().getContents());
         return this;
     }
 
     public String getName() {
 
         return serverPlayer != null && serverPlayer.get() != null ? serverPlayer.get().getName().getContents() : (String) dataItems.get(NAME);
+    }
+
+    public void setName(String name) {
+        dataItems.put(DataType.NAME, name);
     }
 
     public PlayerData removeServerPlayer() {
@@ -325,12 +335,28 @@ public class PlayerData {
     }
 
     public List<Player> getNearbyMembers() {
-        if (listDirty) redoList(getPlayer().getUUID());
+        ServerPlayer p = getPlayer();
+        if (listDirty) {
+            if (p == null) {
+                Parties.LOGGER.error("Attempted to redo experience calculations when a player was not fully connected yet!");
+            } else {
+                redoList(p.getUUID());
+            }
+
+        }
         return nearMembers;
     }
 
     public List<Player> getOnlineMembers() {
-        if (listDirty) redoList(getPlayer().getUUID());
+        ServerPlayer p = getPlayer();
+        if (listDirty) {
+            if (p == null) {
+                Parties.LOGGER.error("Attempted to redo experience calculations when a player was not fully connected yet!");
+            } else {
+                redoList(p.getUUID());
+            }
+
+        }
         return globalMembers;
     }
 

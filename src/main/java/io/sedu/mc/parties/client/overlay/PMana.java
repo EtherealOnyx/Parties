@@ -15,6 +15,7 @@ import net.minecraftforge.fml.ModList;
 
 import java.util.ArrayList;
 
+import static io.sedu.mc.parties.client.overlay.anim.AnimHandler.DF;
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 
 public class PMana extends BarBase {
@@ -76,7 +77,7 @@ public class PMana extends BarBase {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                p.getMana(h -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur) + "/" + h.max, 0x9D7CFC, 0x310F4D, 0xFFE187));
+                p.getMana(h -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(h.cur) + "/" + DF.format(h.max), 0x9D7CFC, 0x310F4D, 0xFFE187));
             }
         });
     }

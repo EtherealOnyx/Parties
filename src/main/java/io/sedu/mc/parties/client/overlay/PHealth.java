@@ -14,6 +14,7 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
+import static io.sedu.mc.parties.client.overlay.anim.AnimHandler.DF;
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
@@ -144,7 +145,7 @@ public class PHealth extends OverflowBarBase {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
                 HealthAnim h = p.getHealth();
-                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur + h.absorb) + "/" + h.max, 0xfc807c, 0x4d110f, 0xffbfbd);
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(h.cur + h.absorb) + "/" + DF.format(h.max), 0xfc807c, 0x4d110f, 0xffbfbd);
             }
         });
     }

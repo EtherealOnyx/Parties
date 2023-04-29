@@ -93,14 +93,14 @@ public class HealthAnim extends AnimHandler {
 
     private void updateText() {
         switch (type) {
-            case 0 -> healthText = (int) Math.ceil(cur + absorb) + "/" + (int) max;
+            case 0 -> healthText = DF.format(cur + absorb) + "/" + DF.format(max);
             case 1 -> {
                 if (absorb > 0)
-                    healthText = (int) Math.ceil(cur) + " (" + (int) Math.ceil(absorb) + ")";
+                    healthText = DF.format(cur) + " (" + DF.format(absorb) + ")";
                 else
-                    healthText = String.valueOf((int) Math.ceil(cur));
+                    healthText = DF.format(cur);
             }
-            case 2 -> healthText = (int) Math.ceil(((cur + absorb) / max) * 100) + "%";
+            case 2 -> healthText = DF.format(((cur + absorb) / max) * 100) + "%";
         }
     }
 

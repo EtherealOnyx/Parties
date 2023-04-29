@@ -160,4 +160,5 @@ public class ClientPacketHelper {
         ClientPlayerData.changeLeader(Minecraft.getInstance().player.getUUID());
         msg(new TranslatableComponent("messages.sedparties.phandler.changeleader2").withStyle(ChatFormatting.AQUA));
     }
+
 }

@@ -65,4 +65,16 @@ public class ServerConfigData {
         }
         return false;
     }
+
+    public static boolean syncPAC() {
+        return partiesSyncType.get() == PartySync.OPEN_PAC;
+    }
+
+    public static boolean syncParties() {
+        return partiesSyncType.get() == PartySync.PARTIES;
+    }
+
+    public static boolean syncFTB() {
+        return false;
+    }
 }

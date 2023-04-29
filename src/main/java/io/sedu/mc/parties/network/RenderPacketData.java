@@ -62,6 +62,7 @@ public class RenderPacketData {
             case 12 -> data = new Object[]{buf.readInt(), buf.readInt(), buf.readInt()};
             case 15, 17 -> data = new Object[]{buf.readBoolean(), buf.readInt()};
             case 18 -> data = buf.readBoolean();
+            case 31 -> data = buf.readUtf();
         }
     }
 
@@ -96,6 +97,8 @@ public class RenderPacketData {
                 buf.writeInt((Integer) ((Object[]) data)[1]); //Duration
             }
             case 18 -> buf.writeBoolean((Boolean) data);
+
+            case 31 -> buf.writeUtf((String) data);
 
         }
     }

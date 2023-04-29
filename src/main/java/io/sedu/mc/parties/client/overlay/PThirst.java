@@ -13,6 +13,8 @@ import net.minecraftforge.fml.ModList;
 
 import java.util.ArrayList;
 
+import static io.sedu.mc.parties.client.overlay.anim.AnimHandler.DF;
+
 public class PThirst extends RenderIconTextItem implements TooltipItem {
 
     private TranslatableComponent tipName = new TranslatableComponent("ui.sedparties.tooltip.thirst");
@@ -72,7 +74,7 @@ public class PThirst extends RenderIconTextItem implements TooltipItem {
             resetColor();
         }
         if (textEnabled)
-            text(tX(i), tY(i), gui, poseStack, String.valueOf(thirst), color);
+            text(tX(i), tY(i), gui, poseStack, DF.format(thirst), color);
     }
 
     @Override
@@ -130,7 +132,7 @@ public class PThirst extends RenderIconTextItem implements TooltipItem {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator)
-                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + p.getThirst(), 0x66BFFF, 0x005591, 0xBEE4FF);
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(p.getThirst()), 0x66BFFF, 0x005591, 0xBEE4FF);
         });
     }
 

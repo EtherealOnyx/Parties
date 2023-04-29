@@ -43,6 +43,12 @@ public class PartyData {
         updateLeaderNew(initiator);
     }
 
+    public PartyData(UUID partyId, UUID leader) {
+        party = new ArrayList<>();
+        this.partyId = partyId;
+        this.leader = leader;
+    }
+
     private void updateLeaderNew(UUID initiator) {
         leader = initiator;
         ServerPacketHelper.sendNewLeader(initiator);
@@ -67,6 +73,20 @@ public class PartyData {
 
         //API Helper
         Util.getServerPlayer(futureMember, (serverPlayer) -> MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(serverPlayer)));
+    }
+
+    public void addMemberSilently(UUID futureMember) {
+        //Add future member to party's trackers.
+        party.forEach(id -> {
+            //Add future member to id's trackers.
+            addTracker(id, futureMember);
+            //Add id to future member's trackers.
+            addTracker(futureMember, id);
+        });
+
+        party.add(futureMember);
+
+
     }
 
     public ArrayList<UUID> getMembers() {

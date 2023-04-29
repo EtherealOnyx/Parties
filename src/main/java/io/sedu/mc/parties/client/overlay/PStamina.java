@@ -16,6 +16,7 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
+import static io.sedu.mc.parties.client.overlay.anim.AnimHandler.DF;
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 
 public class PStamina extends OverflowBarBase {
@@ -134,7 +135,7 @@ public class PStamina extends OverflowBarBase {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
                 p.getStaminaEF(h -> {
-                    renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + (h.cur + h.absorb) + "/" + h.max, 0x66BFAA, 0x005555, 0x55E4CC);
+                    renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(h.cur + h.absorb) + "/" + DF.format(h.max), 0x66BFAA, 0x005555, 0x55E4CC);
                 });
 
             }

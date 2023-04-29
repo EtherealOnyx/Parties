@@ -288,7 +288,7 @@ public class Config {
 
             String bits = ClientConfigData.defaultPreset.get();
             if (bits.equals("") || Integer.parseInt(bits.substring(0, bits.indexOf('|'))) != Parties.ENCODE_VERSION) {
-                saveDefaultPresetString(updater);
+                saveDefaultPresetString();
                 return;
             }
             bits = bits.substring(bits.indexOf('|') + 1);
@@ -301,7 +301,7 @@ public class Config {
             }
             parseBinaryString(bits.toCharArray(), updater);
         } catch (Exception e) {
-            saveDefaultPresetString(updater);
+            saveDefaultPresetString();
         }
     }
 
@@ -312,7 +312,7 @@ public class Config {
         RenderItem.initUpdater(updater);
         try {
             if (bits.equals("") || Integer.parseInt(bits.substring(0, bits.indexOf('|'))) != Parties.ENCODE_VERSION) {
-                saveDefaultPresetString(updater);
+                saveDefaultPresetString();
                 return false;
             }
             bits = bits.substring(bits.indexOf('|') + 1);
@@ -330,7 +330,8 @@ public class Config {
         }
     }
 
-    private static void saveDefaultPresetString(HashMap<String, RenderItem.Update> updater) {
+    public static void saveDefaultPresetString() {
+        //IMPORTANT TO RESAVE THIS PRESET EVERY PRESET VERSION UPDATE.
         Parties.LOGGER.info("Filling the default preset in the client configuration and using it.");
         String defaultLoad = "4|-7|AIAIBUAgAAAf0AgAgL7vn/wAuAJCgRAQlcAQCAcanl//+pqf///wLgKQo8WBAQggGjU8v////+BcBSFHiwICEf+pqf///wLgKQKPFgQEYITgBFu+f+BWAUwwnQCe/ZmYAyApgg7AJ275/8AAADBBQAT4AAAEAcAcKECIAcAcJ8CLBAuATt3z/4AAAGCAIBYBRwH/FwAAAKCEeAmAuAVDAAAAE/+dB3kKZTa8APyYAcEC4B0HgArCAAAAAF4v/itn+2f+Li/7Y2KEC4CQPAAzCAAAA+nMr/bLD/Z5DWHTtsUIFwEgeABmEAAABxLnMr/bLD/EmubDElqUIFwEgeABmEAAABa+r/bWVOWkZs6fPZ1y";
         if (ModList.get().isLoaded("ars_nouveau")) {

@@ -245,7 +245,10 @@
   "messages.sedparties.preset.deletesuccess": "Preset (%s) was deleted successfully.",
 
   "ui.sedparties.tooltip.effectinstant": "Instant",
-  "ui.sedparties.tooltip.stamina": "Stamina: "
+  "ui.sedparties.tooltip.stamina": "Stamina: ",
+  "gui.sedparties.tooltip.hoverlink": "Click to copy preset to clipboard.",
+  "gui.sedparties.tooltip.linkpaste": "Note: '/applypreset' loads a preset from the clipboard.",
+  "gui.sedparties.tooltip.linkpastedesc": "Click to load preset from clipboard."
 
 
 }

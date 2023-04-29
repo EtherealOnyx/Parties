@@ -356,6 +356,9 @@ public class ClientPlayerData {
 
     public void removeEffect(int type) {
         effects.markForRemoval(type);
+        if (MobEffect.byId(type) == MobEffects.ABSORPTION) {
+            getHealth().checkAbsorb(0f);
+        }
     }
 
     public void tick() {

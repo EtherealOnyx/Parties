@@ -45,8 +45,9 @@ public class Util {
     public static PartyData getPartyFromMember(UUID playerId) {
         //Can a hashmap handle a null get()? No...
         UUID party;
+        PlayerData pl;
         PartyData p;
-        if ((party = PlayerData.playerList.get(playerId).getPartyId()) != null && (p = getPartyFromId(party)) != null)
+        if ((pl = PlayerData.playerList.get(playerId)) != null && (party = pl.getPartyId()) != null && (p = getPartyFromId(party)) != null)
             return p;
         return null;
     }

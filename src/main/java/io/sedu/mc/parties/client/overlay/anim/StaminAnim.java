@@ -93,14 +93,14 @@ public class StaminAnim extends AnimHandler {
 
     private void updateText() {
         switch (type) {
-            case 0 -> stamText = (int) Math.ceil(cur + absorb) + "/" + (int) max;
+            case 0 -> stamText = DF.format(cur + absorb) + "/" + DF.format(max);
             case 1 -> {
                 if (absorb > 0)
-                    stamText = (int) Math.ceil(cur) + " (" + (int) Math.ceil(absorb) + ")";
+                    stamText = DF.format(cur) + " (" + DF.format(absorb) + ")";
                 else
-                    stamText = String.valueOf((int) Math.ceil(cur));
+                    stamText = DF.format(cur);
             }
-            case 2 -> stamText = (int) Math.ceil(((cur + absorb) / max) * 100) + "%";
+            case 2 -> stamText = DF.format(((cur + absorb) / max) * 100) + "%";
         }
     }
 

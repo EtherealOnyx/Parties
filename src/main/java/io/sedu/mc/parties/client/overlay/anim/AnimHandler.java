@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.client.overlay.anim;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ public abstract class AnimHandler {
 
 
     static List<AnimHandler> animTickers = new ArrayList<>();
+    public static final DecimalFormat DF = new DecimalFormat("##.#");
     //Generic data
     public final int length;
     public int animTime;

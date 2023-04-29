@@ -40,7 +40,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 setColor(1f, 1f, 1f, id.alpha);
             RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, id.alpha, 0.5f, id.alpha);
             setup(id.getHead());
-            blit(poseStack, x(i), y(i), 32, 32, 32, 32);
+            blit(poseStack, x(i), y(i), 32, 32, 32, 32); blit(poseStack, x(i), y(i), 160, 32, 32, 32);
             resetColor();
         };
         renderMember = (i, id, gui, poseStack, partialTicks) -> {
@@ -58,7 +58,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 setColor(1f, 1f, 1f, id.alpha);
             RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, id.alpha, 0.5f, id.alpha);
             setup(id.getHead());
-            blit(poseStack, x(i), y(i), 32, 32, 32, 32);
+            blit(poseStack, x(i), y(i), 32, 32, 32, 32); blit(poseStack, x(i), y(i), 160, 32, 32, 32);
             resetColor();
         };
     }
@@ -74,7 +74,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 resetColor();
                 RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, 1f, 0.5f, 1f);
                 setup(id.getHead());
-                blit(poseStack, x(i), y(i), 32, 32, 32, 32);
+                blit(poseStack, x(i), y(i), 32, 32, 32, 32); blit(poseStack, x(i), y(i), 160, 32, 32, 32);
                 float heightProgress = height*(1 - id.getReviveProgress());
                 float alpha = (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks) / 8f) / 10f);
 
@@ -95,7 +95,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 resetColor();
                 RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, 1f, 0.5f, 1f);
                 setup(id.getHead());
-                blit(poseStack, x(i), y(i), 32, 32, 32, 32);
+                blit(poseStack, x(i), y(i), 32, 32, 32, 32); blit(poseStack, x(i), y(i), 160, 32, 32, 32);
                 float heightProgress = height*(1 - id.getReviveProgress());
                 float alpha = (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks) / 8f) / 10f);
 
@@ -124,7 +124,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 setColor(1f, 1f, 1f, id.alpha);
             RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, id.alpha, 0.5f, id.alpha);
             setup(id.getHead());
-            blit(poseStack, x(i), y(i), 32, 32, 32, 32);
+            blit(poseStack, x(i), y(i), 32, 32, 32, 32); blit(poseStack, x(i), y(i), 160, 32, 32, 32);
             resetColor();
         };
         renderMember = (i, id, gui, poseStack, partialTicks) -> {
@@ -132,7 +132,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 resetColor();
                 RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, 1f, 0.5f, 1f);
                 setup(id.getHead());
-                blit(poseStack, x(i), y(i), 32, 32, 32, 32);
+                blit(poseStack, x(i), y(i), 32, 32, 32, 32); blit(poseStack, x(i), y(i), 160, 32, 32, 32);
                 float heightProgress = height*(1 - id.getReviveProgress());
                 float alpha = (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks) / 8f) / 10f);
 
@@ -154,7 +154,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 resetColor();
                 RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, 1f, 0.5f, 1f);
                 setup(id.getHead());
-                blit(poseStack, x(i), y(i), 32, 32, 32, 32);
+                blit(poseStack, x(i), y(i), 32, 32, 32, 32); blit(poseStack, x(i), y(i), 160, 32, 32, 32);
                 float heightProgress = height*(1 - id.getReviveProgress());
                 float alpha = (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks) / 8f) / 10f);
 
@@ -185,7 +185,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 setColor(1f, 1f, 1f, id.alpha);
             RenderUtils.grayRect(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, .05f, id.alpha, 0.5f, id.alpha);
             setup(id.getHead());
-            blit(poseStack, x(i), y(i), 32, 32, 32, 32);
+            blit(poseStack, x(i), y(i), 32, 32, 32, 32); blit(poseStack, x(i), y(i), 160, 32, 32, 32);
             resetColor();
         };
     }

@@ -15,6 +15,7 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
+import static io.sedu.mc.parties.client.overlay.anim.AnimHandler.DF;
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
@@ -115,7 +116,7 @@ public class PHunger extends BarBase {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                p.getHunger(hunger -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + hunger.cur, 0xb88458, 0x613c1b, 0xffd5b0));
+                p.getHunger(hunger -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(hunger.cur), 0xb88458, 0x613c1b, 0xffd5b0));
             }
 
         });

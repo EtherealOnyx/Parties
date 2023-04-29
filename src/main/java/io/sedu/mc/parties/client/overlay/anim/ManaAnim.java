@@ -63,9 +63,9 @@ public class ManaAnim extends AnimHandler {
 
     private void updateText() {
         switch (type) {
-            case 0 -> manaText = (int) Math.ceil(cur) + "/" + max;
-            case 1 -> manaText = String.valueOf((int) Math.ceil(cur));
-            case 2 -> manaText = (int) Math.ceil((cur / max) * 100) + "%";
+            case 0 -> manaText = DF.format(cur) + "/" + max;
+            case 1 -> manaText = DF.format(cur);
+            case 2 -> manaText = DF.format((cur / max) * 100) + "%";
         }
     }
 
