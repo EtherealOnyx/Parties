@@ -16,6 +16,9 @@ public class ClientConfigData {
     public static ForgeConfigSpec.BooleanValue renderFeathers;
     //public static ForgeConfigSpec.BooleanValue renderStamina;
     public static ForgeConfigSpec.ConfigValue<String> defaultPreset;
+    public static ForgeConfigSpec.BooleanValue forceModelRotation;
+    public static ForgeConfigSpec.IntValue rotationOffset;
+    public static ForgeConfigSpec.BooleanValue renderSelfFrame;
     public static void registerClientConfig(ForgeConfigSpec.Builder CLIENT_BUILDER) {
         CLIENT_BUILDER.comment("Client Party Settings | Type /party reload in-game to reload this configuration.").push("party");
 
@@ -43,6 +46,19 @@ public class ClientConfigData {
                                        //.define("renderStamina", true);
         defaultPreset = CLIENT_BUILDER.comment("The default preset to load on the client. It's automatically set to load your last preset used.")
                 .define("defaultPreset", "");
+
+        forceModelRotation = CLIENT_BUILDER.comment("Makes all the models drawn on the party frame face forward if true.",
+                                                    "Self model is drawn when the head element has Head Type at 1, or 2 for the entire party.")
+                .define("forceModelRotation", false);
+        rotationOffset = CLIENT_BUILDER.comment("Offset of the front-facing model if forceModelRotation is enabled.",
+                                                "Negative values make the model face right, while positive values make the model face left.")
+                .defineInRange("rotationOffset", -20, -180, 180);
         CLIENT_BUILDER.pop();
+
+        renderSelfFrame = CLIENT_BUILDER.comment("Render your information as a party member.",
+                                                "If true, this will include you in the party list. This will also render your information when outside the party.",
+                                                "If false, your information will NOT be rendered both in a party and outside a party.")
+                                        .define("renderSelfFrame", true);
+
     }
 }

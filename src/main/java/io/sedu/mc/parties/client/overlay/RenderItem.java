@@ -10,6 +10,7 @@ import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.client.overlay.gui.TabButton;
+import io.sedu.mc.parties.data.ClientConfigData;
 import io.sedu.mc.parties.util.RenderUtils;
 import io.sedu.mc.parties.util.TriConsumer;
 import net.minecraft.client.Minecraft;
@@ -68,6 +69,7 @@ public abstract class RenderItem {
     boolean textShadow = true;
     boolean textEnabled;
     boolean iconEnabled;
+    private static ItemRender itemRender;
 
     public static void checkTooltip(int posX, int posY, Consumer<TooltipItem> action) {
         tooltipItems.forEach(t -> {
@@ -92,6 +94,45 @@ public abstract class RenderItem {
                 }
             }
         });
+    }
+
+    public static void updateSelfRender() {
+        if (ClientConfigData.renderSelfFrame.get()) {
+            itemRender = (gui, poseStack, partialTicks) -> ClientPlayerData.forEachOrdered((i, id) -> {
+                if (RenderSelfItem.isSelf(i)) {
+                    for (RenderSelfItem item : selfItems) {
+                        item.itemStart(poseStack);
+                        item.renderSelf(i, id, gui, poseStack, partialTicks);
+                        item.itemEnd(poseStack);
+                    }
+                } else {
+                    for (RenderSelfItem item : selfItems) {
+                        item.itemStart(poseStack);
+                        item.renderMember(i, id, gui, poseStack, partialTicks);
+                        item.itemEnd(poseStack);
+                    }
+                }
+                for (RenderItem item : memberItems) {
+                    item.itemStart(poseStack);
+                    item.renderMember(i, id, gui, poseStack, partialTicks);
+                    item.itemEnd(poseStack);
+                }
+            });
+
+        } else {
+            itemRender = (gui, poseStack, partialTicks) -> ClientPlayerData.forEachWithoutSelf((i, id) -> {
+                for (RenderSelfItem item : selfItems) {
+                    item.itemStart(poseStack);
+                    item.renderMember(i, id, gui, poseStack, partialTicks);
+                    item.itemEnd(poseStack);
+                }
+                for (RenderItem item : memberItems) {
+                    item.itemStart(poseStack);
+                    item.renderMember(i, id, gui, poseStack, partialTicks);
+                    item.itemEnd(poseStack);
+                }
+            });
+        }
     }
 
     public boolean isEnabled() {
@@ -876,7 +917,9 @@ public abstract class RenderItem {
         action.accept(this);
     }
 
-
+    private interface ItemRender {
+        void render(ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
+    }
 
 
 }

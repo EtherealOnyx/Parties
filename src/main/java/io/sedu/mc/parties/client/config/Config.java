@@ -10,6 +10,7 @@ import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
 import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.overlay.GeneralOptions;
+import io.sedu.mc.parties.client.overlay.PHead;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import io.sedu.mc.parties.data.ClientConfigData;
 import net.minecraft.ChatFormatting;
@@ -277,6 +278,8 @@ public class Config {
         TANCompatManager.getHandler().setRenderers(renderThirst.get(), renderTemperature.get());
         SSCompatManager.getHandler().setManaRender(renderSSMana.get());
         FCompatManager.getHandler().setFeathersRender(renderFeathers.get());
+        PHead.updateModelRenderer();
+        RenderItem.updateSelfRender();
     }
 
     public static void loadDefaultPreset() {

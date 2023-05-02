@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PEffects;
 import io.sedu.mc.parties.client.overlay.RenderItem;
+import io.sedu.mc.parties.data.ClientConfigData;
 import io.sedu.mc.parties.util.ColorUtils;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.sedu.mc.parties.client.overlay.RenderItem.*;
+import static io.sedu.mc.parties.client.overlay.RenderSelfItem.selfIndex;
 import static io.sedu.mc.parties.util.RenderUtils.*;
 
 public class HoverScreen extends Screen {
@@ -77,25 +79,81 @@ public class HoverScreen extends Screen {
         if (ClientPlayerData.partySize() > 1) {
             Button b;
             //moveParty.add(addRenderableWidget(new Button(clickArea.l(0) + (clickArea.w() >> 1) - 9, clickArea.t(0) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("⬇"), pButton -> ClientPlayerData.swap(finalI, finalI+1))));
-            for (int i = 0; i < ClientPlayerData.partySize(); i++) {
-                int finalI = i;
-                if (i == ClientPlayerData.partySize()-1) {
-                    b = addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
-                    b.active = false;
-                    moveParty.add(b);
-                }
-                else
-                    moveParty.add(addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI+1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
+            if (ClientConfigData.renderSelfFrame.get()) {
+                for (int i = 0; i < ClientPlayerData.partySize(); i++) {
+                    int finalI = i;
+                    if (i == ClientPlayerData.partySize()-1) {
+                        b = addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
+                        b.active = false;
+                        moveParty.add(b);
+                    }
+                    else
+                        moveParty.add(addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI+1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
 
-                if (i == 0) {
-                    b = addRenderableWidget(new Button(clickArea.l(i) , clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
-                    b.active = false;
-                    moveParty.add(b);
+                    if (i == 0) {
+                        b = addRenderableWidget(new Button(clickArea.l(i) , clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
+                        b.active = false;
+                        moveParty.add(b);
+                    }
+                    else
+                        moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI-1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
+                    //rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
                 }
-                else
-                    moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI-1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
-                //rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
+            } else {
+                for (int i = 0; i < selfIndex; i++) {
+                    int finalI = i;
+                    if (i == ClientPlayerData.partySize() - 1) {
+                        b = addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
+                        b.active = false;
+                        moveParty.add(b);
+                    } else {
+                        if (selfIndex == finalI + 1) {
+                            if (finalI + 2 > ClientPlayerData.partySize() - 1) {
+                                b = addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
+                                b.active = false;
+                                moveParty.add(b);
+                            } else {
+                                moveParty.add(addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 2), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
+                            }
+                        } else {
+                            moveParty.add(addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
+                        }
+                    }
+                    if (i == 0) {
+                        b = addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
+                        b.active = false;
+                        moveParty.add(b);
+                    } else
+                        moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
+                }
+                for (int i = selfIndex+1; i < ClientPlayerData.partySize() - 1; i++) {
+                    int finalI = i;
+                    if (i == ClientPlayerData.partySize() - 1) {
+                        b = addRenderableWidget(new Button(clickArea.r(i-1) - 20, clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
+                        b.active = false;
+                        moveParty.add(b);
+                    } else
+                        moveParty.add(addRenderableWidget(new Button(clickArea.r(i-1) - 20, clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
+
+                    if (i == 0) {
+                        b = addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
+                        b.active = false;
+                        moveParty.add(b);
+                    } else
+                        if (selfIndex == finalI - 1) {
+                            if (finalI - 2 < 0) {
+                                b = addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
+                                b.active = false;
+                                moveParty.add(b);
+                            } else {
+                                moveParty.add(addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 2, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
+                            }
+                        } else {
+                            moveParty.add(addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
+                        }
+                }
             }
+
         }
     }
 

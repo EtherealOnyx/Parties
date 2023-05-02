@@ -74,6 +74,15 @@ public class ClientPlayerData {
         initData();
     }
 
+    public static void forEachWithoutSelf(BiConsumer<Integer, ClientPlayerData> action) {
+        for (int i = 0; i < selfIndex; i++) {
+            action.accept(i, ClientPlayerData.playerList.get(playerOrderedList.get(i)));
+        }
+        for (int i = selfIndex+1; i < ClientPlayerData.playerOrderedList.size(); i++) {
+            action.accept(i-1, ClientPlayerData.playerList.get(playerOrderedList.get(i)));
+        }
+    }
+
     private void initData() {
         data.put(DIM, new DimAnim(100, this));
         data.put(HEALTH, new HealthAnim(20, true));

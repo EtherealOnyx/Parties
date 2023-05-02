@@ -1,17 +1,26 @@
 package io.sedu.mc.parties.client.overlay;
 
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
+import io.sedu.mc.parties.data.ClientConfigData;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import static io.sedu.mc.parties.util.RenderUtils.renderEntityInInventoryAttempt2;
+import static io.sedu.mc.parties.util.RenderUtils.renderFlame;
 
 public class PHead extends RenderSelfItem implements TooltipItem {
 
@@ -19,6 +28,8 @@ public class PHead extends RenderSelfItem implements TooltipItem {
     protected static int renderType = 0; //0 = no body render, 1 = render self only, 2 = render player.
     private Renderer renderSelf;
     private Renderer renderMember;
+    public static ModelRender modelRender;
+    private static int modelOffset = 0;
     protected static boolean renderBleed = false;
 
     public PHead(String name) {
@@ -47,7 +58,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             if (renderType == 2 && id.shouldRenderModel)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 RenderItem.setColor(0,0,0,0);
-                renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, partialTicks);
+                renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, 1F);
                 RenderItem.resetColor();
                 return;
             }
@@ -61,6 +72,82 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             blit(poseStack, x(i), y(i), 32, 32, 32, 32); blit(poseStack, x(i), y(i), 160, 32, 32, 32);
             resetColor();
         };
+
+    }
+
+    public static void updateModelRenderer() {
+        modelOffset = ClientConfigData.rotationOffset.get();
+        if (ClientConfigData.forceModelRotation.get()) {
+            modelRender = (pPosX, pPosY, posestack, pScale, pLivingEntity, partialTicks) -> {
+                posestack.pushPose();
+                posestack.translate((double)pPosX, (double)pPosY, 1050.0D);
+                posestack.scale(1.0F, 1.0F, -1.0F);
+                RenderSystem.applyModelViewMatrix();
+                PoseStack posestack1 = new PoseStack();
+                posestack1.translate(0.0D, 0.0D, 1000.0D);
+                posestack1.scale((float)pScale, (float)pScale, (float)pScale);
+                Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
+                Quaternion quaternion1 = Vector3f.XP.rotationDegrees(0F);
+                quaternion.mul(quaternion1);
+                posestack1.mulPose(quaternion);
+                float f2 = pLivingEntity.yBodyRot;
+                float f3 = pLivingEntity.getYRot();
+                float f4 = pLivingEntity.getXRot();
+                float f5 = pLivingEntity.yHeadRotO;
+                float f6 = pLivingEntity.yHeadRot;
+                pLivingEntity.yBodyRot = 180.0F + modelOffset;
+                pLivingEntity.setYRot( Mth.clamp(f3 - f2, -35f, 35f) + 180F + modelOffset);
+                pLivingEntity.yHeadRot = pLivingEntity.getYRot();
+                pLivingEntity.yHeadRotO = pLivingEntity.getYRot();
+                Lighting.setupForEntityInInventory();
+                EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+                quaternion1.conj();
+                entityrenderdispatcher.overrideCameraOrientation(quaternion1);
+                entityrenderdispatcher.setRenderShadow(false);
+                MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
+                RenderSystem.runAsFancy(() -> {
+                    entityrenderdispatcher.render(pLivingEntity, 0.0D, 0.0D, 0.0D, 0.0F, 1F, posestack1, multibuffersource$buffersource, 15728880);
+                    if (pLivingEntity.isOnFire()) {
+                        renderFlame(posestack1, multibuffersource$buffersource, pLivingEntity);
+                    }
+                });
+                multibuffersource$buffersource.endBatch();
+                entityrenderdispatcher.setRenderShadow(true);
+                pLivingEntity.yBodyRot = f2;
+                pLivingEntity.setYRot(f3);
+                pLivingEntity.setXRot(f4);
+                pLivingEntity.yHeadRotO = f5;
+                pLivingEntity.yHeadRot = f6;
+                posestack.popPose();
+            };
+
+        } else {
+            modelRender = (pPosX, pPosY, posestack, pScale, pLivingEntity, partialTicks) -> {
+                posestack.pushPose();
+                posestack.translate(pPosX, pPosY, 1050.0D);
+                posestack.scale(1.0F, 1.0F, -1.0F);
+                RenderSystem.applyModelViewMatrix();
+                PoseStack posestack1 = new PoseStack();
+                posestack1.translate(0.0D, 0.0D, 1000.0D);
+                posestack1.scale((float)pScale, (float)pScale, (float)pScale);
+                Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
+                posestack1.mulPose(quaternion);
+                Lighting.setupForEntityInInventory();
+                EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+                entityrenderdispatcher.setRenderShadow(false);
+                MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
+                RenderSystem.runAsFancy(() -> {
+                    entityrenderdispatcher.render(pLivingEntity, 0.0D, 0.0D, 0.0D, 0.0F, partialTicks, posestack1, multibuffersource$buffersource, 15728880);
+                    if (pLivingEntity.isOnFire()) {
+                        renderFlame(posestack1, multibuffersource$buffersource, pLivingEntity);
+                    }
+                });
+                multibuffersource$buffersource.endBatch();
+                entityrenderdispatcher.setRenderShadow(true);
+
+                posestack.popPose();
+            };
+        }
     }
 
     @Override
@@ -246,5 +333,9 @@ public class PHead extends RenderSelfItem implements TooltipItem {
 
     private interface Renderer {
         void render(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
+    }
+
+    public interface ModelRender {
+        void renderModel(float pPosX, float pPosY, PoseStack posestack, int pScale, LivingEntity pLivingEntity, float partialTicks);
     }
 }
