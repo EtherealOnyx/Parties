@@ -24,12 +24,13 @@ import java.util.UUID;
 public abstract class ServerPartyMixin {
 
 
-   //@Inject(method = "changeOwner(Ljava/util/UUID;Ljava/lang/String;)Z", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
-    //private void changeOwner(UUID newOwnerId, String newOwnerUsername, CallbackInfoReturnable<Boolean> cir, PartyMember oldOwner, boolean result, IPlayerConfig newOwnerConfig) {
-      //  if (result && ServerConfigData.syncPAC()) {
-        //    PACCompatManager.getHandler().changeLeader(oldOwner.getUUID(), newOwnerId);
-        //}
-    //}
+   @Inject(method = "changeOwner", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
+    private void changeOwner(UUID newOwnerId, String newOwnerUsername, CallbackInfoReturnable<Boolean> cir,
+                             PartyMember oldOwner, boolean result) {
+        if (result && ServerConfigData.syncPAC()) {
+            PACCompatManager.getHandler().changeLeader(oldOwner.getUUID(), newOwnerId);
+        }
+    }
 
     @Inject(method = "addMember(Ljava/util/UUID;Lxaero/pac/common/parties/party/member/PartyMemberRank;Ljava/lang/String;)Lxaero/pac/common/parties/party/member/PartyMember;", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
     private void addMember(UUID memberUUID, PartyMemberRank rank, String playerUsername,
