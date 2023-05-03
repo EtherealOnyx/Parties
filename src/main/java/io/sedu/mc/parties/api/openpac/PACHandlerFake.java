@@ -38,4 +38,9 @@ public class PACHandlerFake implements IPACHandler {
     public void disbandParty(UUID partyId) {
 
     }
+
+    @Override
+    public void initPartiesSync(MinecraftServer server) {
+
+    }
 }

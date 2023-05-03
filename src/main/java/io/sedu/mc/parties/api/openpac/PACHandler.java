@@ -50,6 +50,7 @@ public class PACHandler implements IPACHandler {
             PartyData pData = new PartyData(newPartyId, owner);
             PartyData.partyList.put(newPartyId, pData);
             ServerPacketHelper.sendNewLeader(owner);
+            PartySaveData.get().setDirty();
             return;
         }
         if (!Util.hasParty(owner) || Util.hasParty(newMember)) {
@@ -58,6 +59,7 @@ public class PACHandler implements IPACHandler {
         }
         if (Util.getNormalServerPlayer(newMember) != null) {
             PartyHelper.addPlayerToParty(newMember, Objects.requireNonNull(Util.getPartyFromMember(owner)));
+            PartySaveData.get().setDirty();
         } else {
             Parties.LOGGER.error("Error adding new player to party - player doesn't exist! - " + newMember);
         }
@@ -67,6 +69,7 @@ public class PACHandler implements IPACHandler {
     @Override
     public void memberLeft(UUID memberLeft) {
         PartyHelper.removePlayerFromParty(memberLeft, false);
+        PartySaveData.get().setDirty();
     }
 
     @Override
@@ -76,9 +79,11 @@ public class PACHandler implements IPACHandler {
             PartyData.partyList.remove(partyId);
             PlayerData.playerList.get(owner).removeParty();
             PartiesPacketHandler.sendToPlayer(new ClientPacketData(6), getNormalServerPlayer(owner));
+            PartySaveData.get().setDirty();
             return;
         }
         PartyHelper.removePlayerFromParty(memberLeft, true);
+        PartySaveData.get().setDirty();
     }
 
     @Override
@@ -91,6 +96,7 @@ public class PACHandler implements IPACHandler {
             syncParties(Util.getNormalServerPlayer(owner));
         }
         PartyHelper.giveLeader(newLeader);
+        PartySaveData.get().setDirty();
     }
 
     @Override
@@ -98,6 +104,13 @@ public class PACHandler implements IPACHandler {
         PartyData p = Util.getPartyFromId(partyId);
         if (p != null)
             p.disband();
+        PartySaveData.get().setDirty();
+    }
+
+    @Override
+    public void initPartiesSync(MinecraftServer server) {
+        PartySaveData.get(); //initialize party data.
+        //TODO: Implement party sync for Parties mod.
     }
 
     private static void syncParties(ServerPlayer p) {
@@ -154,5 +167,6 @@ public class PACHandler implements IPACHandler {
                 });
             });
         }
+        PartySaveData.get().setDirty();
     }
 }

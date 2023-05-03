@@ -16,4 +16,6 @@ public interface IPACHandler {
     void changeLeader(UUID owner, UUID newLeader);
 
     void disbandParty(UUID partyId);
+
+    void initPartiesSync(MinecraftServer server);
 }

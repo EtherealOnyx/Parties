@@ -348,14 +348,13 @@ public class PartyEvent {
             if (ServerConfigData.isPersistEnabled()) {
                 if (ServerConfigData.syncPAC()) {
                     PACCompatManager.getHandler().initParties(event.getServer());
+                } else if (ServerConfigData.syncParties()) {
+                    PACCompatManager.getHandler().initPartiesSync(event.getServer());
                 } else {
                     PartySaveData.get(); //Load it into cache.
                 }
             }
-
         }
-
-
     }
 
 }
