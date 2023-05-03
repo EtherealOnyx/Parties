@@ -47,6 +47,7 @@ public class PartyData {
         party = new ArrayList<>();
         this.partyId = partyId;
         this.leader = leader;
+        party.add(leader);
     }
 
     private void updateLeaderNew(UUID initiator) {
@@ -56,7 +57,7 @@ public class PartyData {
 
     public void addMember(UUID futureMember) {
         //No checks necessary here as they have already been done.
-        
+        Parties.LOGGER.debug("Add Member internal START");
         //Add future member to party's trackers.
         party.forEach(id -> {
             //Add future member to id's trackers.
@@ -64,15 +65,16 @@ public class PartyData {
             //Add id to future member's trackers.
             addTracker(futureMember, id);
         });
-
+        Parties.LOGGER.debug("Add Member internal POST-trackers");
         ServerPacketHelper.sendNewMember(futureMember, party);
-        
+        Parties.LOGGER.debug("Add Member internal POST-packet");
         party.add(futureMember);
-
+        Parties.LOGGER.debug("Add Member internal POST-party");
         Util.getPlayer(futureMember, (playerData) -> playerData.addParty(partyId));
-
+        Parties.LOGGER.debug("Add Member internal POST-player party info");
         //API Helper
         Util.getServerPlayer(futureMember, (serverPlayer) -> MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(serverPlayer)));
+        Parties.LOGGER.debug("Add Member internal POST-api");
     }
 
     public void addMemberSilently(UUID futureMember) {
@@ -116,7 +118,8 @@ public class PartyData {
             removeTracker(id, removedMember);
         });
         //Delete party if necessary.
-        if (party.size() == 1) {
+        //Only in Sync NONE mode.
+        if (party.size() == 1 && ServerConfigData.noSync()) {
             
             disband();
             return;

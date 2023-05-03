@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.events;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.openpac.PACCompatManager;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PartySaveData;
@@ -339,11 +340,19 @@ public class PartyEvent {
     @SubscribeEvent
     public static void onServerStart(ServerStartedEvent event) {
         //This should always be server side...
+        PartySaveData.server = event.getServer();
         ServerLevel l = event.getServer().getLevel(Level.OVERWORLD);
         if (l != null) {
             PartySaveData.globalLevel = l;
             Parties.LOGGER.debug("Level saved successfully...");
-            PartySaveData.get(); //Load it into cache.
+            if (ServerConfigData.isPersistEnabled()) {
+                if (ServerConfigData.syncPAC()) {
+                    PACCompatManager.getHandler().initParties(event.getServer());
+                } else {
+                    PartySaveData.get(); //Load it into cache.
+                }
+            }
+
         }
 
 

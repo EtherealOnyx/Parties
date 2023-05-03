@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.network;
 
+import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.data.Util;
 import io.sedu.mc.parties.events.PartyJoinEvent;
@@ -20,13 +21,14 @@ public class ServerPacketHelper {
 
     public static void sendNewMember(UUID futureMember, ArrayList<UUID> party) {
         //Send each member to future party member.
-        
+        Parties.LOGGER.debug("SendNewMember internal START");
         PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, party), getNormalServerPlayer(futureMember));
+        Parties.LOGGER.debug("SendNewMember internal PACKET");
         //Send each member's properties to future party member.
         party.forEach(id -> {
             InfoPacketHelper.sendName(futureMember, id);
         });
-
+        Parties.LOGGER.debug("SendNewMember internal NAME");
         //Send future member to each party member.
         party.forEach(id -> {
             
@@ -46,11 +48,13 @@ public class ServerPacketHelper {
             }
 
         });
+        Parties.LOGGER.debug("SendNewMember internal DATA");
 
         //Send leader to future party member.
         
         PartiesPacketHandler.sendToPlayer(new ClientPacketData(3, getPartyFromMember(party.get(0)).getLeader()),
                                           getNormalServerPlayer(futureMember));
+        Parties.LOGGER.debug("SendNewMember internal POST");
     }
 
     public static void sendRemoveMember(UUID removedMember, ArrayList<UUID> party, boolean wasKicked) {

@@ -5,16 +5,19 @@
   "refmap": "sedparties.refmap.json",
   "mixins": [
     "EntitySelectorMixin",
-
     "MixinANManaRender",
     "MixinHRManager",
-    "PlayerMixin"
+    "PartyManagerMixin",
+    "PlayerMixin",
+    "ServerPartyMixin"
   ],
   "client": [
     "ChatScreenMixin",
     "ClientMessageHandlerMixin",
-    "ManaRendererMixin",
-    "FeathersHudOverlayMixin"
+    "FeathersHudOverlayMixin",
+    "ManaRendererMixin"
+  ],
+  "server": [
   ],
   "minVersion": "0.8"
 }

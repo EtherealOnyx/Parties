@@ -4,6 +4,7 @@ import io.sedu.mc.parties.Parties;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +16,7 @@ public class PartySaveData extends SavedData
     private static final String ID = "partiesdata";
 
     public static ServerLevel globalLevel;
+    public static MinecraftServer server;
 
     public static @NotNull PartySaveData get() {
         return globalLevel.getDataStorage().computeIfAbsent(PartySaveData::new, PartySaveData::new, ID);
@@ -26,8 +28,8 @@ public class PartySaveData extends SavedData
 
     public PartySaveData(CompoundTag tag) {
         Parties.LOGGER.debug("Loading party save data...");
-        if (!ServerConfigData.isPersistEnabled()) {
-            Parties.LOGGER.debug("Loading cancelled, party persistence disabled...");
+        if (!ServerConfigData.isPersistEnabled() || ServerConfigData.syncPAC() /* || ServerConfigData.syncFTB() */) {
+            Parties.LOGGER.debug("Loading cancelled, party persistence disabled or syncing from other parties mod...");
             return;
         }
 

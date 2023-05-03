@@ -6,6 +6,7 @@ import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.feathers.FCompatManager;
 import io.sedu.mc.parties.api.hardcorerevival.HRCompatManager;
+import io.sedu.mc.parties.api.openpac.PACCompatManager;
 import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
@@ -40,6 +41,7 @@ public class ModSetup {
         EFCompatManager.init(); //Epic Fight Support
         FCompatManager.init(); //Feathers Support
         SSCompatManager.init(); //Spells and Shield Support
+        PACCompatManager.init(); //Open-PAC Support
         Parties.LOGGER.info("Mod support initialization complete!");
     }
 }

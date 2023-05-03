@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.data;
 
+import io.sedu.mc.parties.api.openpac.PACCompatManager;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ServerConfigData {
@@ -67,11 +68,15 @@ public class ServerConfigData {
     }
 
     public static boolean syncPAC() {
-        return partiesSyncType.get() == PartySync.OPEN_PAC;
+        return partiesSyncType.get() == PartySync.OPEN_PAC && PACCompatManager.active();
     }
 
     public static boolean syncParties() {
         return partiesSyncType.get() == PartySync.PARTIES;
+    }
+
+    public static boolean noSync() {
+        return partiesSyncType.get() == PartySync.NONE;
     }
 
     public static boolean syncFTB() {
