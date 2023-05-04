@@ -75,12 +75,17 @@ public class PACHandler implements IPACHandler {
             syncParties();
             return;
         }
-        if (Util.getNormalServerPlayer(newMember) != null) {
+        ServerPlayer p = Util.getNormalServerPlayer(newMember);
+        if (p != null) {
             PartyHelper.addPlayerToParty(newMember, Objects.requireNonNull(Util.getPartyFromMember(owner)));
             PartySaveData.get().setDirty();
+            if (server != null) {
+                server.getCommands().sendCommands(p);
+            }
         } else {
             Parties.LOGGER.error("Error adding new player to party - player doesn't exist! - " + newMember);
         }
+
 
     }
 
@@ -88,6 +93,11 @@ public class PACHandler implements IPACHandler {
     public void memberLeft(UUID memberLeft) {
         PartyHelper.removePlayerFromParty(memberLeft, false);
         PartySaveData.get().setDirty();
+        getServerPlayer(memberLeft, m -> {
+            if (server != null) {
+                server.getCommands().sendCommands(m);
+            }
+        });
     }
 
     @Override
@@ -102,6 +112,11 @@ public class PACHandler implements IPACHandler {
         }
         PartyHelper.removePlayerFromParty(memberLeft, true);
         PartySaveData.get().setDirty();
+        getServerPlayer(memberLeft, m -> {
+            if (server != null) {
+                server.getCommands().sendCommands(m);
+            }
+        });
     }
 
     @Override
@@ -115,6 +130,16 @@ public class PACHandler implements IPACHandler {
         } else {
             Objects.requireNonNull(getPartyFromMember(owner)).updateLeader(newLeader);
             PartySaveData.get().setDirty();
+            getServerPlayer(newLeader, m -> {
+                if (server != null) {
+                    server.getCommands().sendCommands(m);
+                }
+            });
+            getServerPlayer(owner, m -> {
+                if (server != null) {
+                    server.getCommands().sendCommands(m);
+                }
+            });
         }
 
     }
@@ -219,6 +244,15 @@ public class PACHandler implements IPACHandler {
         UUID curLeader;
         if (playerData != null && partyData != null) {
             curLeader = partyData.getLeader();
+            //Check if party is a size of 1.
+            if (partyData.getMembers().size() == 1) {
+                getPM(pm -> {
+                    IServerPartyAPI<IPartyMemberAPI, IPartyPlayerInfoAPI, IPartyAllyAPI> party = pm.getPartyByMember(memberLeaving);
+                    if (party != null) {
+                        pm.removeParty(party);
+                    }
+                });
+            }
             if (curLeader.equals(memberLeaving)) {
                 //Transfer ownership first
                 curLeader = null;

@@ -91,7 +91,6 @@ public class PartyCommands {
                 return 0;
             })))
             .then(Commands.literal("leave").executes(ctx -> {
-                //TODO: Implement leave and ownership transfer.
                 if (PartyHelper.leaveParty(ctx.getSource().getPlayerOrException().getUUID())) {
                     //Add Party Update;
                     PartySaveData.get().setDirty();

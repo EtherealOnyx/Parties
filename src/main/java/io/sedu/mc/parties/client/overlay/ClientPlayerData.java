@@ -306,7 +306,7 @@ public class ClientPlayerData {
 
 
     public int getXpLevel() {
-        return (int) data.getOrDefault(XPLEVEL, 0f);
+        return (int) data.getOrDefault(XPLEVEL, 0);
     }
 
     public boolean isLeader() {
