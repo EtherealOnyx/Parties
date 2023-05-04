@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.data;
 
+import io.sedu.mc.parties.api.openpac.PACCompatManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
@@ -18,6 +19,11 @@ public class PartyHelper {
     public static boolean invitePlayerForced(UUID initiator, UUID futureMember) {
         if (!verifyRequest(initiator, futureMember))
             return false;
+
+        //Open-PAC Support
+        if (ServerConfigData.isPartySyncEnabled()) {
+            return PACCompatManager.getHandler().addPartyMember(initiator, futureMember, false);
+        }
 
         //This checks if initiator is in a party. Creates one if not.
         if (!Objects.requireNonNull(getNormalPlayer(initiator)).hasParty()) {
@@ -75,6 +81,11 @@ public class PartyHelper {
         if (!inSameParty(initiator, removedMember)) {
             return false;
         }
+        //Open-PAC Support
+        if (ServerConfigData.isPartySyncEnabled()) {
+            return PACCompatManager.getHandler().removePartyMember(initiator, removedMember, false);
+        }
+
         return removePlayerFromParty(removedMember, true);
     }
 

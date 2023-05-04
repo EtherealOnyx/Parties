@@ -4,7 +4,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import io.sedu.mc.parties.data.PartyHelper;
 import io.sedu.mc.parties.data.PartySaveData;
-import io.sedu.mc.parties.data.ServerConfigData;
 import io.sedu.mc.parties.network.ClientPacketData;
 import io.sedu.mc.parties.network.PartiesPacketHandler;
 import net.minecraft.ChatFormatting;
@@ -31,14 +30,10 @@ public class PartyCommands {
             .then(Commands.literal("invite")
                 .then(Commands.argument("player", new NotSelfArgument(false))
                     .executes(ctx -> {
-                        if (ServerConfigData.syncFTB() || ServerConfigData.syncPAC())
-                            return 0;
                         PartyHelper.questionPlayer(ctx.getSource().getPlayerOrException().getUUID(), EntityArgument.getPlayer(ctx, "player").getUUID());
                         return Command.SINGLE_SUCCESS;})
                 )
             ).then(Commands.literal("accept").then(Commands.argument("initiator", new NotSelfArgument(false)).executes(ctx -> {
-                    if (ServerConfigData.syncFTB() || ServerConfigData.syncPAC())
-                        return 0;
                 if (PartyHelper.acceptInvite(EntityArgument.getPlayer(ctx, "initiator").getUUID(), ctx.getSource().getPlayerOrException().getUUID())) {
                     //Add Party Update;
                     PartySaveData.get().setDirty();
@@ -49,8 +44,6 @@ public class PartyCommands {
                 }
             })))
             .then(Commands.literal("accept").executes(ctx -> {
-                if (ServerConfigData.syncFTB() || ServerConfigData.syncPAC())
-                    return 0;
                 if (PartyHelper.acceptInvite(ctx.getSource().getPlayerOrException().getUUID())) {
                     //Add Party Update;
                     PartySaveData.get().setDirty();
@@ -61,8 +54,6 @@ public class PartyCommands {
                 }
             }))
             .then(Commands.literal("decline").then(Commands.argument("initiator", new NotSelfArgument(false)).executes(ctx -> {
-                if (ServerConfigData.syncFTB() || ServerConfigData.syncPAC())
-                    return 0;
                 if (PartyHelper.declineInvite(EntityArgument.getPlayer(ctx, "initiator").getUUID(), ctx.getSource().getPlayerOrException().getUUID())) {
                     return Command.SINGLE_SUCCESS;
                 }
@@ -71,8 +62,6 @@ public class PartyCommands {
                 }
             })))
             .then(Commands.literal("decline").executes(ctx -> {
-                if (ServerConfigData.syncFTB() || ServerConfigData.syncPAC())
-                    return 0;
                 if (PartyHelper.declineInvite(ctx.getSource().getPlayerOrException().getUUID())) {
                     return Command.SINGLE_SUCCESS;
                 }
@@ -85,8 +74,6 @@ public class PartyCommands {
                 return Command.SINGLE_SUCCESS;
             }))
             .then(Commands.literal("kick").then(Commands.argument("member", new NotSelfArgument(true)).executes(ctx -> {
-                if (ServerConfigData.syncFTB() || ServerConfigData.syncPAC())
-                    return 0;
                 UUID senderId;
                 if (!hasParty(senderId = ctx.getSource().getPlayerOrException().getUUID())) {
                     return 0;
@@ -104,8 +91,7 @@ public class PartyCommands {
                 return 0;
             })))
             .then(Commands.literal("leave").executes(ctx -> {
-                if (ServerConfigData.syncFTB() || ServerConfigData.syncPAC())
-                    return 0;
+                //TODO: Implement leave and ownership transfer.
                 if (PartyHelper.leaveParty(ctx.getSource().getPlayerOrException().getUUID())) {
                     //Add Party Update;
                     PartySaveData.get().setDirty();
@@ -117,8 +103,7 @@ public class PartyCommands {
             .then(Commands.literal("leader")
                 .then(Commands.argument("member", new NotSelfArgument(true))
                     .executes(ctx -> {
-                        if (ServerConfigData.syncFTB() || ServerConfigData.syncPAC())
-                            return 0;
+                        //TODO: Implement leader transfer
                         if (isLeader(ctx.getSource().getPlayerOrException().getUUID()) &&
                                 PartyHelper.giveLeader(EntityArgument.getPlayer(ctx, "member").getUUID())) {
                             //Add Party Update;

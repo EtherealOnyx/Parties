@@ -17,5 +17,7 @@ public interface IPACHandler {
 
     void disbandParty(UUID partyId);
 
-    void initPartiesSync(MinecraftServer server);
+    boolean addPartyMember(UUID initiator, UUID futureMember, boolean finalAttempt);
+
+    boolean removePartyMember(UUID initiator, UUID removedMember, boolean finalAttempt);
 }

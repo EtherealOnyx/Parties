@@ -341,20 +341,18 @@ public class PartyEvent {
     public static void onServerStart(ServerStartedEvent event) {
         //This should always be server side...
         PartySaveData.server = event.getServer();
+        Parties.LOGGER.debug("Server saved successfully...");
         ServerLevel l = event.getServer().getLevel(Level.OVERWORLD);
         if (l != null) {
             PartySaveData.globalLevel = l;
             Parties.LOGGER.debug("Level saved successfully...");
             if (ServerConfigData.isPersistEnabled()) {
-                if (ServerConfigData.syncPAC()) {
+                if (ServerConfigData.isPartySyncEnabled()) {
                     PACCompatManager.getHandler().initParties(event.getServer());
-                } else if (ServerConfigData.syncParties()) {
-                    PACCompatManager.getHandler().initPartiesSync(event.getServer());
-                } else {
-                    PartySaveData.get(); //Load it into cache.
                 }
+            } else {
+                PartySaveData.get(); //Load it into cache.
             }
         }
     }
-
 }

@@ -40,7 +40,13 @@ public class PACHandlerFake implements IPACHandler {
     }
 
     @Override
-    public void initPartiesSync(MinecraftServer server) {
-
+    public boolean addPartyMember(UUID initiator, UUID futureMember, boolean b) {
+        return false;
     }
+
+    @Override
+    public boolean removePartyMember(UUID initiator, UUID removedMember, boolean finalAttempt) {
+        return false;
+    }
+
 }

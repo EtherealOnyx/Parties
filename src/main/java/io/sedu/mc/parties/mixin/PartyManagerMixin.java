@@ -17,14 +17,14 @@ import xaero.pac.common.server.parties.party.ServerParty;
 public abstract class PartyManagerMixin {
     @Inject(method = "createPartyForOwner(Lnet/minecraft/world/entity/player/Player;)Lxaero/pac/common/server/parties/party/ServerParty;", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
     private void createPartyForOwner(Player owner, CallbackInfoReturnable<ServerParty> cir) {
-        if (cir.getReturnValue() != null && ServerConfigData.syncPAC()) {
+        if (cir.getReturnValue() != null && ServerConfigData.isPartySyncEnabled()) {
             PACCompatManager.getHandler().memberAdded(owner.getUUID(), owner.getUUID(), cir.getReturnValue().getId());
         }
     }
 
     @Inject(method = "removeParty(Lxaero/pac/common/server/parties/party/ServerParty;)V", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
     private void removeParty(ServerParty party, CallbackInfo ci) {
-        if (ServerConfigData.syncPAC()) {
+        if (ServerConfigData.isPartySyncEnabled()) {
             if (party.isDestroyed()) {
                 Parties.LOGGER.debug("Open-PAC Party destroyed, disbanding party...");
             }

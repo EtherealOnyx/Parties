@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.data;
 
+import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.openpac.PACCompatManager;
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -14,26 +15,20 @@ public class ServerConfigData {
     public static ForgeConfigSpec.BooleanValue friendlyFire;
     public static ForgeConfigSpec.BooleanValue globalShare;
     public static ForgeConfigSpec.BooleanValue enableShare;
-    public static ForgeConfigSpec.EnumValue<PartySync> partiesSyncType;
+    public static ForgeConfigSpec.BooleanValue partiesSync;
     public static ForgeConfigSpec.BooleanValue partyPersistence;
 
 
-    enum PartySync {
-        NONE,
-        OPEN_PAC,
-        PARTIES,
-      //FTB_TEAMS
-    }
 
     public static void registerServerConfig(ForgeConfigSpec.Builder SERVER_BUILDER) {
         SERVER_BUILDER.comment("Server Party Settings").push("party");
 
-        partiesSyncType = SERVER_BUILDER.comment("This allows for integration with other party mods. Any option aside from 'NONE' forces partyPersistence to true. The following options are:",
-                                                 "NONE     - Ignore other party mods and use the Parties Mod as is. ",
-                                                 "OPEN_PAC - Relies on Open-PAC for parties. This disables all commands from Parties and forces it to sync with Open_PAC.",
-                                                 "PARTIES  - Relies on Parties for parties. This makes Open_PAC parties sync with this mod.")
-                                        .defineEnum("partiesSyncType", PartySync.NONE);
-        partyPersistence = SERVER_BUILDER.comment("Makes parties persist on server launches. Disabling this removes all saved parties - they will have to be remade.")
+        partiesSync = SERVER_BUILDER.comment("This allows for integration with other party mods. Enabling this forces party persistence to be enabled as well.",
+                                                 "true - Enables party sync between Parties mod and Open Parties and Claims.",
+                                             "false - Causes the Parties Mod to use its own party system by itself.",
+                                             "NOTE: If enabled, the partySize setting is ignored.")
+                                        .define("partiesSync", true);
+        partyPersistence = SERVER_BUILDER.comment("Makes parties persist between server launches. Disabling this removes all saved parties - they will have to be remade.")
                                          .define("partyPersistence", true);
 
         playerUpdateInterval = SERVER_BUILDER.comment("Delay (in ticks) for player packet syncing (hunger, xp)")
@@ -58,7 +53,8 @@ public class ServerConfigData {
         if (partyPersistence.get())
             return true;
         else {
-            if (partiesSyncType.get() != PartySync.NONE) {
+            if (isPartySyncEnabled()) {
+                Parties.LOGGER.error("Party sync is enabled, so party persistence cannot be disabled. Enabling...");
                 partyPersistence.set(true);
                 partyPersistence.save();
                 return true;
@@ -67,19 +63,17 @@ public class ServerConfigData {
         return false;
     }
 
-    public static boolean syncPAC() {
-        return partiesSyncType.get() == PartySync.OPEN_PAC && PACCompatManager.active();
-    }
-
-    public static boolean syncParties() {
-        return partiesSyncType.get() == PartySync.PARTIES;
-    }
-
-    public static boolean noSync() {
-        return partiesSyncType.get() == PartySync.NONE;
-    }
-
-    public static boolean syncFTB() {
+    public static boolean isPartySyncEnabled() {
+        //TODO: FTB Teams Support
+        if (partiesSync.get()) {
+            if (!PACCompatManager.active()) {
+                Parties.LOGGER.error("Party sync was enabled but no syncable mods were found. Disabling...");
+                partiesSync.set(false);
+                partiesSync.save();
+                return false;
+            }
+            return true;
+        }
         return false;
     }
 }

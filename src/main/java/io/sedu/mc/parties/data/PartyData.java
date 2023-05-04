@@ -118,9 +118,8 @@ public class PartyData {
             removeTracker(id, removedMember);
         });
         //Delete party if necessary.
-        //Only in Sync NONE mode.
-        if (party.size() == 1 && ServerConfigData.noSync()) {
-            
+        //Only if partySync is not enabled.
+        if (party.size() == 1 && !ServerConfigData.isPartySyncEnabled()) {
             disband();
             return;
         }
@@ -164,6 +163,7 @@ public class PartyData {
     }
 
     public boolean isFull() {
+        if (ServerConfigData.isPartySyncEnabled()) return false;
         return party.size() >= partySize.get();
     }
 

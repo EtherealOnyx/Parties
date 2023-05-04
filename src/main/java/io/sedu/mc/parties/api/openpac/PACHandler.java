@@ -10,12 +10,20 @@ import io.sedu.mc.parties.network.ServerPacketHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.MinecraftForge;
+import xaero.pac.common.parties.party.ally.api.IPartyAllyAPI;
+import xaero.pac.common.parties.party.api.IPartyPlayerInfoAPI;
+import xaero.pac.common.parties.party.member.PartyMemberRank;
+import xaero.pac.common.parties.party.member.api.IPartyMemberAPI;
 import xaero.pac.common.server.api.OpenPACServerAPI;
+import xaero.pac.common.server.parties.party.api.IPartyManagerAPI;
+import xaero.pac.common.server.parties.party.api.IServerPartyAPI;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import static io.sedu.mc.parties.data.Util.*;
 
@@ -23,6 +31,7 @@ public class PACHandler implements IPACHandler {
 
     @Override
     public void initParties(MinecraftServer server) {
+        Parties.LOGGER.info("Loading parties from Open Parties and Claims.");
         OpenPACServerAPI.get(server).getPartyManager().getAllStream().forEach(party -> {
             UUID partyId = party.getId();
             //Create new party.
@@ -39,7 +48,10 @@ public class PACHandler implements IPACHandler {
             PartyData.partyList.put(partyId, pData);
         });
         PartySaveData.get().setDirty();
+        Parties.LOGGER.info("Load complete!");
     }
+
+
 
     @Override
     public void memberAdded(UUID owner, UUID newMember, UUID newPartyId) {
@@ -54,7 +66,7 @@ public class PACHandler implements IPACHandler {
             return;
         }
         if (!Util.hasParty(owner) || Util.hasParty(newMember)) {
-            syncParties(Util.getNormalServerPlayer(owner));
+            syncParties();
             return;
         }
         if (Util.getNormalServerPlayer(newMember) != null) {
@@ -93,7 +105,7 @@ public class PACHandler implements IPACHandler {
             return;
         }
         if (!Util.hasParty(owner) || !Util.inSameParty(owner, newLeader)) {
-            syncParties(Util.getNormalServerPlayer(owner));
+            syncParties();
         }
         PartyHelper.giveLeader(newLeader);
         PartySaveData.get().setDirty();
@@ -108,20 +120,80 @@ public class PACHandler implements IPACHandler {
     }
 
     @Override
-    public void initPartiesSync(MinecraftServer server) {
-        PartySaveData.get(); //initialize party data.
-        //TODO: Implement party sync for Parties mod.
+    public boolean addPartyMember(UUID initiator, UUID futureMember, boolean finalAttempt) {
+        AtomicBoolean success = new AtomicBoolean(false);
+        getPM(pm -> {
+            IServerPartyAPI<IPartyMemberAPI, IPartyPlayerInfoAPI, IPartyAllyAPI> party;
+            ServerPlayer owner = getNormalServerPlayer(initiator);
+            if (!pm.partyExistsForOwner(initiator) && owner != null) {
+                party = pm.createPartyForOwner(owner);
+            } else {
+                party = pm.getPartyByOwner(initiator);
+            }
+            if (party != null) {
+                PlayerData fM = getNormalPlayer(futureMember);
+                if (fM != null) {
+                    //Normal Player would never be null here...
+                    success.set(party.addMember(futureMember, PartyMemberRank.MEMBER, Objects.requireNonNull(fM.getName())) != null);
+                }
+            }
+        });
+        if (!success.get()) {
+            if (finalAttempt) {
+                Parties.LOGGER.error("Still failed to add member to party. Aborting...");
+                return false;
+            } else {
+                Parties.LOGGER.error("Error adding a member to party! Assuming there's a party desync...");
+                syncParties();
+                Parties.LOGGER.error("Trying to add member again...");
+                return addPartyMember(initiator, futureMember, true);
+            }
+        } else {
+            return true;
+        }
     }
 
-    private static void syncParties(ServerPlayer p) {
-        if (p != null) {
-            Parties.LOGGER.error("Parties between mods are desynced! Attempting to recreate...");
-            HashMap<UUID, PartyData> updatedParties = new HashMap<>();
-            PlayerData.playerList.forEach((uuid, playerData) -> {
-                playerData.removeParty(); //Remove parties from all current players.
-                PartiesPacketHandler.sendToPlayer(new ClientPacketData(6), getNormalServerPlayer(uuid));
-            });
-            OpenPACServerAPI.get(p.server).getPartyManager().getAllStream().forEach(party -> {
+    @Override
+    public boolean removePartyMember(UUID initiator, UUID removedMember, boolean finalAttempt) {
+        AtomicBoolean success = new AtomicBoolean(false);
+        getPM(pm -> {
+            IServerPartyAPI<IPartyMemberAPI, IPartyPlayerInfoAPI, IPartyAllyAPI> party = pm.getPartyByMember(initiator);
+            if (party != null) {
+                success.set(party.removeMember(removedMember) != null);
+            }
+        });
+        if (!success.get()) {
+            if (finalAttempt) {
+                Parties.LOGGER.error("Still failed to remove member from party. Aborting...");
+                return false;
+            } else {
+                Parties.LOGGER.error("Error removing member from party! Assuming there's a party desync...");
+                syncParties();
+                Parties.LOGGER.error("Trying to remove member again...");
+                return removePartyMember(initiator, removedMember, true);
+            }
+        } else {
+            return true;
+        }
+    }
+
+    private static void getPM(Consumer<IPartyManagerAPI<IServerPartyAPI<IPartyMemberAPI, IPartyPlayerInfoAPI, IPartyAllyAPI>>> action) {
+        if (PartySaveData.server == null) {
+            Parties.LOGGER.error("Server Data was never saved. Party sync cannot be completed...");
+        } else {
+            action.accept(OpenPACServerAPI.get(PartySaveData.server).getPartyManager());
+        }
+    }
+
+    private static void syncParties() {
+        Parties.LOGGER.error("Parties between mods are desynced! Attempting to recreate...");
+        HashMap<UUID, PartyData> updatedParties = new HashMap<>();
+        PlayerData.playerList.forEach((uuid, playerData) -> {
+            playerData.removeParty(); //Remove parties from all current players.
+            PartiesPacketHandler.sendToPlayer(new ClientPacketData(6), getNormalServerPlayer(uuid));
+        });
+        getPM(pm -> {
+            pm.getAllStream().forEach(party -> {
                 UUID partyId = party.getId();
                 //Create new party.
                 PartyData pData = new PartyData(partyId, party.getOwner().getUUID());
@@ -134,7 +206,8 @@ public class PACHandler implements IPACHandler {
                         pD.addParty(partyId);
                         pD.setName(member.getUsername());
                     } else {
-                        new PlayerData(pId, partyId, member.getUsername());                    }
+                        new PlayerData(pId, partyId, member.getUsername());
+                    }
 
                     //Then add to party.
                     pData.addMemberSilently(pId);
@@ -166,7 +239,7 @@ public class PACHandler implements IPACHandler {
                     });
                 });
             });
-        }
-        PartySaveData.get().setDirty();
+            PartySaveData.get().setDirty();
+        });
     }
 }

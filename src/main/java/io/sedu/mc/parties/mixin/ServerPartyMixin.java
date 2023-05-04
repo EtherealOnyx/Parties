@@ -27,7 +27,7 @@ public abstract class ServerPartyMixin {
    @Inject(method = "changeOwner", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
     private void changeOwner(UUID newOwnerId, String newOwnerUsername, CallbackInfoReturnable<Boolean> cir,
                              PartyMember oldOwner, boolean result) {
-        if (result && ServerConfigData.syncPAC()) {
+        if (result && ServerConfigData.isPartySyncEnabled()) {
             PACCompatManager.getHandler().changeLeader(oldOwner.getUUID(), newOwnerId);
         }
     }
@@ -35,7 +35,7 @@ public abstract class ServerPartyMixin {
     @Inject(method = "addMember(Ljava/util/UUID;Lxaero/pac/common/parties/party/member/PartyMemberRank;Ljava/lang/String;)Lxaero/pac/common/parties/party/member/PartyMember;", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
     private void addMember(UUID memberUUID, PartyMemberRank rank, String playerUsername,
                            CallbackInfoReturnable<PartyMember> cir) {
-        if (cir.getReturnValue() != null && ServerConfigData.syncPAC()) {
+        if (cir.getReturnValue() != null && ServerConfigData.isPartySyncEnabled()) {
             //Success?
             IServerPartyAPI<IPartyMemberAPI, IPartyPlayerInfoAPI, IPartyAllyAPI> p = OpenPACServerAPI.get(PartySaveData.server).getPartyManager().getPartyByMember(memberUUID);
             if (p != null) {
@@ -48,7 +48,7 @@ public abstract class ServerPartyMixin {
 
     @Inject(method = "removeMember(Ljava/util/UUID;)Lxaero/pac/common/parties/party/member/PartyMember;", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
     private void removeMember(UUID memberUUID, CallbackInfoReturnable<PartyMember> cir, PartyMember m) {
-        if (cir.getReturnValue() != null && ServerConfigData.syncPAC()) {
+        if (cir.getReturnValue() != null && ServerConfigData.isPartySyncEnabled()) {
             //Success?
             PACCompatManager.getHandler().memberLeft(memberUUID);
         }
