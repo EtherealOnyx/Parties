@@ -103,7 +103,6 @@ public class PartyCommands {
             .then(Commands.literal("leader")
                 .then(Commands.argument("member", new NotSelfArgument(true))
                     .executes(ctx -> {
-                        //TODO: Implement leader transfer
                         if (isLeader(ctx.getSource().getPlayerOrException().getUUID()) &&
                                 PartyHelper.giveLeader(EntityArgument.getPlayer(ctx, "member").getUUID())) {
                             //Add Party Update;

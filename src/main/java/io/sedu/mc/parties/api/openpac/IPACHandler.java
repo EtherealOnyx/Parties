@@ -22,4 +22,6 @@ public interface IPACHandler {
     boolean removePartyMember(UUID initiator, UUID removedMember, boolean finalAttempt);
 
     boolean changePartyLeader(UUID newLeader, boolean finalAttempt);
+
+    boolean partyMemberLeft(UUID memberLeaving, boolean finalAttempt);
 }

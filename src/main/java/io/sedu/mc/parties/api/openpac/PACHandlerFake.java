@@ -54,4 +54,9 @@ public class PACHandlerFake implements IPACHandler {
         return false;
     }
 
+    @Override
+    public boolean partyMemberLeft(UUID memberLeaving, boolean finalAttempt) {
+        return false;
+    }
+
 }

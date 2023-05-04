@@ -187,16 +187,16 @@ public class PACHandler implements IPACHandler {
 
     @Override
     public boolean changePartyLeader(UUID newLeader, boolean finalAttempt) {
-        AtomicBoolean success = new AtomicBoolean(false);
+        boolean success = false;
         IServerParty<IPartyMember, IPartyPlayerInfo, IPartyAlly> pacParty = ServerData.from(server).getPartyManager().getPartyByMember(newLeader);
         PartyData partyData = getPartyFromMember(newLeader);
         IPartyMember newOwner;
         //Verify old leader from both parties are the same.
         if (pacParty != null && partyData != null && pacParty.getOwner().getUUID().equals(partyData.getLeader()) && (newOwner = pacParty.getMemberInfo(newLeader)) != null) { //Parties exist, Same Party, Same Leader
             pacParty.changeOwner(newLeader, newOwner.getUsername());
-            success.set(true);
+            success = true;
         }
-        if (!success.get()) {
+        if (!success) {
             if (finalAttempt) {
                 Parties.LOGGER.error("Still failed to change party leader. Aborting...");
                 return false;
@@ -209,6 +209,36 @@ public class PACHandler implements IPACHandler {
         } else {
             return true;
         }
+    }
+
+    @Override
+    public boolean partyMemberLeft(UUID memberLeaving, boolean finalAttempt) {
+        //Check if leaving member is the leader
+        PartyData partyData = getPartyFromMember(memberLeaving);
+        PlayerData playerData = getNormalPlayer(memberLeaving);
+        UUID curLeader;
+        if (playerData != null && partyData != null) {
+            curLeader = partyData.getLeader();
+            if (curLeader.equals(memberLeaving)) {
+                //Transfer ownership first
+                curLeader = null;
+                for (UUID member : partyData.getMembers()) {
+                    if (!member.equals(memberLeaving) && curLeader == null) {
+                        //Transfer ownership to first non-same member.
+                        curLeader = member;
+                    }
+                }
+                if (curLeader != null) {
+                    if (changePartyLeader(curLeader, false)) {
+                        //Leader change was successful
+                        return removePartyMember(curLeader, memberLeaving, false);
+                    }
+                }
+            } else {
+                return removePartyMember(curLeader, memberLeaving, false);
+            }
+        }
+        return false;
     }
 
     private static void getPM(Consumer<IPartyManagerAPI<IServerPartyAPI<IPartyMemberAPI, IPartyPlayerInfoAPI, IPartyAllyAPI>>> action) {
@@ -251,28 +281,24 @@ public class PACHandler implements IPACHandler {
             });
             PartyData.partyList = updatedParties;
             PartySaveData.get().setDirty();
-            PartyData.partyList.forEach((partyId, partyData) -> {
-                partyData.getMembers().forEach(member -> {
-                    ServerPlayer mS = getNormalServerPlayer(member);
-                    ArrayList<UUID> mParty = new ArrayList<>(partyData.getMembers());
-                    mParty.remove(member);
-                    PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, mParty), mS);
-                    mParty.forEach(pMember -> {
-                        if (isOnline(pMember)) {//Is online
-                            PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, pMember), mS);
-                            //Send other data
-                            InfoPacketHelper.forceUpdate(member, pMember, true);
-                            //TODO: Make this more efficient. This sends data multiple times...
-                            //API Helper
-                            getServerPlayer(pMember, (player) -> {
-                                MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(player));
-                            });
-                        } else {
-                            PartiesPacketHandler.sendToPlayer(new ClientPacketData(1, pMember), mS);
-                        }
-                    });
+            PartyData.partyList.forEach((partyId, partyData) -> partyData.getMembers().forEach(member -> {
+                ServerPlayer mS = getNormalServerPlayer(member);
+                ArrayList<UUID> mParty = new ArrayList<>(partyData.getMembers());
+                mParty.remove(member);
+                PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, mParty), mS);
+                mParty.forEach(pMember -> {
+                    if (isOnline(pMember)) {//Is online
+                        PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, pMember), mS);
+                        //Send other data
+                        InfoPacketHelper.forceUpdate(member, pMember, true);
+                        //TODO: Make this more efficient. This sends data multiple times...
+                        //API Helper
+                        getServerPlayer(pMember, (player) -> MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(player)));
+                    } else {
+                        PartiesPacketHandler.sendToPlayer(new ClientPacketData(1, pMember), mS);
+                    }
                 });
-            });
+            }));
             PartySaveData.get().setDirty();
         });
     }

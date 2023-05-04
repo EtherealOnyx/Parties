@@ -95,10 +95,14 @@ public class PartyHelper {
         return true;
     }
 
-    public static boolean leaveParty(UUID uuid) {
+    public static boolean leaveParty(UUID memberLeaving) {
         PlayerData p;
-        if ((p = getNormalPlayer(uuid)) != null && p.hasParty()) {
-            Objects.requireNonNull(getPartyFromMember(uuid)).removeMember(uuid, false);
+        if ((p = getNormalPlayer(memberLeaving)) != null && p.hasParty()) {
+            //Open-PAC Support
+            if (ServerConfigData.isPartySyncEnabled()) {
+                return PACCompatManager.getHandler().partyMemberLeft(memberLeaving, false);
+            }
+            Objects.requireNonNull(getPartyFromMember(memberLeaving)).removeMember(memberLeaving, false);
             return true;
         }
         return false;
@@ -190,18 +194,14 @@ public class PartyHelper {
     }
 
     public static void dismissInvite(UUID initiator) {
-        getServerPlayer(initiator, serverPlayer -> {
-            serverPlayer.sendMessage(new TranslatableComponent(
-                    "messages.sedparties.phandler.declineinviteauto").withStyle(ChatFormatting.DARK_AQUA), initiator);
-        });
+        getServerPlayer(initiator, serverPlayer -> serverPlayer.sendMessage(new TranslatableComponent(
+                "messages.sedparties.phandler.declineinviteauto").withStyle(ChatFormatting.DARK_AQUA), initiator));
     }
 
     public static void dismissInvite(PlayerData playerData, UUID initiator) {
         ServerPlayer p;
-        getServerPlayer(initiator, serverPlayer -> {
-            serverPlayer.sendMessage(new TranslatableComponent(
-                    "messages.sedparties.phandler.declineinviteauto2", playerData.getName()).withStyle(ChatFormatting.DARK_AQUA), initiator);
-        });
+        getServerPlayer(initiator, serverPlayer -> serverPlayer.sendMessage(new TranslatableComponent(
+                "messages.sedparties.phandler.declineinviteauto2", playerData.getName()).withStyle(ChatFormatting.DARK_AQUA), initiator));
 
         if ((p = playerData.getPlayer()) != null) {
             p.sendMessage(new TranslatableComponent("messages.sedparties.phandler.declineinviteauto3", getName(initiator)).withStyle(ChatFormatting.DARK_AQUA), initiator);
