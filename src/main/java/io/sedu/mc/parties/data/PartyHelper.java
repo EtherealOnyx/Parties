@@ -104,8 +104,12 @@ public class PartyHelper {
         return false;
     }
 
-    public static boolean giveLeader(UUID player) {
-        Objects.requireNonNull(getPartyFromMember(player)).updateLeader(player);
+    public static boolean giveLeader(UUID newLeader) {
+        //Open-PAC Support
+        if (ServerConfigData.isPartySyncEnabled()) {
+            return PACCompatManager.getHandler().changePartyLeader(newLeader, false);
+        }
+        Objects.requireNonNull(getPartyFromMember(newLeader)).updateLeader(newLeader);
         return true;
     }
 

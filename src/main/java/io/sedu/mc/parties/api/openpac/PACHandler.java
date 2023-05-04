@@ -10,11 +10,16 @@ import io.sedu.mc.parties.network.ServerPacketHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.MinecraftForge;
+import xaero.pac.common.parties.party.IPartyPlayerInfo;
+import xaero.pac.common.parties.party.ally.IPartyAlly;
 import xaero.pac.common.parties.party.ally.api.IPartyAllyAPI;
 import xaero.pac.common.parties.party.api.IPartyPlayerInfoAPI;
+import xaero.pac.common.parties.party.member.IPartyMember;
 import xaero.pac.common.parties.party.member.PartyMemberRank;
 import xaero.pac.common.parties.party.member.api.IPartyMemberAPI;
+import xaero.pac.common.server.ServerData;
 import xaero.pac.common.server.api.OpenPACServerAPI;
+import xaero.pac.common.server.parties.party.IServerParty;
 import xaero.pac.common.server.parties.party.api.IPartyManagerAPI;
 import xaero.pac.common.server.parties.party.api.IServerPartyAPI;
 
@@ -25,6 +30,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+import static io.sedu.mc.parties.data.PartySaveData.server;
 import static io.sedu.mc.parties.data.Util.*;
 
 public class PACHandler implements IPACHandler {
@@ -106,9 +112,11 @@ public class PACHandler implements IPACHandler {
         }
         if (!Util.hasParty(owner) || !Util.inSameParty(owner, newLeader)) {
             syncParties();
+        } else {
+            Objects.requireNonNull(getPartyFromMember(owner)).updateLeader(newLeader);
+            PartySaveData.get().setDirty();
         }
-        PartyHelper.giveLeader(newLeader);
-        PartySaveData.get().setDirty();
+
     }
 
     @Override
@@ -177,11 +185,37 @@ public class PACHandler implements IPACHandler {
         }
     }
 
+    @Override
+    public boolean changePartyLeader(UUID newLeader, boolean finalAttempt) {
+        AtomicBoolean success = new AtomicBoolean(false);
+        IServerParty<IPartyMember, IPartyPlayerInfo, IPartyAlly> pacParty = ServerData.from(server).getPartyManager().getPartyByMember(newLeader);
+        PartyData partyData = getPartyFromMember(newLeader);
+        IPartyMember newOwner;
+        //Verify old leader from both parties are the same.
+        if (pacParty != null && partyData != null && pacParty.getOwner().getUUID().equals(partyData.getLeader()) && (newOwner = pacParty.getMemberInfo(newLeader)) != null) { //Parties exist, Same Party, Same Leader
+            pacParty.changeOwner(newLeader, newOwner.getUsername());
+            success.set(true);
+        }
+        if (!success.get()) {
+            if (finalAttempt) {
+                Parties.LOGGER.error("Still failed to change party leader. Aborting...");
+                return false;
+            } else {
+                Parties.LOGGER.error("Error changing party leader! Assuming there's a party desync...");
+                syncParties();
+                Parties.LOGGER.error("Trying to change leader again...");
+                return changePartyLeader(newLeader, true);
+            }
+        } else {
+            return true;
+        }
+    }
+
     private static void getPM(Consumer<IPartyManagerAPI<IServerPartyAPI<IPartyMemberAPI, IPartyPlayerInfoAPI, IPartyAllyAPI>>> action) {
-        if (PartySaveData.server == null) {
+        if (server == null) {
             Parties.LOGGER.error("Server Data was never saved. Party sync cannot be completed...");
         } else {
-            action.accept(OpenPACServerAPI.get(PartySaveData.server).getPartyManager());
+            action.accept(OpenPACServerAPI.get(server).getPartyManager());
         }
     }
 

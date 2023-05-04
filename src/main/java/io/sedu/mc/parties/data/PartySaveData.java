@@ -28,7 +28,7 @@ public class PartySaveData extends SavedData
 
     public PartySaveData(CompoundTag tag) {
         Parties.LOGGER.debug("Loading party save data...");
-        if (!ServerConfigData.isPersistEnabled() || ServerConfigData.isPartySyncEnabled() /* || ServerConfigData.syncFTB() */) {
+        if (!ServerConfigData.isPersistEnabled() || ServerConfigData.isPartySyncEnabled()) {
             Parties.LOGGER.debug("Loading cancelled, party persistence disabled or syncing from other parties mod...");
             return;
         }

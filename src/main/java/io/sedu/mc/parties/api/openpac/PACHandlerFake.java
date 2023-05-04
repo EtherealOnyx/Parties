@@ -49,4 +49,9 @@ public class PACHandlerFake implements IPACHandler {
         return false;
     }
 
+    @Override
+    public boolean changePartyLeader(UUID newLeader, boolean finalAttempt) {
+        return false;
+    }
+
 }

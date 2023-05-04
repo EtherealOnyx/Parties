@@ -20,4 +20,6 @@ public interface IPACHandler {
     boolean addPartyMember(UUID initiator, UUID futureMember, boolean finalAttempt);
 
     boolean removePartyMember(UUID initiator, UUID removedMember, boolean finalAttempt);
+
+    boolean changePartyLeader(UUID newLeader, boolean finalAttempt);
 }
