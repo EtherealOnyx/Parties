@@ -618,31 +618,49 @@ public class RenderUtils {
 
 
     public static void renderClickableArea(PoseStack poseStack) {
-
-        for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
-            clickArea.rect(i, poseStack, -2, -2, ColorUtils.getRainbowColor() | 150 << 24);
+        if (renderSelfFrame)
+            for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
+                clickArea.rect(i, poseStack, -2, -2, ColorUtils.getRainbowColor() | 150 << 24);
+        else
+            for (int i = 0; i < ClientPlayerData.playerOrderedList.size() - 1; i++)
+                clickArea.rect(i, poseStack, -2, -2, ColorUtils.getRainbowColor() | 150 << 24);
     }
 
     public static void renderFrame(PoseStack poseStack) {
-        int index = ClientPlayerData.playerOrderedList.size()-1;
+        int index = renderSelfFrame ? ClientPlayerData.playerOrderedList.size()-1 : ClientPlayerData.playerOrderedList.size()-2;
         RenderUtils.sizeRect(poseStack.last().pose(),  frameX, frameY, -2, frameEleW + framePosW*index,
                              frameEleH + framePosH*index,
                              ColorUtils.getRainbowColor() | 75 << 24);
     }
 
     public static void renderFrameOutline(PoseStack poseStack) {
-        for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
-            RenderUtils.borderRect(poseStack.last().pose(), -1, 1, frameX + framePosW*i, frameY + framePosH*i,
-                                   frameEleW,
-                                   frameEleH, 0xFFFFFFFF);
+        if (renderSelfFrame)
+            for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
+                RenderUtils.borderRect(poseStack.last().pose(), -1, 1, frameX + framePosW*i, frameY + framePosH*i,
+                                       frameEleW,
+                                       frameEleH, 0xFFFFFFFF);
+        else
+            for (int i = 0; i < ClientPlayerData.playerOrderedList.size() - 1; i++)
+                RenderUtils.borderRect(poseStack.last().pose(), -1, 1, frameX + framePosW*i, frameY + framePosH*i,
+                                       frameEleW,
+                                       frameEleH, 0xFFFFFFFF);
     }
 
     public static void renderFullArea(PoseStack poseStack, boolean b) {
-        for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++) {
-            RenderUtils.borderRect(poseStack.last().pose(), -1, 1, frameX + framePosW*i, frameY + framePosH*i,
-                                   frameEleW, frameEleH,
-                                   0xFFFFFFFF);
+        if (renderSelfFrame)
+            for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++) {
+                RenderUtils.borderRect(poseStack.last().pose(), -1, 1, frameX + framePosW*i, frameY + framePosH*i,
+                                       frameEleW, frameEleH,
+                                       0xFFFFFFFF);
             if (b) clickArea.rect(i, poseStack, 0, -1, ColorUtils.getRainbowColor() | 150 << 24);
+            }
+        else  {
+            for (int i = 0; i < ClientPlayerData.playerOrderedList.size() - 1; i++) {
+                RenderUtils.borderRect(poseStack.last().pose(), -1, 1, frameX + framePosW*i, frameY + framePosH*i,
+                                       frameEleW, frameEleH,
+                                       0xFFFFFFFF);
+                if (b) clickArea.rect(i, poseStack, 0, -1, ColorUtils.getRainbowColor() | 150 << 24);
+            }
         }
 
     }

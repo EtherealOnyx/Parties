@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static io.sedu.mc.parties.client.overlay.RenderSelfItem.selfIndex;
 import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 
 public abstract class RenderItem {
@@ -55,6 +56,7 @@ public abstract class RenderItem {
     public static int frameEleH = 56;
     public static int frameEleW = 0;
     public static int currentY = 0;
+    public static boolean renderSelfFrame = true;
 
     protected int x;
     protected int y;
@@ -98,6 +100,8 @@ public abstract class RenderItem {
 
     public static void updateSelfRender() {
         if (ClientConfigData.renderSelfFrame.get()) {
+            Parties.LOGGER.debug("Enabling self rendering in settings...");
+            renderSelfFrame = true;
             itemRender = (gui, poseStack, partialTicks) -> ClientPlayerData.forEachOrdered((i, id) -> {
                 if (RenderSelfItem.isSelf(i)) {
                     for (RenderSelfItem item : selfItems) {
@@ -120,6 +124,8 @@ public abstract class RenderItem {
             });
 
         } else {
+            Parties.LOGGER.debug("Disabling self rendering in settings...");
+            renderSelfFrame = false;
             itemRender = (gui, poseStack, partialTicks) -> ClientPlayerData.forEachWithoutSelf((i, id) -> {
                 for (RenderSelfItem item : selfItems) {
                     item.itemStart(poseStack);
@@ -279,27 +285,7 @@ public abstract class RenderItem {
     public static void register() {
         IIngameOverlay overlay = (gui, poseStack, partialTicks, width, height) -> {
             if (ClientPlayerData.playerOrderedList.size() == 0) return;
-
-            ClientPlayerData.forEachOrdered((i, id) -> {
-                if (RenderSelfItem.isSelf(i)) {
-                    for (RenderSelfItem item : selfItems) {
-                        item.itemStart(poseStack);
-                        item.renderSelf(i, id, gui, poseStack, partialTicks);
-                        item.itemEnd(poseStack);
-                    }
-                } else {
-                    for (RenderSelfItem item : selfItems) {
-                        item.itemStart(poseStack);
-                        item.renderMember(i, id, gui, poseStack, partialTicks);
-                        item.itemEnd(poseStack);
-                    }
-                }
-                for (RenderItem item : memberItems) {
-                    item.itemStart(poseStack);
-                    item.renderMember(i, id, gui, poseStack, partialTicks);
-                    item.itemEnd(poseStack);
-                }
-            });
+            itemRender.render(gui, poseStack, partialTicks);
             if (isDirty) {
                 syncItems();
                 isDirty = false;
@@ -898,7 +884,9 @@ public abstract class RenderItem {
         mouseX = mouseX - frameX;
         mouseY = mouseY - frameY;
         if (mouseX < frameEleW && mouseY < frameEleH) {
-            action.accept(0, mouseX, mouseY);
+            int finalMouseX = mouseX;
+            int finalMouseY = mouseY;
+            getRealIndex(0, index -> action.accept(index, finalMouseX, finalMouseY));
         }
 
 
@@ -907,8 +895,25 @@ public abstract class RenderItem {
             mouseY -= framePosH;
             if (mouseX < 0 || mouseY < 0) return;
             if (mouseX < frameEleW && mouseY < frameEleH) {
-                action.accept(i, mouseX, mouseY);
+                int finalMouseX = mouseX;
+                int finalMouseY = mouseY;
+                getRealIndex(i, index -> action.accept(index, finalMouseX, finalMouseY));
             }
+        }
+    }
+
+    private static void getRealIndex(int i, Consumer<Integer> action) {
+        if (renderSelfFrame)
+            action.accept(i);
+        else {
+            if (i >= selfIndex) {
+                i = i+1;
+                if (i < ClientPlayerData.playerOrderedList.size())
+                    action.accept(i);
+            } else {
+                action.accept(i);
+            }
+
         }
     }
 

@@ -38,7 +38,7 @@ public class PartySaveData extends SavedData
             CompoundTag tC = (CompoundTag) t;
             //Add new party to save;
             UUID partyId;
-            PartyData party = new PartyData(partyId = tC.getUUID("id"), tC.getUUID("leader"));
+            PartyData party = new PartyData(partyId = tC.getUUID("id"), tC.getUUID("leader"), true);
             ListTag members = tC.getList("members", Tag.TAG_COMPOUND);
             for (Tag m : members) {
                 CompoundTag mC = (CompoundTag) m;

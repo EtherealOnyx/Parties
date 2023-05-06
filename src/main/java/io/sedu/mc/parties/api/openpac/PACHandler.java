@@ -38,10 +38,11 @@ public class PACHandler implements IPACHandler {
     @Override
     public void initParties(MinecraftServer server) {
         Parties.LOGGER.info("Loading parties from Open Parties and Claims.");
+        Parties.LOGGER.debug("Current Party Size: " + PartyData.partyList.size());
         OpenPACServerAPI.get(server).getPartyManager().getAllStream().forEach(party -> {
             UUID partyId = party.getId();
             //Create new party.
-            PartyData pData = new PartyData(partyId, party.getOwner().getUUID());
+            PartyData pData = new PartyData(partyId, party.getOwner().getUUID(), false); //All members are added later.
             //For each member.
             party.getMemberInfoStream().forEach(member -> {
                 UUID pId = member.getUUID();
@@ -65,7 +66,7 @@ public class PACHandler implements IPACHandler {
             //Silently creating new party.
             Parties.LOGGER.debug("Silently creating party of one member...");
             Util.getPlayer(owner, p -> p.addParty(newPartyId));
-            PartyData pData = new PartyData(newPartyId, owner);
+            PartyData pData = new PartyData(newPartyId, owner, true);
             PartyData.partyList.put(newPartyId, pData);
             ServerPacketHelper.sendNewLeader(owner);
             PartySaveData.get().setDirty();
@@ -294,7 +295,7 @@ public class PACHandler implements IPACHandler {
             pm.getAllStream().forEach(party -> {
                 UUID partyId = party.getId();
                 //Create new party.
-                PartyData pData = new PartyData(partyId, party.getOwner().getUUID());
+                PartyData pData = new PartyData(partyId, party.getOwner().getUUID(), true);
                 //For each member.
                 party.getMemberInfoStream().forEach(member -> {
                     UUID pId = member.getUUID();

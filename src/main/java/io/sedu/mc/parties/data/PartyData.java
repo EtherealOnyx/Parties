@@ -43,11 +43,14 @@ public class PartyData {
         updateLeaderNew(initiator);
     }
 
-    public PartyData(UUID partyId, UUID leader) {
+    public PartyData(UUID partyId, UUID leader, boolean addToParty) {
         party = new ArrayList<>();
         this.partyId = partyId;
         this.leader = leader;
-        party.add(leader);
+        if (addToParty) {
+            party.add(leader);
+        }
+
     }
 
     private void updateLeaderNew(UUID initiator) {

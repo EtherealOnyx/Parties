@@ -310,6 +310,7 @@ public class HoverScreen extends Screen {
         menu.forEach(b -> b.visible = false);
         moveParty.forEach(b -> b.visible = false);
         moveFrame.forEach(b -> b.visible = false);
+
         switch (task) {
             case 0 -> {
                 //Standard screen
@@ -320,6 +321,18 @@ public class HoverScreen extends Screen {
             case 1 -> //Settings screen
             {
                 menu.forEach(b -> b.visible = true);
+                if (renderSelfFrame) {
+                    menu.get(1).active = true;
+                    menu.get(2).active = true;
+                } else {
+                    if (ClientPlayerData.playerList.size() > 1) {
+                        menu.get(1).active = true;
+                        menu.get(2).active = true;
+                    } else {
+                        menu.get(1).active = false;
+                        menu.get(2).active = false;
+                    }
+                }
                 notEditing = false;
             }
 
@@ -340,8 +353,13 @@ public class HoverScreen extends Screen {
                 fX.add(revertX);
                 fY.add(revertY);
                 notEditing = false;
-                botLim = frameEleH + framePosH*(ClientPlayerData.playerList.size() - 1);
-                rightLim = frameEleW + framePosW*(ClientPlayerData.playerList.size() - 1);
+                if (renderSelfFrame) {
+                    botLim = frameEleH + framePosH*(ClientPlayerData.playerList.size() - 1);
+                    rightLim = frameEleW + framePosW*(ClientPlayerData.playerList.size() - 1);
+                } else {
+                    botLim = frameEleH + framePosH*(Math.min(ClientPlayerData.playerList.size() - 2, 1));
+                    rightLim = frameEleW + framePosW*(Math.min(ClientPlayerData.playerList.size() - 2, 1));
+                }
             }
             case 4 -> {
                 //Still technically active?

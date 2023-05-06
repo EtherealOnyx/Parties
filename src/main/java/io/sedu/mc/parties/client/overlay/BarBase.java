@@ -232,6 +232,18 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
         }
     }
 
+    @Override
+    boolean isInBound(int mouseX, int mouseY) {
+        if (barMode) {
+            return mouseX > x - 2 && mouseY > y - 2
+                    && mouseX < x + 2 + width*scale && mouseY < y + 2 + height*scale;
+        } else {
+            return mouseX > x - 2 && mouseY > y - 2
+                    && mouseX < x + 2 + 9*scale && mouseY < y + 2 + 9*scale;
+        }
+
+    }
+
     private interface Renderer {
         void render(int i, ClientPlayerData id, PoseStack poseStack, BarBase barItem);
     }

@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
+import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
@@ -78,6 +79,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
     public static void updateModelRenderer() {
         modelOffset = ClientConfigData.rotationOffset.get();
         if (ClientConfigData.forceModelRotation.get()) {
+            Parties.LOGGER.debug("Forcing model rotation on...");
             modelRender = (pPosX, pPosY, posestack, pScale, pLivingEntity, partialTicks) -> {
                 posestack.pushPose();
                 posestack.translate((double)pPosX, (double)pPosY, 1050.0D);
@@ -122,6 +124,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             };
 
         } else {
+            Parties.LOGGER.debug("Forcing model rotation off...");
             modelRender = (pPosX, pPosY, posestack, pScale, pLivingEntity, partialTicks) -> {
                 posestack.pushPose();
                 posestack.translate(pPosX, pPosY, 1050.0D);
@@ -261,7 +264,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             if (renderType == 2 && id.shouldRenderModel)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 RenderItem.setColor(0,0,0,0);
-                renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, partialTicks);
+                renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, 1F);
                 RenderItem.resetColor();
                 return;
             }
