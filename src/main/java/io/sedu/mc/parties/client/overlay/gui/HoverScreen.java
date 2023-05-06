@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PEffects;
 import io.sedu.mc.parties.client.overlay.RenderItem;
@@ -80,6 +81,7 @@ public class HoverScreen extends Screen {
             Button b;
             //moveParty.add(addRenderableWidget(new Button(clickArea.l(0) + (clickArea.w() >> 1) - 9, clickArea.t(0) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("⬇"), pButton -> ClientPlayerData.swap(finalI, finalI+1))));
             if (ClientConfigData.renderSelfFrame.get()) {
+                Parties.LOGGER.debug("Initializing arrange buttons for when rendering self...");
                 for (int i = 0; i < ClientPlayerData.partySize(); i++) {
                     int finalI = i;
                     if (i == ClientPlayerData.partySize()-1) {
@@ -100,57 +102,69 @@ public class HoverScreen extends Screen {
                     //rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
                 }
             } else {
+                Parties.LOGGER.debug("Initializing arrange buttons for when NOT rendering self...");
                 for (int i = 0; i < selfIndex; i++) {
+                    Parties.LOGGER.debug("Current Index: " + i);
                     int finalI = i;
                     if (i == ClientPlayerData.partySize() - 1) {
+                        Parties.LOGGER.debug("Adding down disabled for " + i);
                         b = addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
                         b.active = false;
                         moveParty.add(b);
                     } else {
                         if (selfIndex == finalI + 1) {
                             if (finalI + 2 > ClientPlayerData.partySize() - 1) {
+                                Parties.LOGGER.debug("Adding down disabled for " + i);
                                 b = addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
                                 b.active = false;
                                 moveParty.add(b);
                             } else {
+                                Parties.LOGGER.debug("Adding down enabled for " + i);
                                 moveParty.add(addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 2), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
                             }
                         } else {
+                            Parties.LOGGER.debug("Adding down enabled for " + i);
                             moveParty.add(addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
                         }
                     }
                     if (i == 0) {
+                        Parties.LOGGER.debug("Adding up disabled for " + i);
                         b = addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
                         b.active = false;
                         moveParty.add(b);
-                    } else
+                    } else {
+                        Parties.LOGGER.debug("Adding up enabled for " + i);
                         moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
+                    }
+
                 }
-                for (int i = selfIndex+1; i < ClientPlayerData.partySize() - 1; i++) {
+                Parties.LOGGER.debug("Skipping self index value of " + selfIndex);
+                for (int i = selfIndex+1; i < ClientPlayerData.partySize(); i++) {
                     int finalI = i;
                     if (i == ClientPlayerData.partySize() - 1) {
+                        Parties.LOGGER.debug("Adding down disabled for " + i);
                         b = addRenderableWidget(new Button(clickArea.r(i-1) - 20, clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
                         b.active = false;
                         moveParty.add(b);
-                    } else
+                    } else {
+                        Parties.LOGGER.debug("Adding down enabled for " + i);
                         moveParty.add(addRenderableWidget(new Button(clickArea.r(i-1) - 20, clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
+                    }
 
-                    if (i == 0) {
-                        b = addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
-                        b.active = false;
-                        moveParty.add(b);
-                    } else
-                        if (selfIndex == finalI - 1) {
-                            if (finalI - 2 < 0) {
-                                b = addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
-                                b.active = false;
-                                moveParty.add(b);
-                            } else {
-                                moveParty.add(addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 2, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
-                            }
+                    if (selfIndex == finalI - 1) {
+                        if (finalI - 2 < 0) {
+                            Parties.LOGGER.debug("Adding up disabled for " + i);
+                            b = addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
+                            b.active = false;
+                            moveParty.add(b);
                         } else {
-                            moveParty.add(addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
+                            Parties.LOGGER.debug("Adding up enabled for " + i);
+                            moveParty.add(addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 2, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
                         }
+                    } else {
+                        Parties.LOGGER.debug("Adding up enabled for " + i);
+                        moveParty.add(addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
+                    }
                 }
             }
 
