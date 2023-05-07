@@ -23,22 +23,23 @@ public class PartySaveData extends SavedData
     }
 
     public PartySaveData() {
-        Parties.LOGGER.debug("Creating party save data...");
+        Parties.LOGGER.info("Creating party save data...");
     }
 
     public PartySaveData(CompoundTag tag) {
-        Parties.LOGGER.debug("Loading party save data...");
+        Parties.LOGGER.info("Loading party save data...");
         if (!ServerConfigData.isPersistEnabled() || ServerConfigData.isPartySyncEnabled()) {
-            Parties.LOGGER.debug("Loading cancelled, party persistence disabled or syncing from other parties mod...");
+            Parties.LOGGER.info("Loading cancelled, party persistence disabled or syncing from other parties mod...");
             return;
         }
 
         ListTag parties = tag.getList("parties", Tag.TAG_COMPOUND);
         for (Tag t : parties) {
+
             CompoundTag tC = (CompoundTag) t;
             //Add new party to save;
             UUID partyId;
-            PartyData party = new PartyData(partyId = tC.getUUID("id"), tC.getUUID("leader"), true);
+            PartyData party = new PartyData(partyId = tC.getUUID("id"), tC.getUUID("leader"), false);
             ListTag members = tC.getList("members", Tag.TAG_COMPOUND);
             for (Tag m : members) {
                 CompoundTag mC = (CompoundTag) m;
@@ -50,16 +51,25 @@ public class PartySaveData extends SavedData
             }
             //Then add party.
             PartyData.partyList.put(partyId, party);
+        }
 
+        Parties.LOGGER.debug("Created " + PartyData.partyList.size() + " parties.");
+        for (PartyData p : PartyData.partyList.values()) {
+            Parties.LOGGER.debug("Party with " + p.getMembers().size() + " people");
+            Parties.LOGGER.debug("Party leader is " + Util.getName(p.getLeader()));
+            for (UUID member : p.getMembers()) {
+                Parties.LOGGER.debug("Party member: " + Util.getName(member));
+
+            }
         }
     }
 
 
     @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
-        Parties.LOGGER.debug("Saving parties to disk...");
+        Parties.LOGGER.info("Saving parties to disk...");
         if (!ServerConfigData.isPersistEnabled()) {
-            Parties.LOGGER.debug("Saving cancelled, party persistence disabled...");
+            Parties.LOGGER.info("Saving cancelled, party persistence disabled...");
             return tag;
         }
         ListTag list = new ListTag();

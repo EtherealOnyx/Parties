@@ -346,13 +346,11 @@ public class PartyEvent {
         if (l != null) {
             PartySaveData.globalLevel = l;
             Parties.LOGGER.debug("Level saved successfully...");
-            if (ServerConfigData.isPersistEnabled()) {
-                if (ServerConfigData.isPartySyncEnabled()) {
-                    PACCompatManager.getHandler().initParties(event.getServer());
-                }
-            } else {
-                PartySaveData.get(); //Load it into cache.
+            if (ServerConfigData.isPartySyncEnabled()) {
+                PACCompatManager.getHandler().initParties(event.getServer());
+                return;
             }
+            PartySaveData.get(); //Load it into cache.
         }
     }
 }

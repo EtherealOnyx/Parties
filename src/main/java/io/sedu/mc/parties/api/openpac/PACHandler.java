@@ -295,7 +295,7 @@ public class PACHandler implements IPACHandler {
             pm.getAllStream().forEach(party -> {
                 UUID partyId = party.getId();
                 //Create new party.
-                PartyData pData = new PartyData(partyId, party.getOwner().getUUID(), true);
+                PartyData pData = new PartyData(partyId, party.getOwner().getUUID(), false);
                 //For each member.
                 party.getMemberInfoStream().forEach(member -> {
                     UUID pId = member.getUUID();
