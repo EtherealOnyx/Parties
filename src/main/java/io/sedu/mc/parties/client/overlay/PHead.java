@@ -20,7 +20,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
-import static io.sedu.mc.parties.util.RenderUtils.renderEntityInInventoryAttempt2;
+import static io.sedu.mc.parties.util.RenderUtils.renderEntityInInventory;
 import static io.sedu.mc.parties.util.RenderUtils.renderFlame;
 
 public class PHead extends RenderSelfItem implements TooltipItem {
@@ -41,7 +41,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
         renderSelf = (i, id, gui, poseStack, partialTicks) -> {
             if (renderType != 0 && id.clientPlayer != null && !id.getDim().active)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
-                renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, partialTicks);
+                renderEntityInInventory((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, partialTicks);
 
                 return;
             }
@@ -59,7 +59,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             if (renderType == 2 && id.shouldRenderModel)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 RenderItem.setColor(0,0,0,0);
-                renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, 1F);
+                renderEntityInInventory((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, 1F);
                 RenderItem.resetColor();
                 return;
             }
@@ -204,7 +204,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             }
             if (renderType != 0 && id.clientPlayer != null && !id.getDim().active)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
-                renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) ((y(i))*scale), scale, (int) (15*scale), id.clientPlayer, partialTicks);
+                renderEntityInInventory((int) ((x(i)+16)*scale), (int) ((y(i))*scale), scale, (int) (15*scale), id.clientPlayer, partialTicks);
                 return;
             }
             RenderSystem.enableDepthTest();
@@ -264,7 +264,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             if (renderType == 2 && id.shouldRenderModel)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 RenderItem.setColor(0,0,0,0);
-                renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, 1F);
+                renderEntityInInventory((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, 1F);
                 RenderItem.resetColor();
                 return;
             }

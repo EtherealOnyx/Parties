@@ -2,7 +2,7 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
+import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import io.sedu.mc.parties.client.overlay.anim.ManaSSAnim;

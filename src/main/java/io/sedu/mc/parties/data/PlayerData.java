@@ -1,6 +1,8 @@
 package io.sedu.mc.parties.data;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.helper.PartyAPI;
+import io.sedu.mc.parties.api.helper.PlayerAPI;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -116,7 +118,7 @@ public class PlayerData {
             playerTrackers.put(toTrack, new HashMap<>());
         }
         playerTrackers.get(toTrack).put(trackerHost, true);
-        Util.getPlayer(trackerHost, PlayerData::markDirty);
+        PlayerAPI.getPlayer(trackerHost, PlayerData::markDirty);
     }
 
     private void markDirty() {
@@ -130,12 +132,12 @@ public class PlayerData {
         playerTrackers.get(toTrack).remove(trackerHost);
         if (playerTrackers.get(toTrack).size() == 0)
             playerTrackers.remove(toTrack);
-        Util.getPlayer(trackerHost, PlayerData::markDirty);
+        PlayerAPI.getPlayer(trackerHost, PlayerData::markDirty);
     }
 
     public static void changeTracker(UUID trackerHost, UUID toTrack, boolean serverTracked) {
         playerTrackers.get(toTrack).put(trackerHost, serverTracked);
-        Util.getPlayer(trackerHost, PlayerData::markDirty);
+        PlayerAPI.getPlayer(trackerHost, PlayerData::markDirty);
     }
 
     public void setHunger(int hunger, Consumer<Integer> action) {
@@ -211,6 +213,13 @@ public class PlayerData {
         }
     }
 
+    public void setQuench(int v, Consumer<Integer> action) {
+        if ((int) dataItems.getOrDefault(QUENCH, 0) != v) {
+            dataItems.put(QUENCH, v);
+            action.accept(v);
+        }
+    }
+
     public void setWorldTemp(float v, Consumer<Float> action) {
         if ((float) dataItems.getOrDefault(WORLDTEMP, 0f) != v) {
             dataItems.put(WORLDTEMP, v);
@@ -241,6 +250,10 @@ public class PlayerData {
 
     public int getThirst() {
         return (int) dataItems.getOrDefault(THIRST, 0);
+    }
+
+    public int getQuench() {
+        return (int) dataItems.getOrDefault(QUENCH, 0);
     }
 
     public float getWorldTemp() {
@@ -362,8 +375,8 @@ public class PlayerData {
 
     private void redoList(UUID id) {
         Parties.LOGGER.debug("Refreshing members for XP share!");
-        nearMembers = Util.getNearMembersWithoutSelf(id);
-        globalMembers = Util.getOnlineMembersWithoutSelf(id);
+        nearMembers = PartyAPI.getNearMembersWithoutSelf(id);
+        globalMembers = PartyAPI.getOnlineMembersWithoutSelf(id);
         listDirty = false;
     }
 }

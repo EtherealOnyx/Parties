@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.data;
 
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.openpac.PACCompatManager;
+import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ServerConfigData {

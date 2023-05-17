@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.mixin;
 
-import io.sedu.mc.parties.api.hardcorerevival.HREventHandler;
+import io.sedu.mc.parties.api.mod.hardcorerevival.HREventHandler;
 import net.blay09.mods.hardcorerevival.HardcoreRevival;
 import net.blay09.mods.hardcorerevival.HardcoreRevivalManager;
 import net.minecraft.world.entity.player.Player;

@@ -1,16 +1,16 @@
 package io.sedu.mc.parties.setup;
 
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
-import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
-import io.sedu.mc.parties.api.epicfight.EFCompatManager;
-import io.sedu.mc.parties.api.feathers.FCompatManager;
-import io.sedu.mc.parties.api.hardcorerevival.HRCompatManager;
-import io.sedu.mc.parties.api.openpac.PACCompatManager;
-import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
-import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
-import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
-import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
+import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
+import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
+import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
+import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
+import io.sedu.mc.parties.api.mod.hardcorerevival.HRCompatManager;
+import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
+import io.sedu.mc.parties.api.mod.playerrevive.PRCompatManager;
+import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
+import io.sedu.mc.parties.api.mod.thirstmod.TMCompatManager;
+import io.sedu.mc.parties.api.mod.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.commands.NotSelfArgument;
 import io.sedu.mc.parties.network.PartiesPacketHandler;
 import net.minecraft.commands.synchronization.ArgumentTypes;

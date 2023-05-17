@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.mixin;
 
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.openpac.PACCompatManager;
+import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
 import io.sedu.mc.parties.data.ServerConfigData;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;

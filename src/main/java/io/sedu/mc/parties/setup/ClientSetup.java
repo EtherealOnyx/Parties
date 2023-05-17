@@ -1,12 +1,10 @@
 package io.sedu.mc.parties.setup;
 
-import io.sedu.mc.parties.api.hardcorerevival.HRHandler;
-import io.sedu.mc.parties.api.playerrevive.PRHandler;
+import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.*;
 import io.sedu.mc.parties.events.ClientEvent;
-import io.sedu.mc.parties.util.ColorUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ClientRegistry;
@@ -32,7 +30,7 @@ public class ClientSetup {
 
     private static final IIngameOverlay control = (gui, poseStack, partialTicks, width, height) -> {
         RenderItem.resetPos();
-        ColorUtils.tick();
+        ColorAPI.tick();
     };
 
     public static void init(final FMLClientSetupEvent event) {
@@ -124,7 +122,7 @@ public class ClientSetup {
     public static void postInit(FMLLoadCompleteEvent event) {
         DimConfig.init();
         event.enqueueWork(() -> {
-            if (PRHandler.exists() || HRHandler.exists()) {
+            if (ModList.get().isLoaded("playerrevive") || ModList.get().isLoaded("hardcorerevival")) {
                 ((PHead)RenderItem.items.get("head")).updateRendererForMods();
                 ((PDead)RenderItem.items.get("dead")).updateRendererForMods();
                 BarBase.updateRendererForMods();

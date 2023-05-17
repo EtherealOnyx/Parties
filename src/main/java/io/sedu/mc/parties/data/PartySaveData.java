@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.data;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.helper.PlayerAPI;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -56,9 +57,9 @@ public class PartySaveData extends SavedData
         Parties.LOGGER.debug("Created " + PartyData.partyList.size() + " parties.");
         for (PartyData p : PartyData.partyList.values()) {
             Parties.LOGGER.debug("Party with " + p.getMembers().size() + " people");
-            Parties.LOGGER.debug("Party leader is " + Util.getName(p.getLeader()));
+            Parties.LOGGER.debug("Party leader is " + PlayerAPI.getName(p.getLeader()));
             for (UUID member : p.getMembers()) {
-                Parties.LOGGER.debug("Party member: " + Util.getName(member));
+                Parties.LOGGER.debug("Party member: " + PlayerAPI.getName(member));
 
             }
         }
@@ -80,7 +81,7 @@ public class PartySaveData extends SavedData
             ListTag partyMems = new ListTag();
             partyData.getMembers().forEach((id) -> {
                 CompoundTag playerTag = new CompoundTag();
-                playerTag.putString("name", Util.getName(id));
+                playerTag.putString("name", PlayerAPI.getName(id));
                 playerTag.putUUID("id", id);
                 partyMems.add(playerTag);
             });

@@ -12,6 +12,7 @@ public enum DataType {
 
     //TaN/Thirst was Taken/ColdSweat
     THIRST,
+    QUENCH,
     WORLDTEMP,
     BODYTEMP,
 
@@ -29,5 +30,5 @@ public enum DataType {
     //Spells and Shields
     SSMANA,
     SSMANAMAX,
-    SSMANAABS,
+    SSMANAABS
 }

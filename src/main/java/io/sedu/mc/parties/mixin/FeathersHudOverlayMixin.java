@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.mixin;
 
 import com.elenai.feathers.client.gui.FeathersHudOverlay;
-import io.sedu.mc.parties.api.feathers.FCompatManager;
+import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

@@ -2,8 +2,8 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.sedu.mc.parties.api.epicfight.EFCompatManager;
-import io.sedu.mc.parties.api.feathers.FCompatManager;
+import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
+import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.anim.StaminAnim;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;

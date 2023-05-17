@@ -6,7 +6,7 @@ import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PEffects;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import io.sedu.mc.parties.data.ClientConfigData;
-import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.api.helper.ColorAPI;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -64,7 +64,7 @@ public class HoverScreen extends Screen {
     protected void init() {
         trimmedMessages = minecraft.gui.getChat().trimmedMessages;
 
-        ColorUtils.colorCycle = true;
+        ColorAPI.colorCycle = true;
         int y = Math.max(0, clickArea.t(0) - 10);
         int x = clickArea.l(0);
         settingsButton = addRenderableWidget(new SmallButton(x, y, "⚙", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.partysettings")), 0, .5f, .5f, .5f, 1f));
@@ -500,7 +500,7 @@ public class HoverScreen extends Screen {
 
     @Override
     public void onClose() {
-        ColorUtils.colorCycle = false;
+        ColorAPI.colorCycle = false;
         notEditing = false;
         if (isMoving) {
             revertPos();

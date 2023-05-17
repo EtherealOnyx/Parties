@@ -6,7 +6,7 @@ import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.*;
 import io.sedu.mc.parties.network.PartiesPacketHandler;
 import io.sedu.mc.parties.network.StringPacketData;
-import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -201,7 +201,7 @@ public class SettingsScreen extends Screen {
 
     @Override
     public void onClose() {
-        ColorUtils.colorCycle = false;
+        ColorAPI.colorCycle = false;
         notEditing = true;
         PHead.icon = null;
         PName.sign = null;
@@ -235,15 +235,15 @@ public class SettingsScreen extends Screen {
             renderSelection(poseStack);
 
         if (draggingWindow) {
-            RenderUtils.borderRectNoA(poseStack.last().pose(), 0, 1, screenX, screenY, screenW, screenH, ColorUtils.getRainbowColor());
-            RenderUtils.sizeRect(poseStack.last().pose(), screenX, screenY, 0, screenW, screenH, ColorUtils.getRainbowColor() | 40 << 24);
+            RenderUtils.borderRectNoA(poseStack.last().pose(), 0, 1, screenX, screenY, screenW, screenH, ColorAPI.getRainbowColor());
+            RenderUtils.sizeRect(poseStack.last().pose(), screenX, screenY, 0, screenW, screenH, ColorAPI.getRainbowColor() | 40 << 24);
             move(pMouseX, pMouseY);
             return;
         } else if (oldMX != null) {
             save();
             return;
         }
-        RenderUtils.offRectNoA(poseStack.last().pose(), screenX, screenY, -1, -1, screenW, screenH, ColorUtils.getRainbowColor(), 0x232323);
+        RenderUtils.offRectNoA(poseStack.last().pose(), screenX, screenY, -1, -1, screenW, screenH, ColorAPI.getRainbowColor(), 0x232323);
         RenderSystem.enableDepthTest();
         this.options.render(poseStack, pMouseX, pMouseY, pPartialTick);
         assert minecraft != null;
@@ -256,7 +256,7 @@ public class SettingsScreen extends Screen {
 
         //Presets
         renderPresetBox();
-        font.drawShadow(poseStack, "Save Preset", presetBoxX + (presetBoxW>>1) - 31, presetBoxY + 3, ColorUtils.getRainbowColor());
+        font.drawShadow(poseStack, "Save Preset", presetBoxX + (presetBoxW>>1) - 31, presetBoxY + 3, ColorAPI.getRainbowColor());
         font.drawShadow(poseStack, "Name:", nameBox.x - 29, nameBox.y, 0xFFFFFF);
         font.drawShadow(poseStack, "Desc:", descBox.x - 29, descBox.y, 0xFFFFFF);
         renderShadows(poseStack);
@@ -306,7 +306,7 @@ public class SettingsScreen extends Screen {
     }
 
     private void renderSelection(PoseStack poseStack) {
-        RenderUtils.borderRectNoA(poseStack.last().pose(), 0, 1, selBoxX, selBoxY, selBoxW, selBoxH, ColorUtils.getRainbowColor());
+        RenderUtils.borderRectNoA(poseStack.last().pose(), 0, 1, selBoxX, selBoxY, selBoxW, selBoxH, ColorAPI.getRainbowColor());
     }
 
 
@@ -340,7 +340,7 @@ public class SettingsScreen extends Screen {
 
     protected void init() {
         initMiscButtons();
-        ColorUtils.colorCycle = true;
+        ColorAPI.colorCycle = true;
         RenderItem.initUpdater(updater);
         RenderItem.initGetter(getter);
         notEditing = isPresetOnly;

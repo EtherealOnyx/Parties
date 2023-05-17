@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.client.overlay;
 
-import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.api.helper.ColorAPI;
 import net.minecraft.network.chat.TranslatableComponent;
 
 public abstract class OverflowBarBase extends BarBase {
@@ -19,13 +19,13 @@ public abstract class OverflowBarBase extends BarBase {
 
     protected void setOverflowColors() {
         float hue = this.oHue/100f;
-        absorbColor = ColorUtils.HSBtoRGB(hue, .3f, 1f);
-        bAColorTop = ColorUtils.HSBtoRGB(hue, .5f, 1f);
-        bAColorBot = ColorUtils.HSBtoRGB(hue, .4f, .75f);
-        colorTopAbsorb = ColorUtils.HSBtoRGB(hue, .75f, 1f);
-        colorBotAbsorb = ColorUtils.HSBtoRGB(hue, .9f, .7f);
-        colorAbsTop = ColorUtils.HSBtoRGB(hue, .55f, 1f);
-        colorAbsBot = ColorUtils.HSBtoRGB(hue, .35f, .69f);
+        absorbColor = ColorAPI.HSBtoRGB(hue, .3f, 1f);
+        bAColorTop = ColorAPI.HSBtoRGB(hue, .5f, 1f);
+        bAColorBot = ColorAPI.HSBtoRGB(hue, .4f, .75f);
+        colorTopAbsorb = ColorAPI.HSBtoRGB(hue, .75f, 1f);
+        colorBotAbsorb = ColorAPI.HSBtoRGB(hue, .9f, .7f);
+        colorAbsTop = ColorAPI.HSBtoRGB(hue, .55f, 1f);
+        colorAbsBot = ColorAPI.HSBtoRGB(hue, .35f, .69f);
     }
 
     protected SmallBound setOverflowHue(int d) {

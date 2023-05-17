@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import static io.sedu.mc.parties.client.overlay.ClientPlayerData.*;
-import static io.sedu.mc.parties.data.Util.getClientPlayer;
+import static io.sedu.mc.parties.api.helper.PlayerAPI.getClientPlayer;
 
 public class ClientPacketHelper {
 

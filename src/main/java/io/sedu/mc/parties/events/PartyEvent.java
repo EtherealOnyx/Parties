@@ -1,13 +1,14 @@
 package io.sedu.mc.parties.events;
 
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.openpac.PACCompatManager;
+import io.sedu.mc.parties.api.helper.PartyAPI;
+import io.sedu.mc.parties.api.helper.PlayerAPI;
+import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PartySaveData;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.data.ServerConfigData;
-import io.sedu.mc.parties.data.Util;
 import io.sedu.mc.parties.network.ClientPacketHelper;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
@@ -38,7 +39,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import static io.sedu.mc.parties.data.ServerConfigData.playerUpdateInterval;
-import static io.sedu.mc.parties.data.Util.getPlayer;
+import static io.sedu.mc.parties.api.helper.PlayerAPI.getPlayer;
 
 @Mod.EventBusSubscriber(modid = Parties.MODID)
 public class PartyEvent {
@@ -48,7 +49,7 @@ public class PartyEvent {
         if (!event.getPlayer().level.isClientSide) {
             UUID id = event.getPlayer().getUUID();
             PlayerData pD;
-            if ((pD = Util.getNormalPlayer(id)) == null) {
+            if ((pD = PlayerAPI.getNormalPlayer(id)) == null) {
                 pD = new PlayerData(id);
             }
             pD.setServerPlayer((ServerPlayer) event.getPlayer());//.setOnline();
@@ -160,7 +161,7 @@ public class PartyEvent {
                 && event.getSource() != null
                 && event.getSource().getEntity() instanceof Player source
                 && !ServerConfigData.friendlyFire.get()
-                && Util.inSameParty(source.getUUID(), p.getUUID())) {
+                && PartyAPI.inSameParty(source.getUUID(), p.getUUID())) {
             event.setCanceled(true);
         }
 

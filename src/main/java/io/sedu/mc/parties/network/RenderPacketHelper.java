@@ -7,7 +7,7 @@ import net.minecraft.client.Minecraft;
 
 import java.util.UUID;
 
-import static io.sedu.mc.parties.data.Util.getClientPlayer;
+import static io.sedu.mc.parties.api.helper.PlayerAPI.getClientPlayer;
 
 
 public class RenderPacketHelper {
@@ -157,5 +157,10 @@ public class RenderPacketHelper {
     public static void setExtraStam(UUID player, Integer data) {
         Parties.LOGGER.debug("Setting extra stamina...");
         getClientPlayer(player, p -> p.setExtraStam(data));
+    }
+
+    public static void setQuench(UUID player, Integer data) {
+        Parties.LOGGER.debug("Setting quench level...");
+        getClientPlayer(player, p -> p.setQuench(data));
     }
 }

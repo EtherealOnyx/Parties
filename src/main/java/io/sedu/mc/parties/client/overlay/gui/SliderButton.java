@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
-import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
@@ -23,7 +23,7 @@ public class SliderButton extends SmallButton {
     SliderButton.OnRelease onReleaseAction;
 
     public SliderButton(int color, int w, SliderButton.OnDrag onDrag, SliderButton.OnRelease onRelease, OnTooltip pOnTooltip, float alpha) {
-        super(0, 0, w, "", pButton -> {}, pOnTooltip, 0, 0, ColorUtils.getR(color), ColorUtils.getG(color), ColorUtils.getB(color), alpha);
+        super(0, 0, w, "", pButton -> {}, pOnTooltip, 0, 0, ColorAPI.getR(color), ColorAPI.getG(color), ColorAPI.getB(color), alpha);
         this.onDragAction = onDrag;
         this.onReleaseAction = onRelease;
         this.color = color;

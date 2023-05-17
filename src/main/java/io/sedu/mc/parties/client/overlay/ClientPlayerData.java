@@ -4,14 +4,14 @@ package io.sedu.mc.parties.client.overlay;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
-import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
-import io.sedu.mc.parties.api.epicfight.EFCompatManager;
-import io.sedu.mc.parties.api.feathers.FCompatManager;
-import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
-import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
-import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
-import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
+import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
+import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
+import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
+import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
+import io.sedu.mc.parties.api.mod.playerrevive.PRCompatManager;
+import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
+import io.sedu.mc.parties.api.mod.thirstmod.TMCompatManager;
+import io.sedu.mc.parties.api.mod.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.anim.*;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
@@ -93,6 +93,8 @@ public class ClientPlayerData {
             data.put(EF_STAM, new StaminAnim(20, true));
         if (SSCompatManager.active())
             data.put(SSMANA, new ManaSSAnim(20, true));
+        if (TMCompatManager.active() || TANCompatManager.active())
+            data.put(THIRST, new ThirstAnim(20, true));
 
     }
     public static void getOrderedPlayer(int index, Consumer<ClientPlayerData> action) {
@@ -410,12 +412,17 @@ public class ClientPlayerData {
         this.data.put(REVIVEPROG, data);
     }
 
-    public int getThirst() {
-        return (int) data.getOrDefault(THIRST, 0);
+    public void getThirst(Consumer<ThirstAnim> action) {
+        data.computeIfPresent(THIRST, (data, stam) -> {
+            action.accept((ThirstAnim) stam);
+            return stam;
+        });
     }
 
+
+
     public void setThirst(Integer data) {
-        this.data.put(THIRST, data);
+        getThirst(thirst -> thirst.checkHealth(data));
     }
 
     public void setWorldTemp(Float data) {
@@ -432,6 +439,7 @@ public class ClientPlayerData {
                         new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(
                                 new TranslatableComponent("messages.sedparties.api.coldsweatunload").withStyle(ChatFormatting.RED))
                         , Minecraft.getInstance().player.getUUID());
+            Parties.LOGGER.error("Failed to support Cold Sweat!", t);
         }
     }
 
@@ -456,6 +464,7 @@ public class ClientPlayerData {
                             new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(
                             new TranslatableComponent("messages.sedparties.api.coldsweatunload").withStyle(ChatFormatting.RED))
                             , Minecraft.getInstance().player.getUUID());
+                Parties.LOGGER.error("Failed to support Cold Sweat!", t);
             }
 
         }
@@ -477,13 +486,14 @@ public class ClientPlayerData {
 
     public void updateThirst() {
         if (clientPlayer != null) {
-            data.put(THIRST, TMCompatManager.getHandler().getThirst(clientPlayer));
+            getThirst(thirst -> thirst.checkAnim(TMCompatManager.getHandler().getThirst(clientPlayer), 20, TMCompatManager.getHandler()
+                                                                                                                          .getQuench(clientPlayer)));
         }
     }
 
     public void updateThirstTAN() {
         if (clientPlayer != null) {
-            data.put(THIRST, TANCompatManager.getHandler().getPlayerThirst(clientPlayer));
+            getThirst(thirst -> thirst.checkHealth(TANCompatManager.getHandler().getPlayerThirst(clientPlayer)));
         }
     }
 
@@ -628,6 +638,10 @@ public class ClientPlayerData {
 
     public void setExtraStam(Integer data) {
         getStaminaEF(stam -> stam.checkAbsorb(data));
+    }
+
+    public void setQuench(int data) {
+        getThirst(thirst -> thirst.checkAbsorb(data));
     }
 }
 

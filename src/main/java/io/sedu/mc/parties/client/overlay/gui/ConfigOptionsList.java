@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.RenderItem;
-import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -536,9 +536,9 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         }
 
         private void updateIndValues() {
-            rI = ColorUtils.getRI(value);
-            gI = ColorUtils.getGI(value);
-            bI = ColorUtils.getBI(value);
+            rI = ColorAPI.getRI(value);
+            gI = ColorAPI.getGI(value);
+            bI = ColorAPI.getBI(value);
             r.setValue(String.valueOf(rI));
             g.setValue(String.valueOf(gI));
             b.setValue(String.valueOf(bI));

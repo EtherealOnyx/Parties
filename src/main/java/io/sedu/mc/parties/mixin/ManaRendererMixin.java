@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.mixin;
 
 import de.cas_ual_ty.spells.client.ManaRenderer;
-import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
+import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

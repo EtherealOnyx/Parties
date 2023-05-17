@@ -20,7 +20,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.18.2-0.4.5'
+version = '1.18.2-0.5.0'
 group = 'io.sedu.mc.sedparties' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'sedparties'
 
@@ -203,10 +203,11 @@ dependencies {
     compileOnly files("libs/Thirst--1.18.2-1.2.3.jar")
 
     //Cold Sweat
-    compileOnly fg.deobf("curse.maven:coldsweat-506194:4459981")
+    //compileOnly fg.deobf("curse.maven:coldsweat-506194:4459981")
+    compileOnly fg.deobf("curse.maven:coldsweat-506194:4512295")
 
     //Tough as Nails
-    compileOnly fg.deobf("curse.maven:toughasnails-246391:3804267") //impl
+    implementation fg.deobf("curse.maven:toughasnails-246391:3804267") //impl
 
     //Ars Nouveau Support
     compileOnly fg.deobf("curse.maven:arsnoveau-401955:4052851") //impl

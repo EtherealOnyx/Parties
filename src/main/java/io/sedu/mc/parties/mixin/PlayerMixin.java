@@ -1,9 +1,10 @@
 package io.sedu.mc.parties.mixin;
 
+import io.sedu.mc.parties.api.helper.PartyAPI;
+import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.data.PartyData;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.data.ServerConfigData;
-import io.sedu.mc.parties.data.Util;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,10 +21,10 @@ public abstract class PlayerMixin {
         if (pXpPoints < 0 ) return pXpPoints;
         if (!ServerConfigData.enableShare.get()) return pXpPoints;
         PlayerData pd;
-        if ((pd = Util.getNormalPlayer(((Player)(Object)this).getUUID())) == null) return pXpPoints;
+        if ((pd = PlayerAPI.getNormalPlayer(((Player)(Object)this).getUUID())) == null) return pXpPoints;
         List<Player> members = ServerConfigData.globalShare.get() ? pd.getOnlineMembers() : pd.getNearbyMembers();
         if (members.size() > 0) { //Has party
-            PartyData party = Util.getPartyFromMember(((Player)(Object)this).getUUID());
+            PartyData party = PartyAPI.getPartyFromMember(((Player)(Object)this).getUUID());
             assert party != null;
             pXpPoints += party.getXpOverflow();
             int sharedXp = pXpPoints / (members.size()+1);
