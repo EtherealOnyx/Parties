@@ -60,9 +60,9 @@ public class PHealth extends OverflowBarBase {
         }
         if (textEnabled)
             if (hA.absorb > 0) {
-                textCentered(tX(i), tY(i), gui, poseStack, hA.healthText, absorbColor);
+                textCentered(tX(i), tY(i), gui, poseStack, hA.displayText, absorbColor);
             } else {
-                textCentered(tX(i), tY(i), gui, poseStack, hA.healthText, color);
+                textCentered(tX(i), tY(i), gui, poseStack, hA.displayText, color);
             }
 
     }
@@ -74,7 +74,10 @@ public class PHealth extends OverflowBarBase {
         if (iconEnabled) {
             setup(GUI_ICONS_LOCATION);
             float percent = hA.getPercentE();
-            if (percent > .8f) {
+            if (hA.absorb > 0) {
+                blit(poseStack,x(i), y(i), 16, 0, 9, 9);
+                blit(poseStack,x(i), y(i), 160, 0, 9, 9);
+            } else if (percent > .8f) {
                 blit(poseStack,x(i), y(i), 16, 0, 9, 9);
                 blit(poseStack,x(i), y(i), 52, 0, 9, 9);
             } else if (percent > .6f) {
@@ -90,9 +93,9 @@ public class PHealth extends OverflowBarBase {
 
         if (textEnabled)
             if (hA.absorb > 0) {
-                text(tXI(i), tYI(i), gui, poseStack, hA.healthText, absorbColor);
+                text(tXI(i), tYI(i), gui, poseStack, hA.displayText, absorbColor);
             } else {
-                text(tXI(i), tYI(i), gui, poseStack, hA.healthText, color);
+                text(tXI(i), tYI(i), gui, poseStack, hA.displayText, color);
             }
     }
 
@@ -199,7 +202,7 @@ public class PHealth extends OverflowBarBase {
         c.addTitleEntry("text");
         c.addBooleanEntry("tdisplay", textEnabled);
         c.addBooleanEntry("tshadow", textShadow);
-        c.addSliderEntry("ttype", 0, () -> 2, HealthAnim.type);
+        c.addSliderEntry("ttype", 0, () -> 3, HealthAnim.type);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
         entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));

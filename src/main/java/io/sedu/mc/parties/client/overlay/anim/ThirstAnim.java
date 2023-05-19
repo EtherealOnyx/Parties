@@ -5,10 +5,7 @@ import io.sedu.mc.parties.client.overlay.RenderItem;
 
 public class ThirstAnim extends AnimHandler {
 
-    public float cur = 0f;
-    public float max = 20f;
-    public float absorb = 0f;
-    public String thirstText = "";
+
     public static int type;
 
     public float oldH, curH, oldA, curA = 0f;
@@ -57,6 +54,11 @@ public class ThirstAnim extends AnimHandler {
     }
 
     @Override
+    int getType() {
+        return type;
+    }
+
+    @Override
     public void activate(Object... data) {
         activateValues(data);
         animTime = length;
@@ -88,19 +90,6 @@ public class ThirstAnim extends AnimHandler {
             max = pMax;
             absorb = pAbsorb;
             updateText();
-        }
-    }
-
-    private void updateText() {
-        switch (type) {
-            case 0 -> thirstText = DF.format(cur + absorb) + "/" + DF.format(max);
-            case 1 -> {
-                if (absorb > 0)
-                    thirstText = DF.format(cur) + " (" + DF.format(absorb) + ")";
-                else
-                    thirstText = DF.format(cur);
-            }
-            case 2 -> thirstText = DF.format(((cur + absorb) / max) * 100) + "%";
         }
     }
 

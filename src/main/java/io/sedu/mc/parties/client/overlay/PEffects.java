@@ -66,7 +66,9 @@ public abstract class PEffects extends RenderSelfItem {
         effectItems.forEach(item -> {
             int newX = (posX - item.x)/(item.width/2);
             if (newX < item.maxPerRow) {
-                int eleIndex = ((posY - item.y)/(item.height/2))*item.maxPerRow + newX;
+                int eleIndex = (posY - item.y);
+                if (eleIndex < 0) return;
+                eleIndex = (eleIndex/(item.height/2))*item.maxPerRow + newX;
                 if (eleIndex < item.maxSize && eleIndex > -1) {
                     action.accept(item, eleIndex);
                 }

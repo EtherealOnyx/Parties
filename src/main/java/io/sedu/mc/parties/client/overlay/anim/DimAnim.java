@@ -37,6 +37,11 @@ public class DimAnim extends AnimHandler {
     }
 
     @Override
+    int getType() {
+        return 0;
+    }
+
+    @Override
     public void activate(Object... data) {
         if (animActive) {
             super.activate(data);

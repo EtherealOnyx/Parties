@@ -55,7 +55,7 @@ public class PMana extends BarBase {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 255 - id.alphaI << 24);
             }
             if (textEnabled)
-                textCentered(tX(i), tY(i), gui, poseStack, mana.manaText, color);
+                textCentered(tX(i), tY(i), gui, poseStack, mana.displayText, color);
         });
     }
 
@@ -69,7 +69,7 @@ public class PMana extends BarBase {
             }
 
             if (textEnabled)
-                text(tXI(i), tYI(i), gui, poseStack, mana.manaText, color);
+                text(tXI(i), tYI(i), gui, poseStack, mana.displayText, color);
         });
     }
 

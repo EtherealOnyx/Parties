@@ -58,9 +58,9 @@ public class PStamina extends OverflowBarBase {
             }
             if (textEnabled)
                 if (staminAnim.absorb > 0) {
-                    textCentered(tX(i), tY(i), gui, poseStack, staminAnim.stamText, absorbColor);
+                    textCentered(tX(i), tY(i), gui, poseStack, staminAnim.displayText, absorbColor);
                 } else {
-                    textCentered(tX(i), tY(i), gui, poseStack, staminAnim.stamText, color);
+                    textCentered(tX(i), tY(i), gui, poseStack, staminAnim.displayText, color);
                 }
         });
 
@@ -78,9 +78,9 @@ public class PStamina extends OverflowBarBase {
 
             if (textEnabled)
                 if (staminAnim.absorb > 0) {
-                    text(tXI(i), tYI(i), gui, poseStack, staminAnim.stamText, absorbColor);
+                    text(tXI(i), tYI(i), gui, poseStack, staminAnim.displayText, absorbColor);
                 } else {
-                    text(tXI(i), tYI(i), gui, poseStack, staminAnim.stamText, color);
+                    text(tXI(i), tYI(i), gui, poseStack, staminAnim.displayText, color);
                 }
         });
 
@@ -191,7 +191,7 @@ public class PStamina extends OverflowBarBase {
         c.addTitleEntry("text");
         c.addBooleanEntry("tdisplay", textEnabled);
         c.addBooleanEntry("tshadow", textShadow);
-        c.addSliderEntry("ttype", 0, () -> 2, StaminAnim.type);
+        c.addSliderEntry("ttype", 0, () -> 3, StaminAnim.type);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
         entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));

@@ -5,8 +5,7 @@ import io.sedu.mc.parties.client.overlay.RenderItem;
 
 public class HungerAnim extends AnimHandler {
 
-    public float cur = 0f;
-    public String hungerText = "";
+
     public static int type;
 
     public float oldH, curH = 0f;
@@ -15,6 +14,7 @@ public class HungerAnim extends AnimHandler {
 
     public HungerAnim(int length, boolean enabled) {
         super(length, enabled);
+        max = 20; //Default
         updateText();
     }
 
@@ -40,6 +40,11 @@ public class HungerAnim extends AnimHandler {
     }
 
     @Override
+    int getType() {
+        return type;
+    }
+
+    @Override
     public void activate(Object... data) {
         activateValues(data);
         animTime = length;
@@ -55,14 +60,6 @@ public class HungerAnim extends AnimHandler {
             return true;
         }
         return false;
-    }
-
-    private void updateText() {
-        switch (type) {
-            case 0 -> hungerText = DF.format(cur) + "/" + 20;
-            case 1 -> hungerText = DF.format(cur);
-            case 2 -> hungerText = DF.format((cur / 20) * 100) + "%";
-        }
     }
 
     public void reset(float pCur) {

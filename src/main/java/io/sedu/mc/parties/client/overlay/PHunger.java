@@ -8,7 +8,6 @@ import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
@@ -19,7 +18,7 @@ import static io.sedu.mc.parties.client.overlay.anim.AnimHandler.DF;
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
-public class PHunger extends BarBase {
+public class PHunger extends OverflowBarBase {
 
     public PHunger(String name) {
         super(name, new TranslatableComponent("ui.sedparties.tooltip.hunger"));
@@ -56,7 +55,7 @@ public class PHunger extends BarBase {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 255 - id.alphaI << 24);
             }
             if (textEnabled)
-                textCentered(tX(i), tY(i), gui, poseStack, hunger.hungerText, color);
+                textCentered(tX(i), tY(i), gui, poseStack, hunger.displayText, color);
         });
     }
 
@@ -85,7 +84,7 @@ public class PHunger extends BarBase {
         id.getHunger(hunger -> {
             if (iconEnabled) {
                 useAlpha(id.alpha);
-                setup(Gui.GUI_ICONS_LOCATION);
+                setup(GUI_ICONS_LOCATION);
                 RenderSystem.enableDepthTest();
 
                 if (hunger.cur > 16) {
@@ -106,7 +105,11 @@ public class PHunger extends BarBase {
                 resetColor();
             }
             if (textEnabled)
-                text(tXI(i), tYI(i), gui, poseStack, hunger.hungerText, color);
+                if (hunger.absorb > 0) {
+                    text(tXI(i), tYI(i), gui, poseStack, hunger.displayText, absorbColor);
+                } else {
+                    text(tXI(i), tYI(i), gui, poseStack, hunger.displayText, color);
+                }
         });
 
     }
@@ -141,6 +144,7 @@ public class PHunger extends BarBase {
         e.addEntry("xtpos", 0, 12);
         e.addEntry("ytpos", 0, 12);
         e.addEntry("bhue", 9, 7);
+        e.addEntry("ohue", 11, 7);
         e.addEntry("bcit", 0xffce83, 24);
         e.addEntry("bcib", 0xbc8532, 24);
         e.addEntry("bcdt", 0x9b5e00, 24);

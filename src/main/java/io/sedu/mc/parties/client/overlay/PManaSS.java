@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
-import io.sedu.mc.parties.client.overlay.anim.HealthAnim;
 import io.sedu.mc.parties.client.overlay.anim.ManaSSAnim;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
@@ -58,9 +57,9 @@ public class PManaSS extends OverflowBarBase {
             }
             if (textEnabled)
                 if (mana.absorb > 0) {
-                    textCentered(tX(i), tY(i), gui, poseStack, mana.manaText, absorbColor);
+                    textCentered(tX(i), tY(i), gui, poseStack, mana.displayText, absorbColor);
                 } else {
-                    textCentered(tX(i), tY(i), gui, poseStack, mana.manaText, color);
+                    textCentered(tX(i), tY(i), gui, poseStack, mana.displayText, color);
                 }
         });
 
@@ -78,9 +77,9 @@ public class PManaSS extends OverflowBarBase {
 
             if (textEnabled)
                 if (mana.absorb > 0) {
-                    text(tXI(i), tYI(i), gui, poseStack, mana.manaText, absorbColor);
+                    text(tXI(i), tYI(i), gui, poseStack, mana.displayText, absorbColor);
                 } else {
-                    text(tXI(i), tYI(i), gui, poseStack, mana.manaText, color);
+                    text(tXI(i), tYI(i), gui, poseStack, mana.displayText, color);
                 }
         });
 
@@ -191,7 +190,7 @@ public class PManaSS extends OverflowBarBase {
         c.addTitleEntry("text");
         c.addBooleanEntry("tdisplay", textEnabled);
         c.addBooleanEntry("tshadow", textShadow);
-        c.addSliderEntry("ttype", 0, () -> 2, HealthAnim.type);
+        c.addSliderEntry("ttype", 0, () -> 3, ManaSSAnim.type);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
         entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));

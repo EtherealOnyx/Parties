@@ -50,9 +50,9 @@ public class PThirst extends OverflowBarBase {
             }
             if (textEnabled)
                 if (thirst.absorb > 0) {
-                    textCentered(tX(i), tY(i), gui, poseStack, thirst.thirstText, absorbColor);
+                    textCentered(tX(i), tY(i), gui, poseStack, thirst.displayText, absorbColor);
                 } else {
-                    textCentered(tX(i), tY(i), gui, poseStack, thirst.thirstText, color);
+                    textCentered(tX(i), tY(i), gui, poseStack, thirst.displayText, color);
                 }
         });
     }
@@ -79,9 +79,9 @@ public class PThirst extends OverflowBarBase {
 
             if (textEnabled)
                 if (thirst.absorb > 0) {
-                    text(tXI(i), tYI(i), gui, poseStack, thirst.thirstText, absorbColor);
+                    text(tXI(i), tYI(i), gui, poseStack, thirst.displayText, absorbColor);
                 } else {
-                    text(tXI(i), tYI(i), gui, poseStack, thirst.thirstText, color);
+                    text(tXI(i), tYI(i), gui, poseStack, thirst.displayText, color);
                 }
         });
     }
@@ -134,14 +134,7 @@ public class PThirst extends OverflowBarBase {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                //p.getThirst(thirst -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(thirst.cur) + (thirst.absorb > 0 ? " (" + DF.format(thirst.absorb) + ")" : ""), 0x66BFFF, 0x005591, 0xBEE4FF));
-                p.getThirst(thirst -> {
-                    renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(thirst.cur), 0x66BFFF, 0x005591, 0xBEE4FF);
-                    if (thirst.absorb > 0) {
-                        renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, "Hydration: " + DF.format(thirst.absorb), 0x66BFFF, 0x005591, 0xBEE4FF);
-                    }
-                });
-
+                p.getThirst(thirst -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(thirst.cur) + (thirst.absorb > 0 ? " (" + DF.format(thirst.absorb) + ")" : ""), 0x66BFFF, 0x005591, 0xBEE4FF));
             }
         });
     }
