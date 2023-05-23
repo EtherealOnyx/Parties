@@ -230,6 +230,9 @@ dependencies {
     //Open-PAC
     implementation fg.deobf("curse.maven:openpac-636608:4500809")
 
+    //Dietary Statistics - Local file, also can't test in dev environment...
+    compileOnly files("libs/DietaryStatistics-1.0.2.jar")
+
 }
 
 mixin {

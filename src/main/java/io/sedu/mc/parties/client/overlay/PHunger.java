@@ -55,28 +55,54 @@ public class PHunger extends OverflowBarBase {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 255 - id.alphaI << 24);
             }
             if (textEnabled)
-                textCentered(tX(i), tY(i), gui, poseStack, hunger.displayText, color);
+                if (hunger.absorb > 0) {
+                    textCentered(tX(i), tY(i), gui, poseStack, hunger.displayText, absorbColor);
+                } else {
+                    textCentered(tX(i), tY(i), gui, poseStack, hunger.displayText, color);
+                }
         });
     }
 
     private void renderHungerAnim(int i, PoseStack poseStack, HungerAnim hunger, float partialTicks) {
         if (hunger.animTime - partialTicks < 10) {
             hunger.oldH += (hunger.curH - hunger.oldH) * animPos(10 - hunger.animTime, partialTicks, true, 10, 1);
+            hunger.oldA += (hunger.curA - hunger.oldA) * animPos(10 - hunger.animTime, partialTicks, true, 10, 1);
         }
 
         if (hunger.hInc) {
-            rectAnim(poseStack, i, hunger.oldH, hunger.curH, colorIncTop, colorIncBot);
+            if (hunger.effHOld())
+                rectAnim(poseStack, i, hunger.oldH, hunger.curH, colorAbsTop, colorAbsBot);
+            else
+                rectAnim(poseStack, i, hunger.oldH, hunger.curH, colorIncTop, colorIncBot);
+
         } else {
-            rectAnim(poseStack, i, hunger.curH, hunger.oldH, colorDecTop, colorDecBot);
+            if (hunger.effH())
+                rectAnim(poseStack, i, hunger.curH, hunger.oldH, colorAbsTop, colorAbsBot);
+            else
+                rectAnim(poseStack, i, hunger.curH, hunger.oldH, colorDecTop, colorDecBot);
+
         }
+
+        if (hunger.aInc)
+            rectAnim(poseStack, i, hunger.oldA, hunger.curA, colorAbsTop, colorAbsBot);
+        else
+            rectAnim(poseStack, i, hunger.curA, hunger.oldA, colorAbsTop, colorAbsBot);
     }
 
     private void renderHunger(int i, PoseStack poseStack, HungerAnim hunger) {
-        float hB;
+        float hB, aB;
         hB = hunger.getPercent();
-        RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorTop, bColorBot);
-        RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Hunger
-        rectRNoA(poseStack, i, hB, colorTop, colorBot); //Hunger
+        if (hunger.absorb > 0) {
+            RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bAColorTop, bAColorBot);
+            RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
+            aB = hB + hunger.getPercentA();
+            rectRNoA(poseStack, i, hB, colorTop, colorBot); //Health
+            rectB(poseStack, i, hB, aB, colorTopAbsorb, colorBotAbsorb); //Absorb
+        } else {
+            RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorTop, bColorBot);
+            RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
+            rectRNoA(poseStack, i, hB, colorTop, colorBot); //Health
+        }
     }
 
     @Override

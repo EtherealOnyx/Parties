@@ -21,6 +21,7 @@ public class HealthAnim extends AnimHandler {
         updateText();
     }
 
+
     public static RenderItem.SmallBound setTextType(int d) {
         type = d;
         ClientPlayerData.playerList.values().forEach(c -> c.getHealth().updateText());
