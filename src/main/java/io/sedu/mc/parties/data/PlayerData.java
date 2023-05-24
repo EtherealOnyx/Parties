@@ -147,6 +147,26 @@ public class PlayerData {
         }
     }
 
+    private boolean saturationDirty = false;
+    public void setSaturation(float sat, Consumer<Float> action) {
+        if ((float) dataItems.getOrDefault(SATURATION, 0f) != sat) {
+            dataItems.put(SATURATION, sat);
+            action.accept(sat);
+            saturationDirty = true;
+        }
+    }
+
+    public void updateSaturation(Consumer<Float> action) {
+        if (saturationDirty) {
+            action.accept(getSaturation());
+            saturationDirty = false;
+        }
+    }
+
+    public float getSaturation() {
+        return (float) dataItems.getOrDefault(SATURATION, 0f);
+    }
+
     public void setReviveProg(float data, Runnable action) {
         if ((float) dataItems.getOrDefault(REVIVE, 0f) != data) {
             dataItems.put(REVIVE, data);
@@ -292,6 +312,17 @@ public class PlayerData {
 
     public float getStamina() {
         return (float) dataItems.getOrDefault(STAM, 0f);
+    }
+
+    public float getMaxHunger() {
+        return (float) dataItems.getOrDefault(MAXHUNGER, 0f);
+    }
+
+    public void setMaxHunger(float max, Runnable action) {
+        if (getMaxHunger() != max) {
+            dataItems.put(MAXHUNGER, max);
+            action.run();
+        }
     }
 
     public int getMaxStamina() {

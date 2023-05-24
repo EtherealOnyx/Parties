@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.events;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.api.helper.PartyAPI;
 import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
@@ -18,6 +19,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodData;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
@@ -38,8 +40,8 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static io.sedu.mc.parties.data.ServerConfigData.playerUpdateInterval;
 import static io.sedu.mc.parties.api.helper.PlayerAPI.getPlayer;
+import static io.sedu.mc.parties.data.ServerConfigData.playerUpdateInterval;
 
 @Mod.EventBusSubscriber(modid = Parties.MODID)
 public class PartyEvent {
@@ -98,10 +100,18 @@ public class PartyEvent {
         if (e.side == LogicalSide.SERVER && e.phase == TickEvent.Phase.END) {
             if (e.player.tickCount % playerUpdateInterval.get() == 3) {
                 HashMap<UUID, Boolean> trackers;
+                UUID player;
+                PlayerData pD;
+                FoodData d;
+                (pD = PlayerData.playerList.get(player = e.player.getUUID())).setSaturation((d = e.player.getFoodData()).getSaturationLevel(), saturation -> {
+                    InfoPacketHelper.sendSaturationUpdate((ServerPlayer) e.player, saturation);
+                    Parties.LOGGER.debug("Saturation Update: " + saturation);
+                });
+
                 if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
-                    UUID player;
-                    PlayerData pD;
-                    (pD = PlayerData.playerList.get(player = e.player.getUUID())).setHunger(e.player.getFoodData().getFoodLevel(), hunger -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendFood(id, player, hunger)));
+
+                    pD.setHunger(d.getFoodLevel(), hunger -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendFood(id, player, hunger)));
+                    pD.updateSaturation(sat -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendSaturationUpdate(id, player, sat)));
                     pD.setXpBar(e.player.experienceProgress, (xp) -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendXpBar(id, player, xp)));
                 }
             }
@@ -129,6 +139,11 @@ public class PartyEvent {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onPartyJoin(PartyJoinEvent event) {
+        event.forTrackersAndSelf((sendTo, propOf) -> PlayerAPI.getPlayer(propOf, p -> InfoPacketHelper.sendSaturationUpdate(sendTo, propOf, p.getSaturation())));
     }
 
     @SubscribeEvent

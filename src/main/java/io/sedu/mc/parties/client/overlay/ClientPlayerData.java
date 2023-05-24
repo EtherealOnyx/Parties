@@ -643,6 +643,14 @@ public class ClientPlayerData {
     public void setQuench(int data) {
         getThirst(thirst -> thirst.checkAbsorb(data));
     }
+
+    public void setMaxHunger(float data) {
+        getHunger(hunger -> hunger.checkMax(data));
+    }
+
+    public void setSaturation(float data) {
+        getHunger(hunger -> hunger.checkAbsorb(data));
+    }
 }
 
 //TODO: Check max health updates for server tracked player.

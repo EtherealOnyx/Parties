@@ -29,6 +29,5 @@ public enum DataType {
 
     //Spells and Shields
     SSMANA,
-    SSMANAMAX,
-    SSMANAABS
+    SSMANAMAX, MAXHUNGER, SATURATION, SSMANAABS
 }

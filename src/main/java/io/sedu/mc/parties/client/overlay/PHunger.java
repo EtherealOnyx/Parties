@@ -145,7 +145,7 @@ public class PHunger extends OverflowBarBase {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                p.getHunger(hunger -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(hunger.cur), 0xb88458, 0x613c1b, 0xffd5b0));
+                p.getHunger(hunger -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(hunger.cur + hunger.absorb) + "/" + DF.format(hunger.max), 0xb88458, 0x613c1b, 0xffd5b0));
             }
 
         });
@@ -196,7 +196,7 @@ public class PHunger extends OverflowBarBase {
         c.addTitleEntry("text");
         c.addBooleanEntry("tdisplay", textEnabled);
         c.addBooleanEntry("tshadow", textShadow);
-        c.addSliderEntry("ttype", 0, () -> 2, HungerAnim.type);
+        c.addSliderEntry("ttype", 0, () -> 3, HungerAnim.type);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
         entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));

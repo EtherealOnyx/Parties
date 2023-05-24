@@ -163,4 +163,12 @@ public class RenderPacketHelper {
         Parties.LOGGER.debug("Setting quench level...");
         getClientPlayer(player, p -> p.setQuench(data));
     }
+
+    public static void setMaxHunger(UUID player, Float data) {
+        getClientPlayer(player, p -> p.setMaxHunger(data));
+    }
+
+    public static void setSaturation(UUID player, float data) {
+        getClientPlayer(player, p -> p.setSaturation(data));
+    }
 }

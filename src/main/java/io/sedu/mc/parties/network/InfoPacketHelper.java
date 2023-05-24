@@ -41,8 +41,8 @@ public class InfoPacketHelper {
         sendData(PlayerAPI.getNormalServerPlayer(sendTo), armorOf, 4, armorValue);
     }
 
-    public static void sendFood(UUID sendTo, UUID armorOf, int foodLevel) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), armorOf, 5, foodLevel);
+    public static void sendFood(UUID sendTo, UUID hungerOf, int foodLevel) {
+        sendData(PlayerAPI.getNormalServerPlayer(sendTo), hungerOf, 5, foodLevel);
     }
 
     public static void sendXp(UUID sendTo, UUID levelOf, int levels) {
@@ -199,5 +199,17 @@ public class InfoPacketHelper {
 
     public static void sendQuenchUpdate(UUID sendTo, UUID propOf, int quench) {
         sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 31, quench);
+    }
+
+    public static void sendMaxHungerUpdate(UUID sendTo, UUID propOf, float max) {
+        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 32, max);
+    }
+
+    public static void sendSaturationUpdate(ServerPlayer player, float saturation) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(33, player.getUUID(), saturation), player);
+    }
+
+    public static void sendSaturationUpdate(UUID sendTo, UUID propOf, float sat) {
+        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 33, sat);
     }
 }

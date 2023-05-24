@@ -3,6 +3,7 @@ package io.sedu.mc.parties.setup;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
+import io.sedu.mc.parties.api.mod.dietarystats.DSCompatManager;
 import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
 import io.sedu.mc.parties.api.mod.hardcorerevival.HRCompatManager;
@@ -42,6 +43,7 @@ public class ModSetup {
         FCompatManager.init(); //Feathers Support
         SSCompatManager.init(); //Spells and Shield Support
         PACCompatManager.init(); //Open-PAC Support
+        DSCompatManager.init(); //Dietary Stats Support
         Parties.LOGGER.info("Mod support initialization complete!");
     }
 }
