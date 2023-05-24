@@ -63,7 +63,8 @@ public class HoverScreen extends Screen {
     @Override
     protected void init() {
         trimmedMessages = minecraft.gui.getChat().trimmedMessages;
-
+        frameX = Math.min(ClientConfigData.xPos.get(), width - framePosW*(ClientPlayerData.playerOrderedList.size()-1) - frameEleW);
+        frameY = Math.min(ClientConfigData.yPos.get(), height - framePosH*(ClientPlayerData.playerOrderedList.size()-1) - frameEleH);
         ColorAPI.colorCycle = true;
         int y = Math.max(0, clickArea.t(0) - 10);
         int x = clickArea.l(0);
@@ -319,6 +320,10 @@ public class HoverScreen extends Screen {
         }
         fX.add(frameX);
         fY.add(frameY);
+        ClientConfigData.xPos.set(frameX);
+        ClientConfigData.xPos.save();
+        ClientConfigData.yPos.set(frameY);
+        ClientConfigData.yPos.save();
         checkIndex();
 
     }
