@@ -196,6 +196,10 @@ public class HoverScreen extends Screen {
     private void acceptPos() {
         frameX = fX.get(index);
         frameY = fY.get(index);
+        ClientConfigData.xPos.set(frameX);
+        ClientConfigData.xPos.save();
+        ClientConfigData.yPos.set(frameY);
+        ClientConfigData.yPos.save();
         index = 0;
         fX.clear();
         fY.clear();
@@ -247,7 +251,12 @@ public class HoverScreen extends Screen {
     }
 
     private void defaultPos() {
-        RenderItem.defaultPos();
+        frameX = 16;
+        frameY = 16;
+        ClientConfigData.xPos.set(16);
+        ClientConfigData.xPos.save();
+        ClientConfigData.yPos.set(16);
+        ClientConfigData.yPos.save();
         fX.clear();
         fY.clear();
         refreshAllButtons();

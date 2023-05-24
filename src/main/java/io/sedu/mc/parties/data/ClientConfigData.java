@@ -19,6 +19,9 @@ public class ClientConfigData {
     public static ForgeConfigSpec.BooleanValue forceModelRotation;
     public static ForgeConfigSpec.IntValue rotationOffset;
     public static ForgeConfigSpec.BooleanValue renderSelfFrame;
+
+    public static ForgeConfigSpec.IntValue xPos;
+    public static ForgeConfigSpec.IntValue yPos;
     public static void registerClientConfig(ForgeConfigSpec.Builder CLIENT_BUILDER) {
         CLIENT_BUILDER.comment("--------------------------------------------------------",
                                "Client Party Settings",
@@ -53,6 +56,12 @@ public class ClientConfigData {
                                        //.define("renderStamina", true);
         CLIENT_BUILDER.pop();
         CLIENT_BUILDER.push("party-ui");
+        xPos = CLIENT_BUILDER.comment("X Position of the party frame.",
+                                      "Note: The party frame is bounded by the screen size.")
+                             .defineInRange("xPos", 16, 0, Integer.MAX_VALUE);
+        yPos = CLIENT_BUILDER.comment("Y Position of the party frame.",
+                                      "Note: The party frame is bounded by the screen size.")
+                             .defineInRange("yPos", 16, 0, Integer.MAX_VALUE);
         renderSelfFrame = CLIENT_BUILDER.comment("Render your information as a party member.",
                                                  "If true, this will include you in the party list. This will also render your information when outside the party.",
                                                  "If false, your information will NOT be rendered both in a party and outside a party.")

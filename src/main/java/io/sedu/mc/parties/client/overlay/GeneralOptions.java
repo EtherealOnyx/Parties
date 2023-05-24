@@ -42,8 +42,6 @@ public class GeneralOptions extends RenderItem {
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("gen_x", 16, 12);
-        e.addEntry("gen_y", 16, 12);
         e.addEntry("gen_w", 168, 12);
         e.addEntry("gen_h", 64, 12);
         e.addEntry("gen_pw", 0, 12);
@@ -55,8 +53,8 @@ public class GeneralOptions extends RenderItem {
     protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h, boolean parse) {
         ConfigOptionsList c = super.getConfigOptions(s, minecraft, x, y, w, h, parse);
         c.addTitleEntry("gen_f");
-        c.addSliderEntry("gen_x", 0, () -> s.width - framePosW*(ClientPlayerData.playerOrderedList.size()-1) - frameEleW, frameX);
-        c.addSliderEntry("gen_y", 0, () -> s.height - framePosH*(ClientPlayerData.playerOrderedList.size()-1) - frameEleH, frameY);
+        //c.addSliderEntry("gen_x", 0, () -> s.width - framePosW*(ClientPlayerData.playerOrderedList.size()-1) - frameEleW, frameX);
+        //c.addSliderEntry("gen_y", 0, () -> s.height - framePosH*(ClientPlayerData.playerOrderedList.size()-1) - frameEleH, frameY);
         c.addSliderWithUpdater("gen_w", 0, () -> s.width - frameX, frameEleW, this::ensureBounds, true);
         c.addSliderWithUpdater("gen_h", 0, () -> s.height - frameY, frameEleH, this::ensureBounds, true);
         c.addSliderEntry("gen_pw", 0, () -> s.width - frameX, framePosW, true);

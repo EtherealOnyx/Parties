@@ -742,8 +742,8 @@ public abstract class RenderItem {
         updater.put("totalmax", (n,d) -> ((PEffects) n).setMaxSize((int) d));
 
         updater.put("danim", (n,d) -> {DimAnim.animActive = (boolean)d; return null;});
-        updater.put("gen_x", (n,d) -> {frameX = (int) d; return null;});
-        updater.put("gen_y", (n,d) -> {frameY = (int) d; return null;});
+        updater.put("gen_x", (n,d) -> null);
+        updater.put("gen_y", (n,d) -> null);
         updater.put("gen_w", (n,d) -> {frameEleW = (int) d; return null;});
         updater.put("gen_h", (n,d) -> {frameEleH = (int) d; return null;});
         updater.put("gen_pw", (n,d) -> {framePosW = (int) d; return null;});
@@ -830,7 +830,6 @@ public abstract class RenderItem {
     }
 
     public static void setDefaultValues() {
-        defaultPos();
         frameEleW = 168;
         frameEleH = 64;
         framePosW = 0;
@@ -845,11 +844,6 @@ public abstract class RenderItem {
 
     public static void setElementDefaults(RenderItem item, HashMap<String, Update> updater) {
         item.getDefaults().forEachEntry((s, v) -> updater.get(s.getName()).onUpdate(item, v));
-    }
-
-    public static void defaultPos() {
-        frameX = 16;
-        frameY = 16;
     }
 
     public abstract ConfigEntry getDefaults();
