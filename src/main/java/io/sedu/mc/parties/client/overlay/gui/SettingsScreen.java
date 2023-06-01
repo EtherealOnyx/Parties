@@ -2,11 +2,11 @@ package io.sedu.mc.parties.client.overlay.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.*;
 import io.sedu.mc.parties.network.PartiesPacketHandler;
 import io.sedu.mc.parties.network.StringPacketData;
-import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static io.sedu.mc.parties.client.overlay.RenderItem.globalScale;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.util.RenderUtils.*;
 
@@ -229,11 +230,9 @@ public class SettingsScreen extends Screen {
             this.renderTooltip(poseStack, confirmPrompt, pMouseX, pMouseY + 16);
             poseStack.translate(0,0,-1);
         }
-
         renderFrameOutline(poseStack);
         if (renderSelBox)
             renderSelection(poseStack);
-
         if (draggingWindow) {
             RenderUtils.borderRectNoA(poseStack.last().pose(), 0, 1, screenX, screenY, screenW, screenH, ColorAPI.getRainbowColor());
             RenderUtils.sizeRect(poseStack.last().pose(), screenX, screenY, 0, screenW, screenH, ColorAPI.getRainbowColor() | 40 << 24);
@@ -245,6 +244,7 @@ public class SettingsScreen extends Screen {
         }
         RenderUtils.offRectNoA(poseStack.last().pose(), screenX, screenY, -1, -1, screenW, screenH, ColorAPI.getRainbowColor(), 0x232323);
         RenderSystem.enableDepthTest();
+        //TODO: Make sure this following line doesn't cause errors anymore.
         this.options.render(poseStack, pMouseX, pMouseY, pPartialTick);
         assert minecraft != null;
         //TODO: ModBox
@@ -253,7 +253,6 @@ public class SettingsScreen extends Screen {
 
         //Settings
         renderOptionsBox();
-
         //Presets
         renderPresetBox();
         font.drawShadow(poseStack, "Save Preset", presetBoxX + (presetBoxW>>1) - 31, presetBoxY + 3, ColorAPI.getRainbowColor());
@@ -263,7 +262,6 @@ public class SettingsScreen extends Screen {
 
         renderBg(-5, screenX, screenY, screenX + screenW, screenY + eleBoxH, screenW, eleBoxH, 200, MENU_LOC);
         super.render(poseStack, pMouseX, pMouseY, pPartialTick);
-
 
     }
 
@@ -306,7 +304,7 @@ public class SettingsScreen extends Screen {
     }
 
     private void renderSelection(PoseStack poseStack) {
-        RenderUtils.borderRectNoA(poseStack.last().pose(), 0, 1, selBoxX, selBoxY, selBoxW, selBoxH, ColorAPI.getRainbowColor());
+        RenderUtils.borderRectNoA(poseStack.last().pose(), 0, 1, (int) (selBoxX*globalScale), (int) (selBoxY*globalScale), (int) Math.ceil(selBoxW*globalScale), (int) Math.ceil(selBoxH*globalScale), ColorAPI.getRainbowColor());
     }
 
 
@@ -355,7 +353,6 @@ public class SettingsScreen extends Screen {
         PName.sign = Items.SPRUCE_SIGN.getDefaultInstance();
 
         //Setup Data.
-
         initTabButtons();
         setBounds(width, height, true, false);
         super.init();

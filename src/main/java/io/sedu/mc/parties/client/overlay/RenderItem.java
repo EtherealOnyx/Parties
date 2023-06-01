@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.client.overlay;
 
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
@@ -139,6 +140,13 @@ public abstract class RenderItem {
                 }
             });
         }
+    }
+
+    public static void updateFramePos() {
+        Window w = Minecraft.getInstance().getWindow();
+        //TODO: Check bounds
+        frameX = Math.min(ClientConfigData.xPos.get(), w.getScreenWidth() - framePosW*(ClientPlayerData.playerOrderedList.size()-1) - frameEleW);
+        frameY = Math.min(ClientConfigData.yPos.get(), w.getScreenHeight() - framePosH*(ClientPlayerData.playerOrderedList.size()-1) - frameEleH);
     }
 
     public boolean isEnabled() {
@@ -282,10 +290,15 @@ public abstract class RenderItem {
         this.name = name;
     }
 
+    public static float globalScale = .5f;
     public static void register() {
         IIngameOverlay overlay = (gui, poseStack, partialTicks, width, height) -> {
             if (ClientPlayerData.playerOrderedList.size() == 0) return;
+            poseStack.pushPose();
+            globalScale = .75f;
+            poseStack.scale(globalScale, globalScale, 1f);
             itemRender.render(gui, poseStack, partialTicks);
+            poseStack.popPose();
             if (isDirty) {
                 syncItems();
                 isDirty = false;
@@ -872,7 +885,8 @@ public abstract class RenderItem {
     }
 
     public static void getCurrentMouseFrame(int mouseX, int mouseY, TriConsumer<Integer, Integer, Integer> action) {
-
+        mouseX /= globalScale;
+        mouseY /= globalScale;
         if (mouseX < frameX || mouseY < frameY) return;
 
         mouseX = mouseX - frameX;

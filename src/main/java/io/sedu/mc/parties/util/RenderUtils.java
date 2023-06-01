@@ -414,22 +414,30 @@ public class RenderUtils {
 
 
     public static void renderClickableArea(PoseStack poseStack) {
+        poseStack.pushPose();
+        poseStack.scale(globalScale, globalScale, 1f);
         if (renderSelfFrame)
             for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
                 clickArea.rect(i, poseStack, -2, -2, ColorAPI.getRainbowColor() | 150 << 24);
         else
             for (int i = 0; i < ClientPlayerData.playerOrderedList.size() - 1; i++)
                 clickArea.rect(i, poseStack, -2, -2, ColorAPI.getRainbowColor() | 150 << 24);
+        poseStack.popPose();
     }
 
     public static void renderFrame(PoseStack poseStack) {
+        poseStack.pushPose();
+        poseStack.scale(globalScale, globalScale, 1f);
         int index = renderSelfFrame ? ClientPlayerData.playerOrderedList.size()-1 : ClientPlayerData.playerOrderedList.size()-2;
         RenderUtils.sizeRect(poseStack.last().pose(), frameX, frameY, -2, frameEleW + framePosW*index,
                              frameEleH + framePosH*index,
                              ColorAPI.getRainbowColor() | 75 << 24);
+        poseStack.popPose();
     }
 
     public static void renderFrameOutline(PoseStack poseStack) {
+        poseStack.pushPose();
+        poseStack.scale(globalScale, globalScale, 1f);
         if (renderSelfFrame)
             for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
                 RenderUtils.borderRect(poseStack.last().pose(), -1, 1, frameX + framePosW*i, frameY + framePosH*i,
@@ -440,6 +448,7 @@ public class RenderUtils {
                 RenderUtils.borderRect(poseStack.last().pose(), -1, 1, frameX + framePosW*i, frameY + framePosH*i,
                                        frameEleW,
                                        frameEleH, 0xFFFFFFFF);
+        poseStack.popPose();
     }
 
     public static List<Component> splitTooltip(String text, int splitAt) {

@@ -40,8 +40,9 @@ public class PHead extends RenderSelfItem implements TooltipItem {
         height = 32;
         renderSelf = (i, id, gui, poseStack, partialTicks) -> {
             if (renderType != 0 && id.clientPlayer != null && !id.getDim().active)  {
+                float newScale = scale * globalScale;
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
-                renderEntityInInventory((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, partialTicks);
+                renderEntityInInventory((int) ((x(i)+16)*newScale), (int) (y(i)*newScale), scale*newScale, (int) (15*newScale), id.clientPlayer, partialTicks);
 
                 return;
             }
@@ -57,9 +58,10 @@ public class PHead extends RenderSelfItem implements TooltipItem {
         };
         renderMember = (i, id, gui, poseStack, partialTicks) -> {
             if (renderType == 2 && id.shouldRenderModel)  {
+                float newScale = scale * globalScale;
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 RenderItem.setColor(0,0,0,0);
-                renderEntityInInventory((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, 1F);
+                renderEntityInInventory((int) ((x(i)+16)*newScale), (int) (y(i)*newScale), newScale, (int) (15*newScale), id.clientPlayer, 1F);
                 RenderItem.resetColor();
                 return;
             }
@@ -204,7 +206,8 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             }
             if (renderType != 0 && id.clientPlayer != null && !id.getDim().active)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
-                renderEntityInInventory((int) ((x(i)+16)*scale), (int) ((y(i))*scale), scale, (int) (15*scale), id.clientPlayer, partialTicks);
+                float newScale = scale * globalScale;
+                renderEntityInInventory((int) ((x(i)+16)*newScale), (int) ((y(i))*newScale), newScale, (int) (15*newScale), id.clientPlayer, partialTicks);
                 return;
             }
             RenderSystem.enableDepthTest();
@@ -264,7 +267,8 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             if (renderType == 2 && id.shouldRenderModel)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 RenderItem.setColor(0,0,0,0);
-                renderEntityInInventory((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, 1F);
+                float newScale = scale * globalScale;
+                renderEntityInInventory((int) ((x(i)+16)*newScale), (int) (y(i)*newScale), newScale, (int) (15*newScale), id.clientPlayer, 1F);
                 RenderItem.resetColor();
                 return;
             }

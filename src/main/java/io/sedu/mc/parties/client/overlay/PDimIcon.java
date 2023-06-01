@@ -51,7 +51,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        DimConfig.entry("minecraft:overworld", (icon, color) -> renderGuiItem(icon, b.x+7, b.y+3, .75f, 5));
+        DimConfig.entry("minecraft:overworld", (icon, color) -> renderGuiItemNS(icon, b.x+7, b.y+3, .75f, 5));
     }
 
     @Override
@@ -76,6 +76,32 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
     }
 
+    protected void renderGuiItemNS(ItemStack iStack, int pX, int pY, float scale, float scalePos) {
+        BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, null, Minecraft.getInstance().player, 0);
+        Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
+        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        PoseStack posestack = RenderSystem.getModelViewStack();
+        posestack.pushPose();
+        posestack.translate((pX+scalePos), (pY+scalePos), zPos+2);
+        posestack.scale(1.0F, -1.0F, 1.0F);
+        posestack.scale(16.0F, 16.0F, 1F);
+        RenderSystem.applyModelViewMatrix();
+        PoseStack posestack1 = new PoseStack();
+        posestack1.scale(scale,scale,1f);
+        MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
+        RenderSystem.setupGuiFlatDiffuseLighting(RenderUtils.POS, RenderUtils.NEG);
+
+        Minecraft.getInstance().getItemRenderer().render(iStack, ItemTransforms.TransformType.GUI, false, posestack1, multibuffersource$buffersource, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
+        multibuffersource$buffersource.endBatch();
+        RenderSystem.enableDepthTest();
+
+        posestack.popPose();
+        RenderSystem.applyModelViewMatrix();
+    }
+
     protected void renderGuiItem(ItemStack iStack, int pX, int pY, float scale, float scalePos) {
         BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, null, Minecraft.getInstance().player, 0);
         Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
@@ -85,10 +111,10 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         PoseStack posestack = RenderSystem.getModelViewStack();
         posestack.pushPose();
-        posestack.translate(pX, pY, zPos+2);
-        posestack.translate(scalePos, scalePos, 0.0D);
+        posestack.translate((pX+scalePos)*globalScale, (pY+scalePos)*globalScale, zPos+2);
         posestack.scale(1.0F, -1.0F, 1.0F);
         posestack.scale(16.0F, 16.0F, 1F);
+        posestack.scale(globalScale, globalScale, 1f);
         RenderSystem.applyModelViewMatrix();
         PoseStack posestack1 = new PoseStack();
         posestack1.scale(scale,scale,1f);
@@ -112,11 +138,10 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         PoseStack posestack = RenderSystem.getModelViewStack();
         posestack.pushPose();
-        posestack.translate(pX, pY, zPos+2);
-        posestack.translate(scalePos, scalePos, 0.0D);
-        posestack.translate(x, y, 0);
+        posestack.translate((pX+x+scalePos)*globalScale, (pY+y+scalePos)*globalScale, zPos+2);
         posestack.scale(1.0F, -1.0F, 1.0F);
         posestack.scale(16.0F, 16.0F, 1F);
+        posestack.scale(globalScale, globalScale, 1f);
         RenderSystem.applyModelViewMatrix();
         PoseStack posestack1 = new PoseStack();
         posestack1.scale(scale*head.scale,scale*head.scale,1f);

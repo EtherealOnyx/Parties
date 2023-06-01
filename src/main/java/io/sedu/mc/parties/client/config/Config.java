@@ -282,6 +282,7 @@ public class Config {
         FCompatManager.getHandler().setFeathersRender(renderFeathers.get());
         PHead.updateModelRenderer();
         RenderItem.updateSelfRender();
+        RenderItem.updateFramePos();
     }
 
     public static void loadDefaultPreset() {

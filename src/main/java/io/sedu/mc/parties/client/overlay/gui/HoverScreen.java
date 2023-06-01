@@ -1,24 +1,29 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PEffects;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import io.sedu.mc.parties.data.ClientConfigData;
-import io.sedu.mc.parties.api.helper.ColorAPI;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -63,11 +68,11 @@ public class HoverScreen extends Screen {
     @Override
     protected void init() {
         trimmedMessages = minecraft.gui.getChat().trimmedMessages;
-        frameX = Math.min(ClientConfigData.xPos.get(), width - framePosW*(ClientPlayerData.playerOrderedList.size()-1) - frameEleW);
-        frameY = Math.min(ClientConfigData.yPos.get(), height - framePosH*(ClientPlayerData.playerOrderedList.size()-1) - frameEleH);
+        frameX = (int) Math.min(ClientConfigData.xPos.get(), width/globalScale - framePosW*(ClientPlayerData.playerOrderedList.size()-1) - frameEleW);
+        frameY = (int) Math.min(ClientConfigData.yPos.get(), height/globalScale - framePosH*(ClientPlayerData.playerOrderedList.size()-1) - frameEleH);
         ColorAPI.colorCycle = true;
-        int y = Math.max(0, clickArea.t(0) - 10);
-        int x = clickArea.l(0);
+        int y = (int) Math.max(0, clickArea.t(0)*globalScale - 10);
+        int x = (int) (clickArea.l(0)*globalScale);
         settingsButton = addRenderableWidget(new SmallButton(x, y, "⚙", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.partysettings")), 0, .5f, .5f, .5f, 1f));
         presetButton = addRenderableWidget(new SmallButton(x+11, y, "☰", p -> doTask(5), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.usepreset")), .5f, 1, 0f, 1f, 1f));
         goBackButton = addRenderableWidget(new SmallButton(x, y,"x", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), 1f, .5f, .5f));
@@ -77,29 +82,72 @@ public class HoverScreen extends Screen {
         doTask(0);
     }
 
+    private Button createScaledButton(int pX, int pY, Component text, Button.OnPress press, Button.OnTooltip tip) {
+        return new ScaledButton(pX, pY, text, press, tip);
+    }
+
+    private static class ScaledButton extends Button {
+
+        int originX;
+        int originY;
+
+        public ScaledButton(int pX, int pY, Component pMessage, OnPress pOnPress,
+                            OnTooltip pOnTooltip) {
+            super((int) (pX*globalScale), (int) (pY*globalScale), (int) (20*globalScale), (int) (20*globalScale), pMessage, pOnPress, pOnTooltip);
+            this.originX = pX;
+            this.originY = pY;
+        }
+
+        @Override
+        public void renderButton(@NotNull PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
+            Minecraft minecraft = Minecraft.getInstance();
+            Font font = minecraft.font;
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShaderTexture(0, WIDGETS_LOCATION);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
+            int i = this.getYImage(this.isHoveredOrFocused());
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.enableDepthTest();
+            pPoseStack.pushPose();
+            pPoseStack.scale(globalScale, globalScale, 1f);
+            this.blit(pPoseStack,originX, originY, 0, 46 + i * 20, 10, 20);
+            this.blit(pPoseStack, originX + 10, originY, 200 - 10, 46 + i * 20, 10, 20);
+            this.renderBg(pPoseStack, minecraft, pMouseX, pMouseY);
+
+            int j = getFGColor();
+            drawCenteredString(pPoseStack, font, this.getMessage(), originX + 10, originY + 6, j | Mth.ceil(this.alpha * 255.0F) << 24);
+            pPoseStack.popPose();
+            if (this.isHoveredOrFocused()) {
+                this.renderToolTip(pPoseStack, pMouseX, pMouseY);
+            }
+        }
+    }
+
     protected void initPartyButtons() {
+        //TODO: Fix for global scale
         if (ClientPlayerData.partySize() > 1) {
             Button b;
-            //moveParty.add(addRenderableWidget(new Button(clickArea.l(0) + (clickArea.w() >> 1) - 9, clickArea.t(0) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("⬇"), pButton -> ClientPlayerData.swap(finalI, finalI+1))));
+            //moveParty.add(addRenderableWidget(createScaledButton(clickArea.l(0) + (clickArea.w() >> 1) - 9, clickArea.t(0) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("⬇"), pButton -> ClientPlayerData.swap(finalI, finalI+1))));
             if (ClientConfigData.renderSelfFrame.get()) {
                 Parties.LOGGER.debug("Initializing arrange buttons for when rendering self...");
                 for (int i = 0; i < ClientPlayerData.partySize(); i++) {
                     int finalI = i;
                     if (i == ClientPlayerData.partySize()-1) {
-                        b = addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
+                        b = addRenderableWidget(createScaledButton(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
                         b.active = false;
                         moveParty.add(b);
                     }
                     else
-                        moveParty.add(addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI+1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
+                        moveParty.add(addRenderableWidget(createScaledButton(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI+1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
 
                     if (i == 0) {
-                        b = addRenderableWidget(new Button(clickArea.l(i) , clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
+                        b = addRenderableWidget(createScaledButton(clickArea.l(i) , clickArea.t(i) + (clickArea.h()>>1) - 10, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
                         b.active = false;
                         moveParty.add(b);
                     }
                     else
-                        moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI-1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
+                        moveParty.add(addRenderableWidget(createScaledButton(clickArea.l(i), clickArea.t(i) + (clickArea.h()>>1) - 10, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI-1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
                     //rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
                 }
             } else {
@@ -109,33 +157,33 @@ public class HoverScreen extends Screen {
                     int finalI = i;
                     if (i == ClientPlayerData.partySize() - 1) {
                         Parties.LOGGER.debug("Adding down disabled for " + i);
-                        b = addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
+                        b = addRenderableWidget(createScaledButton(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
                         b.active = false;
                         moveParty.add(b);
                     } else {
                         if (selfIndex == finalI + 1) {
                             if (finalI + 2 > ClientPlayerData.partySize() - 1) {
                                 Parties.LOGGER.debug("Adding down disabled for " + i);
-                                b = addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
+                                b = addRenderableWidget(createScaledButton(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
                                 b.active = false;
                                 moveParty.add(b);
                             } else {
                                 Parties.LOGGER.debug("Adding down enabled for " + i);
-                                moveParty.add(addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 2), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
+                                moveParty.add(addRenderableWidget(createScaledButton(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 2), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
                             }
                         } else {
                             Parties.LOGGER.debug("Adding down enabled for " + i);
-                            moveParty.add(addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
+                            moveParty.add(addRenderableWidget(createScaledButton(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
                         }
                     }
                     if (i == 0) {
                         Parties.LOGGER.debug("Adding up disabled for " + i);
-                        b = addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
+                        b = addRenderableWidget(createScaledButton(clickArea.l(i), clickArea.t(i) + (clickArea.h() >> 1) - 10, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
                         b.active = false;
                         moveParty.add(b);
                     } else {
                         Parties.LOGGER.debug("Adding up enabled for " + i);
-                        moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
+                        moveParty.add(addRenderableWidget(createScaledButton(clickArea.l(i), clickArea.t(i) + (clickArea.h() >> 1) - 10, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
                     }
 
                 }
@@ -144,27 +192,27 @@ public class HoverScreen extends Screen {
                     int finalI = i;
                     if (i == ClientPlayerData.partySize() - 1) {
                         Parties.LOGGER.debug("Adding down disabled for " + i);
-                        b = addRenderableWidget(new Button(clickArea.r(i-1) - 20, clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
+                        b = addRenderableWidget(createScaledButton(clickArea.r(i-1) - 20, clickArea.t(i-1) + (clickArea.h() >> 1) - 10, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
                         b.active = false;
                         moveParty.add(b);
                     } else {
                         Parties.LOGGER.debug("Adding down enabled for " + i);
-                        moveParty.add(addRenderableWidget(new Button(clickArea.r(i-1) - 20, clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
+                        moveParty.add(addRenderableWidget(createScaledButton(clickArea.r(i-1) - 20, clickArea.t(i-1) + (clickArea.h() >> 1) - 10, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
                     }
 
                     if (selfIndex == finalI - 1) {
                         if (finalI - 2 < 0) {
                             Parties.LOGGER.debug("Adding up disabled for " + i);
-                            b = addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
+                            b = addRenderableWidget(createScaledButton(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
                             b.active = false;
                             moveParty.add(b);
                         } else {
                             Parties.LOGGER.debug("Adding up enabled for " + i);
-                            moveParty.add(addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 2, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
+                            moveParty.add(addRenderableWidget(createScaledButton(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 2, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
                         }
                     } else {
                         Parties.LOGGER.debug("Adding up enabled for " + i);
-                        moveParty.add(addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
+                        moveParty.add(addRenderableWidget(createScaledButton(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
                     }
                 }
             }
@@ -181,16 +229,16 @@ public class HoverScreen extends Screen {
     }
 
     private void initDragButtons() {
-        int y = Math.max(0, frameY - 10);
-        moveFrame.add(addRenderableWidget(new SmallButton(frameX, y, "x", p -> revertPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")),.5f, 0f, 1, .5f, .5f)));
-        moveFrame.add(addRenderableWidget(new SmallButton(frameX+11, y,"↺", p -> defaultPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")), .5f, 1f, 1f)));
-        Button b = addRenderableWidget(new SmallButton(frameX+22, y,"◄", p -> updatePos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.umove")), 1, 1, .5f));
+        int y = (int) Math.max(0, (frameY)*globalScale - 10);
+        moveFrame.add(addRenderableWidget(new SmallButton((int) ((frameX)*globalScale), y, "x", p -> revertPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")), .5f, 0f, 1, .5f, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton((int) ((frameX)*globalScale)+11, y,"↺", p -> defaultPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")), .5f, 1f, 1f)));
+        Button b = addRenderableWidget(new SmallButton((int) ((frameX)*globalScale)+22, y,"◄", p -> updatePos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.umove")), 1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        b = addRenderableWidget(new SmallButton(frameX+33, y, "►", p -> updatePos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rmove")),1, 1, .5f));
+        b = addRenderableWidget(new SmallButton((int) ((frameX)*globalScale)+33, y, "►", p -> updatePos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rmove")),1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        moveFrame.add(addRenderableWidget(new SmallButton(frameX+44, y,"✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton((int) ((frameX)*globalScale)+44, y,"✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
 
     }
 
@@ -281,8 +329,8 @@ public class HoverScreen extends Screen {
         int tempFrame = x - oldMX + oldX;
         if (tempFrame < 0) {
             frameX = 0;
-        } else if (tempFrame + rightLim > this.width) {
-            frameX = this.width - rightLim;
+        } else if (tempFrame + rightLim > this.width/globalScale) {
+            frameX = (int) (this.width/globalScale - rightLim);
         } else {
             frameX = x - oldMX + oldX;
         }
@@ -290,8 +338,8 @@ public class HoverScreen extends Screen {
         tempFrame = y - oldMY + oldY;
         if (tempFrame < 0) {
             frameY = 0;
-        } else if (tempFrame + botLim > this.height) {
-            frameY = this.height - botLim;
+        } else if (tempFrame + botLim > this.height/globalScale) {
+            frameY = (int) (this.height/globalScale - botLim);
         } else {
             frameY = y - oldMY + oldY;
         }
@@ -300,9 +348,10 @@ public class HoverScreen extends Screen {
 
 
     private void refreshDragButtons() {
-        int y = Math.max(0, frameY - 10);
+        int x = (int) (frameX*globalScale);
+        int y = (int) Math.max(0, frameY*globalScale - 10);
         for (int i = 0; i < moveFrame.size(); i++) {
-            moveFrame.get(i).x = frameX+(i*11);
+            moveFrame.get(i).x = x+(i*11);
             moveFrame.get(i).y = y;
         }
     }
@@ -382,8 +431,8 @@ public class HoverScreen extends Screen {
                 fY.add(revertY);
                 notEditing = false;
                 if (renderSelfFrame) {
-                    botLim = frameEleH + framePosH*(ClientPlayerData.playerList.size() - 1);
-                    rightLim = frameEleW + framePosW*(ClientPlayerData.playerList.size() - 1);
+                    botLim = (frameEleH + framePosH*(ClientPlayerData.playerList.size() - 1));
+                    rightLim = (frameEleW + framePosW*(ClientPlayerData.playerList.size() - 1));
                 } else {
                     botLim = frameEleH + framePosH*(Math.min(ClientPlayerData.playerList.size() - 2, 1));
                     rightLim = frameEleW + framePosW*(Math.min(ClientPlayerData.playerList.size() - 2, 1));
@@ -401,12 +450,14 @@ public class HoverScreen extends Screen {
     }
 
     public void render(PoseStack poseStack, int mX, int mY, float partialTick) {
+
+        //TODO: Unbind options from the party list.
         super.render(poseStack, mX, mY, partialTick);
 
         checkFrameRender(poseStack);
 
         if (isDragging()) {
-            move(mX, mY);
+            move((int) (mX/globalScale), (int) (mY/globalScale));
             return;
         } else if (oldMX != null) {
             save();
