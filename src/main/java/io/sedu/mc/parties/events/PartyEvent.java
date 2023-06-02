@@ -219,8 +219,9 @@ public class PartyEvent {
             }
         }
     }
-    @SubscribeEvent
+    @SubscribeEvent (priority = EventPriority.LOWEST)
     public static void onEntityDeath(LivingDeathEvent event) {
+        if (event.isCanceled()) return;
         if (!event.getEntityLiving().level.isClientSide()) {
             HashMap<UUID, Boolean> trackers;
             if (event.getEntity() instanceof Player p) {
