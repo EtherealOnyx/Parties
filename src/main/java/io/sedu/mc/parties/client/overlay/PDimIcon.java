@@ -72,8 +72,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
 
     private void world(int pI, ClientPlayerData id) {
-        DimConfig.entry(id.getDim().dimension, (icon, color) -> renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale));
-
+        DimConfig.entry(id.getDim().dimension, (icon, color) -> RenderUtils.renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale, zPos));
     }
 
     protected void renderGuiItemNS(ItemStack iStack, int pX, int pY, float scale, float scalePos) {
@@ -102,32 +101,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         RenderSystem.applyModelViewMatrix();
     }
 
-    protected void renderGuiItem(ItemStack iStack, int pX, int pY, float scale, float scalePos) {
-        BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, null, Minecraft.getInstance().player, 0);
-        Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
-        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        PoseStack posestack = RenderSystem.getModelViewStack();
-        posestack.pushPose();
-        posestack.translate((pX+scalePos)*globalScale, (pY+scalePos)*globalScale, zPos+2);
-        posestack.scale(1.0F, -1.0F, 1.0F);
-        posestack.scale(16.0F, 16.0F, 1F);
-        posestack.scale(globalScale, globalScale, 1f);
-        RenderSystem.applyModelViewMatrix();
-        PoseStack posestack1 = new PoseStack();
-        posestack1.scale(scale,scale,1f);
-        MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
-        RenderSystem.setupGuiFlatDiffuseLighting(RenderUtils.POS, RenderUtils.NEG);
 
-        Minecraft.getInstance().getItemRenderer().render(iStack, ItemTransforms.TransformType.GUI, false, posestack1, multibuffersource$buffersource, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
-        multibuffersource$buffersource.endBatch();
-        RenderSystem.enableDepthTest();
-
-        posestack.popPose();
-        RenderSystem.applyModelViewMatrix();
-    }
 
     protected void renderGuiItem(ItemStack iStack, int pX, int pY, float x, float y, float scale, float scalePos) {
         BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, null, Minecraft.getInstance().player, 0);

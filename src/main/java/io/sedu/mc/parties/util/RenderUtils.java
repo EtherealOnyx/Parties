@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.util;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -8,12 +9,16 @@ import com.mojang.math.Vector3f;
 import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PHead;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -22,6 +27,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -131,7 +138,7 @@ public class RenderUtils {
         RenderSystem.enableTexture();
     }
 
-    public static void offRectNoA(Matrix4f mat, float x, float y, int z, int offset, float width, float height, int startColor, int endColor)
+    public static void offRectNoA(Matrix4f mat, float x, float y, int z, float offset, float width, float height, int startColor, int endColor)
     {
         float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
         float startGreen = (float)(startColor >>  8 & 255) / 255.0F;
@@ -532,6 +539,35 @@ public class RenderUtils {
 
     private static void fireVertex(PoseStack.Pose pMatrixEntry, VertexConsumer pBuffer, float pX, float pY, float pZ, float pTexU, float pTexV) {
         pBuffer.vertex(pMatrixEntry.pose(), pX, pY, pZ).color(255, 255, 255, 255).uv(pTexU, pTexV).overlayCoords(0, 10).uv2(240).normal(pMatrixEntry.normal(), 0.0F, 1.0F, 0.0F).endVertex();
+    }
+
+
+    public static void renderGuiItem(ItemStack iStack, int pX, int pY, float scale, float scalePos, int zPos) {
+        BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, null, Minecraft.getInstance().player, 0);
+        Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
+        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        PoseStack posestack = RenderSystem.getModelViewStack();
+        posestack.pushPose();
+        posestack.translate((pX+scalePos)*globalScale, (pY+scalePos)*globalScale, zPos);
+        posestack.scale(1.0F, -1.0F, 1.0F);
+        posestack.scale(16.0F, 16.0F, 1F);
+        posestack.scale(globalScale, globalScale, 1f);
+        RenderSystem.applyModelViewMatrix();
+        PoseStack posestack1 = new PoseStack();
+        posestack1.scale(scale,scale,1f);
+        posestack1.translate(0,0,zPos);
+        MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
+        RenderSystem.setupGuiFlatDiffuseLighting(RenderUtils.POS, RenderUtils.NEG);
+
+        Minecraft.getInstance().getItemRenderer().render(iStack, ItemTransforms.TransformType.GUI, false, posestack1, multibuffersource$buffersource, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
+        multibuffersource$buffersource.endBatch();
+        RenderSystem.enableDepthTest();
+
+        posestack.popPose();
+        RenderSystem.applyModelViewMatrix();
     }
 
 

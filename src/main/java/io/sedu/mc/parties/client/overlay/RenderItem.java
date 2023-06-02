@@ -290,12 +290,13 @@ public abstract class RenderItem {
         this.name = name;
     }
 
+    //TODO: Make a client config for this option.
     public static float globalScale = .5f;
     public static void register() {
         IIngameOverlay overlay = (gui, poseStack, partialTicks, width, height) -> {
             if (ClientPlayerData.playerOrderedList.size() == 0) return;
             poseStack.pushPose();
-            globalScale = .75f;
+            globalScale = 1f;
             poseStack.scale(globalScale, globalScale, 1f);
             itemRender.render(gui, poseStack, partialTicks);
             poseStack.popPose();

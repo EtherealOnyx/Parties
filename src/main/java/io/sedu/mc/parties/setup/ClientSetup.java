@@ -66,6 +66,7 @@ public class ClientSetup {
         items.put("mana", new PMana("p_mana"));
         items.put("mana_ss", new PManaSS("p_mana_ss"));
         items.put("stam_ef", new PStamina("p_stam_ef"));
+        items.put("origin", new POrigin("p_origin"));
 
 
 

@@ -206,6 +206,7 @@ public class SettingsScreen extends Screen {
         notEditing = true;
         PHead.icon = null;
         PName.sign = null;
+        POrigin.icon = null;
         GeneralOptions.icon = null;
         PresetOptions.icon = null;
         nameHolder = nameBox.getValue().isEmpty() ? null : nameBox.getValue();
@@ -351,6 +352,8 @@ public class SettingsScreen extends Screen {
         assert Minecraft.getInstance().player != null;
         PHead.icon.addTagElement("SkullOwner", StringTag.valueOf(Minecraft.getInstance().player.getName().getContents()));
         PName.sign = Items.SPRUCE_SIGN.getDefaultInstance();
+        POrigin.icon = Items.NETHER_STAR.getDefaultInstance();
+        POrigin.icon.addTagElement("Enchantments", StringTag.valueOf(""));
 
         //Setup Data.
         initTabButtons();
