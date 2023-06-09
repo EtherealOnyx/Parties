@@ -56,23 +56,29 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.isOnline)
-            renderSelf(i, id, gui, poseStack, partialTicks);
+        if (id.isOnline) {
+            if (id.isSpectator) return;
+            if (id.getDim().active)  {
+                worldAnim(poseStack, i, gui, id.getDim(), partialTicks);
+            } else {
+                world(i, id);
+            }
+        }
     }
 
     @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isSpectator) return;
         if (id.getDim().active)  {
-            worldAnim(poseStack, i, gui, id.getDim(), partialTicks);
+            worldAnim(poseStack, 0, gui, id.getDim(), partialTicks);
         } else {
-            world(i, id);
+            world(0, id);
         }
     }
 
 
     private void world(int pI, ClientPlayerData id) {
-        DimConfig.entry(id.getDim().dimension, (icon, color) -> RenderUtils.renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale, zPos));
+        DimConfig.entry(id.getDim().dimension, (icon, color) -> RenderUtils.renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale, zPos, pI == 0 ? playerScale : partyScale));
     }
 
     protected void renderGuiItemNS(ItemStack iStack, int pX, int pY, float scale, float scalePos) {
@@ -112,10 +118,10 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         PoseStack posestack = RenderSystem.getModelViewStack();
         posestack.pushPose();
-        posestack.translate((pX+x+scalePos)*globalScale, (pY+y+scalePos)*globalScale, zPos+2);
+        posestack.translate((pX+x+scalePos)* playerScale, (pY+y+scalePos)* playerScale, zPos+2);
         posestack.scale(1.0F, -1.0F, 1.0F);
         posestack.scale(16.0F, 16.0F, 1F);
-        posestack.scale(globalScale, globalScale, 1f);
+        posestack.scale(playerScale, playerScale, 1f);
         RenderSystem.applyModelViewMatrix();
         PoseStack posestack1 = new PoseStack();
         posestack1.scale(scale*head.scale,scale*head.scale,1f);
@@ -258,7 +264,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
     }
 
     public ItemBound getRenderItemBound() {
-        return new ItemBound(frameX + x, frameY + y, (int) (width * head.scale), (int) (height * head.scale));
+        return new ItemBound(selfFrameX + x, selfFrameY + y, (int) (width * head.scale), (int) (height * head.scale));
     }
 
     @Override

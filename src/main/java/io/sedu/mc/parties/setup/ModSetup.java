@@ -8,6 +8,7 @@ import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
 import io.sedu.mc.parties.api.mod.hardcorerevival.HRCompatManager;
 import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
+import io.sedu.mc.parties.api.mod.origins.OCompatManager;
 import io.sedu.mc.parties.api.mod.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.api.mod.thirstmod.TMCompatManager;
@@ -44,6 +45,7 @@ public class ModSetup {
         SSCompatManager.init(); //Spells and Shield Support
         PACCompatManager.init(); //Open-PAC Support
         DSCompatManager.init(); //Dietary Stats Support
+        OCompatManager.init(); //Origins Mod Support
         Parties.LOGGER.info("Mod support initialization complete!");
     }
 }

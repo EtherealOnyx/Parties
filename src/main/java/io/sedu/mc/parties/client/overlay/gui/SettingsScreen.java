@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static io.sedu.mc.parties.client.overlay.RenderItem.globalScale;
+import static io.sedu.mc.parties.client.overlay.RenderItem.playerScale;
 import static io.sedu.mc.parties.client.overlay.gui.HoverScreen.notEditing;
 import static io.sedu.mc.parties.util.RenderUtils.*;
 
@@ -231,7 +231,7 @@ public class SettingsScreen extends Screen {
             this.renderTooltip(poseStack, confirmPrompt, pMouseX, pMouseY + 16);
             poseStack.translate(0,0,-1);
         }
-        renderFrameOutline(poseStack);
+        renderSelfFrameOutline(poseStack);
         if (renderSelBox)
             renderSelection(poseStack);
         if (draggingWindow) {
@@ -305,7 +305,7 @@ public class SettingsScreen extends Screen {
     }
 
     private void renderSelection(PoseStack poseStack) {
-        RenderUtils.borderRectNoA(poseStack.last().pose(), 0, 1, (int) (selBoxX*globalScale), (int) (selBoxY*globalScale), (int) Math.ceil(selBoxW*globalScale), (int) Math.ceil(selBoxH*globalScale), ColorAPI.getRainbowColor());
+        RenderUtils.borderRectNoA(poseStack.last().pose(), 0, 1, (int) (selBoxX* playerScale), (int) (selBoxY* playerScale), (int) Math.ceil(selBoxW* playerScale), (int) Math.ceil(selBoxH* playerScale), ColorAPI.getRainbowColor());
     }
 
 

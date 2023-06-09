@@ -1,9 +1,12 @@
 package io.sedu.mc.parties.api.mod.origins;
 
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
-public class IOCompatManager {
+public class OCompatManager {
     private static IOHandler handler = new OHandlerFake();
+    protected static OriginCheckEvent eventInstance;
+
     public static IOHandler getHandler() {
         return handler;
     }
@@ -19,6 +22,8 @@ public class IOCompatManager {
 
     private static void initCompat() {
         handler = new OHandler();
+        eventInstance = new OriginCheckEvent((OHandler) handler);
         active = true;
+        MinecraftForge.EVENT_BUS.register(OEventHandler.class);
     }
 }

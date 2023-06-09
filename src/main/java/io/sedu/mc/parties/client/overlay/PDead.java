@@ -123,8 +123,8 @@ public class PDead extends RenderIconTextItem {
     }
 
     @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        renderMember(i, id, gui, poseStack, partialTicks);
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+        renderMember(0, id, gui, poseStack, partialTicks);
     }
 
     @Override

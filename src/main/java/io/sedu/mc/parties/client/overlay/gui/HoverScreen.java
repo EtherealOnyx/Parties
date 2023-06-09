@@ -2,7 +2,6 @@ package io.sedu.mc.parties.client.overlay.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PEffects;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.sedu.mc.parties.client.overlay.RenderItem.*;
-import static io.sedu.mc.parties.client.overlay.RenderSelfItem.selfIndex;
 import static io.sedu.mc.parties.util.RenderUtils.*;
 
 public class HoverScreen extends Screen {
@@ -68,11 +66,12 @@ public class HoverScreen extends Screen {
     @Override
     protected void init() {
         trimmedMessages = minecraft.gui.getChat().trimmedMessages;
-        frameX = (int) Math.min(ClientConfigData.xPos.get(), width/globalScale - framePosW*(ClientPlayerData.playerOrderedList.size()-1) - frameEleW);
-        frameY = (int) Math.min(ClientConfigData.yPos.get(), height/globalScale - framePosH*(ClientPlayerData.playerOrderedList.size()-1) - frameEleH);
+        selfFrameX = (int) Math.min(ClientConfigData.xPos.get(), width/ playerScale - framePosW*(ClientPlayerData.playerOrderedList.size()-1) - frameEleW);
+        selfFrameY = (int) Math.min(ClientConfigData.yPos.get(), height/ playerScale - framePosH*(ClientPlayerData.playerOrderedList.size()-1) - frameEleH);
+        //TODO: Add for otherFrameX/Y.
         ColorAPI.colorCycle = true;
-        int y = (int) Math.max(0, clickArea.t(0)*globalScale - 10);
-        int x = (int) (clickArea.l(0)*globalScale);
+        int y = (int) Math.max(0, clickArea.t(0)* playerScale - 10);
+        int x = (int) (clickArea.l(0)* playerScale);
         settingsButton = addRenderableWidget(new SmallButton(x, y, "⚙", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.partysettings")), 0, .5f, .5f, .5f, 1f));
         presetButton = addRenderableWidget(new SmallButton(x+11, y, "☰", p -> doTask(5), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.usepreset")), .5f, 1, 0f, 1f, 1f));
         goBackButton = addRenderableWidget(new SmallButton(x, y,"x", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), 1f, .5f, .5f));
@@ -93,7 +92,7 @@ public class HoverScreen extends Screen {
 
         public ScaledButton(int pX, int pY, Component pMessage, OnPress pOnPress,
                             OnTooltip pOnTooltip) {
-            super((int) (pX*globalScale), (int) (pY*globalScale), (int) (20*globalScale), (int) (20*globalScale), pMessage, pOnPress, pOnTooltip);
+            super((int) (pX* playerScale), (int) (pY* playerScale), (int) (20* playerScale), (int) (20* playerScale), pMessage, pOnPress, pOnTooltip);
             this.originX = pX;
             this.originY = pY;
         }
@@ -110,7 +109,7 @@ public class HoverScreen extends Screen {
             RenderSystem.defaultBlendFunc();
             RenderSystem.enableDepthTest();
             pPoseStack.pushPose();
-            pPoseStack.scale(globalScale, globalScale, 1f);
+            pPoseStack.scale(playerScale, playerScale, 1f);
             this.blit(pPoseStack,originX, originY, 0, 46 + i * 20, 10, 20);
             this.blit(pPoseStack, originX + 10, originY, 200 - 10, 46 + i * 20, 10, 20);
             this.renderBg(pPoseStack, minecraft, pMouseX, pMouseY);
@@ -125,99 +124,7 @@ public class HoverScreen extends Screen {
     }
 
     protected void initPartyButtons() {
-        //TODO: Fix for global scale
-        if (ClientPlayerData.partySize() > 1) {
-            Button b;
-            //moveParty.add(addRenderableWidget(createScaledButton(clickArea.l(0) + (clickArea.w() >> 1) - 9, clickArea.t(0) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("⬇"), pButton -> ClientPlayerData.swap(finalI, finalI+1))));
-            if (ClientConfigData.renderSelfFrame.get()) {
-                Parties.LOGGER.debug("Initializing arrange buttons for when rendering self...");
-                for (int i = 0; i < ClientPlayerData.partySize(); i++) {
-                    int finalI = i;
-                    if (i == ClientPlayerData.partySize()-1) {
-                        b = addRenderableWidget(createScaledButton(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
-                        b.active = false;
-                        moveParty.add(b);
-                    }
-                    else
-                        moveParty.add(addRenderableWidget(createScaledButton(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI+1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
-
-                    if (i == 0) {
-                        b = addRenderableWidget(createScaledButton(clickArea.l(i) , clickArea.t(i) + (clickArea.h()>>1) - 10, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
-                        b.active = false;
-                        moveParty.add(b);
-                    }
-                    else
-                        moveParty.add(addRenderableWidget(createScaledButton(clickArea.l(i), clickArea.t(i) + (clickArea.h()>>1) - 10, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI-1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
-                    //rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
-                }
-            } else {
-                Parties.LOGGER.debug("Initializing arrange buttons for when NOT rendering self...");
-                for (int i = 0; i < selfIndex; i++) {
-                    Parties.LOGGER.debug("Current Index: " + i);
-                    int finalI = i;
-                    if (i == ClientPlayerData.partySize() - 1) {
-                        Parties.LOGGER.debug("Adding down disabled for " + i);
-                        b = addRenderableWidget(createScaledButton(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
-                        b.active = false;
-                        moveParty.add(b);
-                    } else {
-                        if (selfIndex == finalI + 1) {
-                            if (finalI + 2 > ClientPlayerData.partySize() - 1) {
-                                Parties.LOGGER.debug("Adding down disabled for " + i);
-                                b = addRenderableWidget(createScaledButton(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
-                                b.active = false;
-                                moveParty.add(b);
-                            } else {
-                                Parties.LOGGER.debug("Adding down enabled for " + i);
-                                moveParty.add(addRenderableWidget(createScaledButton(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 2), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
-                            }
-                        } else {
-                            Parties.LOGGER.debug("Adding down enabled for " + i);
-                            moveParty.add(addRenderableWidget(createScaledButton(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
-                        }
-                    }
-                    if (i == 0) {
-                        Parties.LOGGER.debug("Adding up disabled for " + i);
-                        b = addRenderableWidget(createScaledButton(clickArea.l(i), clickArea.t(i) + (clickArea.h() >> 1) - 10, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
-                        b.active = false;
-                        moveParty.add(b);
-                    } else {
-                        Parties.LOGGER.debug("Adding up enabled for " + i);
-                        moveParty.add(addRenderableWidget(createScaledButton(clickArea.l(i), clickArea.t(i) + (clickArea.h() >> 1) - 10, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
-                    }
-
-                }
-                Parties.LOGGER.debug("Skipping self index value of " + selfIndex);
-                for (int i = selfIndex+1; i < ClientPlayerData.partySize(); i++) {
-                    int finalI = i;
-                    if (i == ClientPlayerData.partySize() - 1) {
-                        Parties.LOGGER.debug("Adding down disabled for " + i);
-                        b = addRenderableWidget(createScaledButton(clickArea.r(i-1) - 20, clickArea.t(i-1) + (clickArea.h() >> 1) - 10, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
-                        b.active = false;
-                        moveParty.add(b);
-                    } else {
-                        Parties.LOGGER.debug("Adding down enabled for " + i);
-                        moveParty.add(addRenderableWidget(createScaledButton(clickArea.r(i-1) - 20, clickArea.t(i-1) + (clickArea.h() >> 1) - 10, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
-                    }
-
-                    if (selfIndex == finalI - 1) {
-                        if (finalI - 2 < 0) {
-                            Parties.LOGGER.debug("Adding up disabled for " + i);
-                            b = addRenderableWidget(createScaledButton(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
-                            b.active = false;
-                            moveParty.add(b);
-                        } else {
-                            Parties.LOGGER.debug("Adding up enabled for " + i);
-                            moveParty.add(addRenderableWidget(createScaledButton(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 2, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
-                        }
-                    } else {
-                        Parties.LOGGER.debug("Adding up enabled for " + i);
-                        moveParty.add(addRenderableWidget(createScaledButton(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
-                    }
-                }
-            }
-
-        }
+        //TODO: Re-implement for other party member list ONLY.
     }
 
     private void initMenuButtons(int x, int y) {
@@ -229,25 +136,25 @@ public class HoverScreen extends Screen {
     }
 
     private void initDragButtons() {
-        int y = (int) Math.max(0, (frameY)*globalScale - 10);
-        moveFrame.add(addRenderableWidget(new SmallButton((int) ((frameX)*globalScale), y, "x", p -> revertPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")), .5f, 0f, 1, .5f, .5f)));
-        moveFrame.add(addRenderableWidget(new SmallButton((int) ((frameX)*globalScale)+11, y,"↺", p -> defaultPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")), .5f, 1f, 1f)));
-        Button b = addRenderableWidget(new SmallButton((int) ((frameX)*globalScale)+22, y,"◄", p -> updatePos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.umove")), 1, 1, .5f));
+        int y = (int) Math.max(0, (selfFrameY)* playerScale - 10);
+        moveFrame.add(addRenderableWidget(new SmallButton((int) ((selfFrameX)* playerScale), y, "x", p -> revertPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")), .5f, 0f, 1, .5f, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton((int) ((selfFrameX)* playerScale)+11, y, "↺", p -> defaultPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")), .5f, 1f, 1f)));
+        Button b = addRenderableWidget(new SmallButton((int) ((selfFrameX)* playerScale)+22, y, "◄", p -> updatePos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.umove")), 1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        b = addRenderableWidget(new SmallButton((int) ((frameX)*globalScale)+33, y, "►", p -> updatePos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rmove")),1, 1, .5f));
+        b = addRenderableWidget(new SmallButton((int) ((selfFrameX)* playerScale)+33, y, "►", p -> updatePos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rmove")), 1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        moveFrame.add(addRenderableWidget(new SmallButton((int) ((frameX)*globalScale)+44, y,"✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton((int) ((selfFrameX)* playerScale)+44, y, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
 
     }
 
     private void acceptPos() {
-        frameX = fX.get(index);
-        frameY = fY.get(index);
-        ClientConfigData.xPos.set(frameX);
+        selfFrameX = fX.get(index);
+        selfFrameY = fY.get(index);
+        ClientConfigData.xPos.set(selfFrameX);
         ClientConfigData.xPos.save();
-        ClientConfigData.yPos.set(frameY);
+        ClientConfigData.yPos.set(selfFrameY);
         ClientConfigData.yPos.save();
         index = 0;
         fX.clear();
@@ -272,8 +179,8 @@ public class HoverScreen extends Screen {
             index++;
         }
 
-        frameX = fX.get(index);
-        frameY = fY.get(index);
+        selfFrameX = fX.get(index);
+        selfFrameY = fY.get(index);
         refreshDragButtons();
         checkIndex();
     }
@@ -291,8 +198,8 @@ public class HoverScreen extends Screen {
     }
 
     private void revertPos() {
-        frameX = revertX;
-        frameY = revertY;
+        selfFrameX = revertX;
+        selfFrameY = revertY;
         fX.clear();
         fY.clear();
         refreshDragButtons();
@@ -300,8 +207,8 @@ public class HoverScreen extends Screen {
     }
 
     private void defaultPos() {
-        frameX = 16;
-        frameY = 16;
+        selfFrameX = 16;
+        selfFrameY = 16;
         ClientConfigData.xPos.set(16);
         ClientConfigData.xPos.save();
         ClientConfigData.yPos.set(16);
@@ -317,8 +224,8 @@ public class HoverScreen extends Screen {
         if (oldMX == null) {
             oldMX = x;
             oldMY = y;
-            oldX = frameX;
-            oldY = frameY;
+            oldX = selfFrameX;
+            oldY = selfFrameY;
         }
 
         checkLimits(x, y);
@@ -328,28 +235,28 @@ public class HoverScreen extends Screen {
     private void checkLimits(int x, int y) {
         int tempFrame = x - oldMX + oldX;
         if (tempFrame < 0) {
-            frameX = 0;
-        } else if (tempFrame + rightLim > this.width/globalScale) {
-            frameX = (int) (this.width/globalScale - rightLim);
+            selfFrameX = 0;
+        } else if (tempFrame + rightLim > this.width/ playerScale) {
+            selfFrameX = (int) (this.width/ playerScale - rightLim);
         } else {
-            frameX = x - oldMX + oldX;
+            selfFrameX = x - oldMX + oldX;
         }
 
         tempFrame = y - oldMY + oldY;
         if (tempFrame < 0) {
-            frameY = 0;
-        } else if (tempFrame + botLim > this.height/globalScale) {
-            frameY = (int) (this.height/globalScale - botLim);
+            selfFrameY = 0;
+        } else if (tempFrame + botLim > this.height/ playerScale) {
+            selfFrameY = (int) (this.height/ playerScale - botLim);
         } else {
-            frameY = y - oldMY + oldY;
+            selfFrameY = y - oldMY + oldY;
         }
 
     }
 
 
     private void refreshDragButtons() {
-        int x = (int) (frameX*globalScale);
-        int y = (int) Math.max(0, frameY*globalScale - 10);
+        int x = (int) (selfFrameX* playerScale);
+        int y = (int) Math.max(0, selfFrameY* playerScale - 10);
         for (int i = 0; i < moveFrame.size(); i++) {
             moveFrame.get(i).x = x+(i*11);
             moveFrame.get(i).y = y;
@@ -359,7 +266,7 @@ public class HoverScreen extends Screen {
     private void save() {
         oldMY = null;
         oldMX = null;
-        if (fX.get(index) == frameX && fY.get(index) == frameY)
+        if (fX.get(index) == selfFrameX && fY.get(index) == selfFrameY)
             return;
 
         index++;
@@ -367,11 +274,11 @@ public class HoverScreen extends Screen {
             fX = new ArrayList<>(fX.subList(0, index));
             fY = new ArrayList<>(fY.subList(0, index));
         }
-        fX.add(frameX);
-        fY.add(frameY);
-        ClientConfigData.xPos.set(frameX);
+        fX.add(selfFrameX);
+        fY.add(selfFrameY);
+        ClientConfigData.xPos.set(selfFrameX);
         ClientConfigData.xPos.save();
-        ClientConfigData.yPos.set(frameY);
+        ClientConfigData.yPos.set(selfFrameY);
         ClientConfigData.yPos.save();
         checkIndex();
 
@@ -422,8 +329,8 @@ public class HoverScreen extends Screen {
             case 3 -> {
                 isMoving = true;
                 moveFrame.forEach(b -> b.visible = true);
-                revertX = frameX;
-                revertY = frameY;
+                revertX = selfFrameX;
+                revertY = selfFrameY;
                 fX.clear();
                 fY.clear();
                 index = 0;
@@ -457,7 +364,7 @@ public class HoverScreen extends Screen {
         checkFrameRender(poseStack);
 
         if (isDragging()) {
-            move((int) (mX/globalScale), (int) (mY/globalScale));
+            move((int) (mX/ playerScale), (int) (mY/ playerScale));
             return;
         } else if (oldMX != null) {
             save();
@@ -481,8 +388,8 @@ public class HoverScreen extends Screen {
             return;
         }
         if (isMoving) {
-            renderFrame(poseStack);
-            renderFrameOutline(poseStack);
+            renderSelfFrame(poseStack);
+            renderSelfFrameOutline(poseStack);
         }
     }
 

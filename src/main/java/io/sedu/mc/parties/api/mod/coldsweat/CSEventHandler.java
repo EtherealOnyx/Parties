@@ -1,10 +1,10 @@
 package io.sedu.mc.parties.api.mod.coldsweat;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.data.PlayerData;
 import io.sedu.mc.parties.events.ClientEvent;
-import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.event.TickEvent;
@@ -14,7 +14,6 @@ import net.minecraftforge.fml.LogicalSide;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static io.sedu.mc.parties.client.overlay.RenderSelfItem.selfIndex;
 import static io.sedu.mc.parties.data.ServerConfigData.playerSlowUpdateInterval;
 import static io.sedu.mc.parties.data.ServerConfigData.playerUpdateInterval;
 
@@ -69,7 +68,8 @@ public class CSEventHandler {
         if (event.phase == TickEvent.Phase.END) {
             if (Minecraft.getInstance().isPaused()) return;
             if (ClientEvent.tick % 20 == 2) {
-                ClientPlayerData.getOrderedPlayer(selfIndex, ClientPlayerData::updateTemperatures);
+                //TODO: Reimplement this for client.
+                ClientPlayerData.getSelf(ClientPlayerData::updateTemperatures);
             }
         }
     }

@@ -55,10 +55,10 @@ public class GeneralOptions extends RenderItem {
         c.addTitleEntry("gen_f");
         //c.addSliderEntry("gen_x", 0, () -> s.width - framePosW*(ClientPlayerData.playerOrderedList.size()-1) - frameEleW, frameX);
         //c.addSliderEntry("gen_y", 0, () -> s.height - framePosH*(ClientPlayerData.playerOrderedList.size()-1) - frameEleH, frameY);
-        c.addSliderWithUpdater("gen_w", 0, () -> s.width - frameX, frameEleW, this::ensureBounds, true);
-        c.addSliderWithUpdater("gen_h", 0, () -> s.height - frameY, frameEleH, this::ensureBounds, true);
-        c.addSliderEntry("gen_pw", 0, () -> s.width - frameX, framePosW, true);
-        c.addSliderEntry("gen_ph", 0, () -> s.height - frameY, framePosH, true);
+        c.addSliderWithUpdater("gen_w", 0, () -> s.width - selfFrameX, frameEleW, this::ensureBounds, true);
+        c.addSliderWithUpdater("gen_h", 0, () -> s.height - selfFrameY, frameEleH, this::ensureBounds, true);
+        c.addSliderEntry("gen_pw", 0, () -> s.width - selfFrameX, framePosW, true);
+        c.addSliderEntry("gen_ph", 0, () -> s.height - selfFrameY, framePosH, true);
         return c;
     }
 

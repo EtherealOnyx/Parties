@@ -1,5 +1,16 @@
 package io.sedu.mc.parties.api.helper;
 
+import com.mojang.blaze3d.platform.NativeImage;
+import io.sedu.mc.parties.lib.ct.ColorThief;
+import io.sedu.mc.parties.lib.ct.RGBUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+
 public class ColorAPI {
 
     public static boolean colorCycle = true;
@@ -85,6 +96,24 @@ public class ColorAPI {
         }
 
         return r << 16 | g << 8 | b;
+    }
+
+    public static int getDomColor(ItemStack item) {
+        Item i = item.getItem();
+        TextureAtlasSprite texture;
+        if (i instanceof BlockItem b) {
+            BlockState state = b.getBlock().defaultBlockState();
+            texture = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(state).getParticleIcon();
+        } else {
+            texture = Minecraft.getInstance().getItemRenderer().getItemModelShaper().getItemModel(item).getParticleIcon();
+        }
+
+        if (texture instanceof MissingTextureAtlasSprite)
+            return 0;
+        NativeImage img = texture.mainImage.length == 0 ? null : texture.mainImage[0];
+        if (img == null) return 0;
+        int[] domColor = ColorThief.getColor(img);
+        return domColor == null ? 0 : RGBUtil.packRGB(domColor);
     }
 
     public static void tick() {

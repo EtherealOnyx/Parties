@@ -233,6 +233,10 @@ dependencies {
     //Dietary Statistics - Local file, also can't test in dev environment...
     compileOnly files("libs/DietaryStatistics-1.0.2.jar")
 
+    //Origins Mod
+    implementation fg.deobf("curse.maven:origins-forge-474438:3889853")
+    runtimeOnly fg.deobf("curse.maven:caelus-308989:3650485")
+
 }
 
 mixin {

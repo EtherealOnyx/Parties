@@ -18,11 +18,11 @@ public abstract class RenderIconTextItem extends RenderSelfItem {
     }
 
     public int tX(int pOffset) {
-        return textAttached ? attachedX(pOffset)  : (int) ((frameX + textX + wOffset(pOffset))/scale);
+        return textAttached ? attachedX(pOffset)  : (int) (((pOffset == 0 ? selfFrameX : otherFrameX) + textX + wOffset(pOffset))/scale);
     }
 
     public int tY(int pOffset) {
-        return textAttached ? attachedY(pOffset)  : (int) ((frameY + textY + hOffset(pOffset))/scale);
+        return textAttached ? attachedY(pOffset)  : (int) (((pOffset == 0 ? selfFrameY : otherFrameY) + textY + hOffset(pOffset))/scale);
     }
 
     protected abstract int attachedX(int pOffset);

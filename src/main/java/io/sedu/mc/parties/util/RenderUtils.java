@@ -422,7 +422,7 @@ public class RenderUtils {
 
     public static void renderClickableArea(PoseStack poseStack) {
         poseStack.pushPose();
-        poseStack.scale(globalScale, globalScale, 1f);
+        poseStack.scale(playerScale, playerScale, 1f);
         if (renderSelfFrame)
             for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
                 clickArea.rect(i, poseStack, -2, -2, ColorAPI.getRainbowColor() | 150 << 24);
@@ -432,27 +432,27 @@ public class RenderUtils {
         poseStack.popPose();
     }
 
-    public static void renderFrame(PoseStack poseStack) {
+    public static void renderSelfFrame(PoseStack poseStack) {
         poseStack.pushPose();
-        poseStack.scale(globalScale, globalScale, 1f);
+        poseStack.scale(playerScale, playerScale, 1f);
         int index = renderSelfFrame ? ClientPlayerData.playerOrderedList.size()-1 : ClientPlayerData.playerOrderedList.size()-2;
-        RenderUtils.sizeRect(poseStack.last().pose(), frameX, frameY, -2, frameEleW + framePosW*index,
+        RenderUtils.sizeRect(poseStack.last().pose(), selfFrameX, selfFrameY, -2, frameEleW + framePosW*index,
                              frameEleH + framePosH*index,
                              ColorAPI.getRainbowColor() | 75 << 24);
         poseStack.popPose();
     }
 
-    public static void renderFrameOutline(PoseStack poseStack) {
+    public static void renderSelfFrameOutline(PoseStack poseStack) {
         poseStack.pushPose();
-        poseStack.scale(globalScale, globalScale, 1f);
+        poseStack.scale(playerScale, playerScale, 1f);
         if (renderSelfFrame)
             for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
-                RenderUtils.borderRect(poseStack.last().pose(), -1, 1, frameX + framePosW*i, frameY + framePosH*i,
+                RenderUtils.borderRect(poseStack.last().pose(), -1, 1, selfFrameX + framePosW*i, selfFrameY + framePosH*i,
                                        frameEleW,
                                        frameEleH, 0xFFFFFFFF);
         else
             for (int i = 0; i < ClientPlayerData.playerOrderedList.size() - 1; i++)
-                RenderUtils.borderRect(poseStack.last().pose(), -1, 1, frameX + framePosW*i, frameY + framePosH*i,
+                RenderUtils.borderRect(poseStack.last().pose(), -1, 1, selfFrameX + framePosW*i, selfFrameY + framePosH*i,
                                        frameEleW,
                                        frameEleH, 0xFFFFFFFF);
         poseStack.popPose();
@@ -542,7 +542,8 @@ public class RenderUtils {
     }
 
 
-    public static void renderGuiItem(ItemStack iStack, int pX, int pY, float scale, float scalePos, int zPos) {
+    public static void renderGuiItem(ItemStack iStack, int pX, int pY, float scale, float scalePos, int zPos,
+                                     float playerScale) {
         BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, null, Minecraft.getInstance().player, 0);
         Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
@@ -551,10 +552,10 @@ public class RenderUtils {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         PoseStack posestack = RenderSystem.getModelViewStack();
         posestack.pushPose();
-        posestack.translate((pX+scalePos)*globalScale, (pY+scalePos)*globalScale, zPos);
+        posestack.translate((pX+scalePos)* playerScale, (pY+scalePos)* playerScale, zPos);
         posestack.scale(1.0F, -1.0F, 1.0F);
         posestack.scale(16.0F, 16.0F, 1F);
-        posestack.scale(globalScale, globalScale, 1f);
+        posestack.scale(playerScale, playerScale, 1f);
         RenderSystem.applyModelViewMatrix();
         PoseStack posestack1 = new PoseStack();
         posestack1.scale(scale,scale,1f);

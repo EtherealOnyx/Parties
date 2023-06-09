@@ -188,7 +188,7 @@ public class PThirst extends OverflowBarBase {
         c.addTitleEntry("text");
         c.addBooleanEntry("tdisplay", textEnabled);
         c.addBooleanEntry("tshadow", textShadow);
-        c.addSliderEntry("ttype", 0, () -> 2, ThirstAnim.type);
+        c.addSliderEntry("ttype", 0, () -> 3, ThirstAnim.type);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
         entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));

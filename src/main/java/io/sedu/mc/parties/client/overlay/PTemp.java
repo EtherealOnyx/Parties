@@ -46,9 +46,9 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
     }
 
     @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (!id.isSpectator) {
-            render.render(i,id,gui,poseStack,partialTicks);
+            render.render(0,id,gui,poseStack,partialTicks);
         }
 
     }

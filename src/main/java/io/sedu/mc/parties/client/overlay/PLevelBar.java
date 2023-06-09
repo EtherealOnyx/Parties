@@ -77,9 +77,9 @@ public class PLevelBar extends RenderIconTextItem implements TooltipItem {
     }
 
     @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isSpectator) return;
-        renderBar(i, poseStack, id.getXpBarForced(), id.getLevelForced(), gui);
+        renderBar(0, poseStack, id.getXpBarForced(), id.getLevelForced(), gui);
     }
 
     void renderBar(int i, PoseStack poseStack, float bar, int level, ForgeIngameGui gui) {
@@ -208,7 +208,7 @@ public class PLevelBar extends RenderIconTextItem implements TooltipItem {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                if (isSelf(index)) {
+                if (index == 0) {
                     renderXpTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.getXpBarForced(), p.getLevelForced());
                 } else {
                     renderXpTooltip(poseStack, gui, mouseX, mouseY, 10, 0, p.getXpBar(), p.getXpLevel());

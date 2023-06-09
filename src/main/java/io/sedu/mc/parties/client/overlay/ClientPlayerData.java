@@ -16,6 +16,7 @@ import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.anim.*;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
+import io.sedu.mc.parties.data.ClientConfigData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
@@ -34,7 +35,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static io.sedu.mc.parties.client.overlay.DataType.*;
-import static io.sedu.mc.parties.client.overlay.RenderSelfItem.selfIndex;
 
 public class ClientPlayerData {
     public static HashMap<UUID, ClientPlayerData> playerList = new HashMap<>();
@@ -74,12 +74,17 @@ public class ClientPlayerData {
         initData();
     }
 
-    public static void forEachWithoutSelf(BiConsumer<Integer, ClientPlayerData> action) {
-        for (int i = 0; i < selfIndex; i++) {
-            action.accept(i, ClientPlayerData.playerList.get(playerOrderedList.get(i)));
+
+
+    public static void forSelf(Consumer<ClientPlayerData> action) {
+        if (ClientConfigData.renderSelfFrame.get()) {
+            action.accept(ClientPlayerData.playerList.get(playerOrderedList.get(0)));
         }
-        for (int i = selfIndex+1; i < ClientPlayerData.playerOrderedList.size(); i++) {
-            action.accept(i-1, ClientPlayerData.playerList.get(playerOrderedList.get(i)));
+    }
+
+    public static void forOthersOrdered(BiConsumer<Integer, ClientPlayerData> action) {
+        for (int i = 1; i < ClientPlayerData.playerOrderedList.size(); i++) {
+            action.accept(i, ClientPlayerData.playerList.get(playerOrderedList.get(i)));
         }
     }
 
@@ -105,7 +110,7 @@ public class ClientPlayerData {
     }
 
     public static void getSelf(Consumer<ClientPlayerData> action) {
-        getOrderedPlayer(selfIndex, action);
+        getOrderedPlayer(0, action);
     }
 
     public static void addClientMember(UUID uuid) {
@@ -162,7 +167,6 @@ public class ClientPlayerData {
     public static void resetOnly() {
         playerList.clear();
         playerOrderedList.clear();
-        selfIndex = 0;
         leader = null;
     }
 
@@ -177,7 +181,6 @@ public class ClientPlayerData {
         UUID temp = ClientPlayerData.playerOrderedList.get(f);
         ClientPlayerData.playerOrderedList.set(f, ClientPlayerData.playerOrderedList.get(s));
         ClientPlayerData.playerOrderedList.set(s, temp);
-        RenderSelfItem.updateSelfIndex();
     }
 
     public static void markEffectsDirty() {

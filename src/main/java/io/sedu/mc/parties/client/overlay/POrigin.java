@@ -99,20 +99,27 @@ public class POrigin extends RenderIconTextItem {
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.isOnline)
-            renderSelf(i, id, gui, poseStack, partialTicks);
+        if (id.isOnline && !id.isSpectator)
+            if (iconEnabled) {
+                RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, 0x222222, 0xFFD700);
+                RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 0, width, height, 0xAAAAAA, 0x555555);
+                RenderUtils.renderGuiItem(iconTemp, xNormal(i), yNormal(i), scale, 6*scale, zPos, partyScale);
+            }
+        if (textEnabled)
+            textCentered(tX(i), tY(i), gui, poseStack, "Origin", color);
+
     }
 
     @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isSpectator) return;
         if (iconEnabled) {
-            RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, 0x222222, 0xFFD700);
-            RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 0, width, height, 0xAAAAAA, 0x555555);
-            RenderUtils.renderGuiItem(iconTemp, xNormal(i), yNormal(i), scale, 6*scale, zPos);
+            RenderUtils.offRectNoA(poseStack.last().pose(), x(0), y(0), zPos, -1, width, height, 0x222222, 0xFFD700);
+            RenderUtils.offRectNoA(poseStack.last().pose(), x(0), y(0), zPos, 0, width, height, 0xAAAAAA, 0x555555);
+            RenderUtils.renderGuiItem(iconTemp, xNormal(0), yNormal(0), scale, 6*scale, zPos, playerScale);
         }
         if (textEnabled)
-            textCentered(tX(i), tY(i), gui, poseStack, "Origin", color);
+            textCentered(tX(0), tY(0), gui, poseStack, "Origin", color);
 
 
     }

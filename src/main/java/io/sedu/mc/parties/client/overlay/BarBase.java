@@ -64,14 +64,14 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.isOnline)
-            renderSelf(i, id, gui, poseStack, partialTicks);
+        if (id.isOnline && !id.isSpectator)
+            renderBar.render(i, id, gui, poseStack, partialTicks);
     }
 
     @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isSpectator) return;
-        renderBar.render(i, id, gui, poseStack, partialTicks);
+        renderBar.render(0, id, gui, poseStack, partialTicks);
     }
 
     protected abstract void renderSelfBar(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
@@ -114,11 +114,11 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
     }
 
     public int tXI(int pOffset) {
-        return textAttached ? attachedXIcon(pOffset)  : (int) ((frameX + textX + wOffset(pOffset))/scale);
+        return textAttached ? attachedXIcon(pOffset)  : (int) (((pOffset == 0 ? selfFrameX : otherFrameX) + textX + wOffset(pOffset))/scale);
     }
 
     public int tYI(int pOffset) {
-        return textAttached ? attachedYIcon(pOffset)  : (int) ((frameY + textY + hOffset(pOffset))/scale);
+        return textAttached ? attachedYIcon(pOffset)  : (int) (((pOffset == 0 ? selfFrameY : otherFrameY)  + textY + hOffset(pOffset))/scale);
     }
 
 
