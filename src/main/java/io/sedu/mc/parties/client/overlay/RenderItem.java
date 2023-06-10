@@ -144,8 +144,8 @@ public abstract class RenderItem {
     public static void updateFramePos() {
         Window w = Minecraft.getInstance().getWindow();
         //TODO: include other frame.
-        selfFrameX = Math.min(ClientConfigData.xPos.get(), w.getScreenWidth() - framePosW*(ClientPlayerData.playerOrderedList.size()-1) - frameEleW);
-        selfFrameY = Math.min(ClientConfigData.yPos.get(), w.getScreenHeight() - framePosH*(ClientPlayerData.playerOrderedList.size()-1) - frameEleH);
+        selfFrameX = Math.min(ClientConfigData.xPos.get(), w.getScreenWidth() - frameEleW);
+        selfFrameY = Math.min(ClientConfigData.yPos.get(), w.getScreenHeight() - frameEleH);
     }
 
     public boolean isEnabled() {
@@ -223,44 +223,44 @@ public abstract class RenderItem {
     //abstract void resetElement();
 
     int hOffset(int pOffset) {
-        return pOffset*framePosH;
+        return pOffset == 0 ? 0 : (pOffset-1)*framePosH;
     }
 
     int wOffset(int pOffset) {
-        return pOffset*framePosW;
+        return pOffset == 0 ? 0 : (pOffset-1)*framePosW;
     }
 
     public int x(int pOffset) {
-        return (int) (((pOffset == 0 ? selfFrameX : otherFrameX) + x + wOffset(pOffset))/scale);
+        return (int) ((pOffset == 0 ? selfFrameX + x : otherFrameX + x + framePosW*(pOffset-1))/scale);
     }
 
     public int y(int pOffset) {
-        return (int) (((pOffset == 0 ? selfFrameY : otherFrameY) + y + hOffset(pOffset))/scale);
+        return (int) ((pOffset == 0 ? selfFrameY + y: otherFrameY + y + framePosH*(pOffset-1))/scale);
     }
 
 
     public int xNormal(int pOffset) {
-        return (pOffset == 0 ? selfFrameX : otherFrameX) + x + wOffset(pOffset);
+        return pOffset == 0 ? selfFrameX + x: otherFrameX + x + framePosW*(pOffset-1);
     }
 
     public int yNormal(int pOffset) {
-        return (pOffset == 0 ? selfFrameY : otherFrameY) + y + hOffset(pOffset);
+        return pOffset == 0 ? selfFrameY + y: otherFrameY + y + framePosH*(pOffset-1);
     }
 
     public int l(int pOffset) {
-        return x + (pOffset == 0 ? selfFrameX : otherFrameX) + wOffset(pOffset);
+        return pOffset == 0 ? x + selfFrameX: x + otherFrameX + framePosW*(pOffset - 1);
     }
 
     public int r(int pOffset) {
-        return x + (pOffset == 0 ? selfFrameX : otherFrameX)  + width + wOffset(pOffset);
+        return pOffset == 0 ? x + selfFrameX + width : x + otherFrameX + framePosW*(pOffset - 1) + width;
     }
 
     public int t(int pOffset) {
-        return y + (pOffset == 0 ? selfFrameY : otherFrameY) + hOffset(pOffset);
+        return pOffset == 0 ? y + selfFrameY : y + otherFrameY + framePosH*(pOffset - 1);
     }
 
     public int b(int pOffset) {
-        return y + (pOffset == 0 ? selfFrameY : otherFrameY) + height + hOffset(pOffset);
+        return pOffset == 0 ? y + selfFrameY + height : y + otherFrameY + framePosH*(pOffset - 1) + height;
     }
 
     abstract void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
@@ -898,12 +898,12 @@ public abstract class RenderItem {
 
 
         for (int i = 1; i < ClientPlayerData.playerOrderedList.size(); i++) {
-            partyMouseX -= framePosW;
-            partyMouseY -= framePosH;
             if (partyMouseX < 0 || partyMouseY < 0) return;
             if (partyMouseX < frameEleW && partyMouseY < frameEleH) {
                 action.accept(i, partyMouseX, partyMouseY);
             }
+            partyMouseX -= framePosW;
+            partyMouseY -= framePosH;
         }
     }
 

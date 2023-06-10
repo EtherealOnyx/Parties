@@ -51,7 +51,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        DimConfig.entry("minecraft:overworld", (icon, color) -> renderGuiItemNS(icon, b.x+7, b.y+3, .75f, 5));
+        DimConfig.entry("minecraft:overworld", (icon, color) -> renderGuiItemMenu(icon, b.x+7, b.y+3));
     }
 
     @Override
@@ -81,7 +81,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         DimConfig.entry(id.getDim().dimension, (icon, color) -> RenderUtils.renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale, zPos, pI == 0 ? playerScale : partyScale));
     }
 
-    protected void renderGuiItemNS(ItemStack iStack, int pX, int pY, float scale, float scalePos) {
+    protected void renderGuiItemMenu(ItemStack iStack, int pX, int pY) {
         BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, null, Minecraft.getInstance().player, 0);
         Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
@@ -90,12 +90,12 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         PoseStack posestack = RenderSystem.getModelViewStack();
         posestack.pushPose();
-        posestack.translate((pX+scalePos), (pY+scalePos), zPos+2);
+        posestack.translate((pX+ (float) 5), (pY+ (float) 5), zPos+2);
         posestack.scale(1.0F, -1.0F, 1.0F);
         posestack.scale(16.0F, 16.0F, 1F);
         RenderSystem.applyModelViewMatrix();
         PoseStack posestack1 = new PoseStack();
-        posestack1.scale(scale,scale,1f);
+        posestack1.scale((float) 0.75, (float) 0.75, 1f);
         MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
         RenderSystem.setupGuiFlatDiffuseLighting(RenderUtils.POS, RenderUtils.NEG);
 
@@ -109,7 +109,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
 
 
-    protected void renderGuiItem(ItemStack iStack, int pX, int pY, float x, float y, float scale, float scalePos) {
+    protected void renderGuiItem(ItemStack iStack, int pX, int pY, float x, float y, float scale, float scalePos, float playerScale) {
         BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, null, Minecraft.getInstance().player, 0);
         Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
@@ -166,7 +166,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         }
         translateY += offY;
 
-        renderGuiItem(DimConfig.item(dim.dimension), x(pI), y(pI), translateX, translateY, scale, scalePos);
+        renderGuiItem(DimConfig.item(dim.dimension), x(pI), y(pI), translateX, translateY, scale, scalePos, pI == 0 ? playerScale : partyScale);
 
         if (renderText)
             //TODO: Extract sounds to their own implementation

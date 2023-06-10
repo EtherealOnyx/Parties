@@ -7,7 +7,6 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import io.sedu.mc.parties.api.helper.ColorAPI;
-import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PHead;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -421,23 +420,21 @@ public class RenderUtils {
 
 
     public static void renderClickableArea(PoseStack poseStack) {
-        poseStack.pushPose();
-        poseStack.scale(playerScale, playerScale, 1f);
-        if (renderSelfFrame)
-            for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
-                clickArea.rect(i, poseStack, -2, -2, ColorAPI.getRainbowColor() | 150 << 24);
-        else
-            for (int i = 0; i < ClientPlayerData.playerOrderedList.size() - 1; i++)
-                clickArea.rect(i, poseStack, -2, -2, ColorAPI.getRainbowColor() | 150 << 24);
-        poseStack.popPose();
+        if (renderSelfFrame) {
+            poseStack.pushPose();
+            //For Self
+            poseStack.scale(playerScale, playerScale, 1f);
+            clickArea.rect(0, poseStack, -2, -2, ColorAPI.getRainbowColor() | 150 << 24);
+            poseStack.popPose();
+        }
+        //TODO: For other members.
     }
 
     public static void renderSelfFrame(PoseStack poseStack) {
         poseStack.pushPose();
         poseStack.scale(playerScale, playerScale, 1f);
-        int index = renderSelfFrame ? ClientPlayerData.playerOrderedList.size()-1 : ClientPlayerData.playerOrderedList.size()-2;
-        RenderUtils.sizeRect(poseStack.last().pose(), selfFrameX, selfFrameY, -2, frameEleW + framePosW*index,
-                             frameEleH + framePosH*index,
+        RenderUtils.sizeRect(poseStack.last().pose(), selfFrameX, selfFrameY, -2, frameEleW,
+                             frameEleH,
                              ColorAPI.getRainbowColor() | 75 << 24);
         poseStack.popPose();
     }
@@ -445,16 +442,9 @@ public class RenderUtils {
     public static void renderSelfFrameOutline(PoseStack poseStack) {
         poseStack.pushPose();
         poseStack.scale(playerScale, playerScale, 1f);
-        if (renderSelfFrame)
-            for (int i = 0; i < ClientPlayerData.playerOrderedList.size(); i++)
-                RenderUtils.borderRect(poseStack.last().pose(), -1, 1, selfFrameX + framePosW*i, selfFrameY + framePosH*i,
-                                       frameEleW,
-                                       frameEleH, 0xFFFFFFFF);
-        else
-            for (int i = 0; i < ClientPlayerData.playerOrderedList.size() - 1; i++)
-                RenderUtils.borderRect(poseStack.last().pose(), -1, 1, selfFrameX + framePosW*i, selfFrameY + framePosH*i,
-                                       frameEleW,
-                                       frameEleH, 0xFFFFFFFF);
+        RenderUtils.borderRect(poseStack.last().pose(), -1, 1, selfFrameX, selfFrameY,
+                               frameEleW,
+                               frameEleH, 0xFFFFFFFF);
         poseStack.popPose();
     }
 

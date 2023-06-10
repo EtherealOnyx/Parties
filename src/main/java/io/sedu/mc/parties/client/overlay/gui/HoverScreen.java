@@ -39,16 +39,17 @@ public class HoverScreen extends Screen {
     private int revertY = 0;
     private int oldX = 0;
     private int oldY = 0;
-    private int botLim = 0;
-    private int rightLim = 0;
+
     private Integer oldMX = null;
     private Integer oldMY = null;
     private int index = 0;
     private static int key;
-    private List<Button> moveParty = new ArrayList<>();
-    private List<Button> menu = new ArrayList<>();
-    private List<Button> moveFrame = new ArrayList<>();
+    private final List<Button> moveParty = new ArrayList<>();
+    private final List<Button> menu = new ArrayList<>();
+    private final List<Button> moveFrame = new ArrayList<>();
+    private final List<Button> partyMoveFrame = new ArrayList<>();
     private Button settingsButton;
+    private Button partySettingsButton;
     private Button presetButton;
     private Button goBackButton;
     private List<GuiMessage<FormattedCharSequence>> trimmedMessages;
@@ -66,18 +67,21 @@ public class HoverScreen extends Screen {
     @Override
     protected void init() {
         trimmedMessages = minecraft.gui.getChat().trimmedMessages;
-        selfFrameX = (int) Math.min(ClientConfigData.xPos.get(), width/ playerScale - framePosW*(ClientPlayerData.playerOrderedList.size()-1) - frameEleW);
-        selfFrameY = (int) Math.min(ClientConfigData.yPos.get(), height/ playerScale - framePosH*(ClientPlayerData.playerOrderedList.size()-1) - frameEleH);
+        selfFrameX = (int) Math.min(ClientConfigData.xPos.get(), width / playerScale - frameEleW);
+        selfFrameY = (int) Math.min(ClientConfigData.yPos.get(), height/ playerScale - frameEleH);
         //TODO: Add for otherFrameX/Y.
         ColorAPI.colorCycle = true;
         int y = (int) Math.max(0, clickArea.t(0)* playerScale - 10);
         int x = (int) (clickArea.l(0)* playerScale);
+        int oY = (int) Math.max(0, clickArea.t(1)* partyScale - 10);
+        int oX = (int) (clickArea.l(1)* partyScale);
         settingsButton = addRenderableWidget(new SmallButton(x, y, "⚙", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.partysettings")), 0, .5f, .5f, .5f, 1f));
+        partySettingsButton = addRenderableWidget(new SmallButton(oX, oY, "⚙", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.partysettings")), 0, .5f, .5f, .5f, 1f));
         presetButton = addRenderableWidget(new SmallButton(x+11, y, "☰", p -> doTask(5), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.usepreset")), .5f, 1, 0f, 1f, 1f));
         goBackButton = addRenderableWidget(new SmallButton(x, y,"x", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), 1f, .5f, .5f));
         initPartyButtons();
-        initMenuButtons(x, y);
-        initDragButtons();
+        initMenuButtons(x, y, oX, oY);
+        initDragButtons((int) ((selfFrameX)* playerScale), (int) Math.max(0, (selfFrameY)* playerScale - 10), (int) ((otherFrameX)* partyScale), (int) Math.max(0, (otherFrameY)* partyScale - 10));
         doTask(0);
     }
 
@@ -127,46 +131,64 @@ public class HoverScreen extends Screen {
         //TODO: Re-implement for other party member list ONLY.
     }
 
-    private void initMenuButtons(int x, int y) {
+    private void initMenuButtons(int x, int y, int oX, int oY) {
         menu.add(addRenderableWidget(new SmallButton(x, y, "x", p -> doTask(0), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), .5f, 0f, 1f, .5f, .5f)));
-        menu.add(addRenderableWidget(new SmallButton(x+11, y,"⬆⬇", p -> doTask(2), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rearrange")), .5f, .25f, .5f, .5f, 1f)));
-        menu.add(addRenderableWidget(new SmallButton(x+22, y,"✥", p -> doTask(3), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.move")), 0, 1, .5f, .5f, 1f)));
-        menu.add(addRenderableWidget(new SmallButton(x+33, y,"⚙", p -> doTask(4), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.advsettings")), 0, .5f, .5f, 1f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(oX+11, oY,"⬆⬇", p -> doTask(2), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rearrange")), .5f, .25f, .5f, .5f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(x+11, y,"✥", p -> doTask(3), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.move")), 0, 1, .5f, .5f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(x+22, y,"⚙", p -> doTask(4), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.advsettings")), 0, .5f, .5f, 1f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(oX, oY, "x", p -> doTask(0), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), .5f, 0f, 1f, .5f, .5f)));
+        menu.add(addRenderableWidget(new SmallButton(oX+22, oY,"✥", p -> doTask(3), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.move")), 0, 1, .5f, .5f, 1f)));
 
     }
 
-    private void initDragButtons() {
-        int y = (int) Math.max(0, (selfFrameY)* playerScale - 10);
-        moveFrame.add(addRenderableWidget(new SmallButton((int) ((selfFrameX)* playerScale), y, "x", p -> revertPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")), .5f, 0f, 1, .5f, .5f)));
-        moveFrame.add(addRenderableWidget(new SmallButton((int) ((selfFrameX)* playerScale)+11, y, "↺", p -> defaultPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")), .5f, 1f, 1f)));
-        Button b = addRenderableWidget(new SmallButton((int) ((selfFrameX)* playerScale)+22, y, "◄", p -> updatePos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.umove")), 1, 1, .5f));
+    private void initDragButtons(int x, int y, int oX, int oY) {
+        moveFrame.add(addRenderableWidget(new SmallButton(x, y, "x", p -> revertPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")), .5f, 0f, 1, .5f, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(x+11, y, "↺", p -> defaultPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")), .5f, 1f, 1f)));
+        Button b = addRenderableWidget(new SmallButton(x+22, y, "◄", p -> updatePos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.umove")), 1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        b = addRenderableWidget(new SmallButton((int) ((selfFrameX)* playerScale)+33, y, "►", p -> updatePos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rmove")), 1, 1, .5f));
+        b = addRenderableWidget(new SmallButton(x+33, y, "►", p -> updatePos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rmove")), 1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        moveFrame.add(addRenderableWidget(new SmallButton((int) ((selfFrameX)* playerScale)+44, y, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(x+44, y, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
 
+        //Other members
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(oX, oY, "x", p -> revertPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")), .5f, 0f, 1, .5f, .5f)));
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+11, oY, "↺", p -> defaultPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")), .5f, 1f, 1f)));
+        b = addRenderableWidget(new SmallButton(oX+22, oY, "◄", p -> updatePos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.umove")), 1, 1, .5f));
+        b.active = false;
+        partyMoveFrame.add(b);
+        b = addRenderableWidget(new SmallButton(oX+33, oY, "►", p -> updatePos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rmove")), 1, 1, .5f));
+        b.active = false;
+        partyMoveFrame.add(b);
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+44, oY, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
     }
 
     private void acceptPos() {
+        System.out.println(" REG " + selfFrameY);
         selfFrameX = fX.get(index);
         selfFrameY = fY.get(index);
+        System.out.println(" 1 " + selfFrameY);
         ClientConfigData.xPos.set(selfFrameX);
         ClientConfigData.xPos.save();
         ClientConfigData.yPos.set(selfFrameY);
         ClientConfigData.yPos.save();
+        System.out.println(" 2 " + selfFrameY);
         index = 0;
         fX.clear();
         fY.clear();
+        System.out.println(" 3 " + selfFrameY);
         refreshAllButtons();
+        System.out.println(" 4 " + selfFrameY);
         doTask(1);
+        System.out.println(" 5 " + selfFrameY);
     }
 
     private void refreshAllButtons() {
         clearWidgets();
         moveParty.clear();
         moveFrame.clear();
+        partyMoveFrame.clear();
         menu.clear();
         init();
         doTask(1);
@@ -181,20 +203,33 @@ public class HoverScreen extends Screen {
 
         selfFrameX = fX.get(index);
         selfFrameY = fY.get(index);
-        refreshDragButtons();
-        checkIndex();
+        refreshDragButtons(true);
+        checkIndex(true); //TODO: Add non-self frame.
     }
 
-    private void checkIndex() {
-        if (index == 0)
-            moveFrame.get(2).active = false;
-        else if (index <= fX.size())
-            moveFrame.get(2).active = true;
+    private void checkIndex(boolean selfFrame) {
+        if (selfFrame) {
+            if (index == 0)
+                moveFrame.get(2).active = false;
+            else if (index <= fX.size())
+                moveFrame.get(2).active = true;
 
-        if (index >= fX.size()-1)
-            moveFrame.get(3).active = false;
-        else if (index >= 0)
-            moveFrame.get(3).active = true;
+            if (index >= fX.size()-1)
+                moveFrame.get(3).active = false;
+            else if (index >= 0)
+                moveFrame.get(3).active = true;
+        } else {
+            if (index == 0) //TODO: another index variable for the party move frame.
+                partyMoveFrame.get(2).active = false;
+            else if (index <= fX.size())
+                partyMoveFrame.get(2).active = true;
+
+            if (index >= fX.size()-1)
+                partyMoveFrame.get(3).active = false;
+            else if (index >= 0)
+                partyMoveFrame.get(3).active = true;
+        }
+
     }
 
     private void revertPos() {
@@ -202,7 +237,7 @@ public class HoverScreen extends Screen {
         selfFrameY = revertY;
         fX.clear();
         fY.clear();
-        refreshDragButtons();
+        refreshDragButtons(true);
         doTask(1);
     }
 
@@ -229,15 +264,15 @@ public class HoverScreen extends Screen {
         }
 
         checkLimits(x, y);
-        refreshDragButtons();
+        refreshDragButtons(true); //TODO: Add.
     }
 
     private void checkLimits(int x, int y) {
         int tempFrame = x - oldMX + oldX;
         if (tempFrame < 0) {
             selfFrameX = 0;
-        } else if (tempFrame + rightLim > this.width/ playerScale) {
-            selfFrameX = (int) (this.width/ playerScale - rightLim);
+        } else if (tempFrame + frameEleW > this.width/ playerScale) {
+            selfFrameX = (int) (this.width/ playerScale - frameEleW);
         } else {
             selfFrameX = x - oldMX + oldX;
         }
@@ -245,8 +280,8 @@ public class HoverScreen extends Screen {
         tempFrame = y - oldMY + oldY;
         if (tempFrame < 0) {
             selfFrameY = 0;
-        } else if (tempFrame + botLim > this.height/ playerScale) {
-            selfFrameY = (int) (this.height/ playerScale - botLim);
+        } else if (tempFrame + frameEleH > this.height/ playerScale) {
+            selfFrameY = (int) (this.height/ playerScale - frameEleH);
         } else {
             selfFrameY = y - oldMY + oldY;
         }
@@ -254,13 +289,23 @@ public class HoverScreen extends Screen {
     }
 
 
-    private void refreshDragButtons() {
-        int x = (int) (selfFrameX* playerScale);
-        int y = (int) Math.max(0, selfFrameY* playerScale - 10);
-        for (int i = 0; i < moveFrame.size(); i++) {
-            moveFrame.get(i).x = x+(i*11);
-            moveFrame.get(i).y = y;
+    private void refreshDragButtons(boolean selfFrame) {
+        if (selfFrame) {
+            int x = (int) (selfFrameX* playerScale);
+            int y = (int) Math.max(0, selfFrameY* playerScale - 10);
+            for (int i = 0; i < moveFrame.size(); i++) {
+                moveFrame.get(i).x = x+(i*11);
+                moveFrame.get(i).y = y;
+            }
+        } else {
+            int x = (int) (otherFrameX* partyScale);
+            int y = (int) Math.max(0, otherFrameY* partyScale - 10);
+            for (int i = 0; i < partyMoveFrame.size(); i++) {
+                partyMoveFrame.get(i).x = x+(i*11);
+                partyMoveFrame.get(i).y = y;
+            }
         }
+
     }
 
     private void save() {
@@ -280,7 +325,7 @@ public class HoverScreen extends Screen {
         ClientConfigData.xPos.save();
         ClientConfigData.yPos.set(selfFrameY);
         ClientConfigData.yPos.save();
-        checkIndex();
+        checkIndex(true);
 
     }
 
@@ -289,34 +334,26 @@ public class HoverScreen extends Screen {
         isMoving = false;
         notEditing = true;
         settingsButton.visible = false;
+        partySettingsButton.visible = false;
         goBackButton.visible = false;
         presetButton.visible = false;
         menu.forEach(b -> b.visible = false);
         moveParty.forEach(b -> b.visible = false);
         moveFrame.forEach(b -> b.visible = false);
+        partyMoveFrame.forEach(b -> b.visible = false);
 
         switch (task) {
             case 0 -> {
                 //Standard screen
                 presetButton.visible = true;
                 settingsButton.visible = true;
+                partySettingsButton.visible = true;
             }
 
             case 1 -> //Settings screen
             {
                 menu.forEach(b -> b.visible = true);
-                if (renderSelfFrame) {
-                    menu.get(1).active = true;
-                    menu.get(2).active = true;
-                } else {
-                    if (ClientPlayerData.playerList.size() > 1) {
-                        menu.get(1).active = true;
-                        menu.get(2).active = true;
-                    } else {
-                        menu.get(1).active = false;
-                        menu.get(2).active = false;
-                    }
-                }
+                menu.get(1).active = ClientPlayerData.playerList.size() > 3;
                 notEditing = false;
             }
 
@@ -329,6 +366,7 @@ public class HoverScreen extends Screen {
             case 3 -> {
                 isMoving = true;
                 moveFrame.forEach(b -> b.visible = true);
+                partyMoveFrame.forEach(b -> b.visible = true);
                 revertX = selfFrameX;
                 revertY = selfFrameY;
                 fX.clear();
@@ -337,13 +375,6 @@ public class HoverScreen extends Screen {
                 fX.add(revertX);
                 fY.add(revertY);
                 notEditing = false;
-                if (renderSelfFrame) {
-                    botLim = (frameEleH + framePosH*(ClientPlayerData.playerList.size() - 1));
-                    rightLim = (frameEleW + framePosW*(ClientPlayerData.playerList.size() - 1));
-                } else {
-                    botLim = frameEleH + framePosH*(Math.min(ClientPlayerData.playerList.size() - 2, 1));
-                    rightLim = frameEleW + framePosW*(Math.min(ClientPlayerData.playerList.size() - 2, 1));
-                }
             }
             case 4 -> {
                 //Still technically active?
@@ -354,6 +385,7 @@ public class HoverScreen extends Screen {
                 Minecraft.getInstance().setScreen(new SettingsScreen(true));
             }
         }
+        System.out.println(selfFrameY);
     }
 
     public void render(PoseStack poseStack, int mX, int mY, float partialTick) {
@@ -388,8 +420,11 @@ public class HoverScreen extends Screen {
             return;
         }
         if (isMoving) {
-            renderSelfFrame(poseStack);
-            renderSelfFrameOutline(poseStack);
+            if (renderSelfFrame) {
+                renderSelfFrame(poseStack);
+                renderSelfFrameOutline(poseStack);
+            }
+
         }
     }
 

@@ -22,7 +22,7 @@ public class OEventHandler {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (ClientEvent.tick % 100 == 0 && Minecraft.getInstance().player != null) {
             //Parties.LOGGER.debug(getHandler().getMainOriginClient(Minecraft.getInstance().player));
-            OriginHolder.printOriginInfo();
+            //OriginHolder.printOriginInfo();
         }
     }
 
