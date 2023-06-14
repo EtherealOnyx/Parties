@@ -22,6 +22,8 @@ public class ClientConfigData {
 
     public static ForgeConfigSpec.IntValue xPos;
     public static ForgeConfigSpec.IntValue yPos;
+    public static ForgeConfigSpec.IntValue xPosParty;
+    public static ForgeConfigSpec.IntValue yPosParty;
     public static void registerClientConfig(ForgeConfigSpec.Builder CLIENT_BUILDER) {
         CLIENT_BUILDER.comment("--------------------------------------------------------",
                                "Client Party Settings",
@@ -56,16 +58,23 @@ public class ClientConfigData {
                                        //.define("renderStamina", true);
         CLIENT_BUILDER.pop();
         CLIENT_BUILDER.push("party-ui");
-        xPos = CLIENT_BUILDER.comment("X Position of the party frame.",
-                                      "Note: The party frame is bounded by the screen size.")
-                             .defineInRange("xPos", 16, 0, Integer.MAX_VALUE);
-        yPos = CLIENT_BUILDER.comment("Y Position of the party frame.",
-                                      "Note: The party frame is bounded by the screen size.")
-                             .defineInRange("yPos", 16, 0, Integer.MAX_VALUE);
         renderSelfFrame = CLIENT_BUILDER.comment("Render your information as a party member.",
                                                  "If true, this will include you in the party list. This will also render your information when outside the party.",
                                                  "If false, your information will NOT be rendered both in a party and outside a party.")
                                         .define("renderSelfFrame", true);
+        xPos = CLIENT_BUILDER.comment("X Position of the player frame.",
+                                      "Note: The player frame is bounded by the screen size.")
+                             .defineInRange("xPos", 16, 0, Integer.MAX_VALUE);
+        yPos = CLIENT_BUILDER.comment("Y Position of the player frame.",
+                                      "Note: The player frame is bounded by the screen size.")
+                             .defineInRange("yPos", 16, 0, Integer.MAX_VALUE);
+        xPosParty = CLIENT_BUILDER.comment("X Position of the party frame.",
+                                      "Note: The party frame is bounded by the screen size.")
+                             .defineInRange("xPos", 16, 0, Integer.MAX_VALUE);
+        yPosParty = CLIENT_BUILDER.comment("Y Position of the party frame.",
+                                      "Note: The party frame is bounded by the screen size.")
+                             .defineInRange("yPos", 16, 0, Integer.MAX_VALUE);
+
 
         forceModelRotation = CLIENT_BUILDER.comment("Makes all the models drawn on the party frame face forward if true.",
                                                     "Self model is drawn when the head element has Head Type at 1, or 2 for the entire party.")

@@ -297,7 +297,7 @@ public abstract class RenderItem {
     public static void register() {
         IIngameOverlay overlay = (gui, poseStack, partialTicks, width, height) -> {
             if (ClientPlayerData.playerOrderedList.size() == 0) return;
-            playerScale = .75f;
+            playerScale = 1f;
             itemRender.render(gui, poseStack, partialTicks);
             if (isDirty) {
                 syncItems();
@@ -882,7 +882,7 @@ public abstract class RenderItem {
         int partyMouseY = mouseY;
         mouseX /= playerScale;
         mouseY /= playerScale;
-        if (mouseX < selfFrameX || mouseY < selfFrameY) return;
+        //if (mouseX < selfFrameX || mouseY < selfFrameY) return;
 
         mouseX = mouseX - selfFrameX;
         mouseY = mouseY - selfFrameY;

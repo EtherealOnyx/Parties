@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import io.sedu.mc.parties.api.helper.ColorAPI;
+import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PHead;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -439,12 +440,31 @@ public class RenderUtils {
         poseStack.popPose();
     }
 
+    public static void renderPartyFrame(PoseStack poseStack) {
+        poseStack.pushPose();
+        poseStack.scale(partyScale, partyScale, 1f);
+        int index = ClientPlayerData.playerOrderedList.size()-2;
+        RenderUtils.sizeRect(poseStack.last().pose(), otherFrameX, otherFrameY, -2, frameEleW + framePosW*index,
+                             frameEleH + framePosH*index,
+                             ColorAPI.getRainbowColor() | 75 << 24);
+        poseStack.popPose();
+    }
+
     public static void renderSelfFrameOutline(PoseStack poseStack) {
         poseStack.pushPose();
         poseStack.scale(playerScale, playerScale, 1f);
-        RenderUtils.borderRect(poseStack.last().pose(), -1, 1, selfFrameX, selfFrameY,
+        RenderUtils.borderRectNoA(poseStack.last().pose(), -1, 1, selfFrameX, selfFrameY,
                                frameEleW,
-                               frameEleH, 0xFFFFFFFF);
+                               frameEleH, 0xFFFFFF);
+        poseStack.popPose();
+    }
+
+    public static void renderPartyFrameOutline(PoseStack poseStack) {
+        poseStack.pushPose();
+        poseStack.scale(partyScale, partyScale, 1f);
+        int index = ClientPlayerData.playerOrderedList.size()-2;
+        RenderUtils.borderRectNoA(poseStack.last().pose(), -1, 1, otherFrameX, otherFrameY, frameEleW + framePosW*index,
+                             frameEleH + framePosH*index, 0xFFFFFF);
         poseStack.popPose();
     }
 
