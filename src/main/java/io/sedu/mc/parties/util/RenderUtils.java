@@ -7,8 +7,8 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import io.sedu.mc.parties.api.helper.ColorAPI;
-import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PHead;
+import io.sedu.mc.parties.client.overlay.gui.HoverScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -436,17 +436,24 @@ public class RenderUtils {
         poseStack.scale(playerScale, playerScale, 1f);
         RenderUtils.sizeRect(poseStack.last().pose(), selfFrameX, selfFrameY, -2, frameEleW,
                              frameEleH,
-                             ColorAPI.getRainbowColor() | 75 << 24);
+                             ColorAPI.getRainbowColor() | 25 << 24);
+        RenderUtils.borderRectNoA(poseStack.last().pose(), -1, 1, selfFrameX, selfFrameY, frameEleW,
+                                  frameEleH, ColorAPI.getRainbowColor());
         poseStack.popPose();
     }
 
     public static void renderPartyFrame(PoseStack poseStack) {
         poseStack.pushPose();
         poseStack.scale(partyScale, partyScale, 1f);
-        int index = ClientPlayerData.playerOrderedList.size()-2;
+        int index = HoverScreen.getPartyDisplay()-1;
         RenderUtils.sizeRect(poseStack.last().pose(), otherFrameX, otherFrameY, -2, frameEleW + framePosW*index,
                              frameEleH + framePosH*index,
-                             ColorAPI.getRainbowColor() | 75 << 24);
+                             ColorAPI.getRainbowColor() | 25 << 24);
+        for (int i = 0; i <= index; i++) {
+            RenderUtils.borderRectNoA(poseStack.last().pose(), -1, 1, otherFrameX, otherFrameY, frameEleW + framePosW*i,
+                                      frameEleH + framePosH*i, ColorAPI.getRainbowColor());
+        }
+
         poseStack.popPose();
     }
 
@@ -462,7 +469,7 @@ public class RenderUtils {
     public static void renderPartyFrameOutline(PoseStack poseStack) {
         poseStack.pushPose();
         poseStack.scale(partyScale, partyScale, 1f);
-        int index = ClientPlayerData.playerOrderedList.size()-2;
+        int index = HoverScreen.getPartyDisplay()-1;
         RenderUtils.borderRectNoA(poseStack.last().pose(), -1, 1, otherFrameX, otherFrameY, frameEleW + framePosW*index,
                              frameEleH + framePosH*index, 0xFFFFFF);
         poseStack.popPose();

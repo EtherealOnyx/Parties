@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.sedu.mc.parties.client.overlay.ClientPlayerData.playerOrderedList;
 import static io.sedu.mc.parties.client.overlay.RenderItem.*;
 import static io.sedu.mc.parties.util.RenderUtils.*;
 
@@ -67,7 +68,10 @@ public class HoverScreen extends Screen {
     private static boolean isArranging = false;
     private static boolean isMoving = false;
     private static int draggedItem = -1;
+    private static int partyDisplay = 0;
     static boolean notEditing = true;
+    private int botLim = 0;
+    private int rightLim = 0;
 
     //public boolean rendered;
     public HoverScreen(int value) {
@@ -78,6 +82,9 @@ public class HoverScreen extends Screen {
     @Override
     protected void init() {
         draggedItem = -1;
+        if (partyDisplay < 2 || (partyDisplay > 4 && playerOrderedList != null && partyDisplay != playerOrderedList.size() - 2)) {
+            partyDisplay = Math.max(1, playerOrderedList != null ? playerOrderedList.size() - 1 : 1);
+        }
         trimmedMessages = minecraft.gui.getChat().trimmedMessages;
         selfFrameX = (int) Math.min(ClientConfigData.xPos.get(), width / playerScale - frameEleW);
         selfFrameY = (int) Math.min(ClientConfigData.yPos.get(), height/ playerScale - frameEleH);
@@ -175,6 +182,17 @@ public class HoverScreen extends Screen {
         b.active = false;
         partyMoveFrame.add(b);
         partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+44, oY, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+55, oY, partyDisplay + "", p -> cyclePartyDisplay(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.pcycle")), .5f, .5f, .75f, .5f, 1f)));
+
+    }
+
+    private void cyclePartyDisplay() {
+        partyDisplay++;
+        if (partyDisplay > 5) {
+            partyDisplay = Math.max(1, playerOrderedList != null ? playerOrderedList.size() - 1 : 1);
+        }
+        partyMoveFrame.get(5).setMessage(new TextComponent(partyDisplay + ""));
+        updateLimits();
     }
 
     private void acceptPos() {
@@ -360,8 +378,8 @@ public class HoverScreen extends Screen {
             int tempFrame = x - oldMXP + oldXP;
             if (tempFrame < 0) {
                 otherFrameX = 0;
-            } else if (tempFrame + frameEleW > this.width/ partyScale) {
-                otherFrameX = (int) (this.width/ partyScale - frameEleW);
+            } else if (tempFrame + rightLim > this.width/ partyScale) {
+                otherFrameX = (int) (this.width/ partyScale - rightLim);
             } else {
                 otherFrameX = x - oldMXP + oldXP;
             }
@@ -369,8 +387,8 @@ public class HoverScreen extends Screen {
             tempFrame = y - oldMYP + oldYP;
             if (tempFrame < 0) {
                 otherFrameY = 0;
-            } else if (tempFrame + frameEleH > this.height/ partyScale) {
-                otherFrameY = (int) (this.height/ partyScale - frameEleH);
+            } else if (tempFrame + botLim > this.height/ partyScale) {
+                otherFrameY = (int) (this.height/ partyScale - botLim);
             } else {
                 otherFrameY = y - oldMYP + oldYP;
             }
@@ -494,6 +512,7 @@ public class HoverScreen extends Screen {
                 fXP.add(revertXP);
                 fYP.add(revertYP);
                 notEditing = false;
+                updateLimits();
             }
             case 4 -> {
                 //Still technically active?
@@ -505,6 +524,15 @@ public class HoverScreen extends Screen {
             }
         }
     }
+
+    private void updateLimits() {
+        botLim = (frameEleH + framePosH*(partyDisplay-1));
+        rightLim = (frameEleW + framePosW*(partyDisplay-1));
+        otherFrameX = (int) Math.min(otherFrameX, width / partyScale - rightLim);
+        otherFrameY = (int) Math.min(otherFrameY, height/ partyScale - botLim);
+        refreshDragButtons(false);
+    }
+
 
     public void render(PoseStack poseStack, int mX, int mY, float partialTick) {
 
@@ -529,6 +557,7 @@ public class HoverScreen extends Screen {
             }
 
         }
+        if (isMoving || isArranging) return;
         Style style = getClickedText(mX, mY);
         if (style != null && style.getHoverEvent() != null) {
             this.renderComponentHoverEffect(poseStack, style, mX, mY);
@@ -570,10 +599,9 @@ public class HoverScreen extends Screen {
         partyMouseY -= otherFrameY;
 
 
-        for (int i = 1; i < ClientPlayerData.playerOrderedList.size(); i++) {
+        for (int i = 0; i < partyDisplay; i++) {
             if (partyMouseX < 0 || partyMouseY < 0) return;
             if (partyMouseX < frameEleW && partyMouseY < frameEleH) {
-                System.out.println("2");
                 draggedItem = 2;
                 return;
             }
@@ -600,6 +628,10 @@ public class HoverScreen extends Screen {
                 renderPartyFrameOutline(poseStack);
             }
         }
+    }
+
+    public static int getPartyDisplay() {
+        return partyDisplay;
     }
 
     @Nullable
