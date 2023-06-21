@@ -51,8 +51,8 @@ public abstract class RenderItem {
 
     public static int selfFrameX = 16;
     public static int selfFrameY = 16;
-    public static int otherFrameX = 16;
-    public static int otherFrameY = 128;
+    public static int partyFrameX = 16;
+    public static int partyFrameY = 128;
     public static int framePosW = 0;
     public static int framePosH = 0;
     public static int frameEleH = 56;
@@ -231,36 +231,36 @@ public abstract class RenderItem {
     }
 
     public int x(int pOffset) {
-        return (int) ((pOffset == 0 ? selfFrameX + x : otherFrameX + x + framePosW*(pOffset-1))/scale);
+        return (int) ((pOffset == 0 ? selfFrameX + x : partyFrameX + x + framePosW*(pOffset-1))/scale);
     }
 
     public int y(int pOffset) {
-        return (int) ((pOffset == 0 ? selfFrameY + y: otherFrameY + y + framePosH*(pOffset-1))/scale);
+        return (int) ((pOffset == 0 ? selfFrameY + y: partyFrameY + y + framePosH*(pOffset-1))/scale);
     }
 
 
     public int xNormal(int pOffset) {
-        return pOffset == 0 ? selfFrameX + x: otherFrameX + x + framePosW*(pOffset-1);
+        return pOffset == 0 ? selfFrameX + x: partyFrameX + x + framePosW*(pOffset-1);
     }
 
     public int yNormal(int pOffset) {
-        return pOffset == 0 ? selfFrameY + y: otherFrameY + y + framePosH*(pOffset-1);
+        return pOffset == 0 ? selfFrameY + y: partyFrameY + y + framePosH*(pOffset-1);
     }
 
     public int l(int pOffset) {
-        return pOffset == 0 ? x + selfFrameX: x + otherFrameX + framePosW*(pOffset - 1);
+        return pOffset == 0 ? x + selfFrameX: x + partyFrameX + framePosW*(pOffset - 1);
     }
 
     public int r(int pOffset) {
-        return pOffset == 0 ? x + selfFrameX + width : x + otherFrameX + framePosW*(pOffset - 1) + width;
+        return pOffset == 0 ? x + selfFrameX + width : x + partyFrameX + framePosW*(pOffset - 1) + width;
     }
 
     public int t(int pOffset) {
-        return pOffset == 0 ? y + selfFrameY : y + otherFrameY + framePosH*(pOffset - 1);
+        return pOffset == 0 ? y + selfFrameY : y + partyFrameY + framePosH*(pOffset - 1);
     }
 
     public int b(int pOffset) {
-        return pOffset == 0 ? y + selfFrameY + height : y + otherFrameY + framePosH*(pOffset - 1) + height;
+        return pOffset == 0 ? y + selfFrameY + height : y + partyFrameY + framePosH*(pOffset - 1) + height;
     }
 
     abstract void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
@@ -297,7 +297,6 @@ public abstract class RenderItem {
     public static void register() {
         IIngameOverlay overlay = (gui, poseStack, partialTicks, width, height) -> {
             if (ClientPlayerData.playerOrderedList.size() == 0) return;
-            playerScale = 1f;
             itemRender.render(gui, poseStack, partialTicks);
             if (isDirty) {
                 syncItems();
@@ -893,8 +892,8 @@ public abstract class RenderItem {
 
         partyMouseX /= partyScale;
         partyMouseY /= partyScale;
-        partyMouseX -= otherFrameX; //TODO: Switch to otherFrameX/Y.
-        partyMouseY -= otherFrameY;
+        partyMouseX -= partyFrameX; //TODO: Switch to otherFrameX/Y.
+        partyMouseY -= partyFrameY;
 
 
         for (int i = 1; i < ClientPlayerData.playerOrderedList.size(); i++) {

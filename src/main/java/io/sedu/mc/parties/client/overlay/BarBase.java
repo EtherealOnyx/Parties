@@ -114,11 +114,11 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
     }
 
     public int tXI(int pOffset) {
-        return textAttached ? attachedXIcon(pOffset)  : (int) (((pOffset == 0 ? selfFrameX : otherFrameX) + textX + wOffset(pOffset))/scale);
+        return textAttached ? attachedXIcon(pOffset)  : (int) (((pOffset == 0 ? selfFrameX : partyFrameX) + textX + wOffset(pOffset))/scale);
     }
 
     public int tYI(int pOffset) {
-        return textAttached ? attachedYIcon(pOffset)  : (int) (((pOffset == 0 ? selfFrameY : otherFrameY)  + textY + hOffset(pOffset))/scale);
+        return textAttached ? attachedYIcon(pOffset)  : (int) (((pOffset == 0 ? selfFrameY : partyFrameY)  + textY + hOffset(pOffset))/scale);
     }
 
 

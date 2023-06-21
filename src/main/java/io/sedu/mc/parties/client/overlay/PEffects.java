@@ -214,19 +214,19 @@ public abstract class PEffects extends RenderSelfItem {
     }
 
     private int sX(int pI, int bI) {
-        return (int) (((framePosW<<1)*pI+((x+(pI == 0 ? selfFrameX : otherFrameX))<<1))/scale +width*bI) + xOff/2;
+        return (int) (((framePosW<<1)*pI+((x+(pI == 0 ? selfFrameX : partyFrameX))<<1))/scale +width*bI) + xOff/2;
     }
 
     private float rX(int pI, int bI) {
-        return (framePosW*pI+x+(pI == 0 ? selfFrameX : otherFrameX) + (width/2f*scale)*bI);
+        return (framePosW*pI+x+(pI == 0 ? selfFrameX : partyFrameX) + (width/2f*scale)*bI);
     }
 
     private int sY(int pI, int bI) {
-        return (int) (((framePosH<<1)*pI+((y+(pI == 0 ? selfFrameY : otherFrameY))<<1))/scale +height*bI) + yOff/2;
+        return (int) (((framePosH<<1)*pI+((y+(pI == 0 ? selfFrameY : partyFrameY))<<1))/scale +height*bI) + yOff/2;
     }
 
     private float rY(int pI, int bI) {
-        return framePosH*pI+(y+(pI == 0 ? selfFrameY : otherFrameY))+(height/2f*scale)*bI;
+        return framePosH*pI+(y+(pI == 0 ? selfFrameY : partyFrameY))+(height/2f*scale)*bI;
     }
 
 

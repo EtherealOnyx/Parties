@@ -165,7 +165,7 @@ public class PHunger extends OverflowBarBase {
         e.addEntry("height", 10, 12);
         e.addEntry("tdisplay", true, 1);
         e.addEntry("tshadow", false, 1);
-        e.addEntry("ttype", 1, 4);
+        e.addEntry("ttype", 3, 4);
         e.addEntry("tattached", true, 1);
         e.addEntry("xtpos", 0, 12);
         e.addEntry("ytpos", 0, 12);

@@ -446,11 +446,11 @@ public class RenderUtils {
         poseStack.pushPose();
         poseStack.scale(partyScale, partyScale, 1f);
         int index = HoverScreen.getPartyDisplay()-1;
-        RenderUtils.sizeRect(poseStack.last().pose(), otherFrameX, otherFrameY, -2, frameEleW + framePosW*index,
+        RenderUtils.sizeRect(poseStack.last().pose(), partyFrameX, partyFrameY, -2, frameEleW + framePosW*index,
                              frameEleH + framePosH*index,
                              ColorAPI.getRainbowColor() | 25 << 24);
         for (int i = 0; i <= index; i++) {
-            RenderUtils.borderRectNoA(poseStack.last().pose(), -1, 1, otherFrameX, otherFrameY, frameEleW + framePosW*i,
+            RenderUtils.borderRectNoA(poseStack.last().pose(), -1, 1, partyFrameX, partyFrameY, frameEleW + framePosW*i,
                                       frameEleH + framePosH*i, ColorAPI.getRainbowColor());
         }
 
@@ -470,8 +470,8 @@ public class RenderUtils {
         poseStack.pushPose();
         poseStack.scale(partyScale, partyScale, 1f);
         int index = HoverScreen.getPartyDisplay()-1;
-        RenderUtils.borderRectNoA(poseStack.last().pose(), -1, 1, otherFrameX, otherFrameY, frameEleW + framePosW*index,
-                             frameEleH + framePosH*index, 0xFFFFFF);
+        RenderUtils.borderRectNoA(poseStack.last().pose(), -1, 1, partyFrameX, partyFrameY, frameEleW + framePosW*index,
+                                  frameEleH + framePosH*index, 0xFFFFFF);
         poseStack.popPose();
     }
 

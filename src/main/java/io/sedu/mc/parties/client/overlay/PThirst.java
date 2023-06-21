@@ -143,7 +143,7 @@ public class PThirst extends OverflowBarBase {
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
         e.addEntry("display", true, 1);
-        e.addEntry("barmode", true, 1);
+        e.addEntry("barmode", false, 1);
         e.addEntry("scale", 2, 2);
         e.addEntry("zpos", 0, 4);
         e.addEntry("idisplay", true, 1);
@@ -153,7 +153,7 @@ public class PThirst extends OverflowBarBase {
         e.addEntry("height", 10, 12);
         e.addEntry("tdisplay", true, 1);
         e.addEntry("tshadow", true, 1);
-        e.addEntry("ttype", 0, 4);
+        e.addEntry("ttype", 3, 4);
         e.addEntry("tattached", true, 1);
         e.addEntry("xtpos", 0, 12);
         e.addEntry("ytpos", 0, 12);

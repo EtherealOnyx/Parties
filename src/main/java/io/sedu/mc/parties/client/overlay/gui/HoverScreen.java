@@ -86,8 +86,8 @@ public class HoverScreen extends Screen {
             partyDisplay = Math.max(1, playerOrderedList != null ? playerOrderedList.size() - 1 : 1);
         }
         trimmedMessages = minecraft.gui.getChat().trimmedMessages;
-        selfFrameX = (int) Math.min(ClientConfigData.xPos.get(), width / playerScale - frameEleW);
-        selfFrameY = (int) Math.min(ClientConfigData.yPos.get(), height/ playerScale - frameEleH);
+        selfFrameX = (int) Mth.clamp(ClientConfigData.xPos.get(), 0, width / playerScale - frameEleW);
+        selfFrameY = (int) Mth.clamp(ClientConfigData.yPos.get(),0,  height/ playerScale - frameEleH);
         //TODO: Add for otherFrameX/Y.
         ColorAPI.colorCycle = true;
         int y = (int) Math.max(0, clickArea.t(0)* playerScale - 10);
@@ -100,7 +100,7 @@ public class HoverScreen extends Screen {
         goBackButton = addRenderableWidget(new SmallButton(x, y,"x", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), 1f, .5f, .5f));
         initPartyButtons();
         initMenuButtons(x, y, oX, oY);
-        initDragButtons((int) ((selfFrameX)* playerScale), (int) Math.max(0, (selfFrameY)* playerScale - 10), (int) ((otherFrameX)* partyScale), (int) Math.max(0, (otherFrameY)* partyScale - 10));
+        initDragButtons((int) ((selfFrameX)* playerScale), (int) Math.max(0, (selfFrameY)* playerScale - 10), (int) ((partyFrameX)* partyScale), (int) Math.max(0, (partyFrameY)* partyScale - 10));
         doTask(0);
     }
 
@@ -171,6 +171,7 @@ public class HoverScreen extends Screen {
         b.active = false;
         moveFrame.add(b);
         moveFrame.add(addRenderableWidget(new SmallButton(x+44, y, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(x+55, y, getCurrentScale(true), p -> toggleScale(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.scale")), 0f, 1f, .25f, .75f, 1f)));
 
         //Other members
         partyMoveFrame.add(addRenderableWidget(new SmallButton(oX, oY, "x", p -> revertPos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")), .5f, 0f, 1, .5f, .5f)));
@@ -183,7 +184,54 @@ public class HoverScreen extends Screen {
         partyMoveFrame.add(b);
         partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+44, oY, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
         partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+55, oY, partyDisplay + "", p -> cyclePartyDisplay(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.pcycle")), .5f, .5f, .75f, .5f, 1f)));
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(x+66, y, getCurrentScale(false), p -> toggleScale(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.scale")), 0f, 1f, .25f, .75f, 1f)));
 
+    }
+
+    private void toggleScale(boolean selfFrame) {
+        float scale = selfFrame ? playerScale : partyScale;
+        if (selfFrame) {
+            if (scale <= .25f) playerScale =  .5f;
+            else if (scale <= .5f) playerScale = 1f;
+            else if (scale <= 1f) playerScale =  2f;
+            else playerScale =  .25f;
+            moveFrame.get(5).setMessage(new TextComponent(getCurrentScale(true)));
+            selfFrameX = (int) Mth.clamp(selfFrameX * scale / playerScale, 0, width / playerScale - frameEleW);
+            selfFrameY = (int) Mth.clamp(selfFrameY * scale / playerScale, 0, height/ playerScale - frameEleH);
+            index = 0;
+            fX.clear();
+            fY.clear();
+            fX.add(selfFrameX);
+            fY.add(selfFrameY);
+            moveFrame.get(2).active = false;
+            moveFrame.get(3).active = false;
+            refreshDragButtons(true);
+        } else {
+            if (scale <= .25f) partyScale =  .5f;
+            else if (scale <= .5f) partyScale = 1f;
+            else if (scale <= 1f) partyScale =  2f;
+            else partyScale =  .25f;
+            partyMoveFrame.get(6).setMessage(new TextComponent(getCurrentScale(false)));
+            partyFrameX *= scale / partyScale;
+            partyFrameY *= scale / partyScale;
+            updateLimits();
+            indexP = 0;
+            fXP.clear();
+            fYP.clear();
+            fXP.add(partyFrameX);
+            fYP.add(partyFrameY);
+            partyMoveFrame.get(2).active = false;
+            partyMoveFrame.get(3).active = false;
+            refreshDragButtons(false);
+        }
+    }
+
+    private String getCurrentScale(boolean selfFrame) {
+        float scale = selfFrame ? playerScale : partyScale;
+        if (scale <= .25f) return "¼";
+        else if (scale <= .5f) return "½";
+        else if (scale <= 1f) return "1";
+        else return "2";
     }
 
     private void cyclePartyDisplay() {
@@ -193,21 +241,30 @@ public class HoverScreen extends Screen {
         }
         partyMoveFrame.get(5).setMessage(new TextComponent(partyDisplay + ""));
         updateLimits();
+        indexP = 0;
+        fXP.clear();
+        fYP.clear();
+        fXP.add(partyFrameX);
+        fYP.add(partyFrameY);
+        partyMoveFrame.get(2).active = false;
+        partyMoveFrame.get(3).active = false;
+
+
     }
 
     private void acceptPos() {
         //TODO: One universal button near center of screen?
         selfFrameX = fX.get(index);
         selfFrameY = fY.get(index);
-        otherFrameX = fXP.get(indexP);
-        otherFrameY = fYP.get(indexP);
+        partyFrameX = fXP.get(indexP);
+        partyFrameY = fYP.get(indexP);
         ClientConfigData.xPos.set(selfFrameX);
         ClientConfigData.xPos.save();
         ClientConfigData.yPos.set(selfFrameY);
         ClientConfigData.yPos.save();
-        ClientConfigData.xPosParty.set(otherFrameX);
+        ClientConfigData.xPosParty.set(partyFrameX);
         ClientConfigData.xPosParty.save();
-        ClientConfigData.yPosParty.set(otherFrameY);
+        ClientConfigData.yPosParty.set(partyFrameY);
         ClientConfigData.yPosParty.save();
         index = 0;
         indexP = 0;
@@ -247,8 +304,8 @@ public class HoverScreen extends Screen {
             } else { //redo
                 indexP++;
             }
-            otherFrameX = fXP.get(indexP);
-            otherFrameY = fYP.get(indexP);
+            partyFrameX = fXP.get(indexP);
+            partyFrameY = fYP.get(indexP);
             refreshDragButtons(false);
             checkIndex(false); //TODO: Add non-self frame.
         }
@@ -290,8 +347,8 @@ public class HoverScreen extends Screen {
             fY.clear();
 
         } else {
-            otherFrameX = revertXP;
-            otherFrameY = revertYP;
+            partyFrameX = revertXP;
+            partyFrameY = revertYP;
             fXP.clear();
             fYP.clear();
         }
@@ -311,8 +368,8 @@ public class HoverScreen extends Screen {
             fY.clear();
 
         } else {
-            otherFrameX = 16;
-            otherFrameY = 256;
+            partyFrameX = 16;
+            partyFrameY = 256;
             ClientConfigData.xPosParty.set(16);
             ClientConfigData.xPosParty.save();
             ClientConfigData.yPosParty.set(256);
@@ -345,8 +402,8 @@ public class HoverScreen extends Screen {
             if (oldMXP == null) {
                 oldMXP = x;
                 oldMYP = y;
-                oldXP = otherFrameX;
-                oldYP = otherFrameY;
+                oldXP = partyFrameX;
+                oldYP = partyFrameY;
             }
 
             checkLimits(x, y, false);
@@ -377,20 +434,20 @@ public class HoverScreen extends Screen {
         } else {
             int tempFrame = x - oldMXP + oldXP;
             if (tempFrame < 0) {
-                otherFrameX = 0;
+                partyFrameX = 0;
             } else if (tempFrame + rightLim > this.width/ partyScale) {
-                otherFrameX = (int) (this.width/ partyScale - rightLim);
+                partyFrameX = (int) (this.width/ partyScale - rightLim);
             } else {
-                otherFrameX = x - oldMXP + oldXP;
+                partyFrameX = x - oldMXP + oldXP;
             }
 
             tempFrame = y - oldMYP + oldYP;
             if (tempFrame < 0) {
-                otherFrameY = 0;
+                partyFrameY = 0;
             } else if (tempFrame + botLim > this.height/ partyScale) {
-                otherFrameY = (int) (this.height/ partyScale - botLim);
+                partyFrameY = (int) (this.height/ partyScale - botLim);
             } else {
-                otherFrameY = y - oldMYP + oldYP;
+                partyFrameY = y - oldMYP + oldYP;
             }
         }
 
@@ -406,8 +463,8 @@ public class HoverScreen extends Screen {
                 moveFrame.get(i).y = y;
             }
         } else {
-            int x = (int) (otherFrameX* partyScale);
-            int y = (int) Math.max(0, otherFrameY* partyScale - 10);
+            int x = (int) (partyFrameX * partyScale);
+            int y = (int) Math.max(0, partyFrameY * partyScale - 10);
             for (int i = 0; i < partyMoveFrame.size(); i++) {
                 partyMoveFrame.get(i).x = x+(i*11);
                 partyMoveFrame.get(i).y = y;
@@ -431,16 +488,12 @@ public class HoverScreen extends Screen {
             }
             fX.add(selfFrameX);
             fY.add(selfFrameY);
-            ClientConfigData.xPos.set(selfFrameX);
-            ClientConfigData.xPos.save();
-            ClientConfigData.yPos.set(selfFrameY);
-            ClientConfigData.yPos.save();
             checkIndex(true);
         } else {
             draggedItem = -1;
             oldMYP = null;
             oldMXP = null;
-            if (indexP >= fXP.size() || (fXP.get(indexP) == otherFrameX && fYP.get(indexP) == otherFrameY))
+            if (indexP >= fXP.size() || (fXP.get(indexP) == partyFrameX && fYP.get(indexP) == partyFrameY))
                 return;
 
             indexP++;
@@ -448,12 +501,8 @@ public class HoverScreen extends Screen {
                 fXP = new ArrayList<>(fXP.subList(0, indexP));
                 fYP = new ArrayList<>(fYP.subList(0, indexP));
             }
-            fXP.add(otherFrameX);
-            fYP.add(otherFrameY);
-            //ClientConfigData.xPosP.set(otherFrameX);
-            //ClientConfigData.xPosP.save();
-            //ClientConfigData.yPosP.set(otherFrameY);
-            //ClientConfigData.yPosP.save();
+            fXP.add(partyFrameX);
+            fYP.add(partyFrameY);
             checkIndex(false);
         }
 
@@ -499,8 +548,8 @@ public class HoverScreen extends Screen {
                 partyMoveFrame.forEach(b -> b.visible = true);
                 revertX = selfFrameX;
                 revertY = selfFrameY;
-                revertXP = otherFrameX;
-                revertYP = otherFrameY;
+                revertXP = partyFrameX;
+                revertYP = partyFrameY;
                 fX.clear();
                 fY.clear();
                 fXP.clear();
@@ -528,8 +577,8 @@ public class HoverScreen extends Screen {
     private void updateLimits() {
         botLim = (frameEleH + framePosH*(partyDisplay-1));
         rightLim = (frameEleW + framePosW*(partyDisplay-1));
-        otherFrameX = (int) Math.min(otherFrameX, width / partyScale - rightLim);
-        otherFrameY = (int) Math.min(otherFrameY, height/ partyScale - botLim);
+        partyFrameX = (int) Mth.clamp(partyFrameX, 0, width / partyScale - rightLim);
+        partyFrameY = (int) Mth.clamp(partyFrameY, 0, height/ partyScale - botLim);
         refreshDragButtons(false);
     }
 
@@ -595,8 +644,8 @@ public class HoverScreen extends Screen {
         int partyMouseY = mouseY;
         partyMouseX /= partyScale;
         partyMouseY /= partyScale;
-        partyMouseX -= otherFrameX;
-        partyMouseY -= otherFrameY;
+        partyMouseX -= partyFrameX;
+        partyMouseY -= partyFrameY;
 
 
         for (int i = 0; i < partyDisplay; i++) {
@@ -722,6 +771,14 @@ public class HoverScreen extends Screen {
         }
         draggedItem = -1;
         isArranging = false;
+        ClientConfigData.xPos.set(selfFrameX);
+        ClientConfigData.xPos.save();
+        ClientConfigData.yPos.set(selfFrameY);
+        ClientConfigData.yPos.save();
+        ClientConfigData.xPosParty.set(partyFrameX);
+        ClientConfigData.xPosParty.save();
+        ClientConfigData.yPosParty.set(partyFrameY);
+        ClientConfigData.yPosParty.save();
         super.onClose();
     }
 
