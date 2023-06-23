@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "sedparties.refmap.json",
   "mixins": [
+    "ChooseOriginMixin",
     "EntitySelectorMixin",
     "MixinANManaRender",
     "MixinHRManager",
