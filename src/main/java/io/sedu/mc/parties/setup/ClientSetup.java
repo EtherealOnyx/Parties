@@ -1,6 +1,8 @@
 package io.sedu.mc.parties.setup;
 
 import io.sedu.mc.parties.api.helper.ColorAPI;
+import io.sedu.mc.parties.api.mod.origins.OCompatManager;
+import io.sedu.mc.parties.api.mod.origins.OEventHandler;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.*;
@@ -39,6 +41,8 @@ public class ClientSetup {
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::ticker);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::keyPress);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::mouseReleased);
+
+
 
 
         //Icon above all
@@ -133,5 +137,10 @@ public class ClientSetup {
             }
         });
         Config.reloadClientConfigs();
+
+        if (ModList.get().isLoaded("origins")) {
+            MinecraftForge.EVENT_BUS.addListener(OEventHandler::onClientJoin);
+            OCompatManager.initClientEvent();
+        }
     }
 }

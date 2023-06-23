@@ -365,6 +365,15 @@ public abstract class RenderItem {
         RenderSystem.setShaderColor(r, g, b, a);
     }
 
+    static void setColor(int color) {
+        RenderSystem.setShaderColor(
+                ((color >> 16) & 0xff) / 255.0f,
+                ((color >>  8) & 0xff) / 255.0f,
+                ((color      ) & 0xff) / 255.0f,
+                1f
+        );
+    }
+
     void rect(int i, PoseStack pose, int z, int offset, int startColor, int endColor, int alpha) {
         RenderUtils.rect(pose.last().pose(), z, l(i)+offset, t(i)+offset, r(i)-offset, b(i)-offset, startColor | (alpha << 24), endColor | (alpha << 24));
     }
@@ -675,12 +684,12 @@ public abstract class RenderItem {
 
 
 
-    static class ColorComponent {
+    public static class ColorComponent {
         static final ColorComponent EMPTY = new ColorComponent(new TextComponent(""), 0);
         MutableComponent c;
         int color;
 
-        ColorComponent(MutableComponent c, int color) {
+        public ColorComponent(MutableComponent c, int color) {
             this.color = color;
             this.c = c;
         }

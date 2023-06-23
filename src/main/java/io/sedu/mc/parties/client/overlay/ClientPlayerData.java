@@ -654,6 +654,17 @@ public class ClientPlayerData {
     public void setSaturation(float data) {
         getHunger(hunger -> hunger.checkAbsorb(data));
     }
+
+    public void setOrigin(String data) {
+        this.data.put(ORIGIN, data);
+    }
+
+    public void getOrigin(Consumer<String> action) {
+        data.computeIfPresent(ORIGIN, (data, origin) -> {
+            action.accept((String) origin);
+            return origin;
+        });
+    }
 }
 
 //TODO: Check max health updates for server tracked player.

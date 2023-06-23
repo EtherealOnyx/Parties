@@ -243,7 +243,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         @Override
         void updateValues(int pTop, int pLeft, int pWidth, int pHeight) {
-            descTip = RenderUtils.splitTooltip(desc, pWidth/5);
+            descTip = RenderUtils.splitTooltip(desc, pWidth/5, false, false);
         }
 
         @Override
@@ -388,7 +388,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             slider.rightBound = pLeft + pWidth - 50; //Minus width
             slider.boundWidth = slider.rightBound - slider.leftBound;
             input.x = pLeft + pWidth - 38;
-            descTip = RenderUtils.splitTooltip(desc, pWidth/5);
+            descTip = RenderUtils.splitTooltip(desc, pWidth/5, false, false);
             updateValues();
         }
 
@@ -591,7 +591,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             b.x = pLeft + pWidth - 21 - inWidth;
             g.x = b.x - inWidth - 6;
             r.x = g.x - inWidth - 6;
-            descTip = RenderUtils.splitTooltip(desc, pWidth/5);
+            descTip = RenderUtils.splitTooltip(desc, pWidth/5, false, false);
         }
 
         @Override
@@ -799,7 +799,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             x = pLeft + 4;
             loadPreset.x = pLeft + pWidth - 28;
             deletePreset.x = loadPreset.x + 12;
-            descTip = RenderUtils.splitTooltip(desc, pWidth/5);
+            descTip = RenderUtils.splitTooltip(desc, pWidth/5, false, false);
             descTrimmed = desc.substring(0, Math.min(desc.length(), (pWidth-32)/6));
             if (descTrimmed.length() != desc.length()) {
                 descTrimmed += "...";

@@ -212,4 +212,12 @@ public class InfoPacketHelper {
     public static void sendSaturationUpdate(UUID sendTo, UUID propOf, float sat) {
         sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 33, sat);
     }
+
+    public static void sendOriginUpdate(UUID sendTo, UUID propOf, String origin) {
+        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 34, origin);
+    }
+
+    public static void sendOriginUpdate(UUID sendTo, String origin) {
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(34, sendTo, origin), PlayerAPI.getNormalServerPlayer(sendTo));
+    }
 }

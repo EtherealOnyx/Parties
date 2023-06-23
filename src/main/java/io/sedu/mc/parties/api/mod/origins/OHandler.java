@@ -44,10 +44,5 @@ public class OHandler implements IOHandler {
         return originReg.get();
     }
 
-    @Override
-    public String getMainOriginClient(Player player) {
-        System.out.println(ready);
-        if (!ready) return "";
-        else return getMainOrigin(player);
-    }
+
 }

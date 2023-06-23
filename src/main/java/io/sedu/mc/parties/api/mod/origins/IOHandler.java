@@ -8,6 +8,4 @@ public interface IOHandler {
 
     String getMainOrigin(Player player);
 
-    String getMainOriginClient(Player player);
-
 }

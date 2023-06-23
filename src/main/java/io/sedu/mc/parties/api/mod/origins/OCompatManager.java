@@ -22,8 +22,11 @@ public class OCompatManager {
 
     private static void initCompat() {
         handler = new OHandler();
-        eventInstance = new OriginCheckEvent((OHandler) handler);
         active = true;
-        MinecraftForge.EVENT_BUS.register(OEventHandler.class);
+        MinecraftForge.EVENT_BUS.register(new OCommonEventHandler());
+    }
+
+    public static void initClientEvent() {
+        eventInstance = new OriginCheckEvent((OHandler) handler);
     }
 }

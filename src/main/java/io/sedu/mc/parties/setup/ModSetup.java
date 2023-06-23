@@ -28,8 +28,6 @@ public class ModSetup {
 
         //Init Mod Support
         event.enqueueWork(ModSetup::initSupport);
-
-
     }
 
     private static void initSupport() {

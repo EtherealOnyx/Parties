@@ -171,4 +171,8 @@ public class RenderPacketHelper {
     public static void setSaturation(UUID player, float data) {
         getClientPlayer(player, p -> p.setSaturation(data));
     }
+
+    public static void setOrigin(UUID player, String data) {
+        getClientPlayer(player, p -> p.setOrigin(data));
+    }
 }

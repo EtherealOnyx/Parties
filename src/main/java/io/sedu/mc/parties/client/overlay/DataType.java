@@ -27,5 +27,8 @@ public enum DataType {
     EF_STAM,
 
     //Spells and Shields
-    SSMANA
+    SSMANA,
+
+    //Origins
+    ORIGIN
 }

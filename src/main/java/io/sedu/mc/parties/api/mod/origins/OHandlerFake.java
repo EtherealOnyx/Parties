@@ -15,8 +15,4 @@ public class OHandlerFake implements IOHandler {
         return "";
     }
 
-    @Override
-    public String getMainOriginClient(Player player) {
-        return "";
-    }
 }

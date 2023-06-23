@@ -29,5 +29,8 @@ public enum DataType {
 
     //Spells and Shields
     SSMANA,
-    SSMANAMAX, MAXHUNGER, SATURATION, SSMANAABS
+    SSMANAMAX, MAXHUNGER, SATURATION, SSMANAABS,
+
+    //Origins
+    ORIGIN
 }

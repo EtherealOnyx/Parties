@@ -1,32 +1,27 @@
 package io.sedu.mc.parties.api.mod.origins;
 
-import io.sedu.mc.parties.events.ClientEvent;
-import net.minecraft.client.Minecraft;
+import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.events.PartyJoinEvent;
+import io.sedu.mc.parties.api.helper.PlayerAPI;
+import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.network.InfoPacketHelper;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import static io.sedu.mc.parties.api.mod.origins.OCompatManager.eventInstance;
 
 public class OEventHandler {
 
-    //TODO: Put in client event class so the server wont crash.
     @SubscribeEvent
     public static void onClientJoin(ClientPlayerNetworkEvent.LoggedInEvent event) {
         OHandler.ready = false;
-        MinecraftForge.EVENT_BUS.register(eventInstance);
-    }
-
-    @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (ClientEvent.tick % 100 == 0 && Minecraft.getInstance().player != null) {
-            //Parties.LOGGER.debug(getHandler().getMainOriginClient(Minecraft.getInstance().player));
-            //OriginHolder.printOriginInfo();
+        if (eventInstance != null) {
+            MinecraftForge.EVENT_BUS.register(eventInstance);
+        } else {
+            Parties.LOGGER.error("Error properly loading Origins Support on the client!");
         }
     }
-
-
 
 
 }

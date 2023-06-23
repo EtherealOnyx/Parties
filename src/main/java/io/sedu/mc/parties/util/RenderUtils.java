@@ -21,6 +21,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -475,7 +476,8 @@ public class RenderUtils {
         poseStack.popPose();
     }
 
-    public static List<Component> splitTooltip(String text, int splitAt) {
+    public static List<Component> splitTooltip(String text, int splitAt, boolean isItalic, boolean isBold) {
+        Style s = Style.EMPTY.withItalic(isItalic).withBold(isBold);
         ArrayList<Component> tooltip = new ArrayList<>();
         boolean isTrimming = true;
         while (isTrimming) {
@@ -493,7 +495,7 @@ public class RenderUtils {
                 }
             }
 
-            tooltip.add(new TextComponent(line));
+            tooltip.add(new TextComponent(line).withStyle(s));
             if (finalPos != text.length()) {
                 text = text.substring(finalPos);
             } else {
@@ -578,11 +580,17 @@ public class RenderUtils {
         posestack1.scale(scale,scale,1f);
         posestack1.translate(0,0,zPos);
         MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
-        RenderSystem.setupGuiFlatDiffuseLighting(RenderUtils.POS, RenderUtils.NEG);
+        boolean flag = !bakedmodel.usesBlockLight();
+        if (flag) {
+            Lighting.setupForFlatItems();
+        }
 
         Minecraft.getInstance().getItemRenderer().render(iStack, ItemTransforms.TransformType.GUI, false, posestack1, multibuffersource$buffersource, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
         multibuffersource$buffersource.endBatch();
         RenderSystem.enableDepthTest();
+        if (flag) {
+            Lighting.setupFor3DItems();
+        }
 
         posestack.popPose();
         RenderSystem.applyModelViewMatrix();

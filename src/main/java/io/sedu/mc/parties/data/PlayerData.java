@@ -364,6 +364,17 @@ public class PlayerData {
         }
     }
 
+    public String getOrigin() {
+        return (String) dataItems.getOrDefault(ORIGIN, "origins:empty");
+    }
+
+    public void setOrigin(String v, Runnable action) {
+        if (!Objects.equals(getOrigin(), v)) {
+            dataItems.put(ORIGIN, v);
+            action.run();
+        }
+    }
+
 
     public static class MessageCdHolder {
         UUID id;

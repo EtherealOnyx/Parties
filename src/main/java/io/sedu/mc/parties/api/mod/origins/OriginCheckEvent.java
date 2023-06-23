@@ -24,7 +24,7 @@ public class OriginCheckEvent {
                     if (origin.getRegistryName() == null) {
                         Parties.LOGGER.error("An origin doesn't have a valid registry name! Skipping...");
                     } else {
-                        new OriginHolder(origin.getRegistryName().toString(), origin.getName().getString(), origin.getDescription().getString(), origin.getIcon());
+                        new OriginHolder(origin.getRegistryName().toString(), origin.getName().getString(), origin.getDescription().getString(), origin.getIcon(), origin.getImpact());
                     }
                 });
                 OriginHolder.printOriginInfo();

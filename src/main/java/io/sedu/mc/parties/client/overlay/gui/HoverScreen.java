@@ -73,6 +73,8 @@ public class HoverScreen extends Screen {
     private int botLim = 0;
     private int rightLim = 0;
 
+    public static boolean showInfo = false;
+
     //public boolean rendered;
     public HoverScreen(int value) {
         super(new TextComponent("Mouse Hover"));
@@ -752,6 +754,10 @@ public class HoverScreen extends Screen {
 
 
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+        if (pKeyCode == 341 || pKeyCode == 345) {
+            showInfo = !showInfo;
+            return true;
+        }
         if (pKeyCode != key) {
             //TODO: Fix when you press escape.
 
@@ -779,6 +785,7 @@ public class HoverScreen extends Screen {
         ClientConfigData.xPosParty.save();
         ClientConfigData.yPosParty.set(partyFrameY);
         ClientConfigData.yPosParty.save();
+        showInfo = false;
         super.onClose();
     }
 

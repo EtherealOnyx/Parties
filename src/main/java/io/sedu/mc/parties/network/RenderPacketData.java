@@ -46,7 +46,7 @@ public class RenderPacketData {
             case -1 ->
                     data = new Object[]{buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readInt(),
                             buf.readInt(), buf.readInt()};
-            case 0, 9 -> { //Name
+            case 0, 9, 34 -> { //Name
                 StringBuilder builder = new StringBuilder();
                 while (true) {
                     try {
@@ -75,7 +75,7 @@ public class RenderPacketData {
                 buf.writeInt((Integer) ((Object[]) data)[4]);
                 buf.writeInt((Integer) ((Object[]) data)[5]);
             }
-            case 0, 9 -> { //Name
+            case 0, 9, 34 -> { //Name, Dimension, Origin
                 for (int letter : ((String) data).toCharArray()) {
                     buf.writeChar(letter);
                 }
@@ -154,6 +154,7 @@ public class RenderPacketData {
                 case 31 -> RenderPacketHelper.setQuench(player, (Integer) data);
                 case 32 -> RenderPacketHelper.setMaxHunger(player, (Float) data);
                 case 33 -> RenderPacketHelper.setSaturation(player, (Float) data);
+                case 34 -> RenderPacketHelper.setOrigin(player, (String) data);
                 default -> {
 
                 }
