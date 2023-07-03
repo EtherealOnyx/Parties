@@ -19,6 +19,7 @@
   "gui.sedparties.name.p_bgc":"Clickable Area Element",
   "gui.sedparties.name.p_thirst":"Thirst Element (TaN, Thirst was Taken)",
   "gui.sedparties.name.p_temp":"Temperature Element (TaN, Cold Sweat)",
+  "gui.sedparties.name.p_mana_I":"Mana Element (Iron's Spells n' Spellbooks)",
   "gui.sedparties.name.p_mana_ss":"Mana Element (Spells and Shields)",
   "gui.sedparties.name.p_mana":"Mana Element (Ars Nouveau)",
   "gui.sedparties.name.p_stam_ef":"Stamina Element (Epic Fight Mod/Feathers)",

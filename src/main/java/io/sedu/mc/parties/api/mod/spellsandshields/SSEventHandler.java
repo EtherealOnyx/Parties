@@ -27,8 +27,8 @@ public class SSEventHandler {
                         UUID player;
                         PlayerData pd;
                         (pd = PlayerData.playerList.get(player = e.player.getUUID())).setManaSS(cur, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendManaUpdateSS(id, player, cur)));
-                        pd.setMaxManaSS(max, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendMaxManaUpdateSS(id, player, cur)));
-                        pd.setExtraManaSS(absorb, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendExtraManaUpdateSS(id, player, cur)));
+                        pd.setMaxManaSS(max, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendMaxManaUpdateSS(id, player, max)));
+                        pd.setExtraManaSS(absorb, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendExtraManaUpdateSS(id, player, absorb)));
                     }
                 });
             }

@@ -30,5 +30,8 @@ public enum DataType {
     SSMANA,
 
     //Origins
-    ORIGIN
+    ORIGIN,
+
+    //Spells and Spellbooks
+    MANAI,
 }

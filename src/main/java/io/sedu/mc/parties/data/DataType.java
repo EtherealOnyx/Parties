@@ -29,7 +29,15 @@ public enum DataType {
 
     //Spells and Shields
     SSMANA,
-    SSMANAMAX, MAXHUNGER, SATURATION, SSMANAABS,
+    SSMANAMAX,
+    SSMANAABS,
+
+    //Saturation & Dietary Stats
+    MAXHUNGER, SATURATION,
+
+    //Spells n' Spellbooks
+    IMANA,
+    IMANAMAX,
 
     //Origins
     ORIGIN

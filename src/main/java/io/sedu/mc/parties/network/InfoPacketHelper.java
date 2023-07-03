@@ -220,4 +220,12 @@ public class InfoPacketHelper {
     public static void sendOriginUpdate(UUID sendTo, String origin) {
         PartiesPacketHandler.sendToPlayer(new RenderPacketData(34, sendTo, origin), PlayerAPI.getNormalServerPlayer(sendTo));
     }
+
+    public static void sendManaUpdateI(UUID id, UUID propOf, Integer cur) {
+        sendData(PlayerAPI.getNormalServerPlayer(id), propOf, 35, cur);
+    }
+
+    public static void sendMaxManaUpdateI(UUID id, UUID propOf, Integer max) {
+        sendData(PlayerAPI.getNormalServerPlayer(id), propOf, 36, max);
+    }
 }

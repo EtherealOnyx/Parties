@@ -8,6 +8,7 @@ import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
+import io.sedu.mc.parties.api.mod.ironspellbooks.ISSCompatManager;
 import io.sedu.mc.parties.api.mod.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.api.mod.thirstmod.TMCompatManager;
@@ -100,6 +101,11 @@ public class ClientPlayerData {
             data.put(SSMANA, new ManaSSAnim(20, true));
         if (TMCompatManager.active() || TANCompatManager.active())
             data.put(THIRST, new ThirstAnim(20, true));
+
+        if (ISSCompatManager.active()) {
+            data.put(MANAI, new ManaIAnim(20, true));
+        }
+
 
     }
     public static void getOrderedPlayer(int index, Consumer<ClientPlayerData> action) {
@@ -534,6 +540,13 @@ public class ClientPlayerData {
         });
     }
 
+    public void getManaI(Consumer<ManaIAnim> action) {
+        data.computeIfPresent(MANAI, (data, mana) -> {
+            action.accept((ManaIAnim) mana);
+            return mana;
+        });
+    }
+
 
 
     public void setMana(float data) {
@@ -664,6 +677,20 @@ public class ClientPlayerData {
             action.accept((String) origin);
             return origin;
         });
+    }
+
+    public void updateManaISS() {
+        if (clientPlayer != null) {
+            ISSCompatManager.getHandler().getClientMana(clientPlayer, (i1, i2) -> getManaI(mana -> mana.checkValues(i1, i2)));
+        }
+    }
+
+    public void setManaI(Integer data) {
+        getManaI(mana -> mana.checkHealth(data));
+    }
+
+    public void setMaxManaI(Integer data) {
+        getManaI(mana -> mana.checkMax(data));
     }
 }
 

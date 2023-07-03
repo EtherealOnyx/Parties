@@ -27,7 +27,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -511,7 +510,11 @@ public class RenderUtils {
         if (pLivingEntity.isCrouching()){
             offY -= 2*iScale;
         }
-        if (pLivingEntity.getPose().equals(Pose.SWIMMING)) offY -= 14*iScale;
+        if (pLivingEntity.isVisuallySwimming()) offY -= 14*iScale;
+        if (pLivingEntity.isFallFlying()) {
+            offY -= (90f + pLivingEntity.xRotO) / 90f * (pScale);
+        }
+
         PHead.modelRender.renderModel(pPosX, pPosY+offY, posestack, pScale, pLivingEntity, partialTicks);
         RenderSystem.applyModelViewMatrix();
         Lighting.setupFor3DItems();

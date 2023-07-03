@@ -7,6 +7,7 @@ import io.sedu.mc.parties.api.mod.dietarystats.DSCompatManager;
 import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
 import io.sedu.mc.parties.api.mod.hardcorerevival.HRCompatManager;
+import io.sedu.mc.parties.api.mod.ironspellbooks.ISSCompatManager;
 import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
 import io.sedu.mc.parties.api.mod.origins.OCompatManager;
 import io.sedu.mc.parties.api.mod.playerrevive.PRCompatManager;
@@ -44,6 +45,7 @@ public class ModSetup {
         PACCompatManager.init(); //Open-PAC Support
         DSCompatManager.init(); //Dietary Stats Support
         OCompatManager.init(); //Origins Mod Support
+        ISSCompatManager.init(); //Iron's Spells n' Spellbooks Support
         Parties.LOGGER.info("Mod support initialization complete!");
     }
 }

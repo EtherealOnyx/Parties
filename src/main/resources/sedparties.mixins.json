@@ -6,6 +6,7 @@
   "mixins": [
     "ChooseOriginMixin",
     "EntitySelectorMixin",
+    "MagicManagerMixin",
     "MixinANManaRender",
     "MixinHRManager",
     "PartyManagerMixin",
@@ -14,6 +15,7 @@
   ],
   "client": [
     "ChatScreenMixin",
+    "ClientCastHelperMixin",
     "ClientMessageHandlerMixin",
     "FeathersHudOverlayMixin",
     "ManaRendererMixin"

@@ -175,4 +175,12 @@ public class RenderPacketHelper {
     public static void setOrigin(UUID player, String data) {
         getClientPlayer(player, p -> p.setOrigin(data));
     }
+
+    public static void setManaI(UUID player, Integer data) {
+        getClientPlayer(player, p -> p.setManaI(data));
+    }
+
+    public static void setMaxManaI(UUID player, Integer data) {
+        getClientPlayer(player, p -> p.setMaxManaI(data));
+    }
 }

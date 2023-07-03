@@ -340,9 +340,23 @@ public class PlayerData {
         }
     }
 
+    public void setManaI(Integer v, Runnable r) {
+        if (getManaI() != v) {
+            dataItems.put(IMANA, v);
+            r.run();
+        }
+    }
+
     public void setMaxManaSS(float v, Runnable action) {
         if (getMaxManaSS() != v) {
             dataItems.put(SSMANAMAX, v);
+            action.run();
+        }
+    }
+
+    public void setMaxManaI(int v, Runnable action) {
+        if (getMaxManaI() != v) {
+            dataItems.put(IMANAMAX, v);
             action.run();
         }
     }
@@ -353,6 +367,10 @@ public class PlayerData {
             action.run();
         }
     }
+
+    public int getManaI() { return (int) dataItems.getOrDefault(IMANA, 0);}
+    public int getMaxManaI() { return (int) dataItems.getOrDefault(IMANAMAX, 0);}
+
     public float getManaSS() { return (float) dataItems.getOrDefault(SSMANA, 0f);}
     public float getMaxManaSS() { return (float) dataItems.getOrDefault(SSMANAMAX, 0f);}
     public float getExtraManaSS() { return (float) dataItems.getOrDefault(SSMANAABS, 0f);}
@@ -374,6 +392,8 @@ public class PlayerData {
             action.run();
         }
     }
+
+
 
 
     public static class MessageCdHolder {

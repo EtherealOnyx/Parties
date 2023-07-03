@@ -207,7 +207,7 @@ dependencies {
     compileOnly fg.deobf("curse.maven:coldsweat-506194:4512295")
 
     //Tough as Nails
-    implementation fg.deobf("curse.maven:toughasnails-246391:3804267") //impl
+    compileOnly fg.deobf("curse.maven:toughasnails-246391:3804267") //impl
 
     //Ars Nouveau Support
     compileOnly fg.deobf("curse.maven:arsnoveau-401955:4052851") //impl
@@ -228,7 +228,7 @@ dependencies {
     //runtimeOnly fg.deobf("curse.maven:elenaidodge2-442962:4127737")
 
     //Open-PAC
-    implementation fg.deobf("curse.maven:openpac-636608:4500809")
+    compileOnly fg.deobf("curse.maven:openpac-636608:4500809")
 
     //Dietary Statistics - Local file, also can't test in dev environment...
     compileOnly files("libs/DietaryStatistics-1.0.2.jar")
@@ -236,6 +236,16 @@ dependencies {
     //Origins Mod
     implementation fg.deobf("curse.maven:origins-forge-474438:3889853")
     runtimeOnly fg.deobf("curse.maven:caelus-308989:3650485")
+
+    implementation fg.deobf("curse.maven:irons-spells-n-spellbooks-855414:4605093")
+    implementation fg.deobf("curse.maven:playeranimator-658587:4418152")
+
+    //Curios API
+    runtimeOnly fg.deobf("curse.maven:curios-309927:4590652")
+
+    //GeckoLib
+    runtimeOnly fg.deobf("curse.maven:geckolib-388172:4181370")
+
 
 }
 

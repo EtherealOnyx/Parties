@@ -45,34 +45,37 @@ public class ClientSetup {
 
 
 
-        //Icon above all
+        //Vanilla
         items.put("head", new PHead("p_head"));
         items.put("name", new PName("p_name"));
         items.put("leader", new PLeader("p_leader"));
         items.put("dim", new PDimIcon("p_dim")); //Includes text!
+        items.put("armor", new PArmor("p_armor"));
+        items.put("offline", new POffline("p_offline"));
+        items.put("dead", new PDead("p_dead"));
 
         //Effects
         items.put("effects", new PEffectsBoth("p_effects"));
         items.put("effects_b", new PEffectsBene("p_effects_b"));
         items.put("effects_d", new PEffectsBad("p_effects_d"));
-        items.put("offline", new POffline("p_offline"));
-        items.put("dead", new PDead("p_dead"));
 
-        items.put("thirst", new PThirst("p_thirst"));
-        items.put("temp", new PTemp("p_temp"));
-        items.put("bg1", new PRectD("p_bg1"));
-        items.put("bgc", new ClickArea("p_bgc"));
-        items.put("armor", new PArmor("p_armor"));
-
+        //Bars
         items.put("lvlbar", new PLevelBar("p_lvlbar"));
-        items.put("chicken", new PHunger("p_chicken"));
         items.put("health", new PHealth("p_health"));
+        items.put("chicken", new PHunger("p_chicken"));
+        items.put("thirst", new PThirst("p_thirst"));
         items.put("mana", new PMana("p_mana"));
         items.put("mana_ss", new PManaSS("p_mana_ss"));
+        items.put("mana_i", new PManaI("p_mana_i"));
         items.put("stam_ef", new PStamina("p_stam_ef"));
+
+        //Modded Items
+        items.put("temp", new PTemp("p_temp"));
         items.put("origin", new POrigin("p_origin"));
 
-
+        //Backgrounds
+        items.put("bg1", new PRectD("p_bg1"));
+        items.put("bgc", new ClickArea("p_bgc"));
 
 
         //items.put("p_bg1", new PRectO("bg1", 7, 41, 34, 11));
