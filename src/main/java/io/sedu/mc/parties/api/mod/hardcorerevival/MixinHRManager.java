@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.mixin;
+package io.sedu.mc.parties.api.mod.hardcorerevival;
 
 import io.sedu.mc.parties.api.mod.hardcorerevival.HREventHandler;
 import net.blay09.mods.hardcorerevival.HardcoreRevival;

@@ -7,6 +7,7 @@ import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PEffects;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import io.sedu.mc.parties.data.ClientConfigData;
+import io.sedu.mc.parties.mixinaccessors.TrimmedMessagesAccessor;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -29,7 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.sedu.mc.parties.client.overlay.ClientPlayerData.playerOrderedList;
+import static io.sedu.mc.parties.client.overlay.RenderItem.renderSelfFrame;
 import static io.sedu.mc.parties.client.overlay.RenderItem.*;
+import static io.sedu.mc.parties.util.RenderUtils.renderSelfFrame;
 import static io.sedu.mc.parties.util.RenderUtils.*;
 
 public class HoverScreen extends Screen {
@@ -87,7 +90,8 @@ public class HoverScreen extends Screen {
         if (partyDisplay < 2 || (partyDisplay > 4 && playerOrderedList != null && partyDisplay != playerOrderedList.size() - 2)) {
             partyDisplay = Math.max(1, playerOrderedList != null ? playerOrderedList.size() - 1 : 1);
         }
-        trimmedMessages = minecraft.gui.getChat().trimmedMessages;
+        assert minecraft != null;
+        trimmedMessages = ((TrimmedMessagesAccessor) minecraft.gui.getChat()).getTrimmedMessages();
         selfFrameX = (int) Mth.clamp(ClientConfigData.xPos.get(), 0, width / playerScale - frameEleW);
         selfFrameY = (int) Mth.clamp(ClientConfigData.yPos.get(),0,  height/ playerScale - frameEleH);
         //TODO: Add for otherFrameX/Y.

@@ -21,7 +21,7 @@ public abstract class ChatScreenMixin extends Screen {
     }
 
     @Inject(at = @At("RETURN"), method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V")
-    private void render(PoseStack poseStack, int mX, int mY, float partialTick, CallbackInfo callback) {
+    private void chatTooltipRender(PoseStack poseStack, int mX, int mY, float partialTick, CallbackInfo callback) {
         assert minecraft != null;
         RenderItem.getCurrentMouseFrame(mX, mY, (index, posX, posY) -> {
             RenderItem.checkTooltip(posX, posY, (tooltipItem) -> tooltipItem.renderTooltip(poseStack, (ForgeIngameGui) minecraft.gui, index, mX, mY));

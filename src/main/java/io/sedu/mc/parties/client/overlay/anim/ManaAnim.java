@@ -3,7 +3,7 @@ package io.sedu.mc.parties.client.overlay.anim;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 
-public class ManaAnim extends AnimHandler {
+public class ManaAnim extends AnimBarHandler {
 
     public static int type;
 
@@ -13,7 +13,7 @@ public class ManaAnim extends AnimHandler {
     public boolean hInc = true;
 
     public ManaAnim(int length, boolean enabled) {
-        super(length, enabled);
+        super(length);
         updateText();
     }
 

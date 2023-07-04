@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class DimAnim extends AnimHandler {
+public class DimAnim extends AnimHandlerBase {
 
 
     //Specific data
@@ -21,7 +21,7 @@ public class DimAnim extends AnimHandler {
 
 
     public DimAnim(int length, ClientPlayerData player) {
-        super(length, true);
+        super(length);
         this.player = player;
         dimName.add("?");
         dimName.add("?");
@@ -34,11 +34,6 @@ public class DimAnim extends AnimHandler {
         if ((Boolean) data[1] || oldDimension.equals("")) {
             setOld();
         }
-    }
-
-    @Override
-    int getType() {
-        return 0;
     }
 
     @Override

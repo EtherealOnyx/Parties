@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(FeathersHudOverlay.ClientModBusEvents.class)
-public abstract class FeathersHudOverlayMixin {
+public abstract class FeathersRenderMixin {
     @Inject(at = @At("HEAD"), method = "registerGuiOverlays", remap = false, cancellable = true)
     private static void shouldDisplayOverlay(CallbackInfo callback) {
         if (!FCompatManager.enableOverlay) callback.cancel();

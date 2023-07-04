@@ -13,10 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.UUID;
 
 @Mixin(ClientSpellCastHelper.class)
-public class ClientCastHelperMixin {
+public abstract class ClientCastHelperMixin {
 
     @Inject(at = @At("RETURN"), method = "handleClientBoundOnCastFinished", remap = false, locals = LocalCapture.CAPTURE_FAILHARD)
-    private static void onCastFinished(UUID castingEntityId, SpellType spellType, boolean cancelled, CallbackInfo ci, Player player) {
+    private static void clientCastFinishedListener(UUID castingEntityId, SpellType spellType, boolean cancelled, CallbackInfo ci, Player player) {
         if (!cancelled) ClientPlayerData.getSelf(ClientPlayerData::updateManaISS);
     }
 }

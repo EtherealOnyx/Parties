@@ -93,9 +93,4 @@ public class OriginHolder {
             return data;
         });
     }
-
-
-    //TODO: get main origin from player on the server.
-    //Then, store it on client. Figure out what code is used when Orb of Origin is used to change origins, trigger event.
-    //
 }

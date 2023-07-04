@@ -3,6 +3,7 @@ package io.sedu.mc.parties.api.helper;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.sedu.mc.parties.lib.ct.ColorThief;
 import io.sedu.mc.parties.lib.ct.RGBUtil;
+import io.sedu.mc.parties.mixinaccessors.MainImageAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -110,7 +111,9 @@ public class ColorAPI {
 
         if (texture instanceof MissingTextureAtlasSprite)
             return 0;
-        NativeImage img = texture.mainImage.length == 0 ? null : texture.mainImage[0];
+
+        NativeImage[] mImage = ((MainImageAccessor)texture).getMainImage();
+        NativeImage img = mImage.length == 0 ? null : mImage[0];
         if (img == null) return 0;
         int[] domColor = ColorThief.getColor(img);
         return domColor == null ? 0 : RGBUtil.packRGB(domColor);

@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.events;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.client.overlay.anim.AnimHandler;
+import io.sedu.mc.parties.client.overlay.anim.AnimBarHandler;
 import io.sedu.mc.parties.client.overlay.gui.HoverScreen;
 import io.sedu.mc.parties.client.overlay.gui.SliderButton;
 import io.sedu.mc.parties.setup.ClientSetup;
@@ -27,7 +27,7 @@ public class ClientEvent {
     public static int tick = 0;
     public static void ticker(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
-            AnimHandler.tick();
+            AnimBarHandler.tick();
             if (Minecraft.getInstance().isPaused()) return;
             ClientPlayerData.playerList.values().forEach(ClientPlayerData::tick);
             if (tick++ % 20 == 8) {

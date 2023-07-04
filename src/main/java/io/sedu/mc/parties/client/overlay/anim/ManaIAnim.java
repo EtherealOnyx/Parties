@@ -3,7 +3,7 @@ package io.sedu.mc.parties.client.overlay.anim;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 
-public class ManaIAnim extends AnimHandler {
+public class ManaIAnim extends AnimBarHandler {
 
     public static int type;
 
@@ -13,7 +13,7 @@ public class ManaIAnim extends AnimHandler {
     public boolean hInc = true;
 
     public ManaIAnim(int length, boolean enabled) {
-        super(length, enabled);
+        super(length);
         updateText();
     }
 
@@ -29,15 +29,11 @@ public class ManaIAnim extends AnimHandler {
 
     @Override
     void activateValues(Object... data) {
-        System.out.println(1);
         float b1 = getPercent(oldCur, oldMax);
-        System.out.println(2);
         float b2 = getPercent((Integer) data[0], (Integer) data[1]);
-        System.out.println(3);
         hInc = b1 < b2;
         oldH = b1;
         curH = b2;
-        System.out.println(4);
         cur = (Integer) data[0];
         max = (Integer) data[1];
         updateText();

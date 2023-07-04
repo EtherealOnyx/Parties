@@ -3,7 +3,7 @@ package io.sedu.mc.parties.client.overlay.anim;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 
-public class HealthAnim extends AnimHandler {
+public class HealthAnim extends AnimBarHandler {
 
 
 
@@ -17,7 +17,7 @@ public class HealthAnim extends AnimHandler {
     public boolean aInc = true;
 
     public HealthAnim(int length, boolean enabled) {
-        super(length, enabled);
+        super(length);
         updateText();
     }
 

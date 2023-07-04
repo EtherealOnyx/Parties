@@ -7,18 +7,19 @@
     "ChooseOriginMixin",
     "EntitySelectorMixin",
     "MagicManagerMixin",
-    "MixinANManaRender",
-    "MixinHRManager",
     "PartyManagerMixin",
     "PlayerMixin",
     "ServerPartyMixin"
   ],
   "client": [
+    "ANManaRendererMixin",
+    "ChatComponentMixin",
     "ChatScreenMixin",
     "ClientCastHelperMixin",
     "ClientMessageHandlerMixin",
-    "FeathersHudOverlayMixin",
-    "ManaRendererMixin"
+    "FeathersRenderMixin",
+    "SSManaRenderMixin",
+    "TextureAtlasSpriteMixin"
   ],
   "server": [
   ],

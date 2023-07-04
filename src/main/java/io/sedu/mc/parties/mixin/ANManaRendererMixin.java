@@ -8,9 +8,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ManaRenderer.class)
-public abstract class ManaRendererMixin {
+public abstract class ANManaRendererMixin {
     @Inject(at = @At("HEAD"), method = "render(Lnet/minecraftforge/client/gui/ForgeIngameGui;Lcom/mojang/blaze3d/vertex/PoseStack;FII)V", remap = false, cancellable = true)
-    private void shouldDisplayOverlay(CallbackInfo callback) {
+    private void displayOverlay(CallbackInfo callback) {
         if (!SSCompatManager.enableOverlay) callback.cancel();
     }
 }

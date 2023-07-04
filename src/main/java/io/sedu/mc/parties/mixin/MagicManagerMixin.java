@@ -16,10 +16,10 @@ import java.util.HashMap;
 import java.util.UUID;
 
 @Mixin(MagicManager.class)
-public class MagicManagerMixin {
+public abstract class MagicManagerMixin {
 
     @Inject(at = @At("RETURN"), method = "setPlayerCurrentMana", remap = false, locals = LocalCapture.CAPTURE_FAILHARD)
-    private void setPlayerCurrentManaMixin(ServerPlayer serverPlayer, int newManaValue, CallbackInfo ci, PlayerMagicData playerMagicData) {
+    private void playerManaListener(ServerPlayer serverPlayer, int newManaValue, CallbackInfo ci, PlayerMagicData playerMagicData) {
         ISSCompatManager.getHandler().getServerMana(serverPlayer, (cur, max) -> {
             HashMap<UUID, Boolean> trackers;
             if ((trackers = PlayerData.playerTrackers.get(serverPlayer.getUUID())) != null) {

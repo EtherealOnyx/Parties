@@ -20,7 +20,7 @@ import java.util.Objects;
 public abstract class ChooseOriginMixin {
 
     @Final
-    @Shadow
+    @Shadow(remap = false)
     private Player player;
 
     @Inject(method="setOrigin", at = @At(value = "TAIL"), remap = false, locals = LocalCapture.CAPTURE_FAILHARD)

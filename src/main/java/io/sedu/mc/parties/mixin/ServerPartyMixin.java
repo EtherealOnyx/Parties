@@ -25,7 +25,7 @@ public abstract class ServerPartyMixin {
 
 
    @Inject(method = "changeOwner", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
-    private void changeOwner(UUID newOwnerId, String newOwnerUsername, CallbackInfoReturnable<Boolean> cir,
+    private void changeOwnerListener(UUID newOwnerId, String newOwnerUsername, CallbackInfoReturnable<Boolean> cir,
                              PartyMember oldOwner, boolean result) {
         if (result && ServerConfigData.isPartySyncEnabled()) {
             PACCompatManager.getHandler().changeLeader(oldOwner.getUUID(), newOwnerId);
@@ -33,7 +33,7 @@ public abstract class ServerPartyMixin {
     }
 
     @Inject(method = "addMember(Ljava/util/UUID;Lxaero/pac/common/parties/party/member/PartyMemberRank;Ljava/lang/String;)Lxaero/pac/common/parties/party/member/PartyMember;", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
-    private void addMember(UUID memberUUID, PartyMemberRank rank, String playerUsername,
+    private void addMemberListener(UUID memberUUID, PartyMemberRank rank, String playerUsername,
                            CallbackInfoReturnable<PartyMember> cir) {
         if (cir.getReturnValue() != null && ServerConfigData.isPartySyncEnabled()) {
             //Success?
@@ -47,7 +47,7 @@ public abstract class ServerPartyMixin {
     }
 
     @Inject(method = "removeMember(Ljava/util/UUID;)Lxaero/pac/common/parties/party/member/PartyMember;", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
-    private void removeMember(UUID memberUUID, CallbackInfoReturnable<PartyMember> cir, PartyMember m) {
+    private void removeMemberListener(UUID memberUUID, CallbackInfoReturnable<PartyMember> cir, PartyMember m) {
         if (cir.getReturnValue() != null && ServerConfigData.isPartySyncEnabled()) {
             //Success?
             PACCompatManager.getHandler().memberLeft(memberUUID);

@@ -3,7 +3,7 @@ package io.sedu.mc.parties.client.overlay.anim;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 
-public class StaminAnim extends AnimHandler {
+public class StaminAnim extends AnimBarHandler {
 
     public static int type;
 
@@ -15,7 +15,7 @@ public class StaminAnim extends AnimHandler {
     public boolean aInc = true;
 
     public StaminAnim(int length, boolean enabled) {
-        super(length, enabled);
+        super(length);
         updateText();
     }
 
