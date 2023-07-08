@@ -104,6 +104,7 @@ public class ClientPlayerData {
 
         if (ISSCompatManager.active()) {
             data.put(MANAI, new ManaIAnim(20, true));
+            data.put(CASTBAR, new CastAnim(0));
         }
 
 
@@ -691,6 +692,21 @@ public class ClientPlayerData {
 
     public void setMaxManaI(Integer data) {
         getManaI(mana -> mana.checkMax(data));
+    }
+
+    public void getCastInfo(Consumer<CastAnim> action) {
+        data.computeIfPresent(CASTBAR, (data, cast) -> {
+            action.accept((CastAnim) cast);
+            return cast;
+        });
+    }
+
+    public void initSpell(int spellId, int castDuration) {
+        getCastInfo(cast -> cast.activate(spellId, castDuration));
+    }
+
+    public void finishSpell() {
+        getCastInfo(CastAnim::markDone);
     }
 }
 

@@ -33,5 +33,5 @@ public enum DataType {
     ORIGIN,
 
     //Spells and Spellbooks
-    MANAI,
+    MANAI, CASTBAR,
 }

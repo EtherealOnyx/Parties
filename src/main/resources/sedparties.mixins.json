@@ -16,6 +16,7 @@
     "ChatComponentMixin",
     "ChatScreenMixin",
     "ClientCastHelperMixin",
+    "ClientMagicDataMixin",
     "ClientMessageHandlerMixin",
     "FeathersRenderMixin",
     "SSManaRenderMixin",

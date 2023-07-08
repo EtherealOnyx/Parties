@@ -15,4 +15,7 @@ public interface IISSHandler {
     void getClientMana(Player p, BiConsumer<Integer, Integer> action);
 
     void getServerMana(ServerPlayer p, BiConsumer<Integer, Integer> action);
+
+
+    SpellHolder getSpellInfo(int spellIndex);
 }

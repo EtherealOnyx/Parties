@@ -27,4 +27,9 @@ public class ISSHandlerFake implements IISSHandler {
     public void getServerMana(ServerPlayer p, BiConsumer<Integer, Integer> action) {
 
     }
+
+    @Override
+    public SpellHolder getSpellInfo(int spellIndex) {
+        return null;
+    }
 }

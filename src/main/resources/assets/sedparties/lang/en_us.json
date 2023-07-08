@@ -99,6 +99,7 @@
   "config.sedparties.name.ttype": "Text Type",
   "config.sedparties.name.htype": "Head Icon Type",
   "config.sedparties.name.bleed": "Bleeding/Dying Text",
+  "config.sedparties.name.thalfsize": "Smaller Text Size",
 
   "config.sedparties.tooltip.display": "Activate or deactivate the current element.",
   "config.sedparties.tooltip.xpos": "The X position of the current element (or icon).",
@@ -155,6 +156,7 @@
   "config.sedparties.tooltip.bcdb": "The bottom gradient color of the health decrease animation",
   "config.sedparties.tooltip.ttype": "Text display type. Options are a ratio, current amount only, and a percentage.",
   "config.sedparties.tooltip.htype": "Changes the head display. 0 for icons, 1 for self model only, 2 for party models.",
+  "config.sedparties.tooltip.thalfsize": "Makes the text render at half its size.",
   "config.sedparties.tooltip.bleed": "Whether or not to render bleeding text indicator (for PlayerRevive mod).",
 
   "config.sedparties.tooltip.enableb": "Enabled",

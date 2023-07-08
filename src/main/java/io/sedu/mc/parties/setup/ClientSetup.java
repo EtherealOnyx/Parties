@@ -64,10 +64,11 @@ public class ClientSetup {
         items.put("health", new PHealth("p_health"));
         items.put("chicken", new PHunger("p_chicken"));
         items.put("thirst", new PThirst("p_thirst"));
+        items.put("stam_ef", new PStamina("p_stam_ef"));
         items.put("mana", new PMana("p_mana"));
         items.put("mana_ss", new PManaSS("p_mana_ss"));
         items.put("mana_i", new PManaI("p_mana_i"));
-        items.put("stam_ef", new PStamina("p_stam_ef"));
+        items.put("castbar", new PCastBar("p_castbar"));
 
         //Modded Items
         items.put("temp", new PTemp("p_temp"));

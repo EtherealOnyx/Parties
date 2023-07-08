@@ -775,6 +775,7 @@ public abstract class RenderItem {
 
         updater.put("htype", (n, d) -> {PHead.renderType = (int)d; return null;});
         updater.put("bleed", (n, d) -> {PHead.renderBleed = (boolean)d; return null;});
+        updater.put("thalfsize", (n, d) -> {((PCastBar)n).textHalfSize = (boolean)d; return null;});
     }
 
     public interface Getter {
@@ -845,6 +846,7 @@ public abstract class RenderItem {
         getter.put("genc_y", (n) -> clickArea.y);
         getter.put("htype", (n) -> PHead.renderType);
         getter.put("bleed", (n) -> PHead.renderBleed);
+        getter.put("thalfsize", (n) -> ((PCastBar)n).textHalfSize);
     }
 
     public static void setDefaultValues() {

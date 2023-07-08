@@ -7,12 +7,13 @@ public abstract class AnimHandlerBase {
     static List<AnimHandlerBase> animTickers = new ArrayList<>();
     //Generic data
     public boolean active;
-    public final int length;
+    public int length;
     public int animTime;
 
     AnimHandlerBase(int length) {
         this.length = length;
     }
+
     boolean tickAnim() {
         animTime -= 1;
         if (animTime <= 0) {
@@ -30,10 +31,18 @@ public abstract class AnimHandlerBase {
             //Already tracked
             activateValues(data); //Reset anim with new data.
             animTime = length;
+            if (length == 0) {
+                active = false;
+                return;
+            }
             return;
         }
         activateValues(data);
         animTime = length;
+        if (length == 0) {
+            active = false;
+            return;
+        }
         active = true;
         animTickers.add(this);
     }

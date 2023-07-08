@@ -45,6 +45,7 @@ public class ISSEventHandler {
             InfoPacketHelper.sendMaxManaUpdateI(sendTo, propOf, max);
         })));
     }
+
     @SubscribeEvent
     public static void ticker(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
@@ -57,4 +58,15 @@ public class ISSEventHandler {
         }
     }
 
+    public static void onSpellCast() {
+
+    }
+
+    public static void onClientSpellCast(int spellId, int castDuration) {
+        ClientPlayerData.getSelf(clientPlayerData -> clientPlayerData.initSpell(spellId, castDuration));
+    }
+
+    public static void onClientSpellFinish() {
+        ClientPlayerData.getSelf(ClientPlayerData::finishSpell);
+    }
 }
