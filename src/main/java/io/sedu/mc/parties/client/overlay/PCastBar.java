@@ -113,9 +113,9 @@ public class PCastBar extends RenderIconTextItem {
         id.getCastInfo(castAnim -> {
             if (castAnim.active) {
                 castAnim.getSpell(partialTicks, (spell, percent) -> {
-                    RenderUtils.offRectNoA(poseStack.last().pose(), x(0),y(0), zPos, 0, width,height, 0xffcc5b, 0xd3a85c);
-                    RenderUtils.offRectNoA(poseStack.last().pose(), x(0),y(0), zPos, 1, width,height, 0x3f310b, 0x3f310b);
-                    RenderUtils.offRectNoA(poseStack.last().pose(), x(0),y(0), zPos, 1, width*percent,height, 0xfff0c3, 0xfff0c3);
+                    RenderUtils.offRectNoA(poseStack.last().pose(), x(0),y(0), zPos, 0, width,height, spell.school.bgTop, spell.school.bgBottom);
+                    RenderUtils.offRectNoA(poseStack.last().pose(), x(0),y(0), zPos, 1, width,height, spell.school.bgInner, spell.school.bgInner);
+                    RenderUtils.offRectNoA(poseStack.last().pose(), x(0),y(0), zPos, 1, width*percent,height, spell.school.bgTextColor, spell.school.bgTextColor);
 
                     if (iconEnabled) {
                         resetColor();
@@ -128,10 +128,10 @@ public class PCastBar extends RenderIconTextItem {
                         if (textHalfSize) {
                             poseStack.pushPose();
                             poseStack.scale(.5f,.5f,1f);
-                            text((tX(0)<<1) + 18, (tY(0)<<1) + 9, gui, poseStack, spell.name, 0xfff0c3);
+                            text((tX(0)<<1) + 18, (tY(0)<<1) + 9, gui, poseStack, spell.name, spell.school.bgTextColor);
                             poseStack.popPose();
                         } else {
-                            text(tX(0) + 9, tY(0)+2, gui, poseStack, spell.name, 0xfff0c3);
+                            text(tX(0) + 9, tY(0)+2, gui, poseStack, spell.name, spell.school.bgTextColor);
                         }
                     }
 

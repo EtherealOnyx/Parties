@@ -12,7 +12,7 @@ import static io.sedu.mc.parties.api.mod.ironspellbooks.SpellHolder.CastType.HOL
 
 public class CastAnim extends AnimHandlerBase {
 
-    public static final SpellHolder EMPTY = new SpellHolder(new TextComponent(""), new ResourceLocation(""), SpellHolder.CastType.NORMAL);
+    public static final SpellHolder EMPTY = new SpellHolder(new TextComponent(""), new ResourceLocation(""), SpellHolder.CastType.NORMAL, SpellHolder.School.NONE);
     SpellHolder spell = EMPTY;
     private boolean finished = false;
 
