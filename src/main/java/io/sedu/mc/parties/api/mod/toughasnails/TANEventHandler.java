@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.api.mod.toughasnails;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.events.ClientEvent;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.InfoPacketHelper;
@@ -23,18 +23,18 @@ public class TANEventHandler {
         if (e.side == LogicalSide.SERVER && e.phase == TickEvent.Phase.END) {
             if (e.player.tickCount % playerUpdateInterval.get() == 9) {
                 HashMap<UUID, Boolean> trackers;
-                if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
                     //Thirst
-                    PlayerData.playerList.get(player = e.player.getUUID()).setThirst(TANCompatManager.getHandler().getPlayerThirst(e.player), thirst -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendThirstUpdate(id, player, thirst)));
+                    ServerPlayerData.playerList.get(player = e.player.getUUID()).setThirst(TANCompatManager.getHandler().getPlayerThirst(e.player), thirst -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendThirstUpdate(id, player, thirst)));
                 }
             }
             if (e.player.tickCount % playerSlowUpdateInterval.get() == 9) {
                 HashMap<UUID, Boolean> trackers;
-                if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
                     //Temperature
-                    PlayerData.playerList.get(player = e.player.getUUID()).setWorldTemp(TANCompatManager.getHandler().getPlayerTemp(e.player), temp -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendWorldTempUpdateTAN(id, player, temp)));
+                    ServerPlayerData.playerList.get(player = e.player.getUUID()).setWorldTemp(TANCompatManager.getHandler().getPlayerTemp(e.player), temp -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendWorldTempUpdateTAN(id, player, temp)));
                 }
             }
         }
@@ -43,8 +43,8 @@ public class TANEventHandler {
     @SubscribeEvent
     public static void onPartyJoin(PartyJoinEvent event) {
         event.forTrackersAndSelf((sendTo, propOf) -> {
-            InfoPacketHelper.sendWorldTempUpdateTAN(sendTo, propOf, PlayerData.playerList.get(propOf).getWorldTemp());
-            InfoPacketHelper.sendThirstUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getThirst());
+            InfoPacketHelper.sendWorldTempUpdateTAN(sendTo, propOf, ServerPlayerData.playerList.get(propOf).getWorldTemp());
+            InfoPacketHelper.sendThirstUpdate(sendTo, propOf, ServerPlayerData.playerList.get(propOf).getThirst());
         });
     }
 

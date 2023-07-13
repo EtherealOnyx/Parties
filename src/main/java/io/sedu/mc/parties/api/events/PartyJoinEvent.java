@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.api.events;
 
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.util.TriConsumer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -25,7 +25,7 @@ public class PartyJoinEvent extends PlayerEvent {
     //Constructor used to trigger this event. It requires the player.
     public PartyJoinEvent(Player player) {
         super(player);
-        trackers = PlayerData.playerTrackers.get(id = player.getUUID());
+        trackers = ServerPlayerData.playerTrackers.get(id = player.getUUID());
     }
 
     /*

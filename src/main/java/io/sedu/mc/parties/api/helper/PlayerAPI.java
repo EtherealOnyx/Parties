@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.api.helper;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import net.minecraft.server.level.ServerPlayer;
 
 import javax.annotation.Nullable;
@@ -18,23 +18,23 @@ public class PlayerAPI {
     }
 
     public static ServerPlayer getNormalServerPlayer(UUID id) {
-        PlayerData p;
+        ServerPlayerData p;
         return (p = getNormalPlayer(id)) != null ? p.getPlayer() : null;
     }
 
-    public static void getPlayer(UUID id, Consumer<PlayerData> action) {
-        PlayerData.playerList.computeIfPresent(id, (uuid, playerData) -> {
+    public static void getPlayer(UUID id, Consumer<ServerPlayerData> action) {
+        ServerPlayerData.playerList.computeIfPresent(id, (uuid, playerData) -> {
             action.accept(playerData);
             return playerData;
         });
     }
 
-    public static @Nullable PlayerData getNormalPlayer(UUID id) {
-        return PlayerData.playerList.get(id);
+    public static @Nullable ServerPlayerData getNormalPlayer(UUID id) {
+        return ServerPlayerData.playerList.get(id);
     }
 
     public static String getName(UUID id) {
-        PlayerData p;
+        ServerPlayerData p;
         return (p = getNormalPlayer(id)) != null ? p.getName() : "";
     }
 

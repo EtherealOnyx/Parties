@@ -13,9 +13,9 @@ import java.util.function.Consumer;
 import static io.sedu.mc.parties.data.ServerConfigData.playerAcceptTimer;
 import static io.sedu.mc.parties.data.DataType.*;
 
-public class PlayerData {
+public class ServerPlayerData {
 
-    public static HashMap<UUID, PlayerData> playerList = new HashMap<>();
+    public static HashMap<UUID, ServerPlayerData> playerList = new HashMap<>();
 
     public static List<MessageCdHolder> messageCd = new ArrayList<>();
 
@@ -39,11 +39,11 @@ public class PlayerData {
     //The UUID of the party that this player belongs to.
     private UUID party;
 
-    public PlayerData(UUID id) {
+    public ServerPlayerData(UUID id) {
         playerList.put(id, this);
     }
 
-    public PlayerData(UUID playerId, UUID partyId, String name) {
+    public ServerPlayerData(UUID playerId, UUID partyId, String name) {
         this.party = partyId;
         setName(name);
         playerList.put(playerId, this);
@@ -93,7 +93,7 @@ public class PlayerData {
         party = null;
     }
 
-    public PlayerData setServerPlayer(ServerPlayer player) {
+    public ServerPlayerData setServerPlayer(ServerPlayer player) {
         serverPlayer = new WeakReference<>(player);
         setName(player.getName().getContents());
         return this;
@@ -108,7 +108,7 @@ public class PlayerData {
         dataItems.put(DataType.NAME, name);
     }
 
-    public PlayerData removeServerPlayer() {
+    public ServerPlayerData removeServerPlayer() {
         serverPlayer = null;
         return this;
     }
@@ -118,7 +118,7 @@ public class PlayerData {
             playerTrackers.put(toTrack, new HashMap<>());
         }
         playerTrackers.get(toTrack).put(trackerHost, true);
-        PlayerAPI.getPlayer(trackerHost, PlayerData::markDirty);
+        PlayerAPI.getPlayer(trackerHost, ServerPlayerData::markDirty);
     }
 
     private void markDirty() {
@@ -132,12 +132,12 @@ public class PlayerData {
         playerTrackers.get(toTrack).remove(trackerHost);
         if (playerTrackers.get(toTrack).size() == 0)
             playerTrackers.remove(toTrack);
-        PlayerAPI.getPlayer(trackerHost, PlayerData::markDirty);
+        PlayerAPI.getPlayer(trackerHost, ServerPlayerData::markDirty);
     }
 
     public static void changeTracker(UUID trackerHost, UUID toTrack, boolean serverTracked) {
         playerTrackers.get(toTrack).put(trackerHost, serverTracked);
-        PlayerAPI.getPlayer(trackerHost, PlayerData::markDirty);
+        PlayerAPI.getPlayer(trackerHost, ServerPlayerData::markDirty);
     }
 
     public void setHunger(int hunger, Consumer<Integer> action) {

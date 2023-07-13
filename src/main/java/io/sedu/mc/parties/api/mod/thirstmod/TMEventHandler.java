@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.api.mod.thirstmod;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.events.ClientEvent;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.InfoPacketHelper;
@@ -22,10 +22,10 @@ public class TMEventHandler {
         if (e.side == LogicalSide.SERVER && e.phase == TickEvent.Phase.END) {
             if (e.player.tickCount % playerUpdateInterval.get() == 2) {
                 HashMap<UUID, Boolean> trackers;
-                if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
-                    PlayerData.playerList.get(player = e.player.getUUID()).setThirst(TMCompatManager.getHandler().getThirst(e.player), thirst -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendThirstUpdate(id, player, thirst)));
-                    PlayerData.playerList.get(player).setQuench(TMCompatManager.getHandler().getQuench(e.player), quench -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendQuenchUpdate(id, player, quench)));
+                    ServerPlayerData.playerList.get(player = e.player.getUUID()).setThirst(TMCompatManager.getHandler().getThirst(e.player), thirst -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendThirstUpdate(id, player, thirst)));
+                    ServerPlayerData.playerList.get(player).setQuench(TMCompatManager.getHandler().getQuench(e.player), quench -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendQuenchUpdate(id, player, quench)));
                 }
             }
         }
@@ -34,8 +34,8 @@ public class TMEventHandler {
     @SubscribeEvent
     public static void onPartyJoin(PartyJoinEvent event) {
         event.forTrackersAndSelf((sendTo, propOf) -> {
-            InfoPacketHelper.sendThirstUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getThirst());
-            InfoPacketHelper.sendQuenchUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getQuench());
+            InfoPacketHelper.sendThirstUpdate(sendTo, propOf, ServerPlayerData.playerList.get(propOf).getThirst());
+            InfoPacketHelper.sendQuenchUpdate(sendTo, propOf, ServerPlayerData.playerList.get(propOf).getQuench());
         });
     }
 

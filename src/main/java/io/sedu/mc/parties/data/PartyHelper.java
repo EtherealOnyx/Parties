@@ -33,7 +33,7 @@ public class PartyHelper {
     }
 
     public static boolean acceptInvite(UUID initiator, UUID futureMember) {
-        PlayerData fM;
+        ServerPlayerData fM;
         if ((fM = PlayerAPI.getNormalPlayer(futureMember)) == null) return false;
         if (fM.isInviter(initiator)) {
             fM.removeInviter(initiator);
@@ -50,7 +50,7 @@ public class PartyHelper {
     }
 
     public static boolean declineInvite(UUID initiator, UUID futureMember) {
-        PlayerData pD;
+        ServerPlayerData pD;
         if ((pD = PlayerAPI.getNormalPlayer(futureMember)) == null) return false;
         if (!pD.isInviter(initiator)) return false;
         ServerPlayer p;
@@ -96,7 +96,7 @@ public class PartyHelper {
     }
 
     public static boolean leaveParty(UUID memberLeaving) {
-        PlayerData p;
+        ServerPlayerData p;
         if ((p = PlayerAPI.getNormalPlayer(memberLeaving)) != null && p.hasParty()) {
             //Open-PAC Support
             if (ServerConfigData.isPartySyncEnabled()) {
@@ -119,7 +119,7 @@ public class PartyHelper {
 
     public static void questionPlayer(UUID initiator, UUID futureMember) {
         //This checks if futureMember is a valid player that exists on the server.
-        PlayerData fM;
+        ServerPlayerData fM;
         if (verifyRequest(initiator, futureMember) && !((Objects.requireNonNull(fM = PlayerAPI.getNormalPlayer(futureMember))).isInviter(initiator))) {
             
             fM.addInviter(initiator);
@@ -198,12 +198,12 @@ public class PartyHelper {
                 "messages.sedparties.phandler.declineinviteauto").withStyle(ChatFormatting.DARK_AQUA), initiator));
     }
 
-    public static void dismissInvite(PlayerData playerData, UUID initiator) {
+    public static void dismissInvite(ServerPlayerData serverPlayerData, UUID initiator) {
         ServerPlayer p;
         PlayerAPI.getServerPlayer(initiator, serverPlayer -> serverPlayer.sendMessage(new TranslatableComponent(
-                "messages.sedparties.phandler.declineinviteauto2", playerData.getName()).withStyle(ChatFormatting.DARK_AQUA), initiator));
+                "messages.sedparties.phandler.declineinviteauto2", serverPlayerData.getName()).withStyle(ChatFormatting.DARK_AQUA), initiator));
 
-        if ((p = playerData.getPlayer()) != null) {
+        if ((p = serverPlayerData.getPlayer()) != null) {
             p.sendMessage(new TranslatableComponent("messages.sedparties.phandler.declineinviteauto3", PlayerAPI.getName(initiator)).withStyle(ChatFormatting.DARK_AQUA), initiator);
         }
     }

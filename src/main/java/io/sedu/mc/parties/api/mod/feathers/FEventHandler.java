@@ -2,7 +2,7 @@ package io.sedu.mc.parties.api.mod.feathers;
 
 import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.events.ClientEvent;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.InfoPacketHelper;
@@ -24,10 +24,10 @@ public class FEventHandler {
             if (e.player.tickCount % playerUpdateInterval.get() == 2) {
                 FCompatManager.getHandler().getServerFeathers((ServerPlayer) e.player, (cur, max, abs) -> {
                     HashMap<UUID, Boolean> trackers;
-                    if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
+                    if ((trackers = ServerPlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                         UUID player;
-                        PlayerData pd;
-                        (pd = PlayerData.playerList.get(player = e.player.getUUID())).setStamina(Math.min(cur, max), () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendStaminaUpdate(id, player, cur)));
+                        ServerPlayerData pd;
+                        (pd = ServerPlayerData.playerList.get(player = e.player.getUUID())).setStamina(Math.min(cur, max), () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendStaminaUpdate(id, player, cur)));
                         pd.setMaxStamina(max, () ->  trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendMaxStaminaUpdate(id, player, max)));
                         pd.setExtraStamina(abs, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendExtraStamUpdate(id, player, abs)));
                     }
@@ -39,8 +39,8 @@ public class FEventHandler {
     @SubscribeEvent
     public static void onPartyJoin(PartyJoinEvent event) {
         event.forTrackersAndSelf((sendTo, propOf) -> PlayerAPI.getPlayer(propOf, p -> {
-            PlayerData pD;
-            InfoPacketHelper.sendStaminaUpdate(sendTo, propOf, (pD = PlayerData.playerList.get(propOf)).getStamina());
+            ServerPlayerData pD;
+            InfoPacketHelper.sendStaminaUpdate(sendTo, propOf, (pD = ServerPlayerData.playerList.get(propOf)).getStamina());
             InfoPacketHelper.sendMaxStaminaUpdate(sendTo, propOf, pD.getMaxStamina());
             InfoPacketHelper.sendExtraStamUpdate(sendTo, propOf, pD.getExtraStamina());
         }));

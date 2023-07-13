@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.api.helper;
 
 import io.sedu.mc.parties.data.PartyData;
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
@@ -12,9 +12,9 @@ public class PartyAPI {
 
     public static PartyData getPartyFromMember(UUID playerId) {
         UUID party;
-        PlayerData pl;
+        ServerPlayerData pl;
         PartyData p;
-        if ((pl = PlayerData.playerList.get(playerId)) != null && (party = pl.getPartyId()) != null && (p = getPartyFromId(party)) != null)
+        if ((pl = ServerPlayerData.playerList.get(playerId)) != null && (party = pl.getPartyId()) != null && (p = getPartyFromId(party)) != null)
             return p;
         return null;
     }
@@ -50,7 +50,7 @@ public class PartyAPI {
     private static boolean isClientTracked(UUID tracker, UUID toTrack) {
         HashMap<UUID, Boolean> trackers;
         Boolean serverTracked;
-        if ((trackers = PlayerData.playerTrackers.get(toTrack)) != null && (serverTracked = trackers.get(tracker)) != null)
+        if ((trackers = ServerPlayerData.playerTrackers.get(toTrack)) != null && (serverTracked = trackers.get(tracker)) != null)
             return !serverTracked;
         return false;
     }

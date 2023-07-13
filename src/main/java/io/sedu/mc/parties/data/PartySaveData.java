@@ -29,7 +29,7 @@ public class PartySaveData extends SavedData
 
     public PartySaveData(CompoundTag tag) {
         Parties.LOGGER.info("Loading party save data...");
-        if (!ServerConfigData.isPersistEnabled() || ServerConfigData.isPartySyncEnabled()) {
+        if (ServerConfigData.isPersistDisabled() || ServerConfigData.isPartySyncEnabled()) {
             Parties.LOGGER.info("Loading cancelled, party persistence disabled or syncing from other parties mod...");
             return;
         }
@@ -46,7 +46,7 @@ public class PartySaveData extends SavedData
                 CompoundTag mC = (CompoundTag) m;
                 //Add Player first.
                 UUID pId = mC.getUUID("id");
-                new PlayerData(pId, partyId, mC.getString("name"));
+                new ServerPlayerData(pId, partyId, mC.getString("name"));
                 //Then add player to party.
                 party.addMemberSilently(pId);
             }
@@ -69,7 +69,7 @@ public class PartySaveData extends SavedData
     @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
         Parties.LOGGER.info("Saving parties to disk...");
-        if (!ServerConfigData.isPersistEnabled()) {
+        if (ServerConfigData.isPersistDisabled()) {
             Parties.LOGGER.info("Saving cancelled, party persistence disabled...");
             return tag;
         }

@@ -8,6 +8,7 @@
     "EntitySelectorMixin",
     "MagicManagerMixin",
     "PartyManagerMixin",
+    "PlayerMagicDataMixin",
     "PlayerMixin",
     "ServerPartyMixin"
   ],

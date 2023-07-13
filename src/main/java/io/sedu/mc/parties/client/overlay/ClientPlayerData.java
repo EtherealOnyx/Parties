@@ -702,11 +702,16 @@ public class ClientPlayerData {
     }
 
     public void initSpell(int spellId, int castDuration) {
+        Parties.LOGGER.debug("Casting spell for: " + playerName);
         getCastInfo(cast -> cast.activate(spellId, castDuration));
     }
 
     public void finishSpell() {
         getCastInfo(CastAnim::markDone);
+    }
+
+    public void startCast(Integer spellId, Integer castTime) {
+
     }
 }
 

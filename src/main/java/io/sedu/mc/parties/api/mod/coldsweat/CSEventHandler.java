@@ -3,7 +3,7 @@ package io.sedu.mc.parties.api.mod.coldsweat;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.events.ClientEvent;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import net.minecraft.client.Minecraft;
@@ -24,10 +24,10 @@ public class CSEventHandler {
         if (e.side == LogicalSide.SERVER && e.phase == TickEvent.Phase.END) {
             if (e.player.tickCount % playerUpdateInterval.get() == 9) {
                 HashMap<UUID, Boolean> trackers;
-                if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     try {
                         UUID player;
-                        PlayerData.playerList.get(player = e.player.getUUID()).setBodyTemp(CSCompatManager.getHandler().getBodyTemp(e.player), temp -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendBodyTempUpdate(id, player, temp)));
+                        ServerPlayerData.playerList.get(player = e.player.getUUID()).setBodyTemp(CSCompatManager.getHandler().getBodyTemp(e.player), temp -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendBodyTempUpdate(id, player, temp)));
                     } catch (Throwable t) {
                         CSCompatManager.changeHandler();
                         Parties.LOGGER.error("Failed to support Cold Sweat!", t);
@@ -39,11 +39,11 @@ public class CSEventHandler {
             }
             if (e.player.tickCount % playerSlowUpdateInterval.get() == 9) {
                 HashMap<UUID, Boolean> trackers;
-                if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     try {
                         UUID player;
                         //World
-                        PlayerData.playerList.get(player = e.player.getUUID()).setWorldTemp(CSCompatManager.getHandler().getWorldTemp(e.player), temp -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendWorldTempUpdate(id, player, temp)));
+                        ServerPlayerData.playerList.get(player = e.player.getUUID()).setWorldTemp(CSCompatManager.getHandler().getWorldTemp(e.player), temp -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendWorldTempUpdate(id, player, temp)));
                     } catch (Throwable t) {
                         CSCompatManager.changeHandler();
                         Parties.LOGGER.error("Failed to support Cold Sweat!", t);
@@ -57,7 +57,7 @@ public class CSEventHandler {
     @SubscribeEvent
     public static void onPartyJoin(PartyJoinEvent event) {
         event.forTrackersAndSelf((sendTo, propOf) -> {
-            PlayerData p = PlayerData.playerList.get(propOf);
+            ServerPlayerData p = ServerPlayerData.playerList.get(propOf);
             InfoPacketHelper.sendWorldTempUpdate(sendTo, propOf, p.getWorldTemp());
             InfoPacketHelper.sendBodyTempUpdate(sendTo, propOf,p.getBodyTemp());
         });

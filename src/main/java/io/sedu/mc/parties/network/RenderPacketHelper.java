@@ -183,4 +183,12 @@ public class RenderPacketHelper {
     public static void setMaxManaI(UUID player, Integer data) {
         getClientPlayer(player, p -> p.setMaxManaI(data));
     }
+
+    public static void startCast(UUID player, Integer spellId, Integer castTime) {
+        getClientPlayer(player, playerData -> playerData.initSpell(spellId, castTime));
+    }
+
+    public static void endCast(UUID player) {
+        getClientPlayer(player, ClientPlayerData::finishSpell);
+    }
 }

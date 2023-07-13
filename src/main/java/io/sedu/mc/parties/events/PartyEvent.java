@@ -8,7 +8,7 @@ import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PartySaveData;
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.data.ServerConfigData;
 import io.sedu.mc.parties.network.ClientPacketHelper;
 import io.sedu.mc.parties.network.InfoPacketHelper;
@@ -50,9 +50,9 @@ public class PartyEvent {
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!event.getPlayer().level.isClientSide) {
             UUID id = event.getPlayer().getUUID();
-            PlayerData pD;
+            ServerPlayerData pD;
             if ((pD = PlayerAPI.getNormalPlayer(id)) == null) {
-                pD = new PlayerData(id);
+                pD = new ServerPlayerData(id);
             }
             pD.setServerPlayer((ServerPlayer) event.getPlayer());//.setOnline();
             ServerPacketHelper.sendOnline((ServerPlayer) event.getPlayer());
@@ -61,7 +61,7 @@ public class PartyEvent {
             boolean spectating = p.isSpectator();
             InfoPacketHelper.sendSpectating(p.getUUID(), spectating);
             HashMap<UUID, Boolean> trackers;
-            if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+            if ((trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                 trackers.forEach((trackId, serverTracked) -> InfoPacketHelper.sendSpectating(trackId, p.getUUID(), spectating));
             }
         }
@@ -101,14 +101,14 @@ public class PartyEvent {
             if (e.player.tickCount % playerUpdateInterval.get() == 3) {
                 HashMap<UUID, Boolean> trackers;
                 UUID player;
-                PlayerData pD;
+                ServerPlayerData pD;
                 FoodData d;
-                (pD = PlayerData.playerList.get(player = e.player.getUUID())).setSaturation((d = e.player.getFoodData()).getSaturationLevel(), saturation -> {
+                (pD = ServerPlayerData.playerList.get(player = e.player.getUUID())).setSaturation((d = e.player.getFoodData()).getSaturationLevel(), saturation -> {
                     InfoPacketHelper.sendSaturationUpdate((ServerPlayer) e.player, saturation);
                     Parties.LOGGER.debug("Saturation Update: " + saturation);
                 });
 
-                if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(e.player.getUUID())) != null) {
 
                     pD.setHunger(d.getFoodLevel(), hunger -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendFood(id, player, hunger)));
                     pD.updateSaturation(sat -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendSaturationUpdate(id, player, sat)));
@@ -116,7 +116,7 @@ public class PartyEvent {
                 }
             }
             if (e.player.tickCount % 20 == 7) {
-                PlayerData.playerList.get(e.player.getUUID()).tickInviters();
+                ServerPlayerData.playerList.get(e.player.getUUID()).tickInviters();
             }
         }
     }
@@ -126,7 +126,7 @@ public class PartyEvent {
     public static void onServerTick(TickEvent.ServerTickEvent e) {
         if (e.phase == TickEvent.Phase.END && tickCounter++ >= 20) {
             tickCounter = 1;
-            PlayerData.messageCd.removeIf(PlayerData.MessageCdHolder::tick);
+            ServerPlayerData.messageCd.removeIf(ServerPlayerData.MessageCdHolder::tick);
         }
     }
 
@@ -164,7 +164,7 @@ public class PartyEvent {
     public static void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) {
         HashMap<UUID, Boolean> trackers;
         Player p;
-        if ((trackers = PlayerData.playerTrackers.get((p = event.getPlayer()).getUUID())) != null) {
+        if ((trackers = ServerPlayerData.playerTrackers.get((p = event.getPlayer()).getUUID())) != null) {
             trackers.keySet().forEach(id -> InfoPacketHelper.sendDim(id, p.getUUID(), event.getTo().location()));
         }
     }
@@ -189,7 +189,7 @@ public class PartyEvent {
             HashMap<UUID, Boolean> trackers;
             if (event.getEntity() instanceof Player p) {
                 InfoPacketHelper.sendClose((ServerPlayer) p);
-                if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                     trackers.forEach((id, serverTracked) -> {
                         if (serverTracked) {
                             if (event.getAmount() != 0f) {
@@ -207,7 +207,7 @@ public class PartyEvent {
     public static void onEntityHealed(LivingHealEvent event) {
         if (!event.getEntityLiving().level.isClientSide()) {
             HashMap<UUID, Boolean> trackers;
-            if (event.getEntity() instanceof Player p && !p.isDeadOrDying() && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+            if (event.getEntity() instanceof Player p && !p.isDeadOrDying() && (trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                 trackers.forEach((id, serverTracked) -> {
                     if (serverTracked) {
                         if (event.getAmount() != 0f) {
@@ -226,7 +226,7 @@ public class PartyEvent {
             HashMap<UUID, Boolean> trackers;
             if (event.getEntity() instanceof Player p) {
                 InfoPacketHelper.sendDeath((ServerPlayer)p);
-                if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                     trackers.keySet().forEach(id -> InfoPacketHelper.sendDeath(id, p.getUUID()));
                 }
             }
@@ -240,7 +240,7 @@ public class PartyEvent {
             HashMap<UUID, Boolean> trackers;
             UUID p;
             InfoPacketHelper.sendLife((ServerPlayer) event.getPlayer());
-            if ((trackers = PlayerData.playerTrackers.get(p = event.getPlayer().getUUID())) != null) {
+            if ((trackers = ServerPlayerData.playerTrackers.get(p = event.getPlayer().getUUID())) != null) {
                 trackers.forEach((id, serverTrack) -> {
                     InfoPacketHelper.sendAlive(id, p);
                     if (serverTrack)
@@ -256,7 +256,7 @@ public class PartyEvent {
     public static void onEntityArmorChange(LivingEquipmentChangeEvent event) {
         if (!event.getEntityLiving().level.isClientSide()) {
             HashMap<UUID, Boolean> trackers;
-            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+            if (event.getEntity() instanceof Player p && (trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                 trackers.forEach((id, serverTracked) -> {
                     if (serverTracked) {
                         int val = p.getArmorValue();
@@ -277,7 +277,7 @@ public class PartyEvent {
     public static void onFoodConsumption(LivingEntityUseItemEvent.Finish event) {
         if (!event.getEntityLiving().level.isClientSide()) {
             HashMap<UUID, Boolean> trackers;
-            if (event.getItem().isEdible() && event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+            if (event.getItem().isEdible() && event.getEntity() instanceof Player p && (trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                 trackers.keySet().forEach(id -> InfoPacketHelper.sendFood(id, p.getUUID(), p.getFoodData().getFoodLevel()));
             }
         }
@@ -287,7 +287,7 @@ public class PartyEvent {
     public static void onLevelChange(PlayerXpEvent.LevelChange event) {
         if (!event.getEntityLiving().level.isClientSide()) {
             HashMap<UUID, Boolean> trackers;
-            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+            if (event.getEntity() instanceof Player p && (trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                 trackers.keySet().forEach(id -> InfoPacketHelper.sendXp(id, p.getUUID(), p.experienceLevel + event.getLevels()));
             }
         }
@@ -301,7 +301,7 @@ public class PartyEvent {
                 InfoPacketHelper.sendEffect(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()), event.getPotionEffect().getDuration(),
                                             event.getPotionEffect().getAmplifier());
                 HashMap<UUID, Boolean> trackers;
-                if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                     trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendEffect(id, p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()),
                                                                                     event.getPotionEffect().getDuration(),
                                                                                     event.getPotionEffect().getAmplifier()));
@@ -316,7 +316,7 @@ public class PartyEvent {
                 if (event.getPotionEffect() == null) return;
                 InfoPacketHelper.sendEffectExpired(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
                 HashMap<UUID, Boolean> trackers;
-                if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                    trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendEffectExpired(id, p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect())));
                 }
             }
@@ -330,7 +330,7 @@ public class PartyEvent {
         boolean spectating = event.getNewGameMode() == GameType.SPECTATOR;
         InfoPacketHelper.sendSpectating(p.getUUID(), spectating);
         HashMap<UUID, Boolean> trackers;
-        if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+        if ((trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
             trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendSpectating(id, p.getUUID(), spectating));
         }
     }
@@ -342,7 +342,7 @@ public class PartyEvent {
                 if (event.getPotionEffect() == null) return;
                 InfoPacketHelper.sendEffectExpired(p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect()));
                 HashMap<UUID, Boolean> trackers;
-                if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                     trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendEffectExpired(id, p.getUUID(), MobEffect.getId(event.getPotionEffect().getEffect())));
                 }
             }

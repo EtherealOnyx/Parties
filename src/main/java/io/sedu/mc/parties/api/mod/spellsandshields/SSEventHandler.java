@@ -2,7 +2,7 @@ package io.sedu.mc.parties.api.mod.spellsandshields;
 
 import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.events.ClientEvent;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.InfoPacketHelper;
@@ -23,10 +23,10 @@ public class SSEventHandler {
             if (e.player.tickCount % playerSlowUpdateInterval.get() == 8) {
                 SSCompatManager.getHandler().getAllMana(e.player, (cur, max, absorb) -> {
                     HashMap<UUID, Boolean> trackers;
-                    if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
+                    if ((trackers = ServerPlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                         UUID player;
-                        PlayerData pd;
-                        (pd = PlayerData.playerList.get(player = e.player.getUUID())).setManaSS(cur, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendManaUpdateSS(id, player, cur)));
+                        ServerPlayerData pd;
+                        (pd = ServerPlayerData.playerList.get(player = e.player.getUUID())).setManaSS(cur, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendManaUpdateSS(id, player, cur)));
                         pd.setMaxManaSS(max, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendMaxManaUpdateSS(id, player, max)));
                         pd.setExtraManaSS(absorb, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendExtraManaUpdateSS(id, player, absorb)));
                     }

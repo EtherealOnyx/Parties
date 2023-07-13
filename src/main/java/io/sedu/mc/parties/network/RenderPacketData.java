@@ -62,6 +62,7 @@ public class RenderPacketData {
             case 12 -> data = new Object[]{buf.readInt(), buf.readInt(), buf.readInt()};
             case 15, 17 -> data = new Object[]{buf.readBoolean(), buf.readInt()};
             case 18 -> data = buf.readBoolean();
+            case 37 -> data = new Object[]{buf.readInt(), buf.readInt()};
         }
     }
 
@@ -97,6 +98,10 @@ public class RenderPacketData {
             }
             case 18 -> buf.writeBoolean((Boolean) data);
 
+            case 37 -> {
+                buf.writeInt((Integer) ((Object[]) data)[0]); //spellId
+                buf.writeInt((Integer) ((Object[]) data)[1]); //castTime
+            }
         }
     }
 
@@ -157,6 +162,8 @@ public class RenderPacketData {
                 case 34 -> RenderPacketHelper.setOrigin(player, (String) data);
                 case 35 -> RenderPacketHelper.setManaI(player, (Integer) data);
                 case 36 -> RenderPacketHelper.setMaxManaI(player, (Integer) data);
+                case 37 -> RenderPacketHelper.startCast(player, (Integer) ((Object[]) data)[0], (Integer) ((Object[]) data)[1]);
+                case 38 -> RenderPacketHelper.endCast(player);
                 default -> {
 
                 }

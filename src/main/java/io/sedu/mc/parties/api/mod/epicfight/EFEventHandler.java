@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.api.mod.epicfight;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.events.ClientEvent;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.InfoPacketHelper;
@@ -22,10 +22,10 @@ public class EFEventHandler {
             if (e.player.tickCount % playerUpdateInterval.get() == 8) {
                 EFCompatManager.getHandler().getClientValues(e.player, (cur, max) -> {
                     HashMap<UUID, Boolean> trackers;
-                    if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
+                    if ((trackers = ServerPlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                         UUID player;
-                        PlayerData pd;
-                        (pd = PlayerData.playerList.get(player = e.player.getUUID())).setStamina(cur, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendStaminaUpdate(id, player, cur)));
+                        ServerPlayerData pd;
+                        (pd = ServerPlayerData.playerList.get(player = e.player.getUUID())).setStamina(cur, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendStaminaUpdate(id, player, cur)));
 
                         pd.setMaxStamina(max, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendMaxStaminaUpdate(id, player, max)));
                     }
@@ -37,8 +37,8 @@ public class EFEventHandler {
     @SubscribeEvent
     public static void onPartyJoin(PartyJoinEvent event) {
         event.forTrackersAndSelf((sendTo, propOf) -> {
-            PlayerData pD;
-            InfoPacketHelper.sendStaminaUpdate(sendTo, propOf, (pD = PlayerData.playerList.get(propOf)).getStamina());
+            ServerPlayerData pD;
+            InfoPacketHelper.sendStaminaUpdate(sendTo, propOf, (pD = ServerPlayerData.playerList.get(propOf)).getStamina());
             InfoPacketHelper.sendMaxStaminaUpdate(sendTo, propOf, pD.getMaxStamina());
         });
     }

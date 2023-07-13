@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.api.mod.hardcorerevival;
 
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import net.blay09.mods.hardcorerevival.api.PlayerKnockedOutEvent;
@@ -25,14 +25,14 @@ public class HREventHandler {
             if (isDowned) {
                 HashMap<UUID, Boolean> trackers;
                 InfoPacketHelper.sendDowned((ServerPlayer)p, true, duration);
-                if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                     trackers.forEach((id, serverTracked) -> {
                         InfoPacketHelper.sendDowned(id, p.getUUID(), true, duration);
                         if (serverTracked)
                             InfoPacketHelper.sendHealth(id, p.getUUID(), p.getHealth());
                     });
                 }
-                PlayerData.playerList.get(p.getUUID()).setDowned(true);
+                ServerPlayerData.playerList.get(p.getUUID()).setDowned(true);
             }
         });
     }
@@ -44,10 +44,10 @@ public class HREventHandler {
                 AtomicReference<HashMap<UUID, Boolean>> trackers = new AtomicReference<>();
                 HRCompatManager.getHandler().getReviveProgress(e.player, (revive, targetPlayer) -> {
                     InfoPacketHelper.sendReviveUpdate(targetPlayer.getUUID(), revive);
-                    trackers.set(PlayerData.playerTrackers.get(targetPlayer.getUUID()));
+                    trackers.set(ServerPlayerData.playerTrackers.get(targetPlayer.getUUID()));
                     if (trackers.get() != null) {
                         UUID player;
-                        PlayerData.playerList.get(player = targetPlayer.getUUID()).setReviveProg(revive, () -> trackers.get().forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, revive)));
+                        ServerPlayerData.playerList.get(player = targetPlayer.getUUID()).setReviveProg(revive, () -> trackers.get().forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, revive)));
                     }
                 });
             }
@@ -60,7 +60,7 @@ public class HREventHandler {
             if (isBleeding) {
                 InfoPacketHelper.sendDowned(sendTo, propOf, true, duration);
                 InfoPacketHelper.sendHealth(sendTo, propOf, propPlayer.getHealth());
-                InfoPacketHelper.sendReviveUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getReviveProg());
+                InfoPacketHelper.sendReviveUpdate(sendTo, propOf, ServerPlayerData.playerList.get(propOf).getReviveProg());
             }
         }));
     }
@@ -69,23 +69,23 @@ public class HREventHandler {
         HashMap<UUID, Boolean> trackers;
         //Make the timer reset when they wake up...
         InfoPacketHelper.sendDowned((ServerPlayer)p, false, 0);
-        if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+        if ((trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
             trackers.forEach((id, serverTracked) -> {
                 InfoPacketHelper.sendDowned(id, p.getUUID(), false, 0);
                 if (serverTracked)
                     InfoPacketHelper.sendHealth(id, p.getUUID(), p.getHealth());
             });
         }
-        PlayerData.playerList.get(p.getUUID()).setDowned(false);
+        ServerPlayerData.playerList.get(p.getUUID()).setDowned(false);
     }
 
     public static void abortRescue(Player rescueTarget) {
         if (rescueTarget != null) {
             InfoPacketHelper.sendReviveUpdate(rescueTarget.getUUID(), 0);
-            HashMap<UUID, Boolean> trackers = PlayerData.playerTrackers.get(rescueTarget.getUUID());
+            HashMap<UUID, Boolean> trackers = ServerPlayerData.playerTrackers.get(rescueTarget.getUUID());
             if (trackers != null) {
                 UUID player;
-                PlayerData.playerList.get(player = rescueTarget.getUUID()).setReviveProg(0, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, 0)));
+                ServerPlayerData.playerList.get(player = rescueTarget.getUUID()).setReviveProg(0, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, 0)));
             }
         }
     }

@@ -10,43 +10,39 @@ import java.util.UUID;
 
 public class InfoPacketHelper {
 
-    public static void sendName(UUID sendTo, UUID nameOf) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), nameOf, 0, PlayerAPI.getName(nameOf));
-    }
 
-    public static void sendName(ServerPlayer sendTo, UUID nameOf) {
+    public static void sendName(UUID sendTo, UUID nameOf) {
         sendData(sendTo, nameOf, 0, PlayerAPI.getName(nameOf));
     }
 
-    public static void sendData(ServerPlayer sendTo, UUID propOf, int type, Object data) {
-        if (sendTo == null)
-            return;
-        if (!sendTo.getUUID().equals(propOf))
-            PartiesPacketHandler.sendToPlayer(new RenderPacketData(type, propOf, data), sendTo);
+    public static void sendData(UUID sendTo, UUID propOf, int type, Object data) {
+
+        if (!sendTo.equals(propOf))
+            PartiesPacketHandler.sendToPlayer(new RenderPacketData(type, propOf, data), PlayerAPI.getNormalServerPlayer(sendTo));
     }
 
     public static void sendHealth(UUID sendTo, UUID healthOf, float health) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), healthOf, 1, health);
+        sendData(sendTo, healthOf, 1, health);
     }
 
     public static void sendMaxHealth(UUID sendTo, UUID absorbOf, float max) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), absorbOf, 2, max);
+        sendData(sendTo, absorbOf, 2, max);
     }
 
     public static void sendAbsorb(UUID sendTo, UUID absorbOf, float absorb) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), absorbOf, 3, absorb);
+        sendData(sendTo, absorbOf, 3, absorb);
     }
 
     public static void sendArmor(UUID sendTo, UUID armorOf, int armorValue) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), armorOf, 4, armorValue);
+        sendData(sendTo, armorOf, 4, armorValue);
     }
 
     public static void sendFood(UUID sendTo, UUID hungerOf, int foodLevel) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), hungerOf, 5, foodLevel);
+        sendData(sendTo, hungerOf, 5, foodLevel);
     }
 
     public static void sendXp(UUID sendTo, UUID levelOf, int levels) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), levelOf, 6, levels);
+        sendData(sendTo, levelOf, 6, levels);
     }
 
     public static void forceUpdate(UUID sendTo, UUID propOf, boolean withDim) {
@@ -109,7 +105,7 @@ public class InfoPacketHelper {
     }
 
     public static void sendXpBar(UUID sendTo, UUID propOf, float bar) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 14, bar);
+        sendData(sendTo, propOf, 14, bar);
     }
 
     public static void sendClose(ServerPlayer p) {
@@ -149,19 +145,19 @@ public class InfoPacketHelper {
     }
 
     public static void sendThirstUpdate(UUID sendTo, UUID propOf, int thirst) {
-            sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 19, thirst);
+            sendData(sendTo, propOf, 19, thirst);
     }
 
     public static void sendWorldTempUpdate(UUID sendTo, UUID propOf, float worldTemp) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 20, worldTemp);
+        sendData(sendTo, propOf, 20, worldTemp);
     }
 
     public static void sendBodyTempUpdate(UUID sendTo, UUID propOf, float bodyTemp) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 21, bodyTemp);
+        sendData(sendTo, propOf, 21, bodyTemp);
     }
 
     public static void sendWorldTempUpdateTAN(UUID sendTo, UUID propOf, float worldTemp) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 22, worldTemp);
+        sendData(sendTo, propOf, 22, worldTemp);
     }
 
     public static void sendManaUpdate(UUID sendTo, UUID propOf, float mana) {
@@ -169,40 +165,40 @@ public class InfoPacketHelper {
     }
 
     public static void sendMaxManaUpdate(UUID sendTo, UUID propOf, int maxMana) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 24, maxMana);
+        sendData(sendTo, propOf, 24, maxMana);
     }
 
     public static void sendStaminaUpdate(UUID sendTo, UUID propOf, float currentStamina) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 25, currentStamina);
+        sendData(sendTo, propOf, 25, currentStamina);
     }
 
     public static void sendMaxStaminaUpdate(UUID sendTo, UUID propOf, int maxStamina) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 26, maxStamina);
+        sendData(sendTo, propOf, 26, maxStamina);
     }
 
     public static void sendManaUpdateSS(UUID sendTo, UUID propOf, float curMana) {
         Parties.LOGGER.debug("Sending mana update:" + curMana);
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 27, curMana);
+        sendData(sendTo, propOf, 27, curMana);
     }
 
     public static void sendMaxManaUpdateSS(UUID sendTo, UUID propOf, float mana) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 28, mana);
+        sendData(sendTo, propOf, 28, mana);
     }
 
     public static void sendExtraManaUpdateSS(UUID sendTo, UUID propOf, float mana) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 29, mana);
+        sendData(sendTo, propOf, 29, mana);
     }
 
     public static void sendExtraStamUpdate(UUID sendTo, UUID propOf, int extra) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 30, extra);
+        sendData(sendTo, propOf, 30, extra);
     }
 
     public static void sendQuenchUpdate(UUID sendTo, UUID propOf, int quench) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 31, quench);
+        sendData(sendTo, propOf, 31, quench);
     }
 
     public static void sendMaxHungerUpdate(UUID sendTo, UUID propOf, float max) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 32, max);
+        sendData(sendTo, propOf, 32, max);
     }
 
     public static void sendSaturationUpdate(ServerPlayer player, float saturation) {
@@ -210,22 +206,32 @@ public class InfoPacketHelper {
     }
 
     public static void sendSaturationUpdate(UUID sendTo, UUID propOf, float sat) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 33, sat);
+        sendData(sendTo, propOf, 33, sat);
     }
 
     public static void sendOriginUpdate(UUID sendTo, UUID propOf, String origin) {
-        sendData(PlayerAPI.getNormalServerPlayer(sendTo), propOf, 34, origin);
+        sendData(sendTo, propOf, 34, origin);
     }
 
     public static void sendOriginUpdate(UUID sendTo, String origin) {
         PartiesPacketHandler.sendToPlayer(new RenderPacketData(34, sendTo, origin), PlayerAPI.getNormalServerPlayer(sendTo));
     }
 
-    public static void sendManaUpdateI(UUID id, UUID propOf, Integer cur) {
-        sendData(PlayerAPI.getNormalServerPlayer(id), propOf, 35, cur);
+    public static void sendManaUpdateI(UUID sendTo, UUID propOf, Integer cur) {
+        sendData(sendTo, propOf, 35, cur);
     }
 
-    public static void sendMaxManaUpdateI(UUID id, UUID propOf, Integer max) {
-        sendData(PlayerAPI.getNormalServerPlayer(id), propOf, 36, max);
+    public static void sendMaxManaUpdateI(UUID sendTo, UUID propOf, Integer max) {
+        sendData(sendTo, propOf, 36, max);
+    }
+
+    public static void sendCastUpdate(UUID sendTo, UUID propOf, int spellId, int castDuration) {
+        if (!sendTo.equals(propOf))
+            PartiesPacketHandler.sendToPlayer(new RenderPacketData(37, propOf, spellId, castDuration), PlayerAPI.getNormalServerPlayer(sendTo));
+    }
+
+    public static void sendCastUpdate(UUID sendTo, UUID propOf) {
+        if (!sendTo.equals(propOf))
+            PartiesPacketHandler.sendToPlayer(new RenderPacketData(38, propOf), PlayerAPI.getNormalServerPlayer(sendTo));
     }
 }

@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
-import static io.sedu.mc.parties.data.PlayerData.addTracker;
-import static io.sedu.mc.parties.data.PlayerData.removeTracker;
+import static io.sedu.mc.parties.data.ServerPlayerData.addTracker;
+import static io.sedu.mc.parties.data.ServerPlayerData.removeTracker;
 import static io.sedu.mc.parties.data.ServerConfigData.partySize;
 
 public class PartyData {
@@ -113,7 +113,7 @@ public class PartyData {
             //Some error occured!
 
 
-        PlayerAPI.getPlayer(removedMember, PlayerData::removeParty);
+        PlayerAPI.getPlayer(removedMember, ServerPlayerData::removeParty);
         ServerPacketHelper.sendRemoveMember(removedMember, party, wasKicked);
         //Remove previous member from party's trackers.
         party.forEach(id -> {
@@ -145,8 +145,8 @@ public class PartyData {
         Iterator<UUID> i = party.iterator();
         while (i.hasNext()) {
             UUID member = i.next();
-            PlayerAPI.getPlayer(member, PlayerData::removeParty);
-            PlayerData.playerTrackers.remove(member);
+            PlayerAPI.getPlayer(member, ServerPlayerData::removeParty);
+            ServerPlayerData.playerTrackers.remove(member);
             i.remove();
         }
         partyList.remove(partyId);

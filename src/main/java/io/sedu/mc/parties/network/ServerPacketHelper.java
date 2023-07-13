@@ -3,7 +3,7 @@ package io.sedu.mc.parties.network;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.helper.PartyAPI;
 import io.sedu.mc.parties.api.helper.PlayerAPI;
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.*;
@@ -85,7 +85,7 @@ public class ServerPacketHelper {
             PartiesPacketHandler.sendToPlayer(new ClientPacketData(2, mParty), player);
             mParty.forEach(id -> {
                 //Tell online player the current party member's name.
-                InfoPacketHelper.sendName(player, id);
+                InfoPacketHelper.sendName(player.getUUID(), id);
                 //Tell party members that this player is now online.
                 PartiesPacketHandler.sendToPlayer(new ClientPacketData(0, player.getUUID()), PlayerAPI.getNormalServerPlayer(id));
                 InfoPacketHelper.forceUpdate(id, player.getUUID(), true);
@@ -116,11 +116,11 @@ public class ServerPacketHelper {
 
     public static void trackerToClient(UUID tracker, UUID playerToTrack) {
         
-        PlayerData.changeTracker(tracker, playerToTrack, false);
+        ServerPlayerData.changeTracker(tracker, playerToTrack, false);
     }
 
     public static void trackerToServer(UUID tracker, UUID playerToTrack) {
-        PlayerData.changeTracker(tracker, playerToTrack, true);
+        ServerPlayerData.changeTracker(tracker, playerToTrack, true);
     }
 
     public static void sendNewLeader(UUID initiator) {
@@ -128,7 +128,7 @@ public class ServerPacketHelper {
     }
 
     public static void sendMessageToAll(List<ServerPlayer> playerList, ServerPlayer sender, String data) {
-        if (PlayerData.isOnMessageCd(sender.getUUID())) return;
+        if (ServerPlayerData.isOnMessageCd(sender.getUUID())) return;
         playerList.forEach((p) -> {
             p.sendMessage(new TextComponent("<").append(sender.getName()).append(new TextComponent("> ")).append(new TextComponent("[").withStyle(ChatFormatting.DARK_AQUA)).append(new TextComponent("Preset").withStyle(style -> style.withColor(ChatFormatting.YELLOW).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, data)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("gui.sedparties.tooltip.hoverlink"))))).append(new TextComponent("]").withStyle(ChatFormatting.DARK_AQUA)).append(new TextComponent(" (Click to Copy)").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC)), ChatType.CHAT, sender.getUUID());
             p.sendMessage(new TranslatableComponent("gui.sedparties.tooltip.linkpaste").withStyle(style -> style.withColor(ChatFormatting.GRAY)
@@ -137,6 +137,6 @@ public class ServerPacketHelper {
                                                                                                             .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("gui.sedparties.tooltip.linkpastedesc")))), ChatType.SYSTEM, p.getUUID());
 
         });
-        PlayerData.messageCd.add(new PlayerData.MessageCdHolder(sender.getUUID(), playerMessageCooldown));
+        ServerPlayerData.messageCd.add(new ServerPlayerData.MessageCdHolder(sender.getUUID(), playerMessageCooldown));
     }
 }

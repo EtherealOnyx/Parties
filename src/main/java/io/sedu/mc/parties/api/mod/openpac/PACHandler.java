@@ -48,7 +48,7 @@ public class PACHandler implements IPACHandler {
             party.getMemberInfoStream().forEach(member -> {
                 UUID pId = member.getUUID();
                 //Create member.
-                new PlayerData(pId, partyId, member.getUsername());
+                new ServerPlayerData(pId, partyId, member.getUsername());
                 //Then add to party.
                 pData.addMemberSilently(pId);
             });
@@ -107,7 +107,7 @@ public class PACHandler implements IPACHandler {
         if (owner == memberLeft) {
             //Silently removing party.
             PartyData.partyList.remove(partyId);
-            PlayerData.playerList.get(owner).removeParty();
+            ServerPlayerData.playerList.get(owner).removeParty();
             PartiesPacketHandler.sendToPlayer(new ClientPacketData(6), PlayerAPI.getNormalServerPlayer(owner));
             PartySaveData.get().setDirty();
             return;
@@ -166,7 +166,7 @@ public class PACHandler implements IPACHandler {
                 party = pm.getPartyByOwner(initiator);
             }
             if (party != null) {
-                PlayerData fM = PlayerAPI.getNormalPlayer(futureMember);
+                ServerPlayerData fM = PlayerAPI.getNormalPlayer(futureMember);
                 if (fM != null) {
                     //Normal Player would never be null here...
                     success.set(party.addMember(futureMember, PartyMemberRank.MEMBER, Objects.requireNonNull(fM.getName())) != null);
@@ -242,9 +242,9 @@ public class PACHandler implements IPACHandler {
     public boolean partyMemberLeft(UUID memberLeaving, boolean finalAttempt) {
         //Check if leaving member is the leader
         PartyData partyData = PartyAPI.getPartyFromMember(memberLeaving);
-        PlayerData playerData = PlayerAPI.getNormalPlayer(memberLeaving);
+        ServerPlayerData serverPlayerData = PlayerAPI.getNormalPlayer(memberLeaving);
         UUID curLeader;
-        if (playerData != null && partyData != null) {
+        if (serverPlayerData != null && partyData != null) {
             curLeader = partyData.getLeader();
             //Check if party is a size of 1.
             if (partyData.getMembers().size() == 1) {
@@ -288,7 +288,7 @@ public class PACHandler implements IPACHandler {
     private static void syncParties() {
         Parties.LOGGER.error("Parties between mods are desynced! Attempting to recreate...");
         HashMap<UUID, PartyData> updatedParties = new HashMap<>();
-        PlayerData.playerList.forEach((uuid, playerData) -> {
+        ServerPlayerData.playerList.forEach((uuid, playerData) -> {
             playerData.removeParty(); //Remove parties from all current players.
             PartiesPacketHandler.sendToPlayer(new ClientPacketData(6), PlayerAPI.getNormalServerPlayer(uuid));
         });
@@ -301,12 +301,12 @@ public class PACHandler implements IPACHandler {
                 party.getMemberInfoStream().forEach(member -> {
                     UUID pId = member.getUUID();
                     //Create member.
-                    PlayerData pD = PlayerData.playerList.get(pId);
+                    ServerPlayerData pD = ServerPlayerData.playerList.get(pId);
                     if (pD != null) {
                         pD.addParty(partyId);
                         pD.setName(member.getUsername());
                     } else {
-                        new PlayerData(pId, partyId, member.getUsername());
+                        new ServerPlayerData(pId, partyId, member.getUsername());
                     }
 
                     //Then add to party.

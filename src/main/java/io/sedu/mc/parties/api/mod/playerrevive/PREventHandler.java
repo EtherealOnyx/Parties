@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.api.mod.playerrevive;
 
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,14 +24,14 @@ public class PREventHandler {
         HashMap<UUID, Boolean> trackers;
         if (event.getEntity() instanceof Player p) {
             InfoPacketHelper.sendBleeding((ServerPlayer)p, false, 0);
-            if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+            if ((trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                 trackers.forEach((id, serverTracked) -> {
                     InfoPacketHelper.sendBleeding(id, p.getUUID(), false, 0);
                     if (serverTracked)
                         InfoPacketHelper.sendHealth(id, p.getUUID(), PlayerRevive.CONFIG.revive.healthAfter);
                  });
             }
-            PlayerData.playerList.get(p.getUUID()).setBleeding(false);
+            ServerPlayerData.playerList.get(p.getUUID()).setBleeding(false);
         }
     }
 
@@ -44,14 +44,14 @@ public class PREventHandler {
                         if (isBleeding) {
                             HashMap<UUID, Boolean> trackers;
                             InfoPacketHelper.sendBleeding((ServerPlayer)p, true, duration);
-                            if ((trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+                            if ((trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                                 trackers.forEach((id, serverTracked) -> {
                                     InfoPacketHelper.sendBleeding(id, p.getUUID(), true, duration);
                                     if (serverTracked)
                                         InfoPacketHelper.sendHealth(id, p.getUUID(), p.getHealth());
                                 });
                             }
-                            PlayerData.playerList.get(p.getUUID()).setBleeding(true);
+                            ServerPlayerData.playerList.get(p.getUUID()).setBleeding(true);
                         }
                     });
                 }
@@ -65,7 +65,7 @@ public class PREventHandler {
             if (isBleeding) {
                 InfoPacketHelper.sendBleeding(sendTo, propOf, true, duration);
                 InfoPacketHelper.sendHealth(sendTo, propOf, propPlayer.getHealth());
-                InfoPacketHelper.sendReviveUpdate(sendTo, propOf, PlayerData.playerList.get(propOf).getReviveProg());
+                InfoPacketHelper.sendReviveUpdate(sendTo, propOf, ServerPlayerData.playerList.get(propOf).getReviveProg());
             }
         }));
     }
@@ -74,13 +74,13 @@ public class PREventHandler {
     public static void onEntityTick(TickEvent.PlayerTickEvent e) {
         if (e.side == LogicalSide.SERVER && e.phase == TickEvent.Phase.END) {
             if (e.player.tickCount % playerUpdateInterval.get() == 1) {
-                if (!PlayerData.playerList.get(e.player.getUUID()).isBleeding()) return;
+                if (!ServerPlayerData.playerList.get(e.player.getUUID()).isBleeding()) return;
                 HashMap<UUID, Boolean> trackers;
-                if ((trackers = PlayerData.playerTrackers.get(e.player.getUUID())) != null) {
+                if ((trackers = ServerPlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
                     float revive;
-                    PlayerData.playerList.get(player = e.player.getUUID())
-                                         .setReviveProg(revive = PRCompatManager.getHandler().getReviveProgress(e.player),
+                    ServerPlayerData.playerList.get(player = e.player.getUUID())
+                                               .setReviveProg(revive = PRCompatManager.getHandler().getReviveProgress(e.player),
                                                         () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, revive)));
                 }
             }

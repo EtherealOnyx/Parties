@@ -2,8 +2,8 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.client.config.ConfigEntry;
+import io.sedu.mc.parties.client.overlay.anim.CastAnim;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.util.RenderUtils;
@@ -17,8 +17,6 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
-import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
-
 public class PCastBar extends RenderIconTextItem {
 
     protected boolean textHalfSize = true;
@@ -31,7 +29,7 @@ public class PCastBar extends RenderIconTextItem {
 
     @Override
     int getColor() {
-        return ColorAPI.getRainbowColor();
+        return 0xdd943c;
     }
 
     @Override
@@ -49,12 +47,9 @@ public class PCastBar extends RenderIconTextItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        //RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+7, b.y+5, 0, 14, 7, bColorTop, bColorBot);
-        //RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+8, b.y+6, 0, 12, 5, colorTop, colorBot);
-        setup(GUI_ICONS_LOCATION);
-        RenderSystem.enableDepthTest();
-        blit(poseStack,b.x+3, b.y+4, 16, 0, 9, 9);
-        blit(poseStack,b.x+3, b.y+4, 52, 0, 9, 9);
+        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+3, b.y+5, 0, 18, 7, 0xffcc5b, 0xDDA528);
+        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+4, b.y+6, 0, 12, 5, 0xFFDB8A, 0xFFDB8A);
+        RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+16, b.y+6, 0, 4, 5, 0x3F2B00, 0x3F2B00);
     }
 
     @Override
@@ -105,39 +100,43 @@ public class PCastBar extends RenderIconTextItem {
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-
+        id.getCastInfo(castAnim -> renderSpell(i, castAnim, poseStack, gui, partialTicks));
     }
 
     @Override
     void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        id.getCastInfo(castAnim -> {
-            if (castAnim.active) {
-                castAnim.getSpell(partialTicks, (spell, percent) -> {
-                    RenderUtils.offRectNoA(poseStack.last().pose(), x(0),y(0), zPos, 0, width,height, spell.school.bgTop, spell.school.bgBottom);
-                    RenderUtils.offRectNoA(poseStack.last().pose(), x(0),y(0), zPos, 1, width,height, spell.school.bgInner, spell.school.bgInner);
-                    RenderUtils.offRectNoA(poseStack.last().pose(), x(0),y(0), zPos, 1, width*percent,height, spell.school.bgTextColor, spell.school.bgTextColor);
+        id.getCastInfo(castAnim -> renderSpell(0, castAnim, poseStack, gui, partialTicks));
+    }
 
-                    if (iconEnabled) {
-                        resetColor();
-                        setupSpell(spell.location);
-                        GuiComponent.blit(poseStack, tX(0), tY(0)+2, 0, 0, 8, 8, 8, 8);
-                        resetColor();
+    void renderSpell(int index, CastAnim castAnim, PoseStack poseStack, ForgeIngameGui gui, float partialTicks) {
+        if (castAnim.active) {
+            castAnim.getSpell(partialTicks, (spell, percent) -> {
+                RenderUtils.offRectNoA(poseStack.last().pose(), x(index),y(index), zPos, 0, width,height, spell.school.bgTop, spell.school.bgBottom);
+                RenderUtils.offRectNoA(poseStack.last().pose(), x(index),y(index), zPos, 1, width,height, spell.school.bgInner, spell.school.bgInner);
+                RenderUtils.offRectNoA(poseStack.last().pose(), x(index),y(index), zPos, 1, width*percent,height, spell.school.bgTextColor, spell.school.bgTextColor);
+
+                int xOffset = 0;
+                if (iconEnabled) {
+                    xOffset = 9;
+                    resetColor();
+                    setupSpell(spell.location);
+                    GuiComponent.blit(poseStack, tX(index), tY(index)+2, 0, 0, 8, 8, 8, 8);
+                    resetColor();
+                }
+
+                if (textEnabled) {
+                    if (textHalfSize) {
+                        poseStack.pushPose();
+                        poseStack.scale(.5f,.5f,1f);
+                        text(((tX(index)+xOffset)<<1), (tY(index)<<1) + 9, gui, poseStack, spell.name, spell.school.bgTextColor);
+                        poseStack.popPose();
+                    } else {
+                        text(tX(index) + xOffset, tY(index)+2, gui, poseStack, spell.name, spell.school.bgTextColor);
                     }
+                }
 
-                    if (textEnabled) {
-                        if (textHalfSize) {
-                            poseStack.pushPose();
-                            poseStack.scale(.5f,.5f,1f);
-                            text((tX(0)<<1) + 18, (tY(0)<<1) + 9, gui, poseStack, spell.name, spell.school.bgTextColor);
-                            poseStack.popPose();
-                        } else {
-                            text(tX(0) + 9, tY(0)+2, gui, poseStack, spell.name, spell.school.bgTextColor);
-                        }
-                    }
-
-                });
-            }
-        });
+            });
+        }
     }
 
     static void setupSpell(ResourceLocation location) {

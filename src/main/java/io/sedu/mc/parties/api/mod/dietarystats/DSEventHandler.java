@@ -3,7 +3,7 @@ package io.sedu.mc.parties.api.mod.dietarystats;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.api.helper.PlayerAPI;
-import io.sedu.mc.parties.data.PlayerData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
@@ -20,9 +20,9 @@ public class DSEventHandler {
         if (!event.getItem().isEdible()) return;
         if (!event.getEntityLiving().level.isClientSide()) {
             HashMap<UUID, Boolean> trackers;
-            if (event.getEntity() instanceof Player p && (trackers = PlayerData.playerTrackers.get(p.getUUID())) != null) {
+            if (event.getEntity() instanceof Player p && (trackers = ServerPlayerData.playerTrackers.get(p.getUUID())) != null) {
                 DSCompatManager.getHandler().getMaxHunger(p, food -> {
-                    PlayerData.playerList.get(p.getUUID()).setMaxHunger(food, () -> trackers.forEach((id, serverTracked) -> {
+                    ServerPlayerData.playerList.get(p.getUUID()).setMaxHunger(food, () -> trackers.forEach((id, serverTracked) -> {
                         InfoPacketHelper.sendMaxHungerUpdate(id, p.getUUID(), food);
                     }));
                 });
