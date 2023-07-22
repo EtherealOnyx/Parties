@@ -254,7 +254,8 @@
   "gui.sedparties.tooltip.linkpastedesc": "Click to load preset from clipboard.",
   "gui.sedparties.tooltip.pcycle": "Cycle Ghost Member Amounts",
   "gui.sedparties.tooltip.scale": "Toggle Frame Size",
-  "gui.sedparties.tooltip.ctrlinfo": "Press CTRL for details"
+  "gui.sedparties.tooltip.ctrlinfo": "Press CTRL for details",
+  "gui.sedparties.tooltip.lock": "Toggle Frame Boundary"
 
 
 }
