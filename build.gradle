@@ -20,7 +20,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.18.2-0.4.5'
+version = '1.18.2-0.4.5-post'
 group = 'io.sedu.mc.sedparties' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'sedparties'
 
@@ -228,6 +228,9 @@ dependencies {
 
     //Open-PAC
     implementation fg.deobf("curse.maven:openpac-636608:4500809")
+
+    //Homeostatic
+    implementation fg.deobf("curse.maven:homeostatic-634466:4655143")
 
 }
 

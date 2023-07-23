@@ -8,6 +8,7 @@ import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.feathers.FCompatManager;
+import io.sedu.mc.parties.api.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
@@ -419,24 +420,35 @@ public class ClientPlayerData {
     }
 
     public void setWorldTemp(Float data) {
-        try {
-            CSCompatManager.getHandler().convertTemp(data, (temp, sev) -> {
-                this.data.put(WORLDTEMP, (int) temp);
-                this.data.put(SEVERITY, (int) sev);
-            });
-        } catch (Throwable t) {
-            CSCompatManager.changeHandler();
-            Config.loadDefaultPreset(); //Forces refresh.
-            if (Minecraft.getInstance().player != null)
-                Minecraft.getInstance().player.sendMessage(
-                        new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(
-                                new TranslatableComponent("messages.sedparties.api.coldsweatunload").withStyle(ChatFormatting.RED))
-                        , Minecraft.getInstance().player.getUUID());
+        if (HCompatManager.active()) {
+            this.data.put(WORLDTEMP, HCompatManager.getHandler().convertTemp(data));
+            this.data.put(SEVERITY, HCompatManager.getHandler().getWorldTempSev(data, getSeverity()));
+        } else {
+            try {
+                CSCompatManager.getHandler().convertTemp(data, (temp, sev) -> {
+                    this.data.put(WORLDTEMP, (int) temp);
+                    this.data.put(SEVERITY, (int) sev);
+                });
+            } catch (Throwable t) {
+                CSCompatManager.changeHandler();
+                Config.loadDefaultPreset(); //Forces refresh.
+                if (Minecraft.getInstance().player != null)
+                    Minecraft.getInstance().player.sendMessage(
+                            new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(
+                                    new TranslatableComponent("messages.sedparties.api.coldsweatunload").withStyle(ChatFormatting.RED))
+                            , Minecraft.getInstance().player.getUUID());
+            }
         }
     }
 
     public void setBodyTemp(float data) {
-        this.data.put(BODYTEMP, (int) data);
+
+        if (HCompatManager.active()) {
+            this.data.put(BODYTEMP, HCompatManager.getHandler().convertTemp(data));
+            this.data.put(SEVERITY, HCompatManager.getHandler().getBodyTempSev(data, getSeverity()));
+        } else {
+            this.data.put(BODYTEMP, (int) data);
+        }
     }
 
     public void updateTemperatures() {
@@ -461,6 +473,16 @@ public class ClientPlayerData {
         }
     }
 
+    public void updateTemperaturesH() {
+        if (clientPlayer != null) {
+            HCompatManager.getHandler().getClientTemperature(clientPlayer, (localTemp, bodyTemp, severity) -> {
+                data.put(WORLDTEMP, localTemp);
+                data.put(SEVERITY, severity);
+                data.put(BODYTEMP, bodyTemp);
+            });
+        }
+    }
+
     public void updateTemperaturesTAN() {
         if (clientPlayer != null) {
             TANCompatManager.getHandler().getPlayerTemp(clientPlayer, (temp, text) -> {
@@ -478,6 +500,11 @@ public class ClientPlayerData {
     public void updateThirst() {
         if (clientPlayer != null) {
             data.put(THIRST, TMCompatManager.getHandler().getThirst(clientPlayer));
+        }
+    }
+    public void updateThirstH() {
+        if (clientPlayer != null) {
+            data.put(THIRST, HCompatManager.getHandler().getWaterLevel(clientPlayer));
         }
     }
 
