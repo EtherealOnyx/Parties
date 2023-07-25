@@ -173,7 +173,7 @@ public class HoverScreen extends Screen {
 
     private void initDragButtons(int x, int y, int oX, int oY) {
         moveFrame.add(addRenderableWidget(new SmallButton(x, y, "x", p -> revertPos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")), .5f, 0f, 1, .5f, .5f)));
-        moveFrame.add(addRenderableWidget(new SmallButton(x+11, y, "↺", p -> defaultPos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")), .5f, 1f, 1f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(x+11, y, "↺", p -> defaultPos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")),  1, .5f, .5f)));
         Button b = addRenderableWidget(new SmallButton(x+22, y, "◄", p -> updatePos(true, true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.umove")), 1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
@@ -181,7 +181,7 @@ public class HoverScreen extends Screen {
         b.active = false;
         moveFrame.add(b);
         moveFrame.add(addRenderableWidget(new SmallButton(x+44, y, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
-        moveFrame.add(addRenderableWidget(new SmallButton(x+55, y, getCurrentScale(true), p -> toggleScale(true, true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.scale")), 0f, 1f, .25f, .75f, 1f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(x+55, y, getCurrentScale(true), p -> toggleScale(true, true), p -> toggleScale(true, false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.scale")), 0f, 1f, .25f, .75f, 1f)));
 
         //Other members
         partyMoveFrame.add(addRenderableWidget(new SmallButton(oX, oY, "x", p -> revertPos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")), .5f, 0f, 1, .5f, .5f)));
@@ -193,8 +193,8 @@ public class HoverScreen extends Screen {
         b.active = false;
         partyMoveFrame.add(b);
         partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+44, oY, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
-        partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+55, oY, partyDisplay + "", p -> cyclePartyDisplay(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.pcycle")), .5f, .5f, .75f, .5f, 1f)));
-        partyMoveFrame.add(addRenderableWidget(new SmallButton(x+66, y, getCurrentScale(false), p -> toggleScale(false, true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.scale")), 0f, 1f, .25f, .75f, 1f)));
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+55, oY, partyDisplay + "", p -> cyclePartyDisplay(true), p -> cyclePartyDisplay(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.pcycle")), .5f, 1f, .75f, .75f, .75f)));
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(x+66, y, getCurrentScale(false), p -> toggleScale(false, true), p -> toggleScale(false, false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.scale")), 0f, 1f, .25f, .75f, 1f)));
         partyMoveFrame.add(addRenderableWidget(new SmallButton(x+66, y, "▫", p -> toggleLock(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.lock")), 0f, 1f, .25f, .75f, 1f)));
     }
 
@@ -210,8 +210,11 @@ public class HoverScreen extends Screen {
 
     private void toggleScale(boolean selfFrame, boolean increasing) {
         float scale = selfFrame ? playerScale : partyScale;
-        if (!selfFrame && increasing)
-            enableBoundaries = true;
+        if (!selfFrame && increasing) {
+            enableBoundaries = false;
+            partyMoveFrame.get(7).setMessage(new TextComponent("▫"));
+        }
+
 
         if (selfFrame) {
             if (increasing) {
@@ -270,11 +273,24 @@ public class HoverScreen extends Screen {
         else return "2";
     }
 
-    private void cyclePartyDisplay() {
-        partyDisplay++;
-        if (partyDisplay > 5) {
-            partyDisplay = Math.max(1, playerOrderedList != null ? playerOrderedList.size() - 1 : 1);
+    private void cyclePartyDisplay(boolean forward) {
+        boolean flag = false; //Only update party display if it changes.
+        if (forward) {
+            if (partyDisplay < 5 || partyDisplay < (playerOrderedList != null ? playerOrderedList.size() - 1 : 5)) {
+
+                partyDisplay++;
+                flag = true;
+                enableBoundaries = false;
+                partyMoveFrame.get(7).setMessage(new TextComponent("▫"));
+            }
+
+        } else {
+            if (partyDisplay > 1) {
+                flag = true;
+                partyDisplay--;
+            }
         }
+        if (!flag) return;
         partyMoveFrame.get(5).setMessage(new TextComponent(partyDisplay + ""));
         updateLimits();
         indexP = 0;
@@ -343,7 +359,7 @@ public class HoverScreen extends Screen {
             partyFrameX = fXP.get(indexP);
             partyFrameY = fYP.get(indexP);
             refreshDragButtons(false);
-            checkIndex(false); //TODO: Add non-self frame.
+            checkIndex(false);
         }
 
 
@@ -362,7 +378,7 @@ public class HoverScreen extends Screen {
             else if (index >= 0)
                 moveFrame.get(3).active = true;
         } else {
-            if (indexP == 0) //TODO: another index variable for the party move frame.
+            if (indexP == 0)
                 partyMoveFrame.get(2).active = false;
             else if (indexP <= fXP.size())
                 partyMoveFrame.get(2).active = true;
