@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.mixin;
+package io.sedu.mc.parties.mixin.ironsspellbooks;
 
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.capabilities.magic.PlayerMagicData;

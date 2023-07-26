@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.mixin;
+package io.sedu.mc.parties.mixin.openpac;
 
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;

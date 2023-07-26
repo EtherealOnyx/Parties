@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.mixin;
+package io.sedu.mc.parties.mixin.ironsspellbooks;
 
 
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;

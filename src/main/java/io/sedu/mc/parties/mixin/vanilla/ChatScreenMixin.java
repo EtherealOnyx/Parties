@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.mixin;
+package io.sedu.mc.parties.mixin.vanilla;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;

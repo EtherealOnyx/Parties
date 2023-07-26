@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.mixin;
+package io.sedu.mc.parties.mixin.feathers;
 
 import com.elenai.feathers.client.gui.FeathersHudOverlay;
 import io.sedu.mc.parties.api.mod.feathers.FCompatManager;

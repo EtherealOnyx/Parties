@@ -246,7 +246,8 @@ dependencies {
     //GeckoLib
     runtimeOnly fg.deobf("curse.maven:geckolib-388172:4181370")
 
-
+    //AppleSkin
+    implementation fg.deobf("curse.maven:appleskin-248787:3686482")
 }
 
 mixin {

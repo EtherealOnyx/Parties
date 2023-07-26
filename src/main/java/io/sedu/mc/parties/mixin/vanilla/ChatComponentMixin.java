@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.mixin;
+package io.sedu.mc.parties.mixin.vanilla;
 
 import io.sedu.mc.parties.mixinaccessors.TrimmedMessagesAccessor;
 import net.minecraft.client.GuiMessage;
@@ -15,7 +15,7 @@ public abstract class ChatComponentMixin implements TrimmedMessagesAccessor {
 
     @Shadow
     @Final
-    public List<GuiMessage<FormattedCharSequence>> trimmedMessages;
+    private List<GuiMessage<FormattedCharSequence>> trimmedMessages;
 
     @Override
     public List<GuiMessage<FormattedCharSequence>> getTrimmedMessages() {

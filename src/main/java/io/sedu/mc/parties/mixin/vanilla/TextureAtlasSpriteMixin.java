@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.mixin;
+package io.sedu.mc.parties.mixin.vanilla;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import io.sedu.mc.parties.mixinaccessors.MainImageAccessor;
@@ -12,7 +12,7 @@ public abstract class TextureAtlasSpriteMixin implements MainImageAccessor {
 
     @Shadow
     @Final
-    public NativeImage[] mainImage;
+    protected NativeImage[] mainImage;
 
     @Override
     public NativeImage[] getMainImage() {

@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.mixin;
+package io.sedu.mc.parties.mixin.spellsnshields;
 
 import de.cas_ual_ty.spells.client.ClientMessageHandler;
 import de.cas_ual_ty.spells.network.ManaSyncMessage;

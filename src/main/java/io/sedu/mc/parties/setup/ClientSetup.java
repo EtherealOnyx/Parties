@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.setup;
 
 import io.sedu.mc.parties.api.helper.ColorAPI;
+import io.sedu.mc.parties.api.mod.appleskin.ASCompatManager;
 import io.sedu.mc.parties.api.mod.origins.OCompatManager;
 import io.sedu.mc.parties.api.mod.origins.OEventHandler;
 import io.sedu.mc.parties.client.config.Config;
@@ -146,5 +147,6 @@ public class ClientSetup {
             MinecraftForge.EVENT_BUS.addListener(OEventHandler::onClientJoin);
             OCompatManager.initClientEvent();
         }
+        ASCompatManager.init();
     }
 }

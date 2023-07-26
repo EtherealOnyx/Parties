@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.mixin;
+package io.sedu.mc.parties.mixin.vanilla;
 
 import io.sedu.mc.parties.api.helper.PartyAPI;
 import io.sedu.mc.parties.api.helper.PlayerAPI;

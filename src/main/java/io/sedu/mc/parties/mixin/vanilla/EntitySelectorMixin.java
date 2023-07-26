@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.mixin;
+package io.sedu.mc.parties.mixin.vanilla;
 
 import net.minecraft.commands.arguments.selector.EntitySelector;
 import org.spongepowered.asm.mixin.Mixin;
