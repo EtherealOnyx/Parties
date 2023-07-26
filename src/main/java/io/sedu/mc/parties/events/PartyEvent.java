@@ -163,10 +163,13 @@ public class PartyEvent {
     @SubscribeEvent
     public static void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) {
         HashMap<UUID, Boolean> trackers;
-        Player p;
-        if ((trackers = ServerPlayerData.playerTrackers.get((p = event.getPlayer()).getUUID())) != null) {
+        ServerPlayer p;
+        if ((trackers = ServerPlayerData.playerTrackers.get((p = (ServerPlayer) event.getPlayer()).getUUID())) != null) {
             trackers.keySet().forEach(id -> InfoPacketHelper.sendDim(id, p.getUUID(), event.getTo().location()));
         }
+
+        //XP Bug Fix
+        p.setExperienceLevels(p.experienceLevel);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
