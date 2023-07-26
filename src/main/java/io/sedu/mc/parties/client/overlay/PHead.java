@@ -10,6 +10,7 @@ import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.data.ClientConfigData;
+import io.sedu.mc.parties.client.overlay.gui.GUIRenderer;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -17,6 +18,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
@@ -103,6 +105,9 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 pLivingEntity.setYRot( Mth.clamp(f3 - f2, -35f, 35f) + 180F + modelOffset);
                 pLivingEntity.yHeadRot = pLivingEntity.getYRot();
                 pLivingEntity.yHeadRotO = pLivingEntity.getYRot();
+                if (pLivingEntity instanceof Player p) {
+                    ((GUIRenderer) p).setRenderMode(true);
+                }
                 Lighting.setupForEntityInInventory();
                 EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
                 quaternion1.conj();
@@ -122,6 +127,9 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 pLivingEntity.setXRot(f4);
                 pLivingEntity.yHeadRotO = f5;
                 pLivingEntity.yHeadRot = f6;
+                if (pLivingEntity instanceof Player p) {
+                    ((GUIRenderer) p).setRenderMode(false);
+                }
                 posestack.popPose();
             };
 
@@ -137,6 +145,9 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 posestack1.scale((float)pScale, (float)pScale, (float)pScale);
                 Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
                 posestack1.mulPose(quaternion);
+                if (pLivingEntity instanceof Player p) {
+                    ((GUIRenderer) p).setRenderMode(true);
+                }
                 Lighting.setupForEntityInInventory();
                 EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
                 entityrenderdispatcher.setRenderShadow(false);
@@ -149,7 +160,9 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 });
                 multibuffersource$buffersource.endBatch();
                 entityrenderdispatcher.setRenderShadow(true);
-
+                if (pLivingEntity instanceof Player p) {
+                    ((GUIRenderer) p).setRenderMode(false);
+                }
                 posestack.popPose();
             };
         }

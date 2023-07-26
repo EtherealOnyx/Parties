@@ -2,6 +2,7 @@ package io.sedu.mc.parties.mixin.vanilla;
 
 import io.sedu.mc.parties.api.helper.PartyAPI;
 import io.sedu.mc.parties.api.helper.PlayerAPI;
+import io.sedu.mc.parties.client.overlay.gui.GUIRenderer;
 import io.sedu.mc.parties.data.PartyData;
 import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.data.ServerConfigData;
@@ -14,7 +15,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import java.util.List;
 
 @Mixin(Player.class)
-public abstract class PlayerMixin {
+public abstract class PlayerMixin implements GUIRenderer {
+
+    private boolean renderUI = false;
 
     @ModifyVariable(at = @At("HEAD"), method = "giveExperiencePoints(I)V", argsOnly = true)
     private int modifiedExperiencePoints(int pXpPoints) {
@@ -38,6 +41,14 @@ public abstract class PlayerMixin {
         }
         return pXpPoints;
 
+    }
+
+    public void setRenderMode(boolean uiRendering) {
+        this.renderUI = uiRendering;
+    }
+
+    public boolean isRenderingUI() {
+        return renderUI;
     }
 
     private boolean givePartyExperiencePoints(Player partyPlayer, int pXpPoints) {

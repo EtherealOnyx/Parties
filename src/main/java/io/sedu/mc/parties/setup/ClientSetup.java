@@ -42,6 +42,7 @@ public class ClientSetup {
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::ticker);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::keyPress);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::mouseReleased);
+        MinecraftForge.EVENT_BUS.addListener(ClientEvent::nameTagRender);
 
 
 

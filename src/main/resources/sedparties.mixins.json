@@ -21,6 +21,7 @@
     "spellsnshields.ManaRendererMixin",
     "vanilla.ChatComponentMixin",
     "vanilla.ChatScreenMixin",
+    "vanilla.EntityRendererMixin",
     "vanilla.TextureAtlasSpriteMixin"
   ],
   "server": [

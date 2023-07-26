@@ -2,14 +2,18 @@ package io.sedu.mc.parties.events;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.anim.AnimBarHandler;
+import io.sedu.mc.parties.client.overlay.gui.GUIRenderer;
 import io.sedu.mc.parties.client.overlay.gui.HoverScreen;
 import io.sedu.mc.parties.client.overlay.gui.SliderButton;
 import io.sedu.mc.parties.setup.ClientSetup;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RenderNameplateEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.Event;
 
 public class ClientEvent {
     public static void onClientLeave(ClientPlayerNetworkEvent.LoggedOutEvent event) {
@@ -47,4 +51,9 @@ public class ClientEvent {
         SliderButton.clickReleased = true; //hehe
     }
 
+    public static void nameTagRender(RenderNameplateEvent event) {
+        if (event.getEntity() instanceof Player p && ((GUIRenderer) p).isRenderingUI()) {
+            event.setResult(Event.Result.DENY);
+        }
+    }
 }
