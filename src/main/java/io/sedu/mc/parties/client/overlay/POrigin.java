@@ -185,14 +185,12 @@ public class POrigin extends RenderIconTextItem implements TooltipItem {
         colorCut = (colorCut & 0xfefefe) >> 1;
         RenderUtils.horizRect(poseStack.last().pose(), 0, mouseX+offsetX + 2, currentY+mouseY+offsetY+ySnap-2, mouseX+offsetX+max/2f, currentY+mouseY+offsetY+ySnap-1, colorCut | 255 << 24, name.color | 255 << 24);
         RenderUtils.horizRect(poseStack.last().pose(), 0, mouseX+offsetX+max/2f, currentY+mouseY+offsetY+ySnap-2, mouseX+offsetX+max-2, currentY+mouseY+offsetY+ySnap-1, name.color | 255 << 24, colorCut | 255 << 24);
-
-        int color = name.color | 200 << 24;
         poseStack.pushPose();
         poseStack.scale(.5f, .5f, 1f);
         poseStack.translate(mouseX+offsetX, currentY+mouseY+1+y, 0);
         int yFont = 0;
         for (Component c : list) {
-            gui.getFont().drawShadow(poseStack, c, (mouseX+offsetX), currentY+mouseY+1+y+yFont, color);
+            gui.getFont().drawShadow(poseStack, c, (mouseX+offsetX), currentY+mouseY+1+y+yFont, name.color);
             yFont += gui.getFont().lineHeight+1;
         }
         poseStack.popPose();
