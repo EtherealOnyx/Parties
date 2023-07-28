@@ -3,6 +3,7 @@ package io.sedu.mc.parties.data;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.helper.PartyAPI;
 import io.sedu.mc.parties.api.helper.PlayerAPI;
+import io.sedu.mc.parties.api.mod.dietarystats.DSCompatManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -10,8 +11,8 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static io.sedu.mc.parties.data.ServerConfigData.playerAcceptTimer;
 import static io.sedu.mc.parties.data.DataType.*;
+import static io.sedu.mc.parties.data.ServerConfigData.playerAcceptTimer;
 
 public class ServerPlayerData {
 
@@ -314,12 +315,17 @@ public class ServerPlayerData {
         return (float) dataItems.getOrDefault(STAM, 0f);
     }
 
-    public float getMaxHunger() {
+    public float getMaxHunger(boolean forceUpdate) {
+        if (forceUpdate && !dataItems.containsKey(MAXHUNGER)) {
+            if (serverPlayer.get() != null) { // Try to get info before sending it.
+                DSCompatManager.getHandler().getMaxHunger(serverPlayer.get(), food -> dataItems.put(MAXHUNGER, food));
+            }
+        }
         return (float) dataItems.getOrDefault(MAXHUNGER, 0f);
     }
 
     public void setMaxHunger(float max, Runnable action) {
-        if (getMaxHunger() != max) {
+        if (getMaxHunger(false) != max) {
             dataItems.put(MAXHUNGER, max);
             action.run();
         }

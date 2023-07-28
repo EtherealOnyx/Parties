@@ -1,8 +1,10 @@
 package io.sedu.mc.parties.data;
 
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.helper.PlayerAPI;
+import io.sedu.mc.parties.api.events.PartyDisbandEvent;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
+import io.sedu.mc.parties.api.events.PartyLeaveEvent;
+import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.network.ServerPacketHelper;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -11,9 +13,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
+import static io.sedu.mc.parties.data.ServerConfigData.partySize;
 import static io.sedu.mc.parties.data.ServerPlayerData.addTracker;
 import static io.sedu.mc.parties.data.ServerPlayerData.removeTracker;
-import static io.sedu.mc.parties.data.ServerConfigData.partySize;
 
 public class PartyData {
 
@@ -112,7 +114,8 @@ public class PartyData {
             Parties.LOGGER.error("Error removing a party member from party!");
             //Some error occured!
 
-
+        //Player is being removed.
+        MinecraftForge.EVENT_BUS.post(new PartyLeaveEvent(removedMember, partyId));
         PlayerAPI.getPlayer(removedMember, ServerPlayerData::removeParty);
         ServerPacketHelper.sendRemoveMember(removedMember, party, wasKicked);
         //Remove previous member from party's trackers.
@@ -146,9 +149,14 @@ public class PartyData {
         while (i.hasNext()) {
             UUID member = i.next();
             PlayerAPI.getPlayer(member, ServerPlayerData::removeParty);
+
+            //Player is being removed.
+            MinecraftForge.EVENT_BUS.post(new PartyLeaveEvent(member, partyId));
             ServerPlayerData.playerTrackers.remove(member);
             i.remove();
         }
+        //Party is being removed.
+        MinecraftForge.EVENT_BUS.post(new PartyDisbandEvent(partyId));
         partyList.remove(partyId);
     }
 

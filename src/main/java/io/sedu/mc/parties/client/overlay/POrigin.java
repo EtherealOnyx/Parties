@@ -109,9 +109,9 @@ public class POrigin extends RenderIconTextItem implements TooltipItem {
         if (id.isOnline && !id.isSpectator) {
             id.getOrigin(origin -> OriginHolder.getOriginInfo(origin, (name, item, color) -> {
                 if (iconEnabled) {
-                    RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, 0x222222, color);
-                    RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 0, width, height, color, color);
-                    RenderUtils.renderGuiItem(item, xNormal(i), yNormal(i), scale, 6*scale, zPos, partyScale);
+                    RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, (color & 0xfefefe) >> 1, color);
+                    RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 0, width, height, 0x222222, (color & 0xfefefe) >> 1);
+                    RenderUtils.renderGuiItem(item, xNormal(i), yNormal(i), scale, 8*scale, zPos+2, partyScale);
                 }
 
                 if (textEnabled)

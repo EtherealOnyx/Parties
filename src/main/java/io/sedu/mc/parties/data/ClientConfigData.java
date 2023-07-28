@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.data;
 
+import io.sedu.mc.parties.api.mod.gamestages.ClientSyncType;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ClientConfigData {
@@ -24,6 +25,7 @@ public class ClientConfigData {
     public static ForgeConfigSpec.IntValue yPos;
     public static ForgeConfigSpec.IntValue xPosParty;
     public static ForgeConfigSpec.IntValue yPosParty;
+    public static ForgeConfigSpec.ConfigValue<ClientSyncType> defaultSync;
     public static void registerClientConfig(ForgeConfigSpec.Builder CLIENT_BUILDER) {
         CLIENT_BUILDER.comment("--------------------------------------------------------",
                                "Client Party Settings",
@@ -82,6 +84,16 @@ public class ClientConfigData {
         rotationOffset = CLIENT_BUILDER.comment("Offset of the front-facing model if forceModelRotation is enabled.",
                                                 "Negative values make the model face right, while positive values make the model face left.")
                 .defineInRange("rotationOffset", -20, -180, 180);
+        CLIENT_BUILDER.pop();
+
+        CLIENT_BUILDER.push("mod-options");
+        defaultSync = CLIENT_BUILDER.comment("This allows you to set the type of automatic syncing you'd like for GameStages support",
+                                             "When prompted from a party invite. Syncing only occurs if players allow it.",
+                                             "ALL - Prompt disabled, all game stages are synced. Only works if server allows it.",
+                                             "FUTURE - Prompt disabled, future game stages are synced. Only works if server allows it.",
+                                             "NONE - Prompt disabled, no game stages are synced at all.",
+                                             "PROMPT - A prompt asking for sync permission is sent each time you join a party.")
+                .defineEnum("defaultSync", ClientSyncType.PROMPT);
         CLIENT_BUILDER.pop();
 
     }

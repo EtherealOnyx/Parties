@@ -1,6 +1,8 @@
 package io.sedu.mc.parties.api.mod.openpac;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.events.PartyDisbandEvent;
+import io.sedu.mc.parties.api.events.PartyLeaveEvent;
 import io.sedu.mc.parties.api.helper.PartyAPI;
 import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.data.*;
@@ -32,6 +34,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+import static io.sedu.mc.parties.data.PartyData.partyList;
 import static io.sedu.mc.parties.data.PartySaveData.server;
 
 public class PACHandler implements IPACHandler {
@@ -39,7 +42,7 @@ public class PACHandler implements IPACHandler {
     @Override
     public void initParties(MinecraftServer server) {
         Parties.LOGGER.info("Loading parties from Open Parties and Claims.");
-        Parties.LOGGER.debug("Current Party Size: " + PartyData.partyList.size());
+        Parties.LOGGER.debug("Current Party Size: " + partyList.size());
         OpenPACServerAPI.get(server).getPartyManager().getAllStream().forEach(party -> {
             UUID partyId = party.getId();
             //Create new party.
@@ -53,7 +56,7 @@ public class PACHandler implements IPACHandler {
                 pData.addMemberSilently(pId);
             });
             //Then save the party.
-            PartyData.partyList.put(partyId, pData);
+            partyList.put(partyId, pData);
         });
         PartySaveData.get().setDirty();
         Parties.LOGGER.info("Load complete!");
@@ -68,7 +71,7 @@ public class PACHandler implements IPACHandler {
             Parties.LOGGER.debug("Silently creating party of one member...");
             PlayerAPI.getPlayer(owner, p -> p.addParty(newPartyId));
             PartyData pData = new PartyData(newPartyId, owner, true);
-            PartyData.partyList.put(newPartyId, pData);
+            partyList.put(newPartyId, pData);
             ServerPacketHelper.sendNewLeader(owner);
             PartySaveData.get().setDirty();
             return;
@@ -104,10 +107,14 @@ public class PACHandler implements IPACHandler {
 
     @Override
     public void memberKicked(UUID owner, UUID memberLeft, UUID partyId) {
+        //Player is being removed.
+        MinecraftForge.EVENT_BUS.post(new PartyLeaveEvent(memberLeft, partyId));
         if (owner == memberLeft) {
             //Silently removing party.
-            PartyData.partyList.remove(partyId);
+            partyList.remove(partyId);
             ServerPlayerData.playerList.get(owner).removeParty();
+            //Party is being disbanded.
+            MinecraftForge.EVENT_BUS.post(new PartyDisbandEvent(partyId));
             PartiesPacketHandler.sendToPlayer(new ClientPacketData(6), PlayerAPI.getNormalServerPlayer(owner));
             PartySaveData.get().setDirty();
             return;
@@ -289,9 +296,16 @@ public class PACHandler implements IPACHandler {
         Parties.LOGGER.error("Parties between mods are desynced! Attempting to recreate...");
         HashMap<UUID, PartyData> updatedParties = new HashMap<>();
         ServerPlayerData.playerList.forEach((uuid, playerData) -> {
+            //Player is being removed.
+            MinecraftForge.EVENT_BUS.post(new PartyLeaveEvent(uuid, playerData.getPartyId()));
             playerData.removeParty(); //Remove parties from all current players.
             PartiesPacketHandler.sendToPlayer(new ClientPacketData(6), PlayerAPI.getNormalServerPlayer(uuid));
         });
+        partyList.forEach((uuid, partyData) -> {
+            //Player is being removed.
+            MinecraftForge.EVENT_BUS.post(new PartyDisbandEvent(uuid));
+        });
+        partyList.clear();
         getPM(pm -> {
             pm.getAllStream().forEach(party -> {
                 UUID partyId = party.getId();
@@ -315,9 +329,9 @@ public class PACHandler implements IPACHandler {
                 //Then save the party.
                 updatedParties.put(partyId, pData);
             });
-            PartyData.partyList = updatedParties;
+            partyList = updatedParties;
             PartySaveData.get().setDirty();
-            PartyData.partyList.forEach((partyId, partyData) -> partyData.getMembers().forEach(member -> {
+            partyList.forEach((partyId, partyData) -> partyData.getMembers().forEach(member -> {
                 ServerPlayer mS = PlayerAPI.getNormalServerPlayer(member);
                 ArrayList<UUID> mParty = new ArrayList<>(partyData.getMembers());
                 mParty.remove(member);

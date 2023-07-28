@@ -42,6 +42,6 @@ public class DSEventHandler {
 
     @SubscribeEvent
     public static void onPartyJoin(PartyJoinEvent event) {
-        event.forTrackersAndSelf((sendTo, propOf) -> PlayerAPI.getPlayer(propOf, p -> InfoPacketHelper.sendMaxHungerUpdate(sendTo, propOf, p.getMaxHunger())));
+        event.forTrackersAndSelf((sendTo, propOf) -> PlayerAPI.getPlayer(propOf, p -> InfoPacketHelper.sendMaxHungerUpdate(sendTo, propOf, p.getMaxHunger(true))));
     }
 }

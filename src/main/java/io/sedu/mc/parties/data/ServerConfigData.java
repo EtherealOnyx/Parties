@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.data;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.mod.gamestages.ServerSyncType;
 import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -18,6 +19,7 @@ public class ServerConfigData {
     public static ForgeConfigSpec.BooleanValue partiesSync;
     public static ForgeConfigSpec.BooleanValue partyPersistence;
     public static ForgeConfigSpec.BooleanValue allowGlobalUpdates;
+    public static ForgeConfigSpec.ConfigValue<ServerSyncType> syncGameStages;
 
 
 
@@ -57,7 +59,11 @@ public class ServerConfigData {
                                              "APPLIES TO: Cast Bar Element")
                                     .define("allowGlobalUpdates", true);
 
-
+        syncGameStages = SERVER_BUILDER.comment("Allow you to enable specific type of game stage syncing between party members.",
+                                             "ALL - Players can opt-in to allow all game stage syncing, including previous entries.",
+                                             "FUTURE - Players can only opt-in to allow future game stages to be synced",
+                                             "NONE - Game stage syncing is disabled completely.")
+                                    .defineEnum("syncGameStages", ServerSyncType.NONE);
         SERVER_BUILDER.pop();
     }
 
