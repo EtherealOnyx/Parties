@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.setup;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.mod.dietarystats.DSCompatManager;
@@ -43,6 +44,7 @@ public class ModSetup {
         FCompatManager.init(); //Feathers Support
         SSCompatManager.init(); //Spells and Shield Support
         PACCompatManager.init(); //Open-PAC Support
+        HCompatManager.init(); //Homeostatic Support
         DSCompatManager.init(); //Dietary Stats Support
         OCompatManager.init(); //Origins Mod Support
         ISSCompatManager.init(); //Iron's Spells n' Spellbooks Support

@@ -4,6 +4,7 @@ package io.sedu.mc.parties.client.overlay;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
@@ -436,12 +437,16 @@ public class ClientPlayerData {
     }
 
     public void setWorldTemp(Float data) {
-        try {
-            CSCompatManager.getHandler().convertTemp(data, (temp, sev) -> {
-                this.data.put(WORLDTEMP, (int) temp);
-                this.data.put(SEVERITY, (int) sev);
-            });
-        } catch (Throwable t) {
+        if (HCompatManager.active()) {
+            this.data.put(WORLDTEMP, HCompatManager.getHandler().convertTemp(data));
+            this.data.put(SEVERITY, HCompatManager.getHandler().getWorldTempSev(data, getSeverity()));
+        } else {
+            try {
+                CSCompatManager.getHandler().convertTemp(data, (temp, sev) -> {
+                    this.data.put(WORLDTEMP, (int) temp);
+                    this.data.put(SEVERITY, (int) sev);
+                });
+            } catch (Throwable t) {
             CSCompatManager.changeHandler();
             Config.loadDefaultPreset(); //Forces refresh.
             if (Minecraft.getInstance().player != null)
@@ -450,11 +455,18 @@ public class ClientPlayerData {
                                 new TranslatableComponent("messages.sedparties.api.coldsweatunload").withStyle(ChatFormatting.RED))
                         , Minecraft.getInstance().player.getUUID());
             Parties.LOGGER.error("Failed to support Cold Sweat!", t);
+            }
         }
     }
 
     public void setBodyTemp(float data) {
-        this.data.put(BODYTEMP, (int) data);
+
+        if (HCompatManager.active()) {
+            this.data.put(BODYTEMP, HCompatManager.getHandler().convertTemp(data));
+            this.data.put(SEVERITY, HCompatManager.getHandler().getBodyTempSev(data, getSeverity()));
+        } else {
+            this.data.put(BODYTEMP, (int) data);
+        }
     }
 
     public void updateTemperatures() {
@@ -480,6 +492,16 @@ public class ClientPlayerData {
         }
     }
 
+    public void updateTemperaturesH() {
+        if (clientPlayer != null) {
+            HCompatManager.getHandler().getClientTemperature(clientPlayer, (localTemp, bodyTemp, severity) -> {
+                data.put(WORLDTEMP, localTemp);
+                data.put(SEVERITY, severity);
+                data.put(BODYTEMP, bodyTemp);
+            });
+        }
+    }
+
     public void updateTemperaturesTAN() {
         if (clientPlayer != null) {
             TANCompatManager.getHandler().getPlayerTemp(clientPlayer, (temp, text) -> {
@@ -498,6 +520,11 @@ public class ClientPlayerData {
         if (clientPlayer != null) {
             getThirst(thirst -> thirst.checkAnim(TMCompatManager.getHandler().getThirst(clientPlayer), 20, TMCompatManager.getHandler()
                                                                                                                           .getQuench(clientPlayer)));
+        }
+    }
+    public void updateThirstH() {
+        if (clientPlayer != null) {
+            data.put(THIRST, HCompatManager.getHandler().getWaterLevel(clientPlayer));
         }
     }
 

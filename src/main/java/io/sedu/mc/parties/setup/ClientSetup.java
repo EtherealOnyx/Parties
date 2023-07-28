@@ -138,7 +138,10 @@ public class ClientSetup {
                 ((PDead)RenderItem.items.get("dead")).updateRendererForMods();
                 BarBase.updateRendererForMods();
             }
-            if (ModList.get().isLoaded("toughasnails")) {
+            if (ModList.get().isLoaded("homeostatic")) {
+                ((PTemp)RenderItem.items.get("temp")).updateRendererForHomeostatic();
+            }
+            else if (ModList.get().isLoaded("toughasnails")) {
                 ((PTemp)RenderItem.items.get("temp")).updateRendererForTAN();
             }
         });

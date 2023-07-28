@@ -2,6 +2,8 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+
+import io.sedu.mc.parties.api.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.mod.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
@@ -18,6 +20,7 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
 
     private final TranslatableComponent tipName = new TranslatableComponent("ui.sedparties.tooltip.temp");
     private final TranslatableComponent tipName2 = new TranslatableComponent("ui.sedparties.tooltip.temp2");
+    private final TranslatableComponent tipName3 = new TranslatableComponent("ui.sedparties.tooltip.temp3");
 
     private Renderer render;
     private TooltipRender tooltip;
@@ -84,6 +87,21 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
         if (textEnabled)
             text(tX(i), tY(i), gui, poseStack, id.getTempType(), getTANColor((int) id.getWorldTemp()));
     }
+
+    void renderHTemp(int i, ForgeIngameGui gui, PoseStack poseStack, int worldTemp, int tempTex, float alpha) {
+
+        if (iconEnabled) {
+            setup(partyPath);
+            useAlpha(alpha);
+            RenderSystem.enableDepthTest();
+            blit(poseStack, x(i), y(i), (int) (tempTex*18), 18, 9, 9, 18, 18);
+            resetColor();
+        }
+        if (textEnabled)
+            text(tX(i), tY(i), gui, poseStack, worldTemp + "°", getTANColor(tempTex));
+    }
+
+
 
     private int getSevColor(int sev) {
         switch(sev) {
@@ -176,7 +194,11 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
 
     @Override
     public boolean isEnabled() {
-        if (TANCompatManager.getHandler().tempExists()) {
+        if (HCompatManager.getHandler().exists()) {
+            updateRendererForHomeostatic();
+            return elementEnabled;
+        }
+        else if (TANCompatManager.getHandler().tempExists()) {
             updateRendererForTAN();
             return elementEnabled;
         } else if (CSCompatManager.getHandler().exists()) {
@@ -200,6 +222,21 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
             if (p.isOnline && !p.isSpectator) {
                 renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + p.getWorldTemp() + "°", 0xD6E9D9, 0x88938A, getSevColor(p.getSeverity()));
                 renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName2.getString() + p.getBodyTemp() + "", 0xD6E9D9, 0x88938A, getSevColor(p.getSeverity()));
+            }
+        });
+    }
+
+    public void updateRendererForHomeostatic() {
+        render = (i, id, gui, poseStack, partialTicks) -> {
+            int severe = id.getSeverity() & 0xF;
+            int tempTex = (id.getSeverity() >> 16) & 0xFFFF;
+            renderHTemp(i, gui, poseStack, id.getWorldTemp(), tempTex, severe == 1 ? id.alpha * (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks)/8f)/3f) : id.alpha);
+        };
+        tooltip = (poseStack, gui, index, mouseX, mouseY) -> ClientPlayerData.getOrderedPlayer(index, p -> {
+            if (p.isOnline && !p.isSpectator) {
+                int tempTex = (p.getSeverity() >> 16) & 0xFFFF;
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + p.getWorldTemp() + "°", 0xD6E9D9, 0x88938A, getTANColor(tempTex));
+                renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName3.getString() + p.getBodyTemp() + "°", 0xD6E9D9, 0x88938A, getTANColor(tempTex));
             }
         });
     }

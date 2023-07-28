@@ -223,6 +223,6 @@ public class PThirst extends OverflowBarBase {
 
     @Override
     public boolean isEnabled() {
-        return elementEnabled && (ModList.get().isLoaded("thirst") || ModList.get().isLoaded("toughasnails"));
+        return elementEnabled && (ModList.get().isLoaded("thirst") || ModList.get().isLoaded("toughasnails") || ModList.get().isLoaded("homeostatic"));
     }
 }

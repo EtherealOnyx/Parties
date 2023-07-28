@@ -230,6 +230,9 @@ dependencies {
     //Open-PAC
     compileOnly fg.deobf("curse.maven:openpac-636608:4500809")
 
+    //Homeostatic
+    implementation fg.deobf("curse.maven:homeostatic-634466:4655143")
+
     //Dietary Statistics - Local file, also can't test in dev environment...
     compileOnly files("libs/DietaryStatistics-1.0.2.jar")
 
