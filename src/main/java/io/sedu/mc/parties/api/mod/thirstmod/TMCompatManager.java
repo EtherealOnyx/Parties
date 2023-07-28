@@ -6,6 +6,7 @@ import net.minecraftforge.fml.ModList;
 public class TMCompatManager {
     private static ITMHandler handler = new TMHandlerFake();
     private static boolean active = false;
+    public static boolean enableOverlay = true;
 
     public static ITMHandler getHandler() {
         return handler;

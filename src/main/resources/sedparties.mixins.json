@@ -19,6 +19,7 @@
     "ironsspellbooks.ClientMagicDataMixin",
     "spellsnshields.ClientMessageHandlerMixin",
     "spellsnshields.ManaRendererMixin",
+    "thirstmod.HUDOverlayMixin",
     "vanilla.ChatComponentMixin",
     "vanilla.ChatScreenMixin",
     "vanilla.EntityRendererMixin",

@@ -36,6 +36,7 @@ public class TMHandler implements ITMHandler {
     @Override
     public void setThirstRender(Boolean aBoolean) {
         OverlayRegistry.enableOverlay(ThirstBarRenderer.THIRST_OVERLAY, aBoolean);
+        TMCompatManager.enableOverlay = aBoolean;
     }
 
     @Override
