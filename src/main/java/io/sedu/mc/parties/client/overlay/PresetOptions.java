@@ -5,7 +5,7 @@ import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
-import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.api.helper.ColorAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.item.ItemStack;
@@ -26,7 +26,7 @@ public class PresetOptions extends RenderItem {
 
     @Override
     int getColor() {
-        return ColorUtils.getRainbowColor();
+        return ColorAPI.getRainbowColor();
     }
 
     @Override

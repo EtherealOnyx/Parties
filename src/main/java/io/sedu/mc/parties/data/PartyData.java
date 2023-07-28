@@ -1,7 +1,10 @@
 package io.sedu.mc.parties.data;
 
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.events.PartyJoinEvent;
+import io.sedu.mc.parties.api.events.PartyDisbandEvent;
+import io.sedu.mc.parties.api.events.PartyJoinEvent;
+import io.sedu.mc.parties.api.events.PartyLeaveEvent;
+import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.network.ServerPacketHelper;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -10,9 +13,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
-import static io.sedu.mc.parties.data.PlayerData.addTracker;
-import static io.sedu.mc.parties.data.PlayerData.removeTracker;
 import static io.sedu.mc.parties.data.ServerConfigData.partySize;
+import static io.sedu.mc.parties.data.ServerPlayerData.addTracker;
+import static io.sedu.mc.parties.data.ServerPlayerData.removeTracker;
 
 public class PartyData {
 
@@ -39,7 +42,7 @@ public class PartyData {
 
         party.add(initiator);
         //The player MUST exist here.
-        Util.getPlayer(initiator, (playerData) -> playerData.addParty(partyId));
+        PlayerAPI.getPlayer(initiator, (playerData) -> playerData.addParty(partyId));
         updateLeaderNew(initiator);
     }
 
@@ -73,10 +76,10 @@ public class PartyData {
         Parties.LOGGER.debug("Add Member internal POST-packet");
         party.add(futureMember);
         Parties.LOGGER.debug("Add Member internal POST-party");
-        Util.getPlayer(futureMember, (playerData) -> playerData.addParty(partyId));
+        PlayerAPI.getPlayer(futureMember, (playerData) -> playerData.addParty(partyId));
         Parties.LOGGER.debug("Add Member internal POST-player party info");
         //API Helper
-        Util.getServerPlayer(futureMember, (serverPlayer) -> MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(serverPlayer)));
+        PlayerAPI.getServerPlayer(futureMember, (serverPlayer) -> MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(serverPlayer)));
         Parties.LOGGER.debug("Add Member internal POST-api");
     }
 
@@ -111,8 +114,9 @@ public class PartyData {
             Parties.LOGGER.error("Error removing a party member from party!");
             //Some error occured!
 
-
-        Util.getPlayer(removedMember, PlayerData::removeParty);
+        //Player is being removed.
+        MinecraftForge.EVENT_BUS.post(new PartyLeaveEvent(removedMember, partyId));
+        PlayerAPI.getPlayer(removedMember, ServerPlayerData::removeParty);
         ServerPacketHelper.sendRemoveMember(removedMember, party, wasKicked);
         //Remove previous member from party's trackers.
         party.forEach(id -> {
@@ -135,7 +139,7 @@ public class PartyData {
 
     public void disband() {
         if (party.size() >= 1) {
-            Util.getServerPlayer(party.get(0), (player) -> {
+            PlayerAPI.getServerPlayer(party.get(0), (player) -> {
                 player.giveExperiencePoints(xpOverflow);
             });
         }
@@ -144,10 +148,15 @@ public class PartyData {
         Iterator<UUID> i = party.iterator();
         while (i.hasNext()) {
             UUID member = i.next();
-            Util.getPlayer(member, PlayerData::removeParty);
-            PlayerData.playerTrackers.remove(member);
+            PlayerAPI.getPlayer(member, ServerPlayerData::removeParty);
+
+            //Player is being removed.
+            MinecraftForge.EVENT_BUS.post(new PartyLeaveEvent(member, partyId));
+            ServerPlayerData.playerTrackers.remove(member);
             i.remove();
         }
+        //Party is being removed.
+        MinecraftForge.EVENT_BUS.post(new PartyDisbandEvent(partyId));
         partyList.remove(partyId);
     }
 

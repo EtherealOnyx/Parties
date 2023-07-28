@@ -101,13 +101,13 @@ public class PName extends RenderItem {
     @Override
     public ItemBound getRenderItemBound() {
         if (ClientPlayerData.playerOrderedList.size() > 0)
-            return new ItemBound(frameX + x, frameY + y - 1,
+            return new ItemBound(selfFrameX + x, selfFrameY + y - 1,
                                  (int) (Minecraft.getInstance().font.width(ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0))
                                                                                                                                   .getName()
                                                                                                                                   .substring(0, Math.min(length, ClientPlayerData.playerList.get(ClientPlayerData.playerOrderedList.get(0))
                                                                                                                                                                                             .getName()
                                                                                                                                                                                             .length()))) * scale), (int) (height * scale));
-        return new ItemBound(frameX + x, frameY + y - 1, (int) (width * scale), (int) (height * scale));
+        return new ItemBound(selfFrameX + x, selfFrameY + y - 1, (int) (width * scale), (int) (height * scale));
     }
 
 }

@@ -4,19 +4,21 @@ package io.sedu.mc.parties.client.overlay;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
-import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
-import io.sedu.mc.parties.api.epicfight.EFCompatManager;
-import io.sedu.mc.parties.api.feathers.FCompatManager;
 import io.sedu.mc.parties.api.homeostatic.HCompatManager;
-import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
-import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
-import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
-import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
+import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
+import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
+import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
+import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
+import io.sedu.mc.parties.api.mod.ironspellbooks.ISSCompatManager;
+import io.sedu.mc.parties.api.mod.playerrevive.PRCompatManager;
+import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
+import io.sedu.mc.parties.api.mod.thirstmod.TMCompatManager;
+import io.sedu.mc.parties.api.mod.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.anim.*;
 import io.sedu.mc.parties.client.overlay.effects.ClientEffect;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
+import io.sedu.mc.parties.data.ClientConfigData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
@@ -35,7 +37,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static io.sedu.mc.parties.client.overlay.DataType.*;
-import static io.sedu.mc.parties.client.overlay.RenderSelfItem.selfIndex;
 
 public class ClientPlayerData {
     public static HashMap<UUID, ClientPlayerData> playerList = new HashMap<>();
@@ -75,12 +76,17 @@ public class ClientPlayerData {
         initData();
     }
 
-    public static void forEachWithoutSelf(BiConsumer<Integer, ClientPlayerData> action) {
-        for (int i = 0; i < selfIndex; i++) {
-            action.accept(i, ClientPlayerData.playerList.get(playerOrderedList.get(i)));
+
+
+    public static void forSelf(Consumer<ClientPlayerData> action) {
+        if (ClientConfigData.renderSelfFrame.get()) {
+            action.accept(ClientPlayerData.playerList.get(playerOrderedList.get(0)));
         }
-        for (int i = selfIndex+1; i < ClientPlayerData.playerOrderedList.size(); i++) {
-            action.accept(i-1, ClientPlayerData.playerList.get(playerOrderedList.get(i)));
+    }
+
+    public static void forOthersOrdered(BiConsumer<Integer, ClientPlayerData> action) {
+        for (int i = 1; i < ClientPlayerData.playerOrderedList.size(); i++) {
+            action.accept(i, ClientPlayerData.playerList.get(playerOrderedList.get(i)));
         }
     }
 
@@ -94,6 +100,14 @@ public class ClientPlayerData {
             data.put(EF_STAM, new StaminAnim(20, true));
         if (SSCompatManager.active())
             data.put(SSMANA, new ManaSSAnim(20, true));
+        if (TMCompatManager.active() || TANCompatManager.active())
+            data.put(THIRST, new ThirstAnim(20, true));
+
+        if (ISSCompatManager.active()) {
+            data.put(MANAI, new ManaIAnim(20, true));
+            data.put(CASTBAR, new CastAnim(0));
+        }
+
 
     }
     public static void getOrderedPlayer(int index, Consumer<ClientPlayerData> action) {
@@ -104,7 +118,7 @@ public class ClientPlayerData {
     }
 
     public static void getSelf(Consumer<ClientPlayerData> action) {
-        getOrderedPlayer(selfIndex, action);
+        getOrderedPlayer(0, action);
     }
 
     public static void addClientMember(UUID uuid) {
@@ -161,7 +175,6 @@ public class ClientPlayerData {
     public static void resetOnly() {
         playerList.clear();
         playerOrderedList.clear();
-        selfIndex = 0;
         leader = null;
     }
 
@@ -176,7 +189,6 @@ public class ClientPlayerData {
         UUID temp = ClientPlayerData.playerOrderedList.get(f);
         ClientPlayerData.playerOrderedList.set(f, ClientPlayerData.playerOrderedList.get(s));
         ClientPlayerData.playerOrderedList.set(s, temp);
-        RenderSelfItem.updateSelfIndex();
     }
 
     public static void markEffectsDirty() {
@@ -411,12 +423,17 @@ public class ClientPlayerData {
         this.data.put(REVIVEPROG, data);
     }
 
-    public int getThirst() {
-        return (int) data.getOrDefault(THIRST, 0);
+    public void getThirst(Consumer<ThirstAnim> action) {
+        data.computeIfPresent(THIRST, (data, stam) -> {
+            action.accept((ThirstAnim) stam);
+            return stam;
+        });
     }
 
+
+
     public void setThirst(Integer data) {
-        this.data.put(THIRST, data);
+        getThirst(thirst -> thirst.checkHealth(data));
     }
 
     public void setWorldTemp(Float data) {
@@ -430,13 +447,14 @@ public class ClientPlayerData {
                     this.data.put(SEVERITY, (int) sev);
                 });
             } catch (Throwable t) {
-                CSCompatManager.changeHandler();
-                Config.loadDefaultPreset(); //Forces refresh.
-                if (Minecraft.getInstance().player != null)
-                    Minecraft.getInstance().player.sendMessage(
-                            new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(
-                                    new TranslatableComponent("messages.sedparties.api.coldsweatunload").withStyle(ChatFormatting.RED))
-                            , Minecraft.getInstance().player.getUUID());
+            CSCompatManager.changeHandler();
+            Config.loadDefaultPreset(); //Forces refresh.
+            if (Minecraft.getInstance().player != null)
+                Minecraft.getInstance().player.sendMessage(
+                        new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(
+                                new TranslatableComponent("messages.sedparties.api.coldsweatunload").withStyle(ChatFormatting.RED))
+                        , Minecraft.getInstance().player.getUUID());
+            Parties.LOGGER.error("Failed to support Cold Sweat!", t);
             }
         }
     }
@@ -468,6 +486,7 @@ public class ClientPlayerData {
                             new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(
                             new TranslatableComponent("messages.sedparties.api.coldsweatunload").withStyle(ChatFormatting.RED))
                             , Minecraft.getInstance().player.getUUID());
+                Parties.LOGGER.error("Failed to support Cold Sweat!", t);
             }
 
         }
@@ -499,7 +518,8 @@ public class ClientPlayerData {
 
     public void updateThirst() {
         if (clientPlayer != null) {
-            data.put(THIRST, TMCompatManager.getHandler().getThirst(clientPlayer));
+            getThirst(thirst -> thirst.checkAnim(TMCompatManager.getHandler().getThirst(clientPlayer), 20, TMCompatManager.getHandler()
+                                                                                                                          .getQuench(clientPlayer)));
         }
     }
     public void updateThirstH() {
@@ -510,7 +530,7 @@ public class ClientPlayerData {
 
     public void updateThirstTAN() {
         if (clientPlayer != null) {
-            data.put(THIRST, TANCompatManager.getHandler().getPlayerThirst(clientPlayer));
+            getThirst(thirst -> thirst.checkHealth(TANCompatManager.getHandler().getPlayerThirst(clientPlayer)));
         }
     }
 
@@ -544,6 +564,13 @@ public class ClientPlayerData {
     public void getMana(Consumer<ManaAnim> action) {
         data.computeIfPresent(MANA, (data, mana) -> {
             action.accept((ManaAnim) mana);
+            return mana;
+        });
+    }
+
+    public void getManaI(Consumer<ManaIAnim> action) {
+        data.computeIfPresent(MANAI, (data, mana) -> {
+            action.accept((ManaIAnim) mana);
             return mana;
         });
     }
@@ -655,6 +682,63 @@ public class ClientPlayerData {
 
     public void setExtraStam(Integer data) {
         getStaminaEF(stam -> stam.checkAbsorb(data));
+    }
+
+    public void setQuench(int data) {
+        getThirst(thirst -> thirst.checkAbsorb(data));
+    }
+
+    public void setMaxHunger(float data) {
+        getHunger(hunger -> hunger.checkMax(data));
+    }
+
+    public void setSaturation(float data) {
+        getHunger(hunger -> hunger.checkAbsorb(data));
+    }
+
+    public void setOrigin(String data) {
+        this.data.put(ORIGIN, data);
+    }
+
+    public void getOrigin(Consumer<String> action) {
+        data.computeIfPresent(ORIGIN, (data, origin) -> {
+            action.accept((String) origin);
+            return origin;
+        });
+    }
+
+    public void updateManaISS() {
+        if (clientPlayer != null) {
+            ISSCompatManager.getHandler().getClientMana(clientPlayer, (i1, i2) -> getManaI(mana -> mana.checkValues(i1, i2)));
+        }
+    }
+
+    public void setManaI(Integer data) {
+        getManaI(mana -> mana.checkHealth(data));
+    }
+
+    public void setMaxManaI(Integer data) {
+        getManaI(mana -> mana.checkMax(data));
+    }
+
+    public void getCastInfo(Consumer<CastAnim> action) {
+        data.computeIfPresent(CASTBAR, (data, cast) -> {
+            action.accept((CastAnim) cast);
+            return cast;
+        });
+    }
+
+    public void initSpell(int spellId, int castDuration) {
+        Parties.LOGGER.debug("Casting spell for: " + playerName);
+        getCastInfo(cast -> cast.activate(spellId, castDuration));
+    }
+
+    public void finishSpell() {
+        getCastInfo(CastAnim::markDone);
+    }
+
+    public void startCast(Integer spellId, Integer castTime) {
+
     }
 }
 

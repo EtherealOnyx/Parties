@@ -42,9 +42,9 @@ public class PArmor extends RenderIconTextItem implements TooltipItem {
     }
 
     @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (!id.isSpectator)
-            renderArmor(i, poseStack, gui, id.getArmor(), id.alpha);
+            renderArmor(0, poseStack, gui, id.getArmor(), id.alpha);
     }
 
     @Override

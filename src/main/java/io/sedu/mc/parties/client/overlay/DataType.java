@@ -27,5 +27,11 @@ public enum DataType {
     EF_STAM,
 
     //Spells and Shields
-    SSMANA
+    SSMANA,
+
+    //Origins
+    ORIGIN,
+
+    //Spells and Spellbooks
+    MANAI, CASTBAR,
 }

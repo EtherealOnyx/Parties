@@ -1,31 +1,38 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PEffects;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import io.sedu.mc.parties.data.ClientConfigData;
-import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.mixinaccessors.TrimmedMessagesAccessor;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.sedu.mc.parties.client.overlay.ClientPlayerData.playerOrderedList;
+import static io.sedu.mc.parties.client.overlay.RenderItem.renderSelfFrame;
 import static io.sedu.mc.parties.client.overlay.RenderItem.*;
-import static io.sedu.mc.parties.client.overlay.RenderSelfItem.selfIndex;
+import static io.sedu.mc.parties.util.RenderUtils.renderSelfFrame;
 import static io.sedu.mc.parties.util.RenderUtils.*;
 
 public class HoverScreen extends Screen {
@@ -36,23 +43,42 @@ public class HoverScreen extends Screen {
     private int revertY = 0;
     private int oldX = 0;
     private int oldY = 0;
-    private int botLim = 0;
-    private int rightLim = 0;
+
     private Integer oldMX = null;
     private Integer oldMY = null;
     private int index = 0;
+
+    private ArrayList<Integer> fXP = new ArrayList<>();
+    private ArrayList<Integer> fYP = new ArrayList<>();
+    private int revertXP = 0;
+    private int revertYP = 0;
+    private int oldXP = 0;
+    private int oldYP = 0;
+    private Integer oldMXP = null;
+    private Integer oldMYP = null;
+    private int indexP = 0;
     private static int key;
-    private List<Button> moveParty = new ArrayList<>();
-    private List<Button> menu = new ArrayList<>();
-    private List<Button> moveFrame = new ArrayList<>();
+    private final List<Button> moveParty = new ArrayList<>();
+    private final List<Button> menu = new ArrayList<>();
+    private final List<Button> moveFrame = new ArrayList<>();
+    private final List<Button> partyMoveFrame = new ArrayList<>();
     private Button settingsButton;
+    private Button partySettingsButton;
     private Button presetButton;
     private Button goBackButton;
     private List<GuiMessage<FormattedCharSequence>> trimmedMessages;
 
     private static boolean isArranging = false;
     private static boolean isMoving = false;
+    private static int draggedItem = -1;
+    private static int partyDisplay = 0;
     static boolean notEditing = true;
+    private int botLim = 0;
+    private int rightLim = 0;
+    private boolean outOfBounds = false;
+    private boolean enableBoundaries = false;
+
+    public static boolean showInfo = false;
 
     //public boolean rendered;
     public HoverScreen(int value) {
@@ -62,255 +88,481 @@ public class HoverScreen extends Screen {
 
     @Override
     protected void init() {
-        trimmedMessages = minecraft.gui.getChat().trimmedMessages;
-
-        ColorUtils.colorCycle = true;
-        int y = Math.max(0, clickArea.t(0) - 10);
-        int x = clickArea.l(0);
+        outOfBounds = false;
+        draggedItem = -1;
+        if (partyDisplay < 2 || (partyDisplay > 4 && playerOrderedList != null && partyDisplay != playerOrderedList.size() - 2)) {
+            partyDisplay = Math.max(1, playerOrderedList != null ? playerOrderedList.size() - 1 : 1);
+        }
+        assert minecraft != null;
+        trimmedMessages = ((TrimmedMessagesAccessor) minecraft.gui.getChat()).getTrimmedMessages();
+        selfFrameX = (int) Mth.clamp(ClientConfigData.xPos.get(), 0, width / playerScale - frameEleW);
+        selfFrameY = (int) Mth.clamp(ClientConfigData.yPos.get(),0,  height/ playerScale - frameEleH);
+        updateLimits();
+        //TODO: Add for otherFrameX/Y.
+        ColorAPI.colorCycle = true;
+        int y = (int) Math.max(0, clickArea.t(0)* playerScale - 10);
+        int x = (int) (clickArea.l(0)* playerScale);
+        int oY = (int) Math.max(0, clickArea.t(1)* partyScale - 10);
+        int oX = (int) (clickArea.l(1)* partyScale);
         settingsButton = addRenderableWidget(new SmallButton(x, y, "⚙", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.partysettings")), 0, .5f, .5f, .5f, 1f));
+        partySettingsButton = addRenderableWidget(new SmallButton(oX, oY, "⚙", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.partysettings")), 0, .5f, .5f, .5f, 1f));
         presetButton = addRenderableWidget(new SmallButton(x+11, y, "☰", p -> doTask(5), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.usepreset")), .5f, 1, 0f, 1f, 1f));
         goBackButton = addRenderableWidget(new SmallButton(x, y,"x", p -> doTask(1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), 1f, .5f, .5f));
         initPartyButtons();
-        initMenuButtons(x, y);
-        initDragButtons();
+        initMenuButtons(x, y, oX, oY);
+        initDragButtons((int) ((selfFrameX)* playerScale), (int) Math.max(0, (selfFrameY)* playerScale - 10), (int) ((partyFrameX)* partyScale), (int) Math.max(0, (partyFrameY)* partyScale - 10));
         doTask(0);
     }
 
-    protected void initPartyButtons() {
-        if (ClientPlayerData.partySize() > 1) {
-            Button b;
-            //moveParty.add(addRenderableWidget(new Button(clickArea.l(0) + (clickArea.w() >> 1) - 9, clickArea.t(0) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("⬇"), pButton -> ClientPlayerData.swap(finalI, finalI+1))));
-            if (ClientConfigData.renderSelfFrame.get()) {
-                Parties.LOGGER.debug("Initializing arrange buttons for when rendering self...");
-                for (int i = 0; i < ClientPlayerData.partySize(); i++) {
-                    int finalI = i;
-                    if (i == ClientPlayerData.partySize()-1) {
-                        b = addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
-                        b.active = false;
-                        moveParty.add(b);
-                    }
-                    else
-                        moveParty.add(addRenderableWidget(new Button(clickArea.r(i)-20, clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI+1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
+    private Button createScaledButton(int pX, int pY, Component text, Button.OnPress press, Button.OnTooltip tip) {
+        return new ScaledButton(pX, pY, text, press, tip);
+    }
 
-                    if (i == 0) {
-                        b = addRenderableWidget(new Button(clickArea.l(i) , clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
-                        b.active = false;
-                        moveParty.add(b);
-                    }
-                    else
-                        moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h()>>1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI-1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
-                    //rectCO(poseStack, 5, 5,  frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, frameX + frameW*i + frameW>>1, frameH + frameH*i + frameH>>1, 0xFFFFFF, 0xAAAAAA);
-                }
-            } else {
-                Parties.LOGGER.debug("Initializing arrange buttons for when NOT rendering self...");
-                for (int i = 0; i < selfIndex; i++) {
-                    Parties.LOGGER.debug("Current Index: " + i);
-                    int finalI = i;
-                    if (i == ClientPlayerData.partySize() - 1) {
-                        Parties.LOGGER.debug("Adding down disabled for " + i);
-                        b = addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
-                        b.active = false;
-                        moveParty.add(b);
-                    } else {
-                        if (selfIndex == finalI + 1) {
-                            if (finalI + 2 > ClientPlayerData.partySize() - 1) {
-                                Parties.LOGGER.debug("Adding down disabled for " + i);
-                                b = addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
-                                b.active = false;
-                                moveParty.add(b);
-                            } else {
-                                Parties.LOGGER.debug("Adding down enabled for " + i);
-                                moveParty.add(addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 2), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
-                            }
-                        } else {
-                            Parties.LOGGER.debug("Adding down enabled for " + i);
-                            moveParty.add(addRenderableWidget(new Button(clickArea.r(i) - 20, clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
-                        }
-                    }
-                    if (i == 0) {
-                        Parties.LOGGER.debug("Adding up disabled for " + i);
-                        b = addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
-                        b.active = false;
-                        moveParty.add(b);
-                    } else {
-                        Parties.LOGGER.debug("Adding up enabled for " + i);
-                        moveParty.add(addRenderableWidget(new Button(clickArea.l(i), clickArea.t(i) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
-                    }
+    private static class ScaledButton extends Button {
 
-                }
-                Parties.LOGGER.debug("Skipping self index value of " + selfIndex);
-                for (int i = selfIndex+1; i < ClientPlayerData.partySize(); i++) {
-                    int finalI = i;
-                    if (i == ClientPlayerData.partySize() - 1) {
-                        Parties.LOGGER.debug("Adding down disabled for " + i);
-                        b = addRenderableWidget(new Button(clickArea.r(i-1) - 20, clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown"))));
-                        b.active = false;
-                        moveParty.add(b);
-                    } else {
-                        Parties.LOGGER.debug("Adding down enabled for " + i);
-                        moveParty.add(addRenderableWidget(new Button(clickArea.r(i-1) - 20, clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▼"), pButton -> ClientPlayerData.swap(finalI, finalI + 1), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.movedown")))));
-                    }
+        int originX;
+        int originY;
 
-                    if (selfIndex == finalI - 1) {
-                        if (finalI - 2 < 0) {
-                            Parties.LOGGER.debug("Adding up disabled for " + i);
-                            b = addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> {}, transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup"))));
-                            b.active = false;
-                            moveParty.add(b);
-                        } else {
-                            Parties.LOGGER.debug("Adding up enabled for " + i);
-                            moveParty.add(addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 2, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
-                        }
-                    } else {
-                        Parties.LOGGER.debug("Adding up enabled for " + i);
-                        moveParty.add(addRenderableWidget(new Button(clickArea.l(i-1), clickArea.t(i-1) + (clickArea.h() >> 1) - 10, 20, 20, new TextComponent("▲"), pButton -> ClientPlayerData.swap(finalI - 1, finalI), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.moveup")))));
-                    }
-                }
+        public ScaledButton(int pX, int pY, Component pMessage, OnPress pOnPress,
+                            OnTooltip pOnTooltip) {
+            super((int) (pX* playerScale), (int) (pY* playerScale), (int) (20* playerScale), (int) (20* playerScale), pMessage, pOnPress, pOnTooltip);
+            this.originX = pX;
+            this.originY = pY;
+        }
+
+        @Override
+        public void renderButton(@NotNull PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
+            Minecraft minecraft = Minecraft.getInstance();
+            Font font = minecraft.font;
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShaderTexture(0, WIDGETS_LOCATION);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
+            int i = this.getYImage(this.isHoveredOrFocused());
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.enableDepthTest();
+            pPoseStack.pushPose();
+            pPoseStack.scale(playerScale, playerScale, 1f);
+            this.blit(pPoseStack,originX, originY, 0, 46 + i * 20, 10, 20);
+            this.blit(pPoseStack, originX + 10, originY, 200 - 10, 46 + i * 20, 10, 20);
+            this.renderBg(pPoseStack, minecraft, pMouseX, pMouseY);
+
+            int j = getFGColor();
+            drawCenteredString(pPoseStack, font, this.getMessage(), originX + 10, originY + 6, j | Mth.ceil(this.alpha * 255.0F) << 24);
+            pPoseStack.popPose();
+            if (this.isHoveredOrFocused()) {
+                this.renderToolTip(pPoseStack, pMouseX, pMouseY);
             }
-
         }
     }
 
-    private void initMenuButtons(int x, int y) {
+    protected void initPartyButtons() {
+        //TODO: Re-implement for other party member list ONLY.
+    }
+
+    private void initMenuButtons(int x, int y, int oX, int oY) {
         menu.add(addRenderableWidget(new SmallButton(x, y, "x", p -> doTask(0), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), .5f, 0f, 1f, .5f, .5f)));
-        menu.add(addRenderableWidget(new SmallButton(x+11, y,"⬆⬇", p -> doTask(2), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rearrange")), .5f, .25f, .5f, .5f, 1f)));
-        menu.add(addRenderableWidget(new SmallButton(x+22, y,"✥", p -> doTask(3), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.move")), 0, 1, .5f, .5f, 1f)));
-        menu.add(addRenderableWidget(new SmallButton(x+33, y,"⚙", p -> doTask(4), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.advsettings")), 0, .5f, .5f, 1f, 1f)));
+        //TODO: Implement in next version.
+        menu.add(addRenderableWidget(new SmallButton(oX+11, oY,"⬆⬇", p -> doTask(2), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rearrange")), .5f, .25f, .5f, .5f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(x+11, y,"✥", p -> doTask(3), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.move")), 0, 1, .5f, .5f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(x+22, y,"⚙", p -> doTask(4), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.advsettings")), 0, .5f, .5f, 1f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(oX, oY, "x", p -> doTask(0), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), .5f, 0f, 1f, .5f, .5f)));
+        menu.add(addRenderableWidget(new SmallButton(oX+22, oY,"✥", p -> doTask(3), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.move")), 0, 1, .5f, .5f, 1f)));
 
     }
 
-    private void initDragButtons() {
-        int y = Math.max(0, frameY - 10);
-        moveFrame.add(addRenderableWidget(new SmallButton(frameX, y, "x", p -> revertPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")),.5f, 0f, 1, .5f, .5f)));
-        moveFrame.add(addRenderableWidget(new SmallButton(frameX+11, y,"↺", p -> defaultPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")), .5f, 1f, 1f)));
-        Button b = addRenderableWidget(new SmallButton(frameX+22, y,"◄", p -> updatePos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.umove")), 1, 1, .5f));
+    private void initDragButtons(int x, int y, int oX, int oY) {
+        moveFrame.add(addRenderableWidget(new SmallButton(x, y, "x", p -> revertPos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")), .5f, 0f, 1, .5f, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(x+11, y, "↺", p -> defaultPos(true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")),  1, .5f, .5f)));
+        Button b = addRenderableWidget(new SmallButton(x+22, y, "◄", p -> updatePos(true, true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.umove")), 1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        b = addRenderableWidget(new SmallButton(frameX+33, y, "►", p -> updatePos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rmove")),1, 1, .5f));
+        b = addRenderableWidget(new SmallButton(x+33, y, "►", p -> updatePos(false, true), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rmove")), 1, 1, .5f));
         b.active = false;
         moveFrame.add(b);
-        moveFrame.add(addRenderableWidget(new SmallButton(frameX+44, y,"✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(x+44, y, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
+        moveFrame.add(addRenderableWidget(new SmallButton(x+55, y, getCurrentScale(true), p -> toggleScale(true, true), p -> toggleScale(true, false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.scale")), 0f, 1f, .25f, .75f, 1f)));
+
+        //Other members
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(oX, oY, "x", p -> revertPos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")), .5f, 0f, 1, .5f, .5f)));
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+11, oY, "↺", p -> defaultPos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.dclose")), .5f, 1f, 1f)));
+        b = addRenderableWidget(new SmallButton(oX+22, oY, "◄", p -> updatePos(true, false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.umove")), 1, 1, .5f));
+        b.active = false;
+        partyMoveFrame.add(b);
+        b = addRenderableWidget(new SmallButton(oX+33, oY, "►", p -> updatePos(false, false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rmove")), 1, 1, .5f));
+        b.active = false;
+        partyMoveFrame.add(b);
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+44, oY, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+55, oY, partyDisplay + "", p -> cyclePartyDisplay(true), p -> cyclePartyDisplay(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.pcycle")), .5f, 1f, .75f, .75f, .75f)));
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(x+66, y, getCurrentScale(false), p -> toggleScale(false, true), p -> toggleScale(false, false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.scale")), 0f, 1f, .25f, .75f, 1f)));
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(x+66, y, "▫", p -> toggleLock(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.lock")), 0f, 1f, .25f, .75f, 1f)));
+    }
+
+    private void toggleLock() {
+        enableBoundaries = !enableBoundaries;
+        if (enableBoundaries) {
+            partyMoveFrame.get(7).setMessage(new TextComponent("▪"));
+            updateLimits();
+        } else {
+            partyMoveFrame.get(7).setMessage(new TextComponent("▫"));
+        }
+    }
+
+    private void toggleScale(boolean selfFrame, boolean increasing) {
+        float scale = selfFrame ? playerScale : partyScale;
+        if (!selfFrame && increasing) {
+            enableBoundaries = false;
+            partyMoveFrame.get(7).setMessage(new TextComponent("▫"));
+        }
+
+
+        if (selfFrame) {
+            if (increasing) {
+                if (scale <= .25f) playerScale =  .5f;
+                else if (scale <= .5f) playerScale = 1f;
+                else if (scale <= 1f) playerScale =  2f;
+            } else {
+                if (scale <= .5f) playerScale = .25f;
+                else if (scale <= 1f) playerScale =  .5f;
+                else if (scale <= 2f) playerScale =  1f;
+            }
+
+
+            moveFrame.get(5).setMessage(new TextComponent(getCurrentScale(true)));
+                selfFrameX = (int) Mth.clamp(selfFrameX * scale / playerScale, 0, width / playerScale - frameEleW);
+                selfFrameY = (int) Mth.clamp(selfFrameY * scale / playerScale, 0, height/ playerScale - frameEleH);
+
+            index = 0;
+            fX.clear();
+            fY.clear();
+            fX.add(selfFrameX);
+            fY.add(selfFrameY);
+            moveFrame.get(2).active = false;
+            moveFrame.get(3).active = false;
+            refreshDragButtons(true);
+        } else {
+            if (increasing) {
+                if (scale <= .25f) partyScale =  .5f;
+                else if (scale <= .5f) partyScale = 1f;
+                else if (scale <= 1f) partyScale =  2f;
+            } else {
+                if (scale <= .5f) partyScale = .25f;
+                else if (scale <= 1f) partyScale =  .5f;
+                else if (scale <= 2f) partyScale =  1f;
+            }
+            partyMoveFrame.get(6).setMessage(new TextComponent(getCurrentScale(false)));
+            partyFrameX *= scale / partyScale;
+            partyFrameY *= scale / partyScale;
+            updateLimits();
+            indexP = 0;
+            fXP.clear();
+            fYP.clear();
+            fXP.add(partyFrameX);
+            fYP.add(partyFrameY);
+            partyMoveFrame.get(2).active = false;
+            partyMoveFrame.get(3).active = false;
+            refreshDragButtons(false);
+        }
+    }
+
+    private String getCurrentScale(boolean selfFrame) {
+        float scale = selfFrame ? playerScale : partyScale;
+        if (scale <= .25f) return "¼";
+        else if (scale <= .5f) return "½";
+        else if (scale <= 1f) return "1";
+        else return "2";
+    }
+
+    private void cyclePartyDisplay(boolean forward) {
+        boolean flag = false; //Only update party display if it changes.
+        if (forward) {
+            if (partyDisplay < 5 || partyDisplay < (playerOrderedList != null ? playerOrderedList.size() - 1 : 5)) {
+
+                partyDisplay++;
+                flag = true;
+                enableBoundaries = false;
+                partyMoveFrame.get(7).setMessage(new TextComponent("▫"));
+            }
+
+        } else {
+            if (partyDisplay > 1) {
+                flag = true;
+                partyDisplay--;
+            }
+        }
+        if (!flag) return;
+        partyMoveFrame.get(5).setMessage(new TextComponent(partyDisplay + ""));
+        updateLimits();
+        indexP = 0;
+        fXP.clear();
+        fYP.clear();
+        fXP.add(partyFrameX);
+        fYP.add(partyFrameY);
+        partyMoveFrame.get(2).active = false;
+        partyMoveFrame.get(3).active = false;
+
 
     }
 
     private void acceptPos() {
-        frameX = fX.get(index);
-        frameY = fY.get(index);
+        //TODO: One universal button near center of screen?
+        selfFrameX = fX.get(index);
+        selfFrameY = fY.get(index);
+        partyFrameX = fXP.get(indexP);
+        partyFrameY = fYP.get(indexP);
+        ClientConfigData.xPos.set(selfFrameX);
+        ClientConfigData.xPos.save();
+        ClientConfigData.yPos.set(selfFrameY);
+        ClientConfigData.yPos.save();
+        ClientConfigData.xPosParty.set(partyFrameX);
+        ClientConfigData.xPosParty.save();
+        ClientConfigData.yPosParty.set(partyFrameY);
+        ClientConfigData.yPosParty.save();
         index = 0;
+        indexP = 0;
         fX.clear();
         fY.clear();
+        fXP.clear();
+        fYP.clear();
         refreshAllButtons();
         doTask(1);
+
     }
 
     private void refreshAllButtons() {
         clearWidgets();
         moveParty.clear();
         moveFrame.clear();
+        partyMoveFrame.clear();
         menu.clear();
         init();
         doTask(1);
     }
 
-    private void updatePos(boolean b) {
-        if (b) { //undo
-            index--;
-        } else { //redo
-            index++;
+    private void updatePos(boolean back, boolean selfFrame) {
+        if (selfFrame) {
+            if (back) { //undo
+                index--;
+            } else { //redo
+                index++;
+            }
+            selfFrameX = fX.get(index);
+            selfFrameY = fY.get(index);
+            refreshDragButtons(true);
+            checkIndex(true); //TODO: Add non-self frame.
+        } else {
+            if (back) { //undo
+                indexP--;
+            } else { //redo
+                indexP++;
+            }
+            partyFrameX = fXP.get(indexP);
+            partyFrameY = fYP.get(indexP);
+            refreshDragButtons(false);
+            checkIndex(false);
         }
 
-        frameX = fX.get(index);
-        frameY = fY.get(index);
-        refreshDragButtons();
-        checkIndex();
+
+
     }
 
-    private void checkIndex() {
-        if (index == 0)
-            moveFrame.get(2).active = false;
-        else if (index <= fX.size())
-            moveFrame.get(2).active = true;
+    private void checkIndex(boolean selfFrame) {
+        if (selfFrame) {
+            if (index == 0)
+                moveFrame.get(2).active = false;
+            else if (index <= fX.size())
+                moveFrame.get(2).active = true;
 
-        if (index >= fX.size()-1)
-            moveFrame.get(3).active = false;
-        else if (index >= 0)
-            moveFrame.get(3).active = true;
+            if (index >= fX.size()-1)
+                moveFrame.get(3).active = false;
+            else if (index >= 0)
+                moveFrame.get(3).active = true;
+        } else {
+            if (indexP == 0)
+                partyMoveFrame.get(2).active = false;
+            else if (indexP <= fXP.size())
+                partyMoveFrame.get(2).active = true;
+
+            if (indexP >= fXP.size()-1)
+                partyMoveFrame.get(3).active = false;
+            else if (indexP >= 0)
+                partyMoveFrame.get(3).active = true;
+        }
+
     }
 
-    private void revertPos() {
-        frameX = revertX;
-        frameY = revertY;
-        fX.clear();
-        fY.clear();
-        refreshDragButtons();
+    private void revertPos(boolean selfFrame) {
+        if (selfFrame) {
+            selfFrameX = revertX;
+            selfFrameY = revertY;
+            fX.clear();
+            fY.clear();
+
+        } else {
+            partyFrameX = revertXP;
+            partyFrameY = revertYP;
+            fXP.clear();
+            fYP.clear();
+        }
+        refreshDragButtons(selfFrame);
         doTask(1);
     }
 
-    private void defaultPos() {
-        RenderItem.defaultPos();
-        fX.clear();
-        fY.clear();
+    private void defaultPos(boolean selfFrame) {
+        if (selfFrame) {
+            selfFrameX = 16;
+            selfFrameY = 16;
+            ClientConfigData.xPos.set(16);
+            ClientConfigData.xPos.save();
+            ClientConfigData.yPos.set(16);
+            ClientConfigData.yPos.save();
+            fX.clear();
+            fY.clear();
+
+        } else {
+            partyFrameX = 16;
+            partyFrameY = 256;
+            ClientConfigData.xPosParty.set(16);
+            ClientConfigData.xPosParty.save();
+            ClientConfigData.yPosParty.set(256);
+            ClientConfigData.yPosParty.save();
+            fXP.clear();
+            fYP.clear();
+        }
+
         refreshAllButtons();
         doTask(1);
+
     }
 
     private void move(int x, int y) {
+        if (draggedItem == 1) {
+            x /= playerScale;
+            y /= playerScale;
+            if (oldMX == null) {
+                oldMX = x;
+                oldMY = y;
+                oldX = selfFrameX;
+                oldY = selfFrameY;
+            }
 
-        if (oldMX == null) {
-            oldMX = x;
-            oldMY = y;
-            oldX = frameX;
-            oldY = frameY;
-        }
+            checkLimits(x, y, true);
+            refreshDragButtons(true);
+        } else if (draggedItem == 2) {
+            x /= partyScale;
+            y /= partyScale;
+            if (oldMXP == null) {
+                oldMXP = x;
+                oldMYP = y;
+                oldXP = partyFrameX;
+                oldYP = partyFrameY;
+            }
 
-        checkLimits(x, y);
-        refreshDragButtons();
-    }
-
-    private void checkLimits(int x, int y) {
-        int tempFrame = x - oldMX + oldX;
-        if (tempFrame < 0) {
-            frameX = 0;
-        } else if (tempFrame + rightLim > this.width) {
-            frameX = this.width - rightLim;
-        } else {
-            frameX = x - oldMX + oldX;
-        }
-
-        tempFrame = y - oldMY + oldY;
-        if (tempFrame < 0) {
-            frameY = 0;
-        } else if (tempFrame + botLim > this.height) {
-            frameY = this.height - botLim;
-        } else {
-            frameY = y - oldMY + oldY;
+            checkLimits(x, y, false);
+            refreshDragButtons(false);
         }
 
     }
 
+    private void checkLimits(int x, int y, boolean selfFrame) {
+        if (selfFrame) {
+            int tempFrame = x - oldMX + oldX;
+            if (tempFrame < 0) {
+                selfFrameX = 0;
+            } else if (tempFrame + frameEleW > this.width/ playerScale) {
+                selfFrameX = (int) (this.width/ playerScale - frameEleW);
+            } else {
+                selfFrameX = x - oldMX + oldX;
+            }
 
-    private void refreshDragButtons() {
-        int y = Math.max(0, frameY - 10);
-        for (int i = 0; i < moveFrame.size(); i++) {
-            moveFrame.get(i).x = frameX+(i*11);
-            moveFrame.get(i).y = y;
+            tempFrame = y - oldMY + oldY;
+            if (tempFrame < 0) {
+                selfFrameY = 0;
+            } else if (tempFrame + frameEleH > this.height/ playerScale) {
+                selfFrameY = (int) (this.height/ playerScale - frameEleH);
+            } else {
+                selfFrameY = y - oldMY + oldY;
+            }
+        } else {
+            if (!enableBoundaries) {
+                partyFrameX = x - oldMXP + oldXP;
+                partyFrameY = y - oldMYP + oldYP;
+                outOfBounds = partyFrameX > width / partyScale - rightLim || partyFrameY > height/ partyScale - botLim || partyFrameX < 0 || partyFrameY < 0;
+                return;
+            }
+            int tempFrame = x - oldMXP + oldXP;
+            if (tempFrame < 0) {
+                partyFrameX = 0;
+            } else if (tempFrame + rightLim > this.width/ partyScale) {
+                partyFrameX = (int) (this.width/ partyScale - rightLim);
+            } else {
+                partyFrameX = x - oldMXP + oldXP;
+            }
+
+            tempFrame = y - oldMYP + oldYP;
+            if (tempFrame < 0) {
+                partyFrameY = 0;
+            } else if (tempFrame + botLim > this.height/ partyScale) {
+                partyFrameY = (int) (this.height/ partyScale - botLim);
+            } else {
+                partyFrameY = y - oldMYP + oldYP;
+            }
         }
+
+    }
+
+
+    private void refreshDragButtons(boolean selfFrame) {
+        if (selfFrame) {
+            int x = (int) (selfFrameX* playerScale);
+            int y = (int) Math.max(0, selfFrameY* playerScale - 10);
+            for (int i = 0; i < moveFrame.size(); i++) {
+                moveFrame.get(i).x = x+(i*11);
+                moveFrame.get(i).y = y;
+            }
+        } else {
+            int x = (int) (partyFrameX * partyScale);
+            int y = (int) Math.max(0, partyFrameY * partyScale - 10);
+            for (int i = 0; i < partyMoveFrame.size(); i++) {
+                partyMoveFrame.get(i).x = x+(i*11);
+                partyMoveFrame.get(i).y = y;
+            }
+        }
+
     }
 
     private void save() {
-        oldMY = null;
-        oldMX = null;
-        if (fX.get(index) == frameX && fY.get(index) == frameY)
-            return;
+        if (draggedItem == 1) {
+            draggedItem = -1;
+            oldMY = null;
+            oldMX = null;
+            if (index >= fX.size() || (fX.get(index) == selfFrameX && fY.get(index) == selfFrameY))
+                return;
 
-        index++;
-        if (index != fX.size()) {
-            fX = new ArrayList<>(fX.subList(0, index));
-            fY = new ArrayList<>(fY.subList(0, index));
+            index++;
+            if (index != fX.size()) {
+                fX = new ArrayList<>(fX.subList(0, index));
+                fY = new ArrayList<>(fY.subList(0, index));
+            }
+            fX.add(selfFrameX);
+            fY.add(selfFrameY);
+            checkIndex(true);
+        } else {
+            draggedItem = -1;
+            oldMYP = null;
+            oldMXP = null;
+            if (indexP >= fXP.size() || (fXP.get(indexP) == partyFrameX && fYP.get(indexP) == partyFrameY))
+                return;
+
+            indexP++;
+            if (indexP != fXP.size()) {
+                fXP = new ArrayList<>(fXP.subList(0, indexP));
+                fYP = new ArrayList<>(fYP.subList(0, indexP));
+            }
+            fXP.add(partyFrameX);
+            fYP.add(partyFrameY);
+            checkIndex(false);
         }
-        fX.add(frameX);
-        fY.add(frameY);
-        checkIndex();
 
     }
 
@@ -319,34 +571,26 @@ public class HoverScreen extends Screen {
         isMoving = false;
         notEditing = true;
         settingsButton.visible = false;
+        partySettingsButton.visible = false;
         goBackButton.visible = false;
         presetButton.visible = false;
         menu.forEach(b -> b.visible = false);
         moveParty.forEach(b -> b.visible = false);
         moveFrame.forEach(b -> b.visible = false);
+        partyMoveFrame.forEach(b -> b.visible = false);
 
         switch (task) {
             case 0 -> {
                 //Standard screen
                 presetButton.visible = true;
                 settingsButton.visible = true;
+                partySettingsButton.visible = true;
             }
 
             case 1 -> //Settings screen
             {
                 menu.forEach(b -> b.visible = true);
-                if (renderSelfFrame) {
-                    menu.get(1).active = true;
-                    menu.get(2).active = true;
-                } else {
-                    if (ClientPlayerData.playerList.size() > 1) {
-                        menu.get(1).active = true;
-                        menu.get(2).active = true;
-                    } else {
-                        menu.get(1).active = false;
-                        menu.get(2).active = false;
-                    }
-                }
+                menu.get(1).active = false;
                 notEditing = false;
             }
 
@@ -359,21 +603,23 @@ public class HoverScreen extends Screen {
             case 3 -> {
                 isMoving = true;
                 moveFrame.forEach(b -> b.visible = true);
-                revertX = frameX;
-                revertY = frameY;
+                partyMoveFrame.forEach(b -> b.visible = true);
+                revertX = selfFrameX;
+                revertY = selfFrameY;
+                revertXP = partyFrameX;
+                revertYP = partyFrameY;
                 fX.clear();
                 fY.clear();
+                fXP.clear();
+                fYP.clear();
                 index = 0;
+                indexP = 0;
                 fX.add(revertX);
                 fY.add(revertY);
+                fXP.add(revertXP);
+                fYP.add(revertYP);
                 notEditing = false;
-                if (renderSelfFrame) {
-                    botLim = frameEleH + framePosH*(ClientPlayerData.playerList.size() - 1);
-                    rightLim = frameEleW + framePosW*(ClientPlayerData.playerList.size() - 1);
-                } else {
-                    botLim = frameEleH + framePosH*(Math.min(ClientPlayerData.playerList.size() - 2, 1));
-                    rightLim = frameEleW + framePosW*(Math.min(ClientPlayerData.playerList.size() - 2, 1));
-                }
+                updateLimits();
             }
             case 4 -> {
                 //Still technically active?
@@ -386,18 +632,44 @@ public class HoverScreen extends Screen {
         }
     }
 
+    private void updateLimits() {
+        botLim = (frameEleH + framePosH*(partyDisplay-1));
+        rightLim = (frameEleW + framePosW*(partyDisplay-1));
+        if (enableBoundaries) {
+            partyFrameX = (int) Mth.clamp(partyFrameX, 0, width / partyScale - rightLim);
+            partyFrameY = (int) Mth.clamp(partyFrameY, 0, height/ partyScale - botLim);
+        }
+
+        outOfBounds = partyFrameX > width / partyScale - rightLim || partyFrameY > height/ partyScale - botLim || partyFrameX < 0 || partyFrameY < 0;
+
+        refreshDragButtons(false);
+    }
+
+
     public void render(PoseStack poseStack, int mX, int mY, float partialTick) {
+
+        //TODO: Unbind options from the party list.
         super.render(poseStack, mX, mY, partialTick);
 
         checkFrameRender(poseStack);
 
-        if (isDragging()) {
+        if (isDragging()) { //TODO: add boundary checks to know what element was being dragged. Maybe store active element on click and check if element != null or -1?
+            if (draggedItem == -1) {
+                calculateItem(mX, mY);
+            }
             move(mX, mY);
             return;
-        } else if (oldMX != null) {
-            save();
-            return;
+        } else {
+            if (draggedItem == 0) {
+                draggedItem = -1;
+            } else if (draggedItem > 0) {
+                save();
+                draggedItem = -1;
+                return;
+            }
+
         }
+        if (isMoving || isArranging) return;
         Style style = getClickedText(mX, mY);
         if (style != null && style.getHoverEvent() != null) {
             this.renderComponentHoverEffect(poseStack, style, mX, mY);
@@ -410,15 +682,68 @@ public class HoverScreen extends Screen {
         });
     }
 
+    private void calculateItem(int mouseXR, int mouseYR) {
+
+        int mouseX = (int) (mouseXR /playerScale);
+        int mouseY = (int) (mouseYR / playerScale);
+        if (mouseX < selfFrameX || mouseY < selfFrameY) {
+            calculateParty(mouseXR, mouseYR);
+            return;
+        }
+
+        mouseX = mouseX - selfFrameX;
+        mouseY = mouseY - selfFrameY;
+        if (mouseX < frameEleW && mouseY < frameEleH) {
+            draggedItem = 1;
+            return;
+        }
+
+        calculateParty(mouseXR, mouseYR);
+
+    }
+
+    private void calculateParty(int mouseX, int mouseY) {
+        int partyMouseX = mouseX;
+        int partyMouseY = mouseY;
+        partyMouseX /= partyScale;
+        partyMouseY /= partyScale;
+        partyMouseX -= partyFrameX;
+        partyMouseY -= partyFrameY;
+
+
+        for (int i = 0; i < partyDisplay; i++) {
+            if (partyMouseX < 0 || partyMouseY < 0) return;
+            if (partyMouseX < frameEleW && partyMouseY < frameEleH) {
+                draggedItem = 2;
+                return;
+            }
+            partyMouseX -= framePosW;
+            partyMouseY -= framePosH;
+        }
+        draggedItem = 0;
+    }
+
     private void checkFrameRender(PoseStack poseStack) {
         if (isArranging) {
-            renderClickableArea(poseStack);
+            //TODO: Implement for party members.
+            //renderClickableArea(poseStack);
             return;
         }
         if (isMoving) {
-            renderFrame(poseStack);
-            renderFrameOutline(poseStack);
+            if (renderSelfFrame) {
+                renderSelfFrame(poseStack);
+                if (draggedItem == 1)
+                    renderSelfFrameOutline(poseStack);
+            }
+            renderPartyFrame(poseStack, outOfBounds);
+            if (draggedItem == 2) {
+                renderPartyFrameOutline(poseStack, outOfBounds);
+            }
         }
+    }
+
+    public static int getPartyDisplay() {
+        return partyDisplay;
     }
 
     @Nullable
@@ -490,6 +815,10 @@ public class HoverScreen extends Screen {
 
 
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+        if (pKeyCode == 341 || pKeyCode == 345) {
+            showInfo = !showInfo;
+            return true;
+        }
         if (pKeyCode != key) {
             //TODO: Fix when you press escape.
 
@@ -500,13 +829,24 @@ public class HoverScreen extends Screen {
 
     @Override
     public void onClose() {
-        ColorUtils.colorCycle = false;
+        ColorAPI.colorCycle = false;
         notEditing = false;
         if (isMoving) {
-            revertPos();
+            revertPos(true);
+            revertPos(false);
             isMoving = false;
         }
+        draggedItem = -1;
         isArranging = false;
+        ClientConfigData.xPos.set(selfFrameX);
+        ClientConfigData.xPos.save();
+        ClientConfigData.yPos.set(selfFrameY);
+        ClientConfigData.yPos.save();
+        ClientConfigData.xPosParty.set(partyFrameX);
+        ClientConfigData.xPosParty.save();
+        ClientConfigData.yPosParty.set(partyFrameY);
+        ClientConfigData.yPosParty.save();
+        showInfo = false;
         super.onClose();
     }
 

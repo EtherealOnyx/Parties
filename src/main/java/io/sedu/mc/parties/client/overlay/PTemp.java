@@ -2,9 +2,10 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
+
 import io.sedu.mc.parties.api.homeostatic.HCompatManager;
-import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
+import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
+import io.sedu.mc.parties.api.mod.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
@@ -48,9 +49,9 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
     }
 
     @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (!id.isSpectator) {
-            render.render(i,id,gui,poseStack,partialTicks);
+            render.render(0,id,gui,poseStack,partialTicks);
         }
 
     }

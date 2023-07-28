@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
-import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -64,14 +64,14 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.isOnline)
-            renderSelf(i, id, gui, poseStack, partialTicks);
+        if (id.isOnline && !id.isSpectator)
+            renderBar.render(i, id, gui, poseStack, partialTicks);
     }
 
     @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isSpectator) return;
-        renderBar.render(i, id, gui, poseStack, partialTicks);
+        renderBar.render(0, id, gui, poseStack, partialTicks);
     }
 
     protected abstract void renderSelfBar(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack,
@@ -114,11 +114,11 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
     }
 
     public int tXI(int pOffset) {
-        return textAttached ? attachedXIcon(pOffset)  : (int) ((frameX + textX + wOffset(pOffset))/scale);
+        return textAttached ? attachedXIcon(pOffset)  : (int) (((pOffset == 0 ? selfFrameX : partyFrameX) + textX + wOffset(pOffset))/scale);
     }
 
     public int tYI(int pOffset) {
-        return textAttached ? attachedYIcon(pOffset)  : (int) ((frameY + textY + hOffset(pOffset))/scale);
+        return textAttached ? attachedYIcon(pOffset)  : (int) (((pOffset == 0 ? selfFrameY : partyFrameY)  + textY + hOffset(pOffset))/scale);
     }
 
 
@@ -150,14 +150,14 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
 
     protected void setMainColors() {
         float hue = this.hue/100f;
-        bColorTop = ColorUtils.HSBtoRGB(hue, .5f, .25f);
-        bColorBot = ColorUtils.HSBtoRGB(hue, .25f, .5f);
-        color = ColorUtils.HSBtoRGB(hue, .2f, 1f);
-        deadColor = ColorUtils.HSBtoRGB(hue, .25f, .75f);
-        colorTop = ColorUtils.HSBtoRGB(hue, .8f, .77f);
-        colorBot = ColorUtils.HSBtoRGB(hue, .88f, .42f);
-        colorTopMissing = ColorUtils.HSBtoRGB(hue, .97f, .27f);
-        colorBotMissing = ColorUtils.HSBtoRGB(hue, .91f, .38f);
+        bColorTop = ColorAPI.HSBtoRGB(hue, .5f, .25f);
+        bColorBot = ColorAPI.HSBtoRGB(hue, .25f, .5f);
+        color = ColorAPI.HSBtoRGB(hue, .2f, 1f);
+        deadColor = ColorAPI.HSBtoRGB(hue, .25f, .75f);
+        colorTop = ColorAPI.HSBtoRGB(hue, .8f, .77f);
+        colorBot = ColorAPI.HSBtoRGB(hue, .88f, .42f);
+        colorTopMissing = ColorAPI.HSBtoRGB(hue, .97f, .27f);
+        colorBotMissing = ColorAPI.HSBtoRGB(hue, .91f, .38f);
     }
 
     @Override

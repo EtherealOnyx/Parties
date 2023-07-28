@@ -48,10 +48,10 @@ public class POffline extends RenderIconTextItem {
     }
 
     @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isSpectator) {
             if (textEnabled)
-                text(tX(i), tY(i), gui, poseStack, "§oWatching..", color);
+                text(tX(0), tY(0), gui, poseStack, "§oWatching..", color);
         }
     }
 

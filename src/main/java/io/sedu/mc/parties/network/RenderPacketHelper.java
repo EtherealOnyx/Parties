@@ -7,7 +7,7 @@ import net.minecraft.client.Minecraft;
 
 import java.util.UUID;
 
-import static io.sedu.mc.parties.data.Util.getClientPlayer;
+import static io.sedu.mc.parties.api.helper.PlayerAPI.getClientPlayer;
 
 
 public class RenderPacketHelper {
@@ -157,5 +157,38 @@ public class RenderPacketHelper {
     public static void setExtraStam(UUID player, Integer data) {
         Parties.LOGGER.debug("Setting extra stamina...");
         getClientPlayer(player, p -> p.setExtraStam(data));
+    }
+
+    public static void setQuench(UUID player, Integer data) {
+        Parties.LOGGER.debug("Setting quench level...");
+        getClientPlayer(player, p -> p.setQuench(data));
+    }
+
+    public static void setMaxHunger(UUID player, Float data) {
+        getClientPlayer(player, p -> p.setMaxHunger(data));
+    }
+
+    public static void setSaturation(UUID player, float data) {
+        getClientPlayer(player, p -> p.setSaturation(data));
+    }
+
+    public static void setOrigin(UUID player, String data) {
+        getClientPlayer(player, p -> p.setOrigin(data));
+    }
+
+    public static void setManaI(UUID player, Integer data) {
+        getClientPlayer(player, p -> p.setManaI(data));
+    }
+
+    public static void setMaxManaI(UUID player, Integer data) {
+        getClientPlayer(player, p -> p.setMaxManaI(data));
+    }
+
+    public static void startCast(UUID player, Integer spellId, Integer castTime) {
+        getClientPlayer(player, playerData -> playerData.initSpell(spellId, castTime));
+    }
+
+    public static void endCast(UUID player) {
+        getClientPlayer(player, ClientPlayerData::finishSpell);
     }
 }

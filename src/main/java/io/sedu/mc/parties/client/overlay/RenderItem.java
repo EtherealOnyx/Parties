@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.client.overlay;
 
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
@@ -34,7 +35,6 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static io.sedu.mc.parties.client.overlay.RenderSelfItem.selfIndex;
 import static net.minecraftforge.client.gui.ForgeIngameGui.HOTBAR_ELEMENT;
 
 public abstract class RenderItem {
@@ -49,8 +49,10 @@ public abstract class RenderItem {
     public static ArrayList<String> parser = new ArrayList<>();
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
 
-    public static int frameX = 16;
-    public static int frameY = 16;
+    public static int selfFrameX = 16;
+    public static int selfFrameY = 16;
+    public static int partyFrameX = 16;
+    public static int partyFrameY = 128;
     public static int framePosW = 0;
     public static int framePosH = 0;
     public static int frameEleH = 56;
@@ -102,43 +104,48 @@ public abstract class RenderItem {
         if (ClientConfigData.renderSelfFrame.get()) {
             Parties.LOGGER.debug("Enabling self rendering in settings...");
             renderSelfFrame = true;
-            itemRender = (gui, poseStack, partialTicks) -> ClientPlayerData.forEachOrdered((i, id) -> {
-                if (RenderSelfItem.isSelf(i)) {
+            itemRender = (gui, poseStack, partialTicks) -> {
+                ClientPlayerData.forSelf((id) -> {
+                    poseStack.pushPose();
+                    poseStack.scale(playerScale, playerScale, 1f);
                     for (RenderSelfItem item : selfItems) {
                         item.itemStart(poseStack);
-                        item.renderSelf(i, id, gui, poseStack, partialTicks);
+                        item.renderSelf(id, gui, poseStack, partialTicks);
                         item.itemEnd(poseStack);
                     }
-                } else {
+                    for (RenderItem item : memberItems) {
+                        item.itemStart(poseStack);
+                        item.renderMember(0, id, gui, poseStack, partialTicks);
+                        item.itemEnd(poseStack);
+                    }
+                    poseStack.popPose();
+                });
+                //TODO: Check if this is fine to have outside.
+                poseStack.pushPose();
+                poseStack.scale(partyScale, partyScale, 1f);
+                ClientPlayerData.forOthersOrdered((i, id) -> {
+                    //Render other players.
                     for (RenderSelfItem item : selfItems) {
                         item.itemStart(poseStack);
                         item.renderMember(i, id, gui, poseStack, partialTicks);
                         item.itemEnd(poseStack);
                     }
-                }
-                for (RenderItem item : memberItems) {
-                    item.itemStart(poseStack);
-                    item.renderMember(i, id, gui, poseStack, partialTicks);
-                    item.itemEnd(poseStack);
-                }
-            });
-
-        } else {
-            Parties.LOGGER.debug("Disabling self rendering in settings...");
-            renderSelfFrame = false;
-            itemRender = (gui, poseStack, partialTicks) -> ClientPlayerData.forEachWithoutSelf((i, id) -> {
-                for (RenderSelfItem item : selfItems) {
-                    item.itemStart(poseStack);
-                    item.renderMember(i, id, gui, poseStack, partialTicks);
-                    item.itemEnd(poseStack);
-                }
-                for (RenderItem item : memberItems) {
-                    item.itemStart(poseStack);
-                    item.renderMember(i, id, gui, poseStack, partialTicks);
-                    item.itemEnd(poseStack);
-                }
-            });
+                    for (RenderItem item : memberItems) {
+                        item.itemStart(poseStack);
+                        item.renderMember(i, id, gui, poseStack, partialTicks);
+                        item.itemEnd(poseStack);
+                    }
+                });
+                poseStack.popPose();
+            };
         }
+    }
+
+    public static void updateFramePos() {
+        Window w = Minecraft.getInstance().getWindow();
+        //TODO: include other frame.
+        selfFrameX = Math.min(ClientConfigData.xPos.get(), w.getScreenWidth() - frameEleW);
+        selfFrameY = Math.min(ClientConfigData.yPos.get(), w.getScreenHeight() - frameEleH);
     }
 
     public boolean isEnabled() {
@@ -207,6 +214,7 @@ public abstract class RenderItem {
         return null;
     }
 
+    //TODO: For all frameX and frameY references, check if index == 0 ? frameX : otherFrameX, where otherFrameX is party member frame X position.
 
     public static void resetPos() {
         currentY = 0;
@@ -215,43 +223,44 @@ public abstract class RenderItem {
     //abstract void resetElement();
 
     int hOffset(int pOffset) {
-        return pOffset*framePosH;
+        return pOffset == 0 ? 0 : (pOffset-1)*framePosH;
     }
 
     int wOffset(int pOffset) {
-        return pOffset*framePosW;
+        return pOffset == 0 ? 0 : (pOffset-1)*framePosW;
     }
 
     public int x(int pOffset) {
-        return (int) ((frameX + x + wOffset(pOffset))/scale);
+        return (int) ((pOffset == 0 ? selfFrameX + x : partyFrameX + x + framePosW*(pOffset-1))/scale);
     }
 
     public int y(int pOffset) {
-        return (int) ((frameY + y + hOffset(pOffset))/scale);
+        return (int) ((pOffset == 0 ? selfFrameY + y: partyFrameY + y + framePosH*(pOffset-1))/scale);
     }
 
+
     public int xNormal(int pOffset) {
-        return frameX + x + wOffset(pOffset);
+        return pOffset == 0 ? selfFrameX + x: partyFrameX + x + framePosW*(pOffset-1);
     }
 
     public int yNormal(int pOffset) {
-        return frameY + y + hOffset(pOffset);
+        return pOffset == 0 ? selfFrameY + y: partyFrameY + y + framePosH*(pOffset-1);
     }
 
     public int l(int pOffset) {
-        return x+frameX + wOffset(pOffset);
+        return pOffset == 0 ? x + selfFrameX: x + partyFrameX + framePosW*(pOffset - 1);
     }
 
     public int r(int pOffset) {
-        return x+frameX  + width + wOffset(pOffset);
+        return pOffset == 0 ? x + selfFrameX + width : x + partyFrameX + framePosW*(pOffset - 1) + width;
     }
 
     public int t(int pOffset) {
-        return y+frameY + hOffset(pOffset);
+        return pOffset == 0 ? y + selfFrameY : y + partyFrameY + framePosH*(pOffset - 1);
     }
 
     public int b(int pOffset) {
-        return y+frameY + height + hOffset(pOffset);
+        return pOffset == 0 ? y + selfFrameY + height : y + partyFrameY + framePosH*(pOffset - 1) + height;
     }
 
     abstract void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
@@ -282,6 +291,9 @@ public abstract class RenderItem {
         this.name = name;
     }
 
+    //TODO: Make a client config for this option.
+    public static float playerScale = 1f;
+    public static float partyScale = .5f;
     public static void register() {
         IIngameOverlay overlay = (gui, poseStack, partialTicks, width, height) -> {
             if (ClientPlayerData.playerOrderedList.size() == 0) return;
@@ -351,6 +363,15 @@ public abstract class RenderItem {
 
     static void setColor(float r, float g, float b, float a) {
         RenderSystem.setShaderColor(r, g, b, a);
+    }
+
+    static void setColor(int color) {
+        RenderSystem.setShaderColor(
+                ((color >> 16) & 0xff) / 255.0f,
+                ((color >>  8) & 0xff) / 255.0f,
+                ((color      ) & 0xff) / 255.0f,
+                1f
+        );
     }
 
     void rect(int i, PoseStack pose, int z, int offset, int startColor, int endColor, int alpha) {
@@ -556,7 +577,8 @@ public abstract class RenderItem {
     }
 
     public ItemBound getRenderItemBound() {
-        return new ItemBound(frameX + x, frameY + y, (int) (width * scale), (int) (height * scale));
+        //Render item bound will always target the self frame.
+        return new ItemBound(selfFrameX + x, selfFrameY + y, (int) (width * scale), (int) (height * scale));
     }
 
     protected ResourceLocation getItemBackground() {
@@ -581,12 +603,12 @@ public abstract class RenderItem {
 
     public SmallBound setXPos(int data) {
         this.x = data;
-        return new SmallBound(0, frameX + x);
+        return new SmallBound(0, selfFrameX + x);
     }
 
     public SmallBound setYPos(int data) {
         this.y = data;
-        return new SmallBound(1, frameY + y);
+        return new SmallBound(1, selfFrameY + y);
     }
 
     public SmallBound setZPos(int data) {
@@ -662,12 +684,12 @@ public abstract class RenderItem {
 
 
 
-    static class ColorComponent {
+    public static class ColorComponent {
         static final ColorComponent EMPTY = new ColorComponent(new TextComponent(""), 0);
         MutableComponent c;
         int color;
 
-        ColorComponent(MutableComponent c, int color) {
+        public ColorComponent(MutableComponent c, int color) {
             this.color = color;
             this.c = c;
         }
@@ -742,8 +764,6 @@ public abstract class RenderItem {
         updater.put("totalmax", (n,d) -> ((PEffects) n).setMaxSize((int) d));
 
         updater.put("danim", (n,d) -> {DimAnim.animActive = (boolean)d; return null;});
-        updater.put("gen_x", (n,d) -> {frameX = (int) d; return null;});
-        updater.put("gen_y", (n,d) -> {frameY = (int) d; return null;});
         updater.put("gen_w", (n,d) -> {frameEleW = (int) d; return null;});
         updater.put("gen_h", (n,d) -> {frameEleH = (int) d; return null;});
         updater.put("gen_pw", (n,d) -> {framePosW = (int) d; return null;});
@@ -755,6 +775,7 @@ public abstract class RenderItem {
 
         updater.put("htype", (n, d) -> {PHead.renderType = (int)d; return null;});
         updater.put("bleed", (n, d) -> {PHead.renderBleed = (boolean)d; return null;});
+        updater.put("thalfsize", (n, d) -> {((PCastBar)n).textHalfSize = (boolean)d; return null;});
     }
 
     public interface Getter {
@@ -815,8 +836,6 @@ public abstract class RenderItem {
         getter.put("totalmax", (n) -> ((PEffects) n).maxSize);
 
         getter.put("danim", (n) -> DimAnim.animActive);
-        getter.put("gen_x", (n) -> frameX);
-        getter.put("gen_y", (n) -> frameY);
         getter.put("gen_w", (n) -> frameEleW);
         getter.put("gen_h", (n) -> frameEleH);
         getter.put("gen_pw", (n) -> framePosW);
@@ -827,10 +846,10 @@ public abstract class RenderItem {
         getter.put("genc_y", (n) -> clickArea.y);
         getter.put("htype", (n) -> PHead.renderType);
         getter.put("bleed", (n) -> PHead.renderBleed);
+        getter.put("thalfsize", (n) -> ((PCastBar)n).textHalfSize);
     }
 
     public static void setDefaultValues() {
-        defaultPos();
         frameEleW = 168;
         frameEleH = 64;
         framePosW = 0;
@@ -847,18 +866,11 @@ public abstract class RenderItem {
         item.getDefaults().forEachEntry((s, v) -> updater.get(s.getName()).onUpdate(item, v));
     }
 
-    public static void defaultPos() {
-        frameX = 16;
-        frameY = 16;
-    }
-
     public abstract ConfigEntry getDefaults();
 
 
     public static ConfigEntry getGeneralValues() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("gen_x", frameX, 12);
-        e.addEntry("gen_y", frameY, 12);
         e.addEntry("gen_w", frameEleW, 12);
         e.addEntry("gen_h", frameEleH, 12);
         e.addEntry("gen_pw", framePosW, 12);
@@ -868,8 +880,6 @@ public abstract class RenderItem {
 
     public static ConfigEntry getGeneralDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("gen_x", 16, 12);
-        e.addEntry("gen_y", 16, 12);
         e.addEntry("gen_w", 168, 12);
         e.addEntry("gen_h", 64, 12);
         e.addEntry("gen_pw", 0, 12);
@@ -878,48 +888,33 @@ public abstract class RenderItem {
     }
 
     public static void getCurrentMouseFrame(int mouseX, int mouseY, TriConsumer<Integer, Integer, Integer> action) {
+        int partyMouseX = mouseX;
+        int partyMouseY = mouseY;
+        mouseX /= playerScale;
+        mouseY /= playerScale;
+        //if (mouseX < selfFrameX || mouseY < selfFrameY) return;
 
-        if (mouseX < frameX || mouseY < frameY) return;
-
-        mouseX = mouseX - frameX;
-        mouseY = mouseY - frameY;
+        mouseX = mouseX - selfFrameX;
+        mouseY = mouseY - selfFrameY;
         if (mouseX < frameEleW && mouseY < frameEleH) {
-            int finalMouseX = mouseX;
-            int finalMouseY = mouseY;
-            getRealIndex(0, index -> action.accept(index, finalMouseX, finalMouseY));
+            if (renderSelfFrame)
+                action.accept(0, mouseX, mouseY);
         }
+
+        partyMouseX /= partyScale;
+        partyMouseY /= partyScale;
+        partyMouseX -= partyFrameX; //TODO: Switch to otherFrameX/Y.
+        partyMouseY -= partyFrameY;
 
 
         for (int i = 1; i < ClientPlayerData.playerOrderedList.size(); i++) {
-            mouseX -= framePosW;
-            mouseY -= framePosH;
-            if (mouseX < 0 || mouseY < 0) return;
-            if (mouseX < frameEleW && mouseY < frameEleH) {
-                int finalMouseX = mouseX;
-                int finalMouseY = mouseY;
-                getRealIndex(i, index -> action.accept(index, finalMouseX, finalMouseY));
+            if (partyMouseX < 0 || partyMouseY < 0) return;
+            if (partyMouseX < frameEleW && partyMouseY < frameEleH) {
+                action.accept(i, partyMouseX, partyMouseY);
             }
+            partyMouseX -= framePosW;
+            partyMouseY -= framePosH;
         }
-    }
-
-    private static void getRealIndex(int i, Consumer<Integer> action) {
-        if (renderSelfFrame)
-            action.accept(i);
-        else {
-            if (i >= selfIndex) {
-                i = i+1;
-                if (i < ClientPlayerData.playerOrderedList.size())
-                    action.accept(i);
-            } else {
-                action.accept(i);
-            }
-
-        }
-    }
-
-
-    public void forItem(Consumer<RenderItem> action) {
-        action.accept(this);
     }
 
     private interface ItemRender {

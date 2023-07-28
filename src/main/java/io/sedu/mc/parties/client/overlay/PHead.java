@@ -10,6 +10,7 @@ import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.data.ClientConfigData;
+import io.sedu.mc.parties.client.overlay.gui.GUIRenderer;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -17,10 +18,11 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
-import static io.sedu.mc.parties.util.RenderUtils.renderEntityInInventoryAttempt2;
+import static io.sedu.mc.parties.util.RenderUtils.renderEntityInInventory;
 import static io.sedu.mc.parties.util.RenderUtils.renderFlame;
 
 public class PHead extends RenderSelfItem implements TooltipItem {
@@ -40,8 +42,9 @@ public class PHead extends RenderSelfItem implements TooltipItem {
         height = 32;
         renderSelf = (i, id, gui, poseStack, partialTicks) -> {
             if (renderType != 0 && id.clientPlayer != null && !id.getDim().active)  {
+                float newScale = scale * i == 0 ? playerScale : partyScale;
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
-                renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, partialTicks);
+                renderEntityInInventory((int) ((x(i)+16)*newScale), (int) (y(i)*newScale), scale*newScale, (int) (15*newScale), id.clientPlayer, partialTicks);
 
                 return;
             }
@@ -57,9 +60,10 @@ public class PHead extends RenderSelfItem implements TooltipItem {
         };
         renderMember = (i, id, gui, poseStack, partialTicks) -> {
             if (renderType == 2 && id.shouldRenderModel)  {
+                float newScale = scale * i == 0 ? playerScale : partyScale;
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 RenderItem.setColor(0,0,0,0);
-                renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, 1F);
+                renderEntityInInventory((int) ((x(i)+16)*newScale), (int) (y(i)*newScale), newScale, (int) (15*newScale), id.clientPlayer, 1F);
                 RenderItem.resetColor();
                 return;
             }
@@ -101,6 +105,9 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 pLivingEntity.setYRot( Mth.clamp(f3 - f2, -35f, 35f) + 180F + modelOffset);
                 pLivingEntity.yHeadRot = pLivingEntity.getYRot();
                 pLivingEntity.yHeadRotO = pLivingEntity.getYRot();
+                if (pLivingEntity instanceof Player p) {
+                    ((GUIRenderer) p).setRenderMode(true);
+                }
                 Lighting.setupForEntityInInventory();
                 EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
                 quaternion1.conj();
@@ -120,6 +127,9 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 pLivingEntity.setXRot(f4);
                 pLivingEntity.yHeadRotO = f5;
                 pLivingEntity.yHeadRot = f6;
+                if (pLivingEntity instanceof Player p) {
+                    ((GUIRenderer) p).setRenderMode(false);
+                }
                 posestack.popPose();
             };
 
@@ -135,6 +145,9 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 posestack1.scale((float)pScale, (float)pScale, (float)pScale);
                 Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
                 posestack1.mulPose(quaternion);
+                if (pLivingEntity instanceof Player p) {
+                    ((GUIRenderer) p).setRenderMode(true);
+                }
                 Lighting.setupForEntityInInventory();
                 EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
                 entityrenderdispatcher.setRenderShadow(false);
@@ -147,7 +160,9 @@ public class PHead extends RenderSelfItem implements TooltipItem {
                 });
                 multibuffersource$buffersource.endBatch();
                 entityrenderdispatcher.setRenderShadow(true);
-
+                if (pLivingEntity instanceof Player p) {
+                    ((GUIRenderer) p).setRenderMode(false);
+                }
                 posestack.popPose();
             };
         }
@@ -204,7 +219,8 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             }
             if (renderType != 0 && id.clientPlayer != null && !id.getDim().active)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
-                renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) ((y(i))*scale), scale, (int) (15*scale), id.clientPlayer, partialTicks);
+                float newScale = scale * i == 0 ? playerScale : partyScale;
+                renderEntityInInventory((int) ((x(i)+16)*newScale), (int) ((y(i))*newScale), newScale, (int) (15*newScale), id.clientPlayer, partialTicks);
                 return;
             }
             RenderSystem.enableDepthTest();
@@ -264,7 +280,8 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             if (renderType == 2 && id.shouldRenderModel)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 RenderItem.setColor(0,0,0,0);
-                renderEntityInInventoryAttempt2((int) ((x(i)+16)*scale), (int) (y(i)*scale), scale, (int) (15*scale), id.clientPlayer, 1F);
+                float newScale = scale * i == 0 ? playerScale : partyScale;
+                renderEntityInInventory((int) ((x(i)+16)*newScale), (int) (y(i)*newScale), newScale, (int) (15*newScale), id.clientPlayer, 1F);
                 RenderItem.resetColor();
                 return;
             }
@@ -309,8 +326,8 @@ public class PHead extends RenderSelfItem implements TooltipItem {
     }
 
     @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        this.renderSelf.render(i,id,gui,poseStack,partialTicks);
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+        this.renderSelf.render(0,id,gui,poseStack,partialTicks);
 
     }
 

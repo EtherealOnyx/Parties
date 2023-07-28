@@ -3,12 +3,8 @@ package io.sedu.mc.parties.client.overlay.anim;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 
-public class StaminAnim extends AnimHandler {
+public class StaminAnim extends AnimBarHandler {
 
-    public float cur = 0f;
-    public float max = 20f;
-    public float absorb = 0f;
-    public String stamText = "";
     public static int type;
 
     public float oldH, curH, oldA, curA = 0f;
@@ -19,7 +15,7 @@ public class StaminAnim extends AnimHandler {
     public boolean aInc = true;
 
     public StaminAnim(int length, boolean enabled) {
-        super(length, enabled);
+        super(length);
         updateText();
     }
 
@@ -57,6 +53,11 @@ public class StaminAnim extends AnimHandler {
     }
 
     @Override
+    int getType() {
+        return type;
+    }
+
+    @Override
     public void activate(Object... data) {
         activateValues(data);
         animTime = length;
@@ -91,18 +92,6 @@ public class StaminAnim extends AnimHandler {
         }
     }
 
-    private void updateText() {
-        switch (type) {
-            case 0 -> stamText = DF.format(cur + absorb) + "/" + DF.format(max);
-            case 1 -> {
-                if (absorb > 0)
-                    stamText = DF.format(cur) + " (" + DF.format(absorb) + ")";
-                else
-                    stamText = DF.format(cur);
-            }
-            case 2 -> stamText = DF.format(((cur + absorb) / max) * 100) + "%";
-        }
-    }
 
     public void reset(float pCur, float pMax, float pAbsorb) {
         curH = getPercent(pCur, pMax, pAbsorb);

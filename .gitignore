@@ -46,3 +46,4 @@ local.properties
 .buildpath
 
 .DS_Store
+/src/main/java/io/sedu/mc/parties/lib/

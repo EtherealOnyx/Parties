@@ -66,7 +66,9 @@ public abstract class PEffects extends RenderSelfItem {
         effectItems.forEach(item -> {
             int newX = (posX - item.x)/(item.width/2);
             if (newX < item.maxPerRow) {
-                int eleIndex = ((posY - item.y)/(item.height/2))*item.maxPerRow + newX;
+                int eleIndex = (posY - item.y);
+                if (eleIndex < 0) return;
+                eleIndex = (eleIndex/(item.height/2))*item.maxPerRow + newX;
                 if (eleIndex < item.maxSize && eleIndex > -1) {
                     action.accept(item, eleIndex);
                 }
@@ -90,7 +92,7 @@ public abstract class PEffects extends RenderSelfItem {
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isOnline) {
-            renderSelf(i, id, gui, poseStack, partialTicks);
+            renderSelf(id, gui, poseStack, partialTicks);
         }
     }
 
@@ -212,19 +214,19 @@ public abstract class PEffects extends RenderSelfItem {
     }
 
     private int sX(int pI, int bI) {
-        return (int) (((framePosW<<1)*pI+((x+frameX)<<1))/scale +width*bI) + xOff/2;
+        return (int) (((framePosW<<1)*pI+((x+(pI == 0 ? selfFrameX : partyFrameX))<<1))/scale +width*bI) + xOff/2;
     }
 
     private float rX(int pI, int bI) {
-        return (framePosW*pI+x+frameX + (width/2f*scale)*bI);
+        return (framePosW*pI+x+(pI == 0 ? selfFrameX : partyFrameX) + (width/2f*scale)*bI);
     }
 
     private int sY(int pI, int bI) {
-        return (int) (((framePosH<<1)*pI+((y+frameY)<<1))/scale +height*bI) + yOff/2;
+        return (int) (((framePosH<<1)*pI+((y+(pI == 0 ? selfFrameY : partyFrameY))<<1))/scale +height*bI) + yOff/2;
     }
 
     private float rY(int pI, int bI) {
-        return framePosH*pI+(y+frameY)+(height/2f*scale)*bI;
+        return framePosH*pI+(y+(pI == 0 ? selfFrameY : partyFrameY))+(height/2f*scale)*bI;
     }
 
 
@@ -339,7 +341,7 @@ public abstract class PEffects extends RenderSelfItem {
 
     @Override
     public ItemBound getRenderItemBound() {
-        return new ItemBound(frameX + x, frameY + y, (int) (width / 2 * maxPerRow * scale),
+        return new ItemBound(selfFrameX + x, selfFrameY + y, (int) (width / 2 * maxPerRow * scale),
                              (int) ((height / 2) * Math.ceil(1f * maxSize / maxPerRow) * scale));
     }
 

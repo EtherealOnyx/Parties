@@ -51,32 +51,37 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
-        DimConfig.entry("minecraft:overworld", (icon, color) -> renderGuiItem(icon, b.x+7, b.y+3, .75f, 5));
+        DimConfig.entry("minecraft:overworld", (icon, color) -> renderGuiItemMenu(icon, b.x+7, b.y+3));
     }
 
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
-        if (id.isOnline)
-            renderSelf(i, id, gui, poseStack, partialTicks);
+        if (id.isOnline) {
+            if (id.isSpectator) return;
+            if (id.getDim().active)  {
+                worldAnim(poseStack, i, gui, id.getDim(), partialTicks);
+            } else {
+                world(i, id);
+            }
+        }
     }
 
     @Override
-    void renderSelf(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isSpectator) return;
         if (id.getDim().active)  {
-            worldAnim(poseStack, i, gui, id.getDim(), partialTicks);
+            worldAnim(poseStack, 0, gui, id.getDim(), partialTicks);
         } else {
-            world(i, id);
+            world(0, id);
         }
     }
 
 
     private void world(int pI, ClientPlayerData id) {
-        DimConfig.entry(id.getDim().dimension, (icon, color) -> renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale));
-
+        DimConfig.entry(id.getDim().dimension, (icon, color) -> RenderUtils.renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale, zPos, pI == 0 ? playerScale : partyScale));
     }
 
-    protected void renderGuiItem(ItemStack iStack, int pX, int pY, float scale, float scalePos) {
+    protected void renderGuiItemMenu(ItemStack iStack, int pX, int pY) {
         BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, null, Minecraft.getInstance().player, 0);
         Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
@@ -85,13 +90,12 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         PoseStack posestack = RenderSystem.getModelViewStack();
         posestack.pushPose();
-        posestack.translate(pX, pY, zPos+2);
-        posestack.translate(scalePos, scalePos, 0.0D);
+        posestack.translate((pX+ (float) 5), (pY+ (float) 5), zPos+2);
         posestack.scale(1.0F, -1.0F, 1.0F);
         posestack.scale(16.0F, 16.0F, 1F);
         RenderSystem.applyModelViewMatrix();
         PoseStack posestack1 = new PoseStack();
-        posestack1.scale(scale,scale,1f);
+        posestack1.scale((float) 0.75, (float) 0.75, 1f);
         MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
         RenderSystem.setupGuiFlatDiffuseLighting(RenderUtils.POS, RenderUtils.NEG);
 
@@ -103,7 +107,9 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         RenderSystem.applyModelViewMatrix();
     }
 
-    protected void renderGuiItem(ItemStack iStack, int pX, int pY, float x, float y, float scale, float scalePos) {
+
+
+    protected void renderGuiItem(ItemStack iStack, int pX, int pY, float x, float y, float scale, float scalePos, float playerScale) {
         BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer().getModel(iStack, null, Minecraft.getInstance().player, 0);
         Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
@@ -112,11 +118,10 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         PoseStack posestack = RenderSystem.getModelViewStack();
         posestack.pushPose();
-        posestack.translate(pX, pY, zPos+2);
-        posestack.translate(scalePos, scalePos, 0.0D);
-        posestack.translate(x, y, 0);
+        posestack.translate((pX+x+scalePos)* playerScale, (pY+y+scalePos)* playerScale, zPos+2);
         posestack.scale(1.0F, -1.0F, 1.0F);
         posestack.scale(16.0F, 16.0F, 1F);
+        posestack.scale(playerScale, playerScale, 1f);
         RenderSystem.applyModelViewMatrix();
         PoseStack posestack1 = new PoseStack();
         posestack1.scale(scale*head.scale,scale*head.scale,1f);
@@ -161,7 +166,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         }
         translateY += offY;
 
-        renderGuiItem(DimConfig.item(dim.dimension), x(pI), y(pI), translateX, translateY, scale, scalePos);
+        renderGuiItem(DimConfig.item(dim.dimension), x(pI), y(pI), translateX, translateY, scale, scalePos, pI == 0 ? playerScale : partyScale);
 
         if (renderText)
             //TODO: Extract sounds to their own implementation
@@ -259,7 +264,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
     }
 
     public ItemBound getRenderItemBound() {
-        return new ItemBound(frameX + x, frameY + y, (int) (width * head.scale), (int) (height * head.scale));
+        return new ItemBound(selfFrameX + x, selfFrameY + y, (int) (width * head.scale), (int) (height * head.scale));
     }
 
     @Override

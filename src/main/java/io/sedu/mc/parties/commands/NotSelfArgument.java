@@ -6,10 +6,11 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import io.sedu.mc.parties.api.helper.PartyAPI;
+import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.data.PartyData;
-import io.sedu.mc.parties.data.Util;
-import io.sedu.mc.parties.mixin.EntitySelectorMixin;
+import io.sedu.mc.parties.mixin.vanilla.EntitySelectorMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.commands.CommandSourceStack;
@@ -92,18 +93,18 @@ public class NotSelfArgument extends EntityArgument {
         }
     }
 
-    public static UUID getPlayerUUID(CommandContext<CommandSourceStack> pContext, String pName, UUID senderId) throws CommandSyntaxException {
+    public static UUID getPlayerUUID(CommandContext<CommandSourceStack> pContext, String pName, UUID senderId) {
         PartyData pD;
-        if ((pD = Util.getPartyFromMember(senderId)) == null) return UUID.randomUUID();
+        if ((pD = PartyAPI.getPartyFromMember(senderId)) == null) return UUID.randomUUID();
         return findPlayer(pD, ((EntitySelectorMixin)pContext.getArgument(pName, EntitySelector.class)).getPlayerName());
     }
 
     private static UUID findPlayer(PartyData party, String pName) {
         for (UUID member : party.getMembers()) {
-            if (Util.getName(member).equals(pName)) {
+            if (PlayerAPI.getName(member).equals(pName)) {
                 return member;
             }
-        };
+        }
         return null;
     }
 }

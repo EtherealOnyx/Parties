@@ -20,7 +20,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.18.2-0.4.5-post'
+version = '1.18.2-1.0.0'
 group = 'io.sedu.mc.sedparties' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'sedparties'
 
@@ -44,7 +44,7 @@ minecraft {
     // Simply re-run your setup task after changing the mappings to update your workspace.
     mappings channel: 'parchment', version: '2022.11.06-1.18.2'
 
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
+    //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -203,7 +203,8 @@ dependencies {
     compileOnly files("libs/Thirst--1.18.2-1.2.3.jar")
 
     //Cold Sweat
-    compileOnly fg.deobf("curse.maven:coldsweat-506194:4459981")
+    //compileOnly fg.deobf("curse.maven:coldsweat-506194:4459981")
+    compileOnly fg.deobf("curse.maven:coldsweat-506194:4512295")
 
     //Tough as Nails
     compileOnly fg.deobf("curse.maven:toughasnails-246391:3804267") //impl
@@ -227,11 +228,32 @@ dependencies {
     //runtimeOnly fg.deobf("curse.maven:elenaidodge2-442962:4127737")
 
     //Open-PAC
-    implementation fg.deobf("curse.maven:openpac-636608:4500809")
+    compileOnly fg.deobf("curse.maven:openpac-636608:4500809")
 
     //Homeostatic
     implementation fg.deobf("curse.maven:homeostatic-634466:4655143")
 
+    //Dietary Statistics - Local file, also can't test in dev environment...
+    compileOnly files("libs/DietaryStatistics-1.0.2.jar")
+
+    //Origins Mod
+    implementation fg.deobf("curse.maven:origins-forge-474438:3889853")
+    runtimeOnly fg.deobf("curse.maven:caelus-308989:3650485")
+
+    implementation fg.deobf("curse.maven:irons-spells-n-spellbooks-855414:4605093")
+    implementation fg.deobf("curse.maven:playeranimator-658587:4418152")
+
+    //Curios API
+    runtimeOnly fg.deobf("curse.maven:curios-309927:4590652")
+
+    //GeckoLib
+    runtimeOnly fg.deobf("curse.maven:geckolib-388172:4181370")
+
+    //AppleSkin
+    implementation fg.deobf("curse.maven:appleskin-248787:3686482")
+
+    //Game Stages
+    implementation fg.deobf("curse.maven:game-stages-268655:4066389")
 }
 
 mixin {

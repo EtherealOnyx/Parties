@@ -3,12 +3,8 @@ package io.sedu.mc.parties.client.overlay.anim;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 
-public class ManaSSAnim extends AnimHandler {
+public class ManaSSAnim extends AnimBarHandler {
 
-    public float cur = 0f;
-    public float max = 20f;
-    public float absorb = 0f;
-    public String manaText = "";
     public static int type;
 
     public float oldH, curH, oldA, curA = 0f;
@@ -19,7 +15,7 @@ public class ManaSSAnim extends AnimHandler {
     public boolean aInc = true;
 
     public ManaSSAnim(int length, boolean enabled) {
-        super(length, enabled);
+        super(length);
         updateText();
     }
 
@@ -57,6 +53,11 @@ public class ManaSSAnim extends AnimHandler {
     }
 
     @Override
+    int getType() {
+        return type;
+    }
+
+    @Override
     public void activate(Object... data) {
         activateValues(data);
         animTime = length;
@@ -88,19 +89,6 @@ public class ManaSSAnim extends AnimHandler {
             max = pMax;
             absorb = pAbsorb;
             updateText();
-        }
-    }
-
-    private void updateText() {
-        switch (type) {
-            case 0 -> manaText = DF.format(cur + absorb) + "/" + DF.format(max);
-            case 1 -> {
-                if (absorb > 0)
-                    manaText = DF.format(cur) + " (" + DF.format(absorb) + ")";
-                else
-                    manaText = DF.format(cur);
-            }
-            case 2 -> manaText = DF.format(((cur + absorb) / max) * 100) + "%";
         }
     }
 

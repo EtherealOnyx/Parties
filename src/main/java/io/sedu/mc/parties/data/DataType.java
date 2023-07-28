@@ -12,6 +12,7 @@ public enum DataType {
 
     //TaN/Thirst was Taken/ColdSweat
     THIRST,
+    QUENCH,
     WORLDTEMP,
     BODYTEMP,
 
@@ -30,4 +31,14 @@ public enum DataType {
     SSMANA,
     SSMANAMAX,
     SSMANAABS,
+
+    //Saturation & Dietary Stats
+    MAXHUNGER, SATURATION,
+
+    //Spells n' Spellbooks
+    IMANA,
+    IMANAMAX,
+
+    //Origins
+    ORIGIN
 }

@@ -1,12 +1,13 @@
 package io.sedu.mc.parties.setup;
 
-import io.sedu.mc.parties.api.hardcorerevival.HRHandler;
-import io.sedu.mc.parties.api.playerrevive.PRHandler;
+import io.sedu.mc.parties.api.helper.ColorAPI;
+import io.sedu.mc.parties.api.mod.appleskin.ASCompatManager;
+import io.sedu.mc.parties.api.mod.origins.OCompatManager;
+import io.sedu.mc.parties.api.mod.origins.OEventHandler;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.*;
 import io.sedu.mc.parties.events.ClientEvent;
-import io.sedu.mc.parties.util.ColorUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ClientRegistry;
@@ -32,7 +33,7 @@ public class ClientSetup {
 
     private static final IIngameOverlay control = (gui, poseStack, partialTicks, width, height) -> {
         RenderItem.resetPos();
-        ColorUtils.tick();
+        ColorAPI.tick();
     };
 
     public static void init(final FMLClientSetupEvent event) {
@@ -41,35 +42,43 @@ public class ClientSetup {
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::ticker);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::keyPress);
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::mouseReleased);
+        MinecraftForge.EVENT_BUS.addListener(ClientEvent::nameTagRender);
 
 
-        //Icon above all
+
+
+        //Vanilla
         items.put("head", new PHead("p_head"));
         items.put("name", new PName("p_name"));
         items.put("leader", new PLeader("p_leader"));
         items.put("dim", new PDimIcon("p_dim")); //Includes text!
+        items.put("armor", new PArmor("p_armor"));
+        items.put("offline", new POffline("p_offline"));
+        items.put("dead", new PDead("p_dead"));
 
         //Effects
         items.put("effects", new PEffectsBoth("p_effects"));
         items.put("effects_b", new PEffectsBene("p_effects_b"));
         items.put("effects_d", new PEffectsBad("p_effects_d"));
-        items.put("offline", new POffline("p_offline"));
-        items.put("dead", new PDead("p_dead"));
 
-        items.put("thirst", new PThirst("p_thirst"));
-        items.put("temp", new PTemp("p_temp"));
-        items.put("bg1", new PRectD("p_bg1"));
-        items.put("bgc", new ClickArea("p_bgc"));
-        items.put("armor", new PArmor("p_armor"));
-
+        //Bars
         items.put("lvlbar", new PLevelBar("p_lvlbar"));
-        items.put("chicken", new PHunger("p_chicken"));
         items.put("health", new PHealth("p_health"));
+        items.put("chicken", new PHunger("p_chicken"));
+        items.put("thirst", new PThirst("p_thirst"));
+        items.put("stam_ef", new PStamina("p_stam_ef"));
         items.put("mana", new PMana("p_mana"));
         items.put("mana_ss", new PManaSS("p_mana_ss"));
-        items.put("stam_ef", new PStamina("p_stam_ef"));
+        items.put("mana_i", new PManaI("p_mana_i"));
+        items.put("castbar", new PCastBar("p_castbar"));
 
+        //Modded Items
+        items.put("temp", new PTemp("p_temp"));
+        items.put("origin", new POrigin("p_origin"));
 
+        //Backgrounds
+        items.put("bg1", new PRectD("p_bg1"));
+        items.put("bgc", new ClickArea("p_bgc"));
 
 
         //items.put("p_bg1", new PRectO("bg1", 7, 41, 34, 11));
@@ -124,7 +133,7 @@ public class ClientSetup {
     public static void postInit(FMLLoadCompleteEvent event) {
         DimConfig.init();
         event.enqueueWork(() -> {
-            if (PRHandler.exists() || HRHandler.exists()) {
+            if (ModList.get().isLoaded("playerrevive") || ModList.get().isLoaded("hardcorerevival")) {
                 ((PHead)RenderItem.items.get("head")).updateRendererForMods();
                 ((PDead)RenderItem.items.get("dead")).updateRendererForMods();
                 BarBase.updateRendererForMods();
@@ -137,5 +146,11 @@ public class ClientSetup {
             }
         });
         Config.reloadClientConfigs();
+
+        if (ModList.get().isLoaded("origins")) {
+            MinecraftForge.EVENT_BUS.addListener(OEventHandler::onClientJoin);
+            OCompatManager.initClientEvent();
+        }
+        ASCompatManager.init();
     }
 }

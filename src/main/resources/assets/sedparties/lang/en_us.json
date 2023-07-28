@@ -19,6 +19,7 @@
   "gui.sedparties.name.p_bgc":"Clickable Area Element",
   "gui.sedparties.name.p_thirst":"Thirst Element (TaN, Thirst was Taken)",
   "gui.sedparties.name.p_temp":"Temperature Element (TaN, Cold Sweat)",
+  "gui.sedparties.name.p_mana_I":"Mana Element (Iron's Spells n' Spellbooks)",
   "gui.sedparties.name.p_mana_ss":"Mana Element (Spells and Shields)",
   "gui.sedparties.name.p_mana":"Mana Element (Ars Nouveau)",
   "gui.sedparties.name.p_stam_ef":"Stamina Element (Epic Fight Mod/Feathers)",
@@ -98,6 +99,7 @@
   "config.sedparties.name.ttype": "Text Type",
   "config.sedparties.name.htype": "Head Icon Type",
   "config.sedparties.name.bleed": "Bleeding/Dying Text",
+  "config.sedparties.name.thalfsize": "Smaller Text Size",
 
   "config.sedparties.tooltip.display": "Activate or deactivate the current element.",
   "config.sedparties.tooltip.xpos": "The X position of the current element (or icon).",
@@ -154,6 +156,7 @@
   "config.sedparties.tooltip.bcdb": "The bottom gradient color of the health decrease animation",
   "config.sedparties.tooltip.ttype": "Text display type. Options are a ratio, current amount only, and a percentage.",
   "config.sedparties.tooltip.htype": "Changes the head display. 0 for icons, 1 for self model only, 2 for party models.",
+  "config.sedparties.tooltip.thalfsize": "Makes the text render at half its size.",
   "config.sedparties.tooltip.bleed": "Whether or not to render bleeding text indicator (for PlayerRevive mod).",
 
   "config.sedparties.tooltip.enableb": "Enabled",
@@ -249,7 +252,11 @@
   "ui.sedparties.tooltip.stamina": "Stamina: ",
   "gui.sedparties.tooltip.hoverlink": "Click to copy preset to clipboard.",
   "gui.sedparties.tooltip.linkpaste": "Note: '/applypreset' loads a preset from the clipboard.",
-  "gui.sedparties.tooltip.linkpastedesc": "Click to load preset from clipboard."
+  "gui.sedparties.tooltip.linkpastedesc": "Click to load preset from clipboard.",
+  "gui.sedparties.tooltip.pcycle": "Cycle Ghost Member Amounts",
+  "gui.sedparties.tooltip.scale": "Toggle Frame Size",
+  "gui.sedparties.tooltip.ctrlinfo": "Press CTRL for details",
+  "gui.sedparties.tooltip.lock": "Toggle Frame Boundary"
 
 
 }

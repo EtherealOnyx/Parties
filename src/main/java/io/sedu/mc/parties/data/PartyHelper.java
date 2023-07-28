@@ -1,6 +1,8 @@
 package io.sedu.mc.parties.data;
 
-import io.sedu.mc.parties.api.openpac.PACCompatManager;
+import io.sedu.mc.parties.api.helper.PartyAPI;
+import io.sedu.mc.parties.api.helper.PlayerAPI;
+import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
@@ -11,8 +13,6 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static io.sedu.mc.parties.data.Util.*;
 
 public class PartyHelper {
 
@@ -26,15 +26,15 @@ public class PartyHelper {
         }
 
         //This checks if initiator is in a party. Creates one if not.
-        if (!Objects.requireNonNull(getNormalPlayer(initiator)).hasParty()) {
+        if (!Objects.requireNonNull(PlayerAPI.getNormalPlayer(initiator)).hasParty()) {
             new PartyData(initiator);
         }
-        return addPlayerToParty(futureMember, Objects.requireNonNull(getPartyFromMember(initiator)));
+        return addPlayerToParty(futureMember, Objects.requireNonNull(PartyAPI.getPartyFromMember(initiator)));
     }
 
     public static boolean acceptInvite(UUID initiator, UUID futureMember) {
-        PlayerData fM;
-        if ((fM = getNormalPlayer(futureMember)) == null) return false;
+        ServerPlayerData fM;
+        if ((fM = PlayerAPI.getNormalPlayer(futureMember)) == null) return false;
         if (fM.isInviter(initiator)) {
             fM.removeInviter(initiator);
             return invitePlayerForced(initiator, futureMember);
@@ -45,28 +45,28 @@ public class PartyHelper {
 
     public static boolean acceptInvite(UUID futureMember) {
         AtomicBoolean ret = new AtomicBoolean(false);
-        getPlayer(futureMember, playerData -> playerData.ifInviterExists((inviter) -> ret.set(acceptInvite(inviter, futureMember))));
+        PlayerAPI.getPlayer(futureMember, playerData -> playerData.ifInviterExists((inviter) -> ret.set(acceptInvite(inviter, futureMember))));
         return ret.get();
     }
 
     public static boolean declineInvite(UUID initiator, UUID futureMember) {
-        PlayerData pD;
-        if ((pD = getNormalPlayer(futureMember)) == null) return false;
+        ServerPlayerData pD;
+        if ((pD = PlayerAPI.getNormalPlayer(futureMember)) == null) return false;
         if (!pD.isInviter(initiator)) return false;
         ServerPlayer p;
-        if ((p = getNormalServerPlayer(initiator)) != null) {
-            p.sendMessage(new TranslatableComponent("messages.sedparties.phandler.invitedeclined", getName(futureMember)).withStyle(ChatFormatting.DARK_AQUA), initiator);
+        if ((p = PlayerAPI.getNormalServerPlayer(initiator)) != null) {
+            p.sendMessage(new TranslatableComponent("messages.sedparties.phandler.invitedeclined", PlayerAPI.getName(futureMember)).withStyle(ChatFormatting.DARK_AQUA), initiator);
         }
-        if ((p = getNormalServerPlayer(futureMember)) != null) {
-            p.sendMessage(new TranslatableComponent("messages.sedparties.phandler.declineinvite", getName(initiator)).withStyle(ChatFormatting.DARK_AQUA), futureMember);
+        if ((p = PlayerAPI.getNormalServerPlayer(futureMember)) != null) {
+            p.sendMessage(new TranslatableComponent("messages.sedparties.phandler.declineinvite", PlayerAPI.getName(initiator)).withStyle(ChatFormatting.DARK_AQUA), futureMember);
         }
-        getPlayer(futureMember, playerData -> playerData.removeInviter(initiator));
+        PlayerAPI.getPlayer(futureMember, playerData -> playerData.removeInviter(initiator));
         return true;
     }
 
     public static boolean declineInvite(UUID futureMember) {
         AtomicBoolean ret = new AtomicBoolean(false);
-        getPlayer(futureMember, playerData -> playerData.ifInviterExists((inviter) -> ret.set(declineInvite(inviter, futureMember))));
+        PlayerAPI.getPlayer(futureMember, playerData -> playerData.ifInviterExists((inviter) -> ret.set(declineInvite(inviter, futureMember))));
         return ret.get();
     }
 
@@ -78,7 +78,7 @@ public class PartyHelper {
 
     //Kicks player from party.
     public static boolean kickPlayer(UUID initiator, UUID removedMember) {
-        if (!inSameParty(initiator, removedMember)) {
+        if (!PartyAPI.inSameParty(initiator, removedMember)) {
             return false;
         }
         //Open-PAC Support
@@ -91,18 +91,18 @@ public class PartyHelper {
 
     public static boolean removePlayerFromParty(UUID removedMember, boolean wasKicked) {
         //Remove player from the party.
-        Objects.requireNonNull(getPartyFromMember(removedMember)).removeMember(removedMember, wasKicked);
+        Objects.requireNonNull(PartyAPI.getPartyFromMember(removedMember)).removeMember(removedMember, wasKicked);
         return true;
     }
 
     public static boolean leaveParty(UUID memberLeaving) {
-        PlayerData p;
-        if ((p = getNormalPlayer(memberLeaving)) != null && p.hasParty()) {
+        ServerPlayerData p;
+        if ((p = PlayerAPI.getNormalPlayer(memberLeaving)) != null && p.hasParty()) {
             //Open-PAC Support
             if (ServerConfigData.isPartySyncEnabled()) {
                 return PACCompatManager.getHandler().partyMemberLeft(memberLeaving, false);
             }
-            Objects.requireNonNull(getPartyFromMember(memberLeaving)).removeMember(memberLeaving, false);
+            Objects.requireNonNull(PartyAPI.getPartyFromMember(memberLeaving)).removeMember(memberLeaving, false);
             return true;
         }
         return false;
@@ -113,19 +113,19 @@ public class PartyHelper {
         if (ServerConfigData.isPartySyncEnabled()) {
             return PACCompatManager.getHandler().changePartyLeader(newLeader, false);
         }
-        Objects.requireNonNull(getPartyFromMember(newLeader)).updateLeader(newLeader);
+        Objects.requireNonNull(PartyAPI.getPartyFromMember(newLeader)).updateLeader(newLeader);
         return true;
     }
 
     public static void questionPlayer(UUID initiator, UUID futureMember) {
         //This checks if futureMember is a valid player that exists on the server.
-        PlayerData fM;
-        if (verifyRequest(initiator, futureMember) && !((Objects.requireNonNull(fM = getNormalPlayer(futureMember))).isInviter(initiator))) {
+        ServerPlayerData fM;
+        if (verifyRequest(initiator, futureMember) && !((Objects.requireNonNull(fM = PlayerAPI.getNormalPlayer(futureMember))).isInviter(initiator))) {
             
             fM.addInviter(initiator);
             //Sends message to futureMember.
             fM.getPlayer().sendMessage(
-                    new TranslatableComponent("messages.sedparties.phandler.receivedinvite", getName(initiator)).withStyle(ChatFormatting.DARK_AQUA)
+                    new TranslatableComponent("messages.sedparties.phandler.receivedinvite", PlayerAPI.getName(initiator)).withStyle(ChatFormatting.DARK_AQUA)
                     , futureMember);
 
             fM.getPlayer().sendMessage(
@@ -134,7 +134,7 @@ public class PartyHelper {
                             style -> style.withColor(ChatFormatting.GREEN)
                                           .withUnderlined(true)
                                           .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                                                                         "/party accept " + getName(initiator)))
+                                                                         "/party accept " + PlayerAPI.getName(initiator)))
                                           .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                                                          new TranslatableComponent("messages.sedparties.phandler.accepttooltip"))))
                     ).append(" "
@@ -143,7 +143,7 @@ public class PartyHelper {
                                     style -> style.withColor(ChatFormatting.RED)
                                                   .withUnderlined(true)
                                                   .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                                                                                 "/party decline " + getName(initiator)))
+                                                                                 "/party decline " + PlayerAPI.getName(initiator)))
                                                   .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                                                                  new TranslatableComponent("messages.sedparties.phandler.declinetooltip")))
                             )
@@ -151,15 +151,15 @@ public class PartyHelper {
                     , futureMember);
 
             //TODO: Support changing /party to /p, etc
-            getServerPlayer(futureMember, serverPlayer -> serverPlayer.sendMessage(
+            PlayerAPI.getServerPlayer(futureMember, serverPlayer -> serverPlayer.sendMessage(
                     new TranslatableComponent("messages.sedparties.phandler.receivedinvite5").withStyle(ChatFormatting.DARK_AQUA)
                                                                                              .append(new TextComponent("/party accept").withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(true)))
                                                                                              .append(new TextComponent(" | ").withStyle(ChatFormatting.DARK_AQUA))
                                                                                              .append(new TextComponent("/party decline").withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(true)))
                     , futureMember));
 
-            getServerPlayer(initiator, serverPlayer -> serverPlayer.sendMessage(new TranslatableComponent("messages.sedparties.phandler.sendinvite",
-                                                                                                      getName(futureMember)).withStyle(ChatFormatting.DARK_AQUA), initiator));
+            PlayerAPI.getServerPlayer(initiator, serverPlayer -> serverPlayer.sendMessage(new TranslatableComponent("messages.sedparties.phandler.sendinvite",
+                                                                                                                    PlayerAPI.getName(futureMember)).withStyle(ChatFormatting.DARK_AQUA), initiator));
         }
 
 
@@ -167,24 +167,24 @@ public class PartyHelper {
 
     private static boolean verifyRequest(UUID initiator, UUID futureMember) {
         ServerPlayer p;
-        if (getNormalPlayer(futureMember) == null || (p = getNormalServerPlayer(initiator)) == null || initiator.equals(futureMember)) {
+        if (PlayerAPI.getNormalPlayer(futureMember) == null || (p = PlayerAPI.getNormalServerPlayer(initiator)) == null || initiator.equals(futureMember)) {
             
             return false;
         }
         
         //This checks if the target is currently in a party.
-        if (Objects.requireNonNull(getNormalPlayer(futureMember)).hasParty()) {
+        if (Objects.requireNonNull(PlayerAPI.getNormalPlayer(futureMember)).hasParty()) {
             p.sendMessage(new TranslatableComponent(
-                    "messages.sedparties.phandler.alreadyhasparty", getName(futureMember)).withStyle(ChatFormatting.DARK_AQUA), initiator);
+                    "messages.sedparties.phandler.alreadyhasparty", PlayerAPI.getName(futureMember)).withStyle(ChatFormatting.DARK_AQUA), initiator);
             return false;
         }
-        if (Objects.requireNonNull(getNormalPlayer(initiator)).hasParty()) {
-            if (!isLeader(initiator)) {
+        if (Objects.requireNonNull(PlayerAPI.getNormalPlayer(initiator)).hasParty()) {
+            if (!PartyAPI.isLeader(initiator)) {
                 p.sendMessage(new TranslatableComponent(
                         "messages.sedparties.phandler.noinviteperms").withStyle(ChatFormatting.DARK_AQUA), initiator);
                 return false;
             }
-            if (Objects.requireNonNull(getPartyFromMember(initiator)).isFull()) {
+            if (Objects.requireNonNull(PartyAPI.getPartyFromMember(initiator)).isFull()) {
                 p.sendMessage(new TranslatableComponent(
                         "messages.sedparties.phandler.partyfull").withStyle(ChatFormatting.DARK_AQUA), initiator);
                 return false;
@@ -194,17 +194,17 @@ public class PartyHelper {
     }
 
     public static void dismissInvite(UUID initiator) {
-        getServerPlayer(initiator, serverPlayer -> serverPlayer.sendMessage(new TranslatableComponent(
+        PlayerAPI.getServerPlayer(initiator, serverPlayer -> serverPlayer.sendMessage(new TranslatableComponent(
                 "messages.sedparties.phandler.declineinviteauto").withStyle(ChatFormatting.DARK_AQUA), initiator));
     }
 
-    public static void dismissInvite(PlayerData playerData, UUID initiator) {
+    public static void dismissInvite(ServerPlayerData serverPlayerData, UUID initiator) {
         ServerPlayer p;
-        getServerPlayer(initiator, serverPlayer -> serverPlayer.sendMessage(new TranslatableComponent(
-                "messages.sedparties.phandler.declineinviteauto2", playerData.getName()).withStyle(ChatFormatting.DARK_AQUA), initiator));
+        PlayerAPI.getServerPlayer(initiator, serverPlayer -> serverPlayer.sendMessage(new TranslatableComponent(
+                "messages.sedparties.phandler.declineinviteauto2", serverPlayerData.getName()).withStyle(ChatFormatting.DARK_AQUA), initiator));
 
-        if ((p = playerData.getPlayer()) != null) {
-            p.sendMessage(new TranslatableComponent("messages.sedparties.phandler.declineinviteauto3", getName(initiator)).withStyle(ChatFormatting.DARK_AQUA), initiator);
+        if ((p = serverPlayerData.getPlayer()) != null) {
+            p.sendMessage(new TranslatableComponent("messages.sedparties.phandler.declineinviteauto3", PlayerAPI.getName(initiator)).withStyle(ChatFormatting.DARK_AQUA), initiator);
         }
     }
 }

@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.data;
 
+import io.sedu.mc.parties.api.mod.gamestages.ClientSyncType;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ClientConfigData {
@@ -19,6 +20,12 @@ public class ClientConfigData {
     public static ForgeConfigSpec.BooleanValue forceModelRotation;
     public static ForgeConfigSpec.IntValue rotationOffset;
     public static ForgeConfigSpec.BooleanValue renderSelfFrame;
+
+    public static ForgeConfigSpec.IntValue xPos;
+    public static ForgeConfigSpec.IntValue yPos;
+    public static ForgeConfigSpec.IntValue xPosParty;
+    public static ForgeConfigSpec.IntValue yPosParty;
+    public static ForgeConfigSpec.ConfigValue<ClientSyncType> defaultSync;
     public static void registerClientConfig(ForgeConfigSpec.Builder CLIENT_BUILDER) {
         CLIENT_BUILDER.comment("--------------------------------------------------------",
                                "Client Party Settings",
@@ -57,6 +64,19 @@ public class ClientConfigData {
                                                  "If true, this will include you in the party list. This will also render your information when outside the party.",
                                                  "If false, your information will NOT be rendered both in a party and outside a party.")
                                         .define("renderSelfFrame", true);
+        xPos = CLIENT_BUILDER.comment("X Position of the player frame.",
+                                      "Note: The player frame is bounded by the screen size.")
+                             .defineInRange("xPos", 16, 0, Integer.MAX_VALUE);
+        yPos = CLIENT_BUILDER.comment("Y Position of the player frame.",
+                                      "Note: The player frame is bounded by the screen size.")
+                             .defineInRange("yPos", 16, 0, Integer.MAX_VALUE);
+        xPosParty = CLIENT_BUILDER.comment("X Position of the party frame.",
+                                      "Note: The party frame is bounded by the screen size.")
+                             .defineInRange("xPos", 16, 0, Integer.MAX_VALUE);
+        yPosParty = CLIENT_BUILDER.comment("Y Position of the party frame.",
+                                      "Note: The party frame is bounded by the screen size.")
+                             .defineInRange("yPos", 16, 0, Integer.MAX_VALUE);
+
 
         forceModelRotation = CLIENT_BUILDER.comment("Makes all the models drawn on the party frame face forward if true.",
                                                     "Self model is drawn when the head element has Head Type at 1, or 2 for the entire party.")
@@ -64,6 +84,16 @@ public class ClientConfigData {
         rotationOffset = CLIENT_BUILDER.comment("Offset of the front-facing model if forceModelRotation is enabled.",
                                                 "Negative values make the model face right, while positive values make the model face left.")
                 .defineInRange("rotationOffset", -20, -180, 180);
+        CLIENT_BUILDER.pop();
+
+        CLIENT_BUILDER.push("mod-options");
+        defaultSync = CLIENT_BUILDER.comment("This allows you to set the type of automatic syncing you'd like for GameStages support",
+                                             "When prompted from a party invite. Syncing only occurs if players allow it.",
+                                             "ALL - Prompt disabled, all game stages are synced. Only works if server allows it.",
+                                             "FUTURE - Prompt disabled, future game stages are synced. Only works if server allows it.",
+                                             "NONE - Prompt disabled, no game stages are synced at all.",
+                                             "PROMPT - A prompt asking for sync permission is sent each time you join a party.")
+                .defineEnum("defaultSync", ClientSyncType.PROMPT);
         CLIENT_BUILDER.pop();
 
     }

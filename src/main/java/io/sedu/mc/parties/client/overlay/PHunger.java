@@ -8,18 +8,17 @@ import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
 
-import static io.sedu.mc.parties.client.overlay.anim.AnimHandler.DF;
+import static io.sedu.mc.parties.client.overlay.anim.AnimBarHandler.DF;
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
-public class PHunger extends BarBase {
+public class PHunger extends OverflowBarBase {
 
     public PHunger(String name) {
         super(name, new TranslatableComponent("ui.sedparties.tooltip.hunger"));
@@ -56,28 +55,54 @@ public class PHunger extends BarBase {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 255 - id.alphaI << 24);
             }
             if (textEnabled)
-                textCentered(tX(i), tY(i), gui, poseStack, hunger.hungerText, color);
+                if (hunger.absorb > 0) {
+                    textCentered(tX(i), tY(i), gui, poseStack, hunger.displayText, absorbColor);
+                } else {
+                    textCentered(tX(i), tY(i), gui, poseStack, hunger.displayText, color);
+                }
         });
     }
 
     private void renderHungerAnim(int i, PoseStack poseStack, HungerAnim hunger, float partialTicks) {
         if (hunger.animTime - partialTicks < 10) {
             hunger.oldH += (hunger.curH - hunger.oldH) * animPos(10 - hunger.animTime, partialTicks, true, 10, 1);
+            hunger.oldA += (hunger.curA - hunger.oldA) * animPos(10 - hunger.animTime, partialTicks, true, 10, 1);
         }
 
         if (hunger.hInc) {
-            rectAnim(poseStack, i, hunger.oldH, hunger.curH, colorIncTop, colorIncBot);
+            if (hunger.effHOld())
+                rectAnim(poseStack, i, hunger.oldH, hunger.curH, colorAbsTop, colorAbsBot);
+            else
+                rectAnim(poseStack, i, hunger.oldH, hunger.curH, colorIncTop, colorIncBot);
+
         } else {
-            rectAnim(poseStack, i, hunger.curH, hunger.oldH, colorDecTop, colorDecBot);
+            if (hunger.effH())
+                rectAnim(poseStack, i, hunger.curH, hunger.oldH, colorAbsTop, colorAbsBot);
+            else
+                rectAnim(poseStack, i, hunger.curH, hunger.oldH, colorDecTop, colorDecBot);
+
         }
+
+        if (hunger.aInc)
+            rectAnim(poseStack, i, hunger.oldA, hunger.curA, colorAbsTop, colorAbsBot);
+        else
+            rectAnim(poseStack, i, hunger.curA, hunger.oldA, colorAbsTop, colorAbsBot);
     }
 
     private void renderHunger(int i, PoseStack poseStack, HungerAnim hunger) {
-        float hB;
+        float hB, aB;
         hB = hunger.getPercent();
-        RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorTop, bColorBot);
-        RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Hunger
-        rectRNoA(poseStack, i, hB, colorTop, colorBot); //Hunger
+        if (hunger.absorb > 0) {
+            RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bAColorTop, bAColorBot);
+            RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
+            aB = hB + hunger.getPercentA();
+            rectRNoA(poseStack, i, hB, colorTop, colorBot); //Health
+            rectB(poseStack, i, hB, aB, colorTopAbsorb, colorBotAbsorb); //Absorb
+        } else {
+            RenderUtils.sizeRectNoA(poseStack.last().pose(), x(i), y(i), zPos, width, height, bColorTop, bColorBot);
+            RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 1, width, height, colorTopMissing, colorBotMissing); //Missing
+            rectRNoA(poseStack, i, hB, colorTop, colorBot); //Health
+        }
     }
 
     @Override
@@ -85,7 +110,7 @@ public class PHunger extends BarBase {
         id.getHunger(hunger -> {
             if (iconEnabled) {
                 useAlpha(id.alpha);
-                setup(Gui.GUI_ICONS_LOCATION);
+                setup(GUI_ICONS_LOCATION);
                 RenderSystem.enableDepthTest();
 
                 if (hunger.cur > 16) {
@@ -106,7 +131,11 @@ public class PHunger extends BarBase {
                 resetColor();
             }
             if (textEnabled)
-                text(tXI(i), tYI(i), gui, poseStack, hunger.hungerText, color);
+                if (hunger.absorb > 0) {
+                    text(tXI(i), tYI(i), gui, poseStack, hunger.displayText, absorbColor);
+                } else {
+                    text(tXI(i), tYI(i), gui, poseStack, hunger.displayText, color);
+                }
         });
 
     }
@@ -116,7 +145,7 @@ public class PHunger extends BarBase {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                p.getHunger(hunger -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(hunger.cur), 0xb88458, 0x613c1b, 0xffd5b0));
+                p.getHunger(hunger -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(hunger.cur + hunger.absorb) + "/" + DF.format(hunger.max), 0xb88458, 0x613c1b, 0xffd5b0));
             }
 
         });
@@ -136,11 +165,12 @@ public class PHunger extends BarBase {
         e.addEntry("height", 10, 12);
         e.addEntry("tdisplay", true, 1);
         e.addEntry("tshadow", false, 1);
-        e.addEntry("ttype", 1, 4);
+        e.addEntry("ttype", 3, 4);
         e.addEntry("tattached", true, 1);
         e.addEntry("xtpos", 0, 12);
         e.addEntry("ytpos", 0, 12);
         e.addEntry("bhue", 9, 7);
+        e.addEntry("ohue", 11, 7);
         e.addEntry("bcit", 0xffce83, 24);
         e.addEntry("bcib", 0xbc8532, 24);
         e.addEntry("bcdt", 0x9b5e00, 24);
@@ -166,7 +196,7 @@ public class PHunger extends BarBase {
         c.addTitleEntry("text");
         c.addBooleanEntry("tdisplay", textEnabled);
         c.addBooleanEntry("tshadow", textShadow);
-        c.addSliderEntry("ttype", 0, () -> 2, HungerAnim.type);
+        c.addSliderEntry("ttype", 0, () -> 3, HungerAnim.type);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
         entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));

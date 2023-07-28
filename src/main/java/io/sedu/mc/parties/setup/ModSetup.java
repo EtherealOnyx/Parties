@@ -1,17 +1,20 @@
 package io.sedu.mc.parties.setup;
 
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.arsnoveau.ANCompatManager;
-import io.sedu.mc.parties.api.coldsweat.CSCompatManager;
-import io.sedu.mc.parties.api.epicfight.EFCompatManager;
-import io.sedu.mc.parties.api.feathers.FCompatManager;
-import io.sedu.mc.parties.api.hardcorerevival.HRCompatManager;
 import io.sedu.mc.parties.api.homeostatic.HCompatManager;
-import io.sedu.mc.parties.api.openpac.PACCompatManager;
-import io.sedu.mc.parties.api.playerrevive.PRCompatManager;
-import io.sedu.mc.parties.api.spellsandshields.SSCompatManager;
-import io.sedu.mc.parties.api.thirstmod.TMCompatManager;
-import io.sedu.mc.parties.api.toughasnails.TANCompatManager;
+import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
+import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
+import io.sedu.mc.parties.api.mod.dietarystats.DSCompatManager;
+import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
+import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
+import io.sedu.mc.parties.api.mod.hardcorerevival.HRCompatManager;
+import io.sedu.mc.parties.api.mod.ironspellbooks.ISSCompatManager;
+import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
+import io.sedu.mc.parties.api.mod.origins.OCompatManager;
+import io.sedu.mc.parties.api.mod.playerrevive.PRCompatManager;
+import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
+import io.sedu.mc.parties.api.mod.thirstmod.TMCompatManager;
+import io.sedu.mc.parties.api.mod.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.commands.NotSelfArgument;
 import io.sedu.mc.parties.network.PartiesPacketHandler;
 import net.minecraft.commands.synchronization.ArgumentTypes;
@@ -27,8 +30,6 @@ public class ModSetup {
 
         //Init Mod Support
         event.enqueueWork(ModSetup::initSupport);
-
-
     }
 
     private static void initSupport() {
@@ -44,6 +45,9 @@ public class ModSetup {
         SSCompatManager.init(); //Spells and Shield Support
         PACCompatManager.init(); //Open-PAC Support
         HCompatManager.init(); //Homeostatic Support
+        DSCompatManager.init(); //Dietary Stats Support
+        OCompatManager.init(); //Origins Mod Support
+        ISSCompatManager.init(); //Iron's Spells n' Spellbooks Support
         Parties.LOGGER.info("Mod support initialization complete!");
     }
 }

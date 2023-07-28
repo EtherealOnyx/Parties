@@ -3,11 +3,8 @@ package io.sedu.mc.parties.client.overlay.anim;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 
-public class ManaAnim extends AnimHandler {
+public class ManaAnim extends AnimBarHandler {
 
-    public float cur = 0f;
-    public int max = 20;
-    public String manaText = "";
     public static int type;
 
     public float oldH, curH = 0f;
@@ -16,7 +13,7 @@ public class ManaAnim extends AnimHandler {
     public boolean hInc = true;
 
     public ManaAnim(int length, boolean enabled) {
-        super(length, enabled);
+        super(length);
         updateText();
     }
 
@@ -43,6 +40,11 @@ public class ManaAnim extends AnimHandler {
     }
 
     @Override
+    int getType() {
+        return type;
+    }
+
+    @Override
     public void activate(Object... data) {
         activateValues(data);
         animTime = length;
@@ -55,18 +57,10 @@ public class ManaAnim extends AnimHandler {
         if (super.tickAnim()) {
             oldH = curH = 0f;
             oldCur = cur;
-            oldMax = max;
+            oldMax = (int) max;
             return true;
         }
         return false;
-    }
-
-    private void updateText() {
-        switch (type) {
-            case 0 -> manaText = DF.format(cur) + "/" + max;
-            case 1 -> manaText = DF.format(cur);
-            case 2 -> manaText = DF.format((cur / max) * 100) + "%";
-        }
     }
 
     public void reset(float pCur, int pMax) {
@@ -101,7 +95,7 @@ public class ManaAnim extends AnimHandler {
     public void checkHealth(float data) {
         if (data != cur) {
             if (active) {
-                reset(data, max);
+                reset(data, (int) max);
             } else {
                 activate(data, max);
                 return;

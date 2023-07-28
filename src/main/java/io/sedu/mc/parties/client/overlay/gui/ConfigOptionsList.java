@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.RenderItem;
-import io.sedu.mc.parties.util.ColorUtils;
+import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -243,7 +243,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
 
         @Override
         void updateValues(int pTop, int pLeft, int pWidth, int pHeight) {
-            descTip = RenderUtils.splitTooltip(desc, pWidth/5);
+            descTip = RenderUtils.splitTooltip(desc, pWidth/5, false, false);
         }
 
         @Override
@@ -388,7 +388,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             slider.rightBound = pLeft + pWidth - 50; //Minus width
             slider.boundWidth = slider.rightBound - slider.leftBound;
             input.x = pLeft + pWidth - 38;
-            descTip = RenderUtils.splitTooltip(desc, pWidth/5);
+            descTip = RenderUtils.splitTooltip(desc, pWidth/5, false, false);
             updateValues();
         }
 
@@ -536,9 +536,9 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
         }
 
         private void updateIndValues() {
-            rI = ColorUtils.getRI(value);
-            gI = ColorUtils.getGI(value);
-            bI = ColorUtils.getBI(value);
+            rI = ColorAPI.getRI(value);
+            gI = ColorAPI.getGI(value);
+            bI = ColorAPI.getBI(value);
             r.setValue(String.valueOf(rI));
             g.setValue(String.valueOf(gI));
             b.setValue(String.valueOf(bI));
@@ -591,7 +591,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             b.x = pLeft + pWidth - 21 - inWidth;
             g.x = b.x - inWidth - 6;
             r.x = g.x - inWidth - 6;
-            descTip = RenderUtils.splitTooltip(desc, pWidth/5);
+            descTip = RenderUtils.splitTooltip(desc, pWidth/5, false, false);
         }
 
         @Override
@@ -799,7 +799,7 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             x = pLeft + 4;
             loadPreset.x = pLeft + pWidth - 28;
             deletePreset.x = loadPreset.x + 12;
-            descTip = RenderUtils.splitTooltip(desc, pWidth/5);
+            descTip = RenderUtils.splitTooltip(desc, pWidth/5, false, false);
             descTrimmed = desc.substring(0, Math.min(desc.length(), (pWidth-32)/6));
             if (descTrimmed.length() != desc.length()) {
                 descTrimmed += "...";

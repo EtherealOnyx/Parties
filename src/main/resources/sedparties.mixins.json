@@ -4,18 +4,26 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "sedparties.refmap.json",
   "mixins": [
-    "EntitySelectorMixin",
-    "MixinANManaRender",
-    "MixinHRManager",
-    "PartyManagerMixin",
-    "PlayerMixin",
-    "ServerPartyMixin"
+    "ironsspellbooks.MagicManagerMixin",
+    "ironsspellbooks.PlayerMagicDataMixin",
+    "openpac.PartyManagerMixin",
+    "openpac.ServerPartyMixin",
+    "origins.ChooseOriginMixin",
+    "vanilla.EntitySelectorMixin",
+    "vanilla.PlayerMixin"
   ],
   "client": [
-    "ChatScreenMixin",
-    "ClientMessageHandlerMixin",
-    "FeathersHudOverlayMixin",
-    "ManaRendererMixin"
+    "arsnouveau.GuiManaMixin",
+    "feathers.FeathersRenderMixin",
+    "ironsspellbooks.ClientCastHelperMixin",
+    "ironsspellbooks.ClientMagicDataMixin",
+    "spellsnshields.ClientMessageHandlerMixin",
+    "spellsnshields.ManaRendererMixin",
+    "thirstmod.HUDOverlayMixin",
+    "vanilla.ChatComponentMixin",
+    "vanilla.ChatScreenMixin",
+    "vanilla.EntityRendererMixin",
+    "vanilla.TextureAtlasSpriteMixin"
   ],
   "server": [
   ],

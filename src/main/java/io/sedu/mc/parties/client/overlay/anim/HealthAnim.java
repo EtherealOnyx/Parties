@@ -3,12 +3,10 @@ package io.sedu.mc.parties.client.overlay.anim;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 
-public class HealthAnim extends AnimHandler {
+public class HealthAnim extends AnimBarHandler {
 
-    public float cur = 0f;
-    public float max = 20f;
-    public float absorb = 0f;
-    public String healthText = "";
+
+
     public static int type;
 
     public float oldH, curH, oldA, curA = 0f;
@@ -19,9 +17,10 @@ public class HealthAnim extends AnimHandler {
     public boolean aInc = true;
 
     public HealthAnim(int length, boolean enabled) {
-        super(length, enabled);
+        super(length);
         updateText();
     }
+
 
     public static RenderItem.SmallBound setTextType(int d) {
         type = d;
@@ -54,6 +53,11 @@ public class HealthAnim extends AnimHandler {
         max = (Float) data[1];
         absorb = (Float) data[2];
         updateText();
+    }
+
+    @Override
+    int getType() {
+        return type;
     }
 
     @Override
@@ -91,18 +95,7 @@ public class HealthAnim extends AnimHandler {
         }
     }
 
-    private void updateText() {
-        switch (type) {
-            case 0 -> healthText = DF.format(cur + absorb) + "/" + DF.format(max);
-            case 1 -> {
-                if (absorb > 0)
-                    healthText = DF.format(cur) + " (" + DF.format(absorb) + ")";
-                else
-                    healthText = DF.format(cur);
-            }
-            case 2 -> healthText = DF.format(((cur + absorb) / max) * 100) + "%";
-        }
-    }
+
 
     public void reset(float pCur, float pMax, float pAbsorb) {
         curH = getPercent(pCur, pMax, pAbsorb);

@@ -14,8 +14,8 @@ import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.UUID;
 
-import static io.sedu.mc.parties.data.Util.hasParty;
-import static io.sedu.mc.parties.data.Util.isLeader;
+import static io.sedu.mc.parties.api.helper.PartyAPI.hasParty;
+import static io.sedu.mc.parties.api.helper.PartyAPI.isLeader;
 
 public class PartyCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
