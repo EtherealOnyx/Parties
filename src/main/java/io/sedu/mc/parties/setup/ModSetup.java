@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.setup;
 
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.homeostatic.HCompatManager;
+import io.sedu.mc.parties.api.mod.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.mod.dietarystats.DSCompatManager;

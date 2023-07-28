@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.api.homeostatic;
+package io.sedu.mc.parties.api.mod.homeostatic;
 
 import io.sedu.mc.parties.util.TriConsumer;
 import net.minecraft.world.entity.player.Player;

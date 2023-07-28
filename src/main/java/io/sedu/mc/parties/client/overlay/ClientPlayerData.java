@@ -4,7 +4,7 @@ package io.sedu.mc.parties.client.overlay;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.homeostatic.HCompatManager;
+import io.sedu.mc.parties.api.mod.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;

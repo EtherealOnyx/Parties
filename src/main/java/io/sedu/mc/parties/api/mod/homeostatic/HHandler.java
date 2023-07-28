@@ -1,4 +1,4 @@
-package io.sedu.mc.parties.api.homeostatic;
+package io.sedu.mc.parties.api.mod.homeostatic;
 
 
 import homeostatic.common.capabilities.Temperature;

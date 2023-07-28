@@ -3,7 +3,7 @@ package io.sedu.mc.parties.client.overlay;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import io.sedu.mc.parties.api.homeostatic.HCompatManager;
+import io.sedu.mc.parties.api.mod.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.mod.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
