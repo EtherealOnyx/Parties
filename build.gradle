@@ -254,6 +254,9 @@ dependencies {
 
     //Game Stages
     implementation fg.deobf("curse.maven:game-stages-268655:4066389")
+
+    //Incapacitated
+    implementation fg.deobf("curse.maven:incapacitated-528135:4645650")
 }
 
 mixin {

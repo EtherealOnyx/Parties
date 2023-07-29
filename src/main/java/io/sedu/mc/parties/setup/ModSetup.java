@@ -1,13 +1,14 @@
 package io.sedu.mc.parties.setup;
 
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.mod.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.mod.dietarystats.DSCompatManager;
 import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
 import io.sedu.mc.parties.api.mod.hardcorerevival.HRCompatManager;
+import io.sedu.mc.parties.api.mod.homeostatic.HCompatManager;
+import io.sedu.mc.parties.api.mod.incapacitated.ICompatManager;
 import io.sedu.mc.parties.api.mod.ironspellbooks.ISSCompatManager;
 import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
 import io.sedu.mc.parties.api.mod.origins.OCompatManager;
@@ -48,6 +49,7 @@ public class ModSetup {
         DSCompatManager.init(); //Dietary Stats Support
         OCompatManager.init(); //Origins Mod Support
         ISSCompatManager.init(); //Iron's Spells n' Spellbooks Support
+        ICompatManager.init(); //Incapacitated Support
         Parties.LOGGER.info("Mod support initialization complete!");
     }
 }

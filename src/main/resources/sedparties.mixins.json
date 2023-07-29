@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "sedparties.refmap.json",
   "mixins": [
+    "incapacitated.IncapPacketMixin",
     "ironsspellbooks.MagicManagerMixin",
     "ironsspellbooks.PlayerMagicDataMixin",
     "openpac.PartyManagerMixin",

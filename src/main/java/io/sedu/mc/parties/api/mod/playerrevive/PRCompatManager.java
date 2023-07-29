@@ -12,7 +12,7 @@ public class PRCompatManager {
     }
 
     public static void init() {
-        if (ModList.get().isLoaded("playerrevive")) initCompat();
+        if (ModList.get().isLoaded("playerrevive") && !ModList.get().isLoaded("incapacitated")) initCompat();
     }
 
     private static void initCompat() {

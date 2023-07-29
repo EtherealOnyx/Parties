@@ -133,7 +133,8 @@ public class ClientSetup {
     public static void postInit(FMLLoadCompleteEvent event) {
         DimConfig.init();
         event.enqueueWork(() -> {
-            if (ModList.get().isLoaded("playerrevive") || ModList.get().isLoaded("hardcorerevival")) {
+
+            if (ModList.get().isLoaded("incapacitated") || ModList.get().isLoaded("playerrevive") || ModList.get().isLoaded("hardcorerevival")) {
                 ((PHead)RenderItem.items.get("head")).updateRendererForMods();
                 ((PDead)RenderItem.items.get("dead")).updateRendererForMods();
                 BarBase.updateRendererForMods();

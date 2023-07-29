@@ -33,6 +33,14 @@ public class PlayerAPI {
         return ServerPlayerData.playerList.get(id);
     }
 
+    public static @Nullable ServerPlayerData getPlayerFromId(int id) {
+        for (ServerPlayerData serverPlayerData : ServerPlayerData.playerList.values()) {
+            if (serverPlayerData.getPlayer() != null && serverPlayerData.getPlayer().getId() == id)
+                return serverPlayerData;
+        }
+        return null;
+    }
+
     public static String getName(UUID id) {
         ServerPlayerData p;
         return (p = getNormalPlayer(id)) != null ? p.getName() : "";

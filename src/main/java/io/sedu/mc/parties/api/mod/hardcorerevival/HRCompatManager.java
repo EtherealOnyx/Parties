@@ -10,7 +10,7 @@ public class HRCompatManager {
     }
 
     public static void init() {
-        if (ModList.get().isLoaded("hardcorerevival")) initCompat();
+        if (ModList.get().isLoaded("hardcorerevival") && !ModList.get().isLoaded("incapacitated")) initCompat();
     }
 
     private static void initCompat() {
