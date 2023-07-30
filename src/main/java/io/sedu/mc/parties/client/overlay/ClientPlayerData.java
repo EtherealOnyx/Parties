@@ -100,7 +100,7 @@ public class ClientPlayerData {
             data.put(EF_STAM, new StaminAnim(20, true));
         if (SSCompatManager.active())
             data.put(SSMANA, new ManaSSAnim(20, true));
-        if (TMCompatManager.active() || TANCompatManager.active())
+        if (TMCompatManager.active() || TANCompatManager.active() || HCompatManager.active())
             data.put(THIRST, new ThirstAnim(20, true));
 
         if (ISSCompatManager.active()) {
@@ -524,7 +524,7 @@ public class ClientPlayerData {
     }
     public void updateThirstH() {
         if (clientPlayer != null) {
-            data.put(THIRST, HCompatManager.getHandler().getWaterLevel(clientPlayer));
+            getThirst(thirst -> thirst.checkHealth(HCompatManager.getHandler().getWaterLevel(clientPlayer)));
         }
     }
 

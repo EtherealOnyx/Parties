@@ -253,7 +253,7 @@ dependencies {
     implementation fg.deobf("curse.maven:appleskin-248787:3686482")
 
     //Game Stages
-    implementation fg.deobf("curse.maven:game-stages-268655:4066389")
+    compileOnly fg.deobf("curse.maven:game-stages-268655:4066389")
 
     //Incapacitated
     implementation fg.deobf("curse.maven:incapacitated-528135:4645650")
