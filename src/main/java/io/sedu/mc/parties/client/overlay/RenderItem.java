@@ -49,10 +49,10 @@ public abstract class RenderItem {
     public static ArrayList<String> parser = new ArrayList<>();
     static final ResourceLocation partyPath = new ResourceLocation(Parties.MODID, "textures/partyicons.png");
 
-    public static int selfFrameX = 16;
-    public static int selfFrameY = 16;
-    public static int partyFrameX = 16;
-    public static int partyFrameY = 128;
+    public static int selfFrameX = 8;
+    public static int selfFrameY = 8;
+    public static int partyFrameX = 8;
+    public static int partyFrameY = 144;
     public static int framePosW = 0;
     public static int framePosH = 0;
     public static int frameEleH = 56;

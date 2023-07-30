@@ -97,8 +97,11 @@ public class HoverScreen extends Screen {
         trimmedMessages = ((TrimmedMessagesAccessor) minecraft.gui.getChat()).getTrimmedMessages();
         selfFrameX = (int) Mth.clamp(ClientConfigData.xPos.get(), 0, width / playerScale - frameEleW);
         selfFrameY = (int) Mth.clamp(ClientConfigData.yPos.get(),0,  height/ playerScale - frameEleH);
+        //Doing this twice if enableBoundaries is true...
+        partyFrameX = (int) Mth.clamp(ClientConfigData.xPosParty.get(), 0, width / partyScale - frameEleW);
+        partyFrameY = (int) Mth.clamp(ClientConfigData.yPosParty.get(),0,  height/ partyScale - frameEleH);
         updateLimits();
-        //TODO: Add for otherFrameX/Y.
+
         ColorAPI.colorCycle = true;
         int y = (int) Math.max(0, clickArea.t(0)* playerScale - 10);
         int x = (int) (clickArea.l(0)* playerScale);
