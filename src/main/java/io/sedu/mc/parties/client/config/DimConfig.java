@@ -70,6 +70,8 @@ public class DimConfig {
         List<DimEntryConfig> dims = getDefaultDims();
         dims.forEach(DimConfig::addDimEntry);
         Config.saveDefaultDims(dims);
+        //Load custom dim entries as well.
+        Config.forEachDimFile(list -> list.forEach(DimConfig::addDimEntry));
     }
 
     public static List<DimEntryConfig> getDefaultDims() {
@@ -86,7 +88,6 @@ public class DimConfig {
     public static void reload() {
         dimEntries.clear();
         init();
-        Config.forEachDimFile(list -> list.forEach(DimConfig::addDimEntry));
         Minecraft.getInstance().player.displayClientMessage(new TranslatableComponent("messages.sedparties.config.reloadsuccess"), true);
     }
 
