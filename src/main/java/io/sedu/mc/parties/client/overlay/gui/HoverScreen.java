@@ -195,7 +195,7 @@ public class HoverScreen extends Screen {
         partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+44, oY, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
         partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+55, oY, partyDisplay + "", p -> cyclePartyDisplay(true), p -> cyclePartyDisplay(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.pcycle")), .5f, 1f, .75f, .75f, .75f)));
         partyMoveFrame.add(addRenderableWidget(new SmallButton(x+66, y, getCurrentScale(false), p -> toggleScale(false, true), p -> toggleScale(false, false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.scale")), 0f, 1f, .25f, .75f, 1f)));
-        partyMoveFrame.add(addRenderableWidget(new SmallButton(x+66, y, "▫", p -> toggleLock(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.lock")), 0f, 1f, .25f, .75f, 1f)));
+        partyMoveFrame.add(addRenderableWidget(new SmallButton(x+77, y, "▫", p -> toggleLock(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.lock")), 0f, 1f, .25f, .75f, 1f)));
     }
 
     private void toggleLock() {
@@ -514,15 +514,15 @@ public class HoverScreen extends Screen {
 
     private void refreshDragButtons(boolean selfFrame) {
         if (selfFrame) {
-            int x = (int) (selfFrameX* playerScale);
-            int y = (int) Math.max(0, selfFrameY* playerScale - 10);
+            int x = (int) Mth.clamp(selfFrameX* playerScale, 0, this.width - 66);
+            int y = (int) Mth.clamp(selfFrameY* playerScale - 10, 0, this.height - 10);
             for (int i = 0; i < moveFrame.size(); i++) {
                 moveFrame.get(i).x = x+(i*11);
                 moveFrame.get(i).y = y;
             }
         } else {
-            int x = (int) (partyFrameX * partyScale);
-            int y = (int) Math.max(0, partyFrameY * partyScale - 10);
+            int x = (int) Mth.clamp(partyFrameX * partyScale, 0, this.width - 88);
+            int y = (int) Mth.clamp(partyFrameY * partyScale - 10, 0, this.height - 10);
             for (int i = 0; i < partyMoveFrame.size(); i++) {
                 partyMoveFrame.get(i).x = x+(i*11);
                 partyMoveFrame.get(i).y = y;
