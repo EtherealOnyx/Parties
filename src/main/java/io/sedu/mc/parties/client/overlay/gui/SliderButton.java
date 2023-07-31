@@ -1,10 +1,9 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
-import io.sedu.mc.parties.api.helper.ColorAPI;
-import io.sedu.mc.parties.util.RenderUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
-import net.minecraft.client.Minecraft;
+import io.sedu.mc.parties.api.helper.ColorAPI;
+import io.sedu.mc.parties.util.RenderUtils;
 import net.minecraft.util.Mth;
 
 public class SliderButton extends SmallButton {
@@ -60,21 +59,6 @@ public class SliderButton extends SmallButton {
         xPos = Mth.clamp((boundWidth*oldPos) + dragX, 0, boundWidth) / boundWidth;
         if (oldXPos != xPos)
             this.onDragAction.onDrag(xPos);
-    }
-
-    @Override //Abstract Widget method
-    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if (this.active && this.visible) {
-            if (this.isValidClickButton(pButton)) {
-                boolean flag = this.clicked(pMouseX, pMouseY);
-                if (flag) {
-                    this.playDownSound(Minecraft.getInstance().getSoundManager());
-                    this.onClick(pMouseX, pMouseY);
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     @Override

@@ -259,7 +259,11 @@
   "gui.sedparties.tooltip.pcycle": "Cycle Ghost Member Amounts",
   "gui.sedparties.tooltip.scale": "Toggle Frame Size",
   "gui.sedparties.tooltip.ctrlinfo": "Press CTRL for details",
-  "gui.sedparties.tooltip.lock": "Toggle Frame Boundary"
+  "gui.sedparties.tooltip.lock": "Toggle Frame Boundary",
+  "gui.sedparties.tooltip.pcycle-l": "L-Click: Cycle Forward",
+  "gui.sedparties.tooltip.pcycle-r": "R-Click: Cycle Backward",
+  "gui.sedparties.tooltip.scale-l": "L-Click: Increase Size",
+  "gui.sedparties.tooltip.scale-r": "R-Click: Decrease Size"
 
 
 }

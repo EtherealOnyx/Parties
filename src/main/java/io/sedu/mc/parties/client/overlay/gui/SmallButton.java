@@ -6,9 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.sounds.SoundEvents;
 
 public class SmallButton extends Button {
 
@@ -18,7 +16,6 @@ public class SmallButton extends Button {
     private float b = 1f;
     private float offX = 0;
     private float offY = 0;
-    protected Button.OnPress onPressSpecial = null;
 
     public SmallButton(int pX, int pY, String m, OnPress pOnPress, OnTooltip pOnTooltip, float r, float g, float b) {
         super(pX, pY, 10,10, new TextComponent(m), pOnPress, pOnTooltip);
@@ -27,15 +24,7 @@ public class SmallButton extends Button {
         this.b = b;
     }
 
-    public SmallButton(int pX, int pY, String m, OnPress pOnPress, OnPress pOnPressSpecial, OnTooltip pOnTooltip, float offX, float offY, float r, float g, float b) {
-        super(pX, pY, 10,10, new TextComponent(m), pOnPress, pOnTooltip);
-        this.offX = offX;
-        this.offY = offY;
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.onPressSpecial = pOnPressSpecial;
-    }
+
 
     public void setColor(float r, float g, float b) {
         this.r = r;
@@ -104,34 +93,9 @@ public class SmallButton extends Button {
         }
     }
 
-    @Override
-    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if (this.active && this.visible) {
-            if (this.isValidClickButton(pButton)) {
-                if (this.clicked(pMouseX, pMouseY)) {
-                    onClickSpecial(pButton);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
-    @Override
-    protected boolean isValidClickButton(int pButton) {
-        return pButton == 0 || pButton == 1;
-    }
 
-    private void onClickSpecial(int pButton) {
-        if (pButton == 0) {
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-            this.onPress();
-        } else { //Can only be 0 or 1 because of isValidClickButton.
-            if (onPressSpecial == null) return;
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 0.75F));
-            this.onPressSpecial.onPress(this);
-        }
-    }
+
 
 
 }

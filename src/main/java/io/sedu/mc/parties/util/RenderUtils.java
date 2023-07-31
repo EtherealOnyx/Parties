@@ -20,10 +20,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -32,6 +29,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -53,6 +51,22 @@ public class RenderUtils {
 
             public void narrateTooltip(@NotNull Consumer<Component> p_169456_) {
                 p_169456_.accept(this.text);
+            }
+        };
+    }
+
+    public static Button.OnTooltip triTransTip(Screen s, TranslatableComponent t, MutableComponent l, MutableComponent r) {
+        return new Button.OnTooltip() {
+            private final List<Component> text = Arrays.asList(t, l, r);
+            public void onTooltip(@NotNull Button b, @NotNull PoseStack p, int mX, int mY) {
+                if (b.active) {
+                    s.renderComponentTooltip(p, text, mX, mY+16);
+                }
+
+            }
+
+            public void narrateTooltip(@NotNull Consumer<Component> p_169456_) {
+                p_169456_.accept(t);
             }
         };
     }

@@ -257,6 +257,10 @@ dependencies {
 
     //Incapacitated
     implementation fg.deobf("curse.maven:incapacitated-528135:4645650")
+
+    //Blue Skies
+    runtimeOnly fg.deobf("curse.maven:structure-gel-api-378802:4018606")
+    runtimeOnly fg.deobf("curse.maven:blue-skies-312918:3788736")
 }
 
 mixin {

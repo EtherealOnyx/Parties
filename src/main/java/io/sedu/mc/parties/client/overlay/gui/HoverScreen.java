@@ -8,6 +8,7 @@ import io.sedu.mc.parties.client.overlay.PEffects;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import io.sedu.mc.parties.data.ClientConfigData;
 import io.sedu.mc.parties.mixinaccessors.TrimmedMessagesAccessor;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -184,7 +185,10 @@ public class HoverScreen extends Screen {
         b.active = false;
         moveFrame.add(b);
         moveFrame.add(addRenderableWidget(new SmallButton(x+44, y, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
-        moveFrame.add(addRenderableWidget(new SmallButton(x+55, y, getCurrentScale(true), p -> toggleScale(true, true), p -> toggleScale(true, false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.scale")), 0f, 1f, .25f, .75f, 1f)));
+        moveFrame.add(addRenderableWidget(new SpecialButton(x+55, y, getCurrentScale(true), p -> toggleScale(true, true), p -> toggleScale(true, false), triTransTip(this,
+                                                                                                                                                                     new TranslatableComponent("gui.sedparties.tooltip.scale"),
+                                                                                                                                                                     new TranslatableComponent("gui.sedparties.tooltip.scale-l").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC),
+                                                                                                                                                                     new TranslatableComponent("gui.sedparties.tooltip.scale-r").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC)), 0f, 1f, .25f, .75f, 1f)));
 
         //Other members
         partyMoveFrame.add(addRenderableWidget(new SmallButton(oX, oY, "x", p -> revertPos(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rclose")), .5f, 0f, 1, .5f, .5f)));
@@ -196,8 +200,14 @@ public class HoverScreen extends Screen {
         b.active = false;
         partyMoveFrame.add(b);
         partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+44, oY, "✓", p -> acceptPos(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.sclose")), .5f, 1, .5f)));
-        partyMoveFrame.add(addRenderableWidget(new SmallButton(oX+55, oY, partyDisplay + "", p -> cyclePartyDisplay(true), p -> cyclePartyDisplay(false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.pcycle")), .5f, 1f, .75f, .75f, .75f)));
-        partyMoveFrame.add(addRenderableWidget(new SmallButton(x+66, y, getCurrentScale(false), p -> toggleScale(false, true), p -> toggleScale(false, false), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.scale")), 0f, 1f, .25f, .75f, 1f)));
+        partyMoveFrame.add(addRenderableWidget(new SpecialButton(oX+55, oY, partyDisplay + "", p -> cyclePartyDisplay(true), p -> cyclePartyDisplay(false), triTransTip(this,
+                                                                                                                                                                        new TranslatableComponent("gui.sedparties.tooltip.pcycle"),
+                                                                                                                                                                        new TranslatableComponent("gui.sedparties.tooltip.pcycle-l").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC),
+                                                                                                                                                                        new TranslatableComponent("gui.sedparties.tooltip.pcycle-r").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC)), .5f, 1f, .75f, .75f, .75f)));
+        partyMoveFrame.add(addRenderableWidget(new SpecialButton(x+66, y, getCurrentScale(false), p -> toggleScale(false, true), p -> toggleScale(false, false), triTransTip(this,
+                                                                                                                                                                             new TranslatableComponent("gui.sedparties.tooltip.scale"),
+                                                                                                                                                                             new TranslatableComponent("gui.sedparties.tooltip.scale-l").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC),
+                                                                                                                                                                             new TranslatableComponent("gui.sedparties.tooltip.scale-r").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC)), 0f, 1f, .25f, .75f, 1f)));
         partyMoveFrame.add(addRenderableWidget(new SmallButton(x+77, y, "▫", p -> toggleLock(), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.lock")), 0f, 1f, .25f, .75f, 1f)));
     }
 
