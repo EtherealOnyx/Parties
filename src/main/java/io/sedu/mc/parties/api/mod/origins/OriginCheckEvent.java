@@ -27,7 +27,7 @@ public class OriginCheckEvent {
                         new OriginHolder(origin.getRegistryName().toString(), origin.getName().getString(), origin.getDescription().getString(), origin.getIcon(), origin.getImpact());
                     }
                 });
-                OriginHolder.printOriginInfo();
+                //OriginHolder.printOriginInfo();
                 //Unregister the tracker.
                 MinecraftForge.EVENT_BUS.unregister(eventInstance);
                 OHandler.ready = true;

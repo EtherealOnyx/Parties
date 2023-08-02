@@ -42,7 +42,7 @@ public class GeneralOptions extends RenderItem {
     @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("gen_w", 168, 12);
+        e.addEntry("gen_w", 256, 12);
         e.addEntry("gen_h", 64, 12);
         e.addEntry("gen_pw", 0, 12);
         e.addEntry("gen_ph", 63, 12);

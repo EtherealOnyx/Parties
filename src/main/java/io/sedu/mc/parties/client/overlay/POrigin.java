@@ -47,7 +47,7 @@ public class POrigin extends RenderIconTextItem implements TooltipItem {
 
     @Override
     int getColor() {
-        return 0xFFD700;
+        return 0xfff4f3;
     }
 
     @Override
@@ -66,17 +66,16 @@ public class POrigin extends RenderIconTextItem implements TooltipItem {
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
         e.addEntry("display", true, 1);
-        e.addEntry("scale", 2, 2);
+        e.addEntry("scale", 1, 2);
         e.addEntry("zpos", 1, 4);
         e.addEntry("idisplay", true, 1);
-        e.addEntry("xpos", 157, 12);
-        e.addEntry("ypos", 9, 12);
-        e.addEntry("tdisplay", true, 1);
+        e.addEntry("xpos", 34, 12);
+        e.addEntry("ypos", 34, 12);
+        e.addEntry("tdisplay", false, 1);
         e.addEntry("tshadow", true, 1);
-        e.addEntry("tcolor", 0xFFD700, 24);
         e.addEntry("tattached", false, 1);
-        e.addEntry("xtpos", 25, 12);
-        e.addEntry("ytpos", 20, 12);
+        e.addEntry("xtpos", 0, 12);
+        e.addEntry("ytpos", 0, 12);
         return e;
     }
 
@@ -94,7 +93,6 @@ public class POrigin extends RenderIconTextItem implements TooltipItem {
         c.addTitleEntry("text");
         c.addBooleanEntry("tdisplay", textEnabled);
         c.addBooleanEntry("tshadow", textShadow);
-        c.addColorEntry("tcolor", color);
         final ArrayList<ConfigOptionsList.Entry> entries = new ArrayList<>();
         c.addBooleanEntry("tattached", textAttached, () -> toggleTextAttach(entries));
         entries.add(c.addSliderEntry("xtpos", 0, () -> Math.max(0, frameEleW), textX));

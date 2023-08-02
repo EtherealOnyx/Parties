@@ -99,9 +99,10 @@ public class HoverScreen extends Screen {
         selfFrameX = (int) Mth.clamp(ClientConfigData.xPos.get(), 0, width / playerScale - frameEleW);
         selfFrameY = (int) Mth.clamp(ClientConfigData.yPos.get(),0,  height/ playerScale - frameEleH);
         //Doing this twice if enableBoundaries is true...
-        partyFrameX = (int) Mth.clamp(ClientConfigData.xPosParty.get(), 0, width / partyScale - frameEleW);
-        partyFrameY = (int) Mth.clamp(ClientConfigData.yPosParty.get(),0,  height/ partyScale - frameEleH);
-        updateLimits();
+        //partyFrameX = (int) Mth.clamp(ClientConfigData.xPosParty.get(), 0, width / partyScale - frameEleW);
+        //TODO: This might be causing issues
+        //partyFrameY = (int) Mth.clamp(ClientConfigData.yPosParty.get(),0,  height/ partyScale - frameEleH);
+        //updateLimits();
 
         ColorAPI.colorCycle = true;
         int y = (int) Math.max(0, clickArea.t(0)* playerScale - 10);
@@ -167,12 +168,11 @@ public class HoverScreen extends Screen {
     private void initMenuButtons(int x, int y, int oX, int oY) {
         menu.add(addRenderableWidget(new SmallButton(x, y, "x", p -> doTask(0), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), .5f, 0f, 1f, .5f, .5f)));
         //TODO: Implement in next version.
-        menu.add(addRenderableWidget(new SmallButton(oX+11, oY,"⬆⬇", p -> doTask(2), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.rearrange")), .5f, .25f, .5f, .5f, 1f)));
         menu.add(addRenderableWidget(new SmallButton(x+11, y,"✥", p -> doTask(3), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.move")), 0, 1, .5f, .5f, 1f)));
         menu.add(addRenderableWidget(new SmallButton(x+22, y,"⚙", p -> doTask(4), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.advsettings")), 0, .5f, .5f, 1f, 1f)));
         menu.add(addRenderableWidget(new SmallButton(oX, oY, "x", p -> doTask(0), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.close")), .5f, 0f, 1f, .5f, .5f)));
-        menu.add(addRenderableWidget(new SmallButton(oX+22, oY,"✥", p -> doTask(3), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.move")), 0, 1, .5f, .5f, 1f)));
-
+        menu.add(addRenderableWidget(new SmallButton(oX+11, oY,"✥", p -> doTask(3), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.move")), 0, 1, .5f, .5f, 1f)));
+        menu.add(addRenderableWidget(new SmallButton(oX+22, oY,"⚙", p -> doTask(4), transTip(this, new TranslatableComponent("gui.sedparties.tooltip.advsettings")), 0, .5f, .5f, 1f, 1f)));
     }
 
     private void initDragButtons(int x, int y, int oX, int oY) {
@@ -433,11 +433,11 @@ public class HoverScreen extends Screen {
             fY.clear();
 
         } else {
-            partyFrameX = 16;
-            partyFrameY = 256;
-            ClientConfigData.xPosParty.set(16);
+            partyFrameX = 8;
+            partyFrameY = 224;
+            ClientConfigData.xPosParty.set(8);
             ClientConfigData.xPosParty.save();
-            ClientConfigData.yPosParty.set(256);
+            ClientConfigData.yPosParty.set(224);
             ClientConfigData.yPosParty.save();
             fXP.clear();
             fYP.clear();
@@ -603,7 +603,6 @@ public class HoverScreen extends Screen {
             case 1 -> //Settings screen
             {
                 menu.forEach(b -> b.visible = true);
-                menu.get(1).active = false;
                 notEditing = false;
             }
 

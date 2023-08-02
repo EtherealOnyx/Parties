@@ -2,10 +2,12 @@ package io.sedu.mc.parties.api.mod.dietarystats;
 
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
+import io.sedu.mc.parties.api.events.PartyLeaveEvent;
 import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -43,5 +45,29 @@ public class DSEventHandler {
     @SubscribeEvent
     public static void onPartyJoin(PartyJoinEvent event) {
         event.forTrackersAndSelf((sendTo, propOf) -> PlayerAPI.getPlayer(propOf, p -> InfoPacketHelper.sendMaxHungerUpdate(sendTo, propOf, p.getMaxHunger(true))));
+    }
+
+
+    @SubscribeEvent
+    public static void onClientJoin(ClientPlayerNetworkEvent.LoggedInEvent event) {
+        if (event.getPlayer() != null)
+            PlayerAPI.getClientPlayer(event.getPlayer().getUUID(), player -> DSCompatManager.getHandler().getMaxHunger(event.getPlayer(), (max) -> {
+                if (max > 0) {
+                    Parties.LOGGER.debug("Setting max hunger on client-side.");
+                    player.setMaxHunger(max);
+                }
+            }));
+    }
+
+    @SubscribeEvent
+    public static void onPartyLeave(PartyLeaveEvent event) {
+        PlayerAPI.getPlayer(event.getPlayerId(), player -> {
+            if (player.getPlayer() != null) {
+                DSCompatManager.getHandler().getMaxHunger(player.getPlayer(), (max) -> {
+                    InfoPacketHelper.sendMaxHungerUpdate(event.getPlayerId(), event.getPlayerId(), max);
+                });
+            }
+        });
+
     }
 }

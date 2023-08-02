@@ -52,7 +52,7 @@ public abstract class RenderItem {
     public static int selfFrameX = 8;
     public static int selfFrameY = 8;
     public static int partyFrameX = 8;
-    public static int partyFrameY = 144;
+    public static int partyFrameY = 224;
     public static int framePosW = 0;
     public static int framePosH = 0;
     public static int frameEleH = 56;
@@ -880,7 +880,7 @@ public abstract class RenderItem {
 
     public static ConfigEntry getGeneralDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("gen_w", 168, 12);
+        e.addEntry("gen_w", 256, 12);
         e.addEntry("gen_h", 64, 12);
         e.addEntry("gen_pw", 0, 12);
         e.addEntry("gen_ph", 63, 12);

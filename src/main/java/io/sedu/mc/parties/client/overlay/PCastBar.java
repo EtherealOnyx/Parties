@@ -59,10 +59,10 @@ public class PCastBar extends RenderIconTextItem {
         e.addEntry("scale", 2, 2);
         e.addEntry("zpos", 0, 4);
         e.addEntry("idisplay", true, 1);
-        e.addEntry("xpos", 46, 12);
-        e.addEntry("ypos", 29, 12);
-        e.addEntry("width", 120, 12);
-        e.addEntry("height", 10, 12);
+        e.addEntry("xpos", 172, 12);
+        e.addEntry("ypos", 18, 12);
+        e.addEntry("width", 64, 12);
+        e.addEntry("height", 6, 12);
         e.addEntry("tdisplay", true, 1);
         e.addEntry("tshadow", true, 1);
         e.addEntry("tattached", true, 1);

@@ -168,10 +168,10 @@ public class ServerPlayerData {
         return (float) dataItems.getOrDefault(SATURATION, 0f);
     }
 
-    public void setReviveProg(float data, Runnable action) {
+    public void setReviveProg(float data, Consumer<Float> action) {
         if ((float) dataItems.getOrDefault(REVIVE, 0f) != data) {
             dataItems.put(REVIVE, data);
-            action.run();
+            action.accept(data);
         }
     }
 

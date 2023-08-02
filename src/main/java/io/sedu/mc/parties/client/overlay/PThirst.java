@@ -147,7 +147,7 @@ public class PThirst extends OverflowBarBase {
         e.addEntry("scale", 2, 2);
         e.addEntry("zpos", 0, 4);
         e.addEntry("idisplay", true, 1);
-        e.addEntry("xpos", 118, 12);
+        e.addEntry("xpos", 115, 12);
         e.addEntry("ypos", 19, 12);
         e.addEntry("width", 20, 12);
         e.addEntry("height", 10, 12);

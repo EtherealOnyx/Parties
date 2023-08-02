@@ -81,7 +81,7 @@ public class PREventHandler {
                     float revive;
                     ServerPlayerData.playerList.get(player = e.player.getUUID())
                                                .setReviveProg(revive = PRCompatManager.getHandler().getReviveProgress(e.player),
-                                                        () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, revive)));
+                                                        (data) -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, data)));
                 }
             }
         }

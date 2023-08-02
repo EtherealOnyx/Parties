@@ -198,7 +198,7 @@ public class InfoPacketHelper {
     }
 
     public static void sendMaxHungerUpdate(UUID sendTo, UUID propOf, float max) {
-        sendData(sendTo, propOf, 32, max);
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(32, propOf, max), PlayerAPI.getNormalServerPlayer(sendTo));
     }
 
     public static void sendSaturationUpdate(ServerPlayer player, float saturation) {

@@ -47,7 +47,7 @@ public class HREventHandler {
                     trackers.set(ServerPlayerData.playerTrackers.get(targetPlayer.getUUID()));
                     if (trackers.get() != null) {
                         UUID player;
-                        ServerPlayerData.playerList.get(player = targetPlayer.getUUID()).setReviveProg(revive, () -> trackers.get().forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, revive)));
+                        ServerPlayerData.playerList.get(player = targetPlayer.getUUID()).setReviveProg(revive, (data) -> trackers.get().forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, revive)));
                     }
                 });
             }
@@ -85,7 +85,7 @@ public class HREventHandler {
             HashMap<UUID, Boolean> trackers = ServerPlayerData.playerTrackers.get(rescueTarget.getUUID());
             if (trackers != null) {
                 UUID player;
-                ServerPlayerData.playerList.get(player = rescueTarget.getUUID()).setReviveProg(0, () -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, 0)));
+                ServerPlayerData.playerList.get(player = rescueTarget.getUUID()).setReviveProg(0, (data) -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendReviveUpdate(id, player, 0)));
             }
         }
     }
