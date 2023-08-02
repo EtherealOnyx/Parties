@@ -9,7 +9,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class IHandler implements IIHandler {
-    //TODO: Timer counts down on revive when its not supposed to.
 
     @Override
     public void getReviveCount(Player p, Consumer<Integer> action) {

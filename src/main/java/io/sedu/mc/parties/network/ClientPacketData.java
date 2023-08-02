@@ -5,14 +5,18 @@ import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
 import io.sedu.mc.parties.setup.ClientSetup;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.function.Supplier;
+
+import static io.sedu.mc.parties.network.ClientPacketHelper.msg;
 
 public class ClientPacketData {
 
@@ -103,14 +107,19 @@ public class ClientPacketData {
                 Config.loadDefaultPreset();
             }
             case 8 -> {
-                ClientPacketData.closeScreens();
+                ClientPacketData.closeScreens(false);
             }
 
             case 9 -> {
                 Minecraft mc = Minecraft.getInstance();
                 HashMap<String, RenderItem.Update> updater = new HashMap<>();
                 RenderItem.initUpdater(updater);
-                Config.pastePreset(mc, updater);
+                closeScreens(true);
+                if (Config.pastePreset(mc, updater)) {
+                    msg(new TranslatableComponent("messages.sedparties.preset.loadsuccessclipboard").withStyle(ChatFormatting.GREEN));
+                } else {
+                    msg(new TranslatableComponent("messages.sedparties.preset.loadfailclipboard").withStyle(ChatFormatting.RED));
+                }
                 //TODO: Figure out how to delete said message.
 
             }
@@ -121,10 +130,15 @@ public class ClientPacketData {
         return true;
     }
 
-    private static void closeScreens() {
-        if (Minecraft.getInstance().screen instanceof SettingsScreen) {
+    private static void closeScreens(boolean closeAll) {
+        if (closeAll) {
             Minecraft.getInstance().setScreen(null);
+        } else {
+            if (Minecraft.getInstance().screen instanceof SettingsScreen) {
+                Minecraft.getInstance().setScreen(null);
+            }
         }
+
     }
 
 

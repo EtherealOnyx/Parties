@@ -254,7 +254,7 @@
   "ui.sedparties.tooltip.effectinstant": "Instant",
   "ui.sedparties.tooltip.stamina": "Stamina: ",
   "gui.sedparties.tooltip.hoverlink": "Click to copy preset to clipboard.",
-  "gui.sedparties.tooltip.linkpaste": "Note: '/applypreset' loads a preset from the clipboard.",
+  "gui.sedparties.tooltip.linkpaste": "Click here to run the command /applypreset, which loads a preset from your clipboard.",
   "gui.sedparties.tooltip.linkpastedesc": "Click to load preset from clipboard.",
   "gui.sedparties.tooltip.pcycle": "Cycle Ghost Member Amounts",
   "gui.sedparties.tooltip.scale": "Toggle Frame Size",
@@ -263,7 +263,9 @@
   "gui.sedparties.tooltip.pcycle-l": "L-Click: Cycle Forward",
   "gui.sedparties.tooltip.pcycle-r": "R-Click: Cycle Backward",
   "gui.sedparties.tooltip.scale-l": "L-Click: Increase Size",
-  "gui.sedparties.tooltip.scale-r": "R-Click: Decrease Size"
+  "gui.sedparties.tooltip.scale-r": "R-Click: Decrease Size",
+  "messages.sedparties.preset.loadsuccessclipboard": "Preset from clipboard has been loaded successfully.",
+  "messages.sedparties.preset.loadfailclipboard": "Could not load a valid preset from the clipboard."
 
 
 }

@@ -29,7 +29,7 @@ public class ClientPacketHelper {
     }
 
 
-    private static void msg(MutableComponent msg) {
+    static void msg(MutableComponent msg) {
         Minecraft.getInstance().player.displayClientMessage(msg, true);
     }
 
