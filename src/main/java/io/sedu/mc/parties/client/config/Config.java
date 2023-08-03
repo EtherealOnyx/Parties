@@ -237,7 +237,7 @@ public class Config {
             for (Path path : stream) {
                 if (!Files.isDirectory(path)) {
                     String pathName = path.getFileName().toString();
-                    if (pathName.endsWith(".json") && !pathName.equals("default.json")) {
+                    if (pathName.endsWith(".json") && !pathName.equals("default.json") & !pathName.equals("missing.json")) {
                         try (Reader reader = new FileReader(master.resolve(path).toFile())) {
                             List<DimConfig.DimEntryConfig> l = gson.fromJson(reader, dimListType);
                             if (l != null) action.accept(l);
@@ -247,6 +247,18 @@ public class Config {
             }
         } catch (IOException e) {
             Parties.LOGGER.error("Error trying to load dimension entries!", e);
+        }
+    }
+
+    public static void forEachMissing(Consumer<List<DimConfig.DimEntryConfig>> action) {
+        try (Reader reader = new FileReader(FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).resolve("dims").resolve("missing.json").toFile())) {
+            Gson gson = new Gson();
+            //General values
+            Type dimListType = new TypeToken<ArrayList<DimConfig.DimEntryConfig>>(){}.getType();
+            List<DimConfig.DimEntryConfig> l = gson.fromJson(reader, dimListType);
+            if (l != null) action.accept(l);
+        } catch (IOException e) {
+            Parties.LOGGER.debug("missing.json was not found. Generating...");
         }
     }
 
@@ -381,5 +393,22 @@ public class Config {
     public static void saveCurrentPresetAsDefault(HashMap<String, RenderItem.Getter> getter) {
         ClientConfigData.defaultPreset.set(getPresetString(getter));
         Parties.LOGGER.debug("Updated default preset for this instance.");
+    }
+
+    public static void saveMissingDims() {
+        List<DimConfig.DimEntryConfig> dims = new ArrayList<>();
+        DimConfig.missingEntries.forEach((loc, dimEntry) -> {
+            if (dimEntry.item.getItem().getRegistryName() != null)
+                dims.add(new DimConfig.DimEntryConfig(loc, dimEntry.item.getItem().getRegistryName().toString(), dimEntry.color, dimEntry.priority));
+            else
+                dims.add(new DimConfig.DimEntryConfig(loc, "minecraft:bedrock", dimEntry.color, dimEntry.priority));
+        });
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        try (FileWriter writer = new FileWriter(new File(FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).resolve("dims").toFile(), "missing.json"))){
+            writer.write(gson.toJson(dims));
+            writer.flush();
+        } catch (IOException e) {
+            Parties.LOGGER.error("Error trying to save missing dimension entries !", e);
+        }
     }
 }

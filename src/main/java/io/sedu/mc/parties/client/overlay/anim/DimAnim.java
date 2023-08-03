@@ -1,6 +1,8 @@
 package io.sedu.mc.parties.client.overlay.anim;
 
 
+import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 
 import java.util.ArrayList;
@@ -51,6 +53,8 @@ public class DimAnim extends AnimHandlerBase {
     }
 
     private void setupDim(String data) {
+        DimConfig.checkDim(data);
+
         //Custom RFTools Dimensions support (since it has unlimited entries)
         if (data.substring(0, data.indexOf(':')).equals("rftoolsdim")) {
             dimension = "rftoolsdim:dim";
@@ -73,6 +77,7 @@ public class DimAnim extends AnimHandlerBase {
         dim.forEach(word -> fString.add("§o" + word.substring(0, 1).toUpperCase() + word.substring(1)));
         this.dimName = fString;
         this.dimNorm = String.join(" ", dimName).replace("§o", "");
+        Parties.LOGGER.debug("DimAnim: {} has been converted to {}.", dimName, dimNorm);
     }
 
     @Override

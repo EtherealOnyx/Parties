@@ -120,8 +120,6 @@ public class ClientPacketData {
                 } else {
                     msg(new TranslatableComponent("messages.sedparties.preset.loadfailclipboard").withStyle(ChatFormatting.RED));
                 }
-                //TODO: Figure out how to delete said message.
-
             }
             default -> {
                 return false;
