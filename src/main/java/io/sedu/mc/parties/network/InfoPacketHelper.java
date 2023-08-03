@@ -234,4 +234,9 @@ public class InfoPacketHelper {
         if (!sendTo.equals(propOf))
             PartiesPacketHandler.sendToPlayer(new RenderPacketData(38, propOf), PlayerAPI.getNormalServerPlayer(sendTo));
     }
+
+    public static void sendPreset(UUID sendTo, UUID propOf, String preset, String name) {
+
+        PartiesPacketHandler.sendToPlayer(new RenderPacketData(39, propOf, preset, name), PlayerAPI.getNormalServerPlayer(sendTo));
+    }
 }

@@ -1,9 +1,13 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.*;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -190,5 +194,31 @@ public class RenderPacketHelper {
 
     public static void endCast(UUID player) {
         getClientPlayer(player, ClientPlayerData::finishSpell);
+    }
+
+    public static void sendMessage(UUID messageFrom, String preset, String name) {
+        Parties.LOGGER.debug("Incoming preset chat, checking for validity...");
+        if (Config.checkPresetString(preset.toCharArray(), name)) {
+            Parties.LOGGER.debug("Preset valid, posting...");
+            Player p;
+            if ((p = Minecraft.getInstance().player) != null) {
+                p.sendMessage(new TextComponent("<").append(name).append(new TextComponent("> "))
+                                                    .append(new TextComponent("[").withStyle(ChatFormatting.DARK_AQUA))
+                                                    .append(new TextComponent("Preset")
+                                                                    .withStyle(style -> style.withColor(ChatFormatting.YELLOW)
+                                                                                             .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, preset))
+                                                                                             .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("gui.sedparties.tooltip.hoverlink")))))
+                                                    .append(new TextComponent("]").withStyle(ChatFormatting.DARK_AQUA))
+                                                    .append(new TextComponent(" (Click to Copy)")
+                                                                    .withStyle(ChatFormatting.GRAY)
+                                                                    .withStyle(ChatFormatting.ITALIC)), messageFrom);
+                p.sendMessage(new TranslatableComponent("gui.sedparties.tooltip.linkpaste").withStyle(style -> style.withColor(ChatFormatting.GRAY)
+                                                                                                                    .withItalic(true)
+                                                                                                                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/applypreset"))
+                                                                                                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("gui.sedparties.tooltip.linkpastedesc")))), p.getUUID());
+            }
+        } else {
+            Parties.LOGGER.warn("Failed to properly parse incoming preset link from {}, skipping...", name);
+        }
     }
 }

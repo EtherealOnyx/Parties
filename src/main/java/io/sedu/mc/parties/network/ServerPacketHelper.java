@@ -1,12 +1,10 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.api.helper.PartyAPI;
 import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.data.ServerPlayerData;
-import io.sedu.mc.parties.api.events.PartyJoinEvent;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.common.MinecraftForge;
@@ -130,12 +128,7 @@ public class ServerPacketHelper {
     public static void sendMessageToAll(List<ServerPlayer> playerList, ServerPlayer sender, String data) {
         if (ServerPlayerData.isOnMessageCd(sender.getUUID())) return;
         playerList.forEach((p) -> {
-            p.sendMessage(new TextComponent("<").append(sender.getName()).append(new TextComponent("> ")).append(new TextComponent("[").withStyle(ChatFormatting.DARK_AQUA)).append(new TextComponent("Preset").withStyle(style -> style.withColor(ChatFormatting.YELLOW).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, data)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("gui.sedparties.tooltip.hoverlink"))))).append(new TextComponent("]").withStyle(ChatFormatting.DARK_AQUA)).append(new TextComponent(" (Click to Copy)").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC)), ChatType.CHAT, sender.getUUID());
-            p.sendMessage(new TranslatableComponent("gui.sedparties.tooltip.linkpaste").withStyle(style -> style.withColor(ChatFormatting.GRAY)
-                                                                                                            .withItalic(true)
-                                                                                                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/applypreset"))
-                                                                                                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("gui.sedparties.tooltip.linkpastedesc")))), ChatType.SYSTEM, p.getUUID());
-
+            InfoPacketHelper.sendPreset(p.getUUID(), sender.getUUID(), data, sender.getName().getContents());
         });
         ServerPlayerData.messageCd.add(new ServerPlayerData.MessageCdHolder(sender.getUUID(), playerMessageCooldown));
     }

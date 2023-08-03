@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.network;
 
+import io.sedu.mc.parties.Parties;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -31,11 +32,23 @@ public class StringPacketData {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             switch (type) {
-                case 0 -> //Send UUID to server to tell them the client is tracking it now.
+                case 0 -> { //Send UUID to server to tell them the client is tracking it now.
+                    if (stringValidator(data)) {
                         ServerPacketHelper.sendMessageToAll(ctx.getSender().server.getPlayerList().getPlayers(), ctx.getSender(), data);
+                    } else {
+                        Parties.LOGGER.warn("[Parties] [Link to Chat] Preset validation failed for {}.", ctx.getSender().getName().getContents());
+                    }
+
+                }
+
+
             }
         });
         return true;
+    }
+
+    private boolean stringValidator(String data) {
+        return data.matches("^[A-Za-z0-9+/\\-=:|]+");
     }
 
 

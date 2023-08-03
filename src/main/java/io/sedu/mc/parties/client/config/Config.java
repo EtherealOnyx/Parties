@@ -272,6 +272,71 @@ public class Config {
 
     }
 
+    public static boolean checkPresetString(char[] bits, String playerName)  {
+        StringBuilder bitBuilder = new StringBuilder();
+        boolean newEntry = true;
+        boolean hasZeroes = false;
+        boolean validPreset = false;
+        int eleId = -1;
+        int eleVer = 0;
+        String elementBits = "";
+        try {
+            for (char bit : bits) {
+                if (bit == ':') { //bitBuilder contains ID.
+                    newEntry = false; //We are grabbing an entry.
+                    eleId = Integer.parseInt(bitBuilder.toString());
+                    bitBuilder.setLength(0); //Clear builder.
+                    continue;
+                }
+                if (bit == '-') {
+                    if (newEntry) {//newEntry = true, - defines a subversion of an entry.
+                        eleVer = Integer.parseInt(bitBuilder.toString());
+                    } else { //newEntry = false, - defines additional zeros needed.
+                        hasZeroes = true;
+                        //base64 part completed.
+                        elementBits = new BigInteger(1, Base64.decodeBase64(bitBuilder.toString())).toString(2);
+                    }
+                    bitBuilder.setLength(0); //Clear builder.
+                    continue;
+                }
+                if (bit == '|') {
+                    if (hasZeroes) { //bitBuilder contains integer of zeroes we need to add to elementBits.
+                        elementBits = String.format("%" + (elementBits.length() + Integer.parseInt(bitBuilder.toString())) + "s", elementBits)
+                                            .replace(' ', '0');
+                    } else { //bitBuilder contains elementBits.
+                        elementBits = new BigInteger(1, Base64.decodeBase64(bitBuilder.toString())).toString(2);
+                    }
+                    //Entry is fully defined.
+                    if (eleId == 0) {
+                        GeneralOptions.INSTANCE.getDefaults().readBits(elementBits.toCharArray(), (name, value) -> {});
+                    } else {
+                        //TODO: Replace eleVer functionality when multi versions of elements are added.
+                        if (eleVer == 0) {
+                            String finalElementBits = elementBits;
+                            RenderItem.getItemById(eleId, item -> {
+                                item.getDefaults().readBits(finalElementBits.toCharArray(), (name, value) -> {});
+                            });
+                        }  //Can't test else yet...
+
+                    }
+                    bitBuilder.setLength(0); //Clear builder.
+                    //Reset for next element
+                    eleId = -1;
+                    eleVer = 0;
+                    hasZeroes = false;
+                    newEntry = true;
+                    validPreset = true;
+                    continue;
+                }
+                bitBuilder.append(bit);
+            }
+            return validPreset;
+        } catch (Exception e) {
+            Parties.LOGGER.error("Parsing a preset threw an error!", e);
+            return false;
+        }
+    }
+
     public static String getPresetString(HashMap<String, RenderItem.Getter> getter) {
         //New
         //Only save enabled items.
