@@ -11,7 +11,7 @@ public class GSCompatManager {
     }
 
     private static void initCompat() {
-        Parties.LOGGER.info("Initializing Compatibility with Game Stages.");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with Game Stages.");
         MinecraftForge.EVENT_BUS.register(GSEventHandler.class);
     }
 }

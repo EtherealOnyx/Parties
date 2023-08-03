@@ -11,7 +11,7 @@ public class ASCompatManager {
     }
 
     private static void initCompat() {
-        Parties.LOGGER.info("Initializing Compatibility with AppleSkin.");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with AppleSkin.");
         MinecraftForge.EVENT_BUS.register(ASEventHandler.class);
     }
 }

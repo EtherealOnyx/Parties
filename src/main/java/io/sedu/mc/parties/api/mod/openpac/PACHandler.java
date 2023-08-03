@@ -41,7 +41,7 @@ public class PACHandler implements IPACHandler {
 
     @Override
     public void initParties(MinecraftServer server) {
-        Parties.LOGGER.info("Loading parties from Open Parties and Claims.");
+        Parties.LOGGER.info("[Parties] Loading parties from Open Parties and Claims.");
         Parties.LOGGER.debug("Current Party Size: " + partyList.size());
         OpenPACServerAPI.get(server).getPartyManager().getAllStream().forEach(party -> {
             UUID partyId = party.getId();
@@ -59,7 +59,7 @@ public class PACHandler implements IPACHandler {
             partyList.put(partyId, pData);
         });
         PartySaveData.get().setDirty();
-        Parties.LOGGER.info("Load complete!");
+        Parties.LOGGER.info("[Parties] Load complete!");
     }
 
 
@@ -88,7 +88,7 @@ public class PACHandler implements IPACHandler {
                 server.getCommands().sendCommands(p);
             }
         } else {
-            Parties.LOGGER.error("Error adding new player to party - player doesn't exist! - " + newMember);
+            Parties.LOGGER.error("[Parties] Error adding new player to party - player doesn't exist! - " + newMember);
         }
 
 
@@ -131,7 +131,7 @@ public class PACHandler implements IPACHandler {
     @Override
     public void changeLeader(UUID owner, UUID newLeader) {
         if (owner == newLeader) {
-            Parties.LOGGER.error("Attempting to set new leader but it's the same one...");
+            Parties.LOGGER.error("[Parties] Attempting to set new leader but it's the same one...");
             return;
         }
         if (!PartyAPI.hasParty(owner) || !PartyAPI.inSameParty(owner, newLeader)) {
@@ -182,12 +182,12 @@ public class PACHandler implements IPACHandler {
         });
         if (!success.get()) {
             if (finalAttempt) {
-                Parties.LOGGER.error("Still failed to add member to party. Aborting...");
+                Parties.LOGGER.error("[Parties] Still failed to add member to party. Aborting...");
                 return false;
             } else {
-                Parties.LOGGER.error("Error adding a member to party! Assuming there's a party desync...");
+                Parties.LOGGER.error("[Parties] Error adding a member to party! Assuming there's a party desync...");
                 syncParties();
-                Parties.LOGGER.error("Trying to add member again...");
+                Parties.LOGGER.error("[Parties] Trying to add member again...");
                 return addPartyMember(initiator, futureMember, true);
             }
         } else {
@@ -206,12 +206,12 @@ public class PACHandler implements IPACHandler {
         });
         if (!success.get()) {
             if (finalAttempt) {
-                Parties.LOGGER.error("Still failed to remove member from party. Aborting...");
+                Parties.LOGGER.error("[Parties] Still failed to remove member from party. Aborting...");
                 return false;
             } else {
-                Parties.LOGGER.error("Error removing member from party! Assuming there's a party desync...");
+                Parties.LOGGER.error("[Parties] Error removing member from party! Assuming there's a party desync...");
                 syncParties();
-                Parties.LOGGER.error("Trying to remove member again...");
+                Parties.LOGGER.error("[Parties] Trying to remove member again...");
                 return removePartyMember(initiator, removedMember, true);
             }
         } else {
@@ -232,12 +232,12 @@ public class PACHandler implements IPACHandler {
         }
         if (!success) {
             if (finalAttempt) {
-                Parties.LOGGER.error("Still failed to change party leader. Aborting...");
+                Parties.LOGGER.error("[Parties] Still failed to change party leader. Aborting...");
                 return false;
             } else {
-                Parties.LOGGER.error("Error changing party leader! Assuming there's a party desync...");
+                Parties.LOGGER.error("[Parties] Error changing party leader! Assuming there's a party desync...");
                 syncParties();
-                Parties.LOGGER.error("Trying to change leader again...");
+                Parties.LOGGER.error("[Parties] Trying to change leader again...");
                 return changePartyLeader(newLeader, true);
             }
         } else {
@@ -286,14 +286,14 @@ public class PACHandler implements IPACHandler {
 
     private static void getPM(Consumer<IPartyManagerAPI<IServerPartyAPI<IPartyMemberAPI, IPartyPlayerInfoAPI, IPartyAllyAPI>>> action) {
         if (server == null) {
-            Parties.LOGGER.error("Server Data was never saved. Party sync cannot be completed...");
+            Parties.LOGGER.error("[Parties] Server Data was never saved. Party sync cannot be completed...");
         } else {
             action.accept(OpenPACServerAPI.get(server).getPartyManager());
         }
     }
 
     private static void syncParties() {
-        Parties.LOGGER.error("Parties between mods are desynced! Attempting to recreate...");
+        Parties.LOGGER.error("[Parties] Parties between mods are desynced! Attempting to recreate...");
         HashMap<UUID, PartyData> updatedParties = new HashMap<>();
         ServerPlayerData.playerList.forEach((uuid, playerData) -> {
             //Player is being removed.

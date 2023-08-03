@@ -169,8 +169,10 @@ public class PStamina extends OverflowBarBase {
         return e;
     }
 
-
-
+    @Override
+    public int getId() {
+        return 17;
+    }
 
 
     @Override

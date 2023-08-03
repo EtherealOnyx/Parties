@@ -126,7 +126,7 @@ public class DimConfig {
         if (dimEntries.containsKey(entry.dimension)) return; //Entries outside missing.json will always have higher priority.
         ResourceLocation location = new ResourceLocation(entry.item);
         if (resourceInvalid(location)) {
-            Parties.LOGGER.warn("DimEntry {} had an invalid item location. Changing to minecraft:bedrock.", entry.dimension);
+            Parties.LOGGER.warn("[Parties] DimEntry {} had an invalid item location. Changing to minecraft:bedrock.", entry.dimension);
             location = new ResourceLocation("minecraft:bedrock");
         }
         missingEntries.put(entry.dimension, new DimEntry(ForgeRegistries.ITEMS.getValue(location), entry.color, entry.priority));
@@ -134,7 +134,7 @@ public class DimConfig {
 
     private static boolean resourceInvalid(ResourceLocation loc) {
         if (!ForgeRegistries.ITEMS.containsKey(loc)) {
-            Parties.LOGGER.warn("Failed to load dimension item: '" + loc + "'. This may be alright!");
+            Parties.LOGGER.warn("[Parties] Failed to load dimension item: '" + loc + "'. This may be alright!");
             return true;
         }
         return false;

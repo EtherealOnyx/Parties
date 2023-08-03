@@ -18,9 +18,9 @@ public class SSHandler implements ISSHandler {
     }
 
     static {
-        Parties.LOGGER.info("Initializing Compatibility with Spells and Shields Mod.");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with Spells and Shields Mod.");
         if (MANA == null) {
-            Parties.LOGGER.error("Failed to load Spells and Shields compatibility...");
+            Parties.LOGGER.error("[Parties] Failed to load Spells and Shields compatibility...");
         }
     }
 

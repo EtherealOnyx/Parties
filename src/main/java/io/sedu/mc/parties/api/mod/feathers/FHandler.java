@@ -20,9 +20,9 @@ public class FHandler implements IFHandler {
     }
 
     static {
-        Parties.LOGGER.info("Initializing Compatibility with Feathers Mod.");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with Feathers Mod.");
         if (FEATHERS == null) {
-            Parties.LOGGER.error("Failed to load Feathers compatibility...");
+            Parties.LOGGER.error("[Parties] Failed to load Feathers compatibility...");
         }
     }
 

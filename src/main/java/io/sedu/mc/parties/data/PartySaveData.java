@@ -24,13 +24,13 @@ public class PartySaveData extends SavedData
     }
 
     public PartySaveData() {
-        Parties.LOGGER.info("Creating party save data...");
+        Parties.LOGGER.info("[Parties] Creating party save data...");
     }
 
     public PartySaveData(CompoundTag tag) {
-        Parties.LOGGER.info("Loading party save data...");
+        Parties.LOGGER.info("[Parties] Loading party save data...");
         if (ServerConfigData.isPersistDisabled() || ServerConfigData.isPartySyncEnabled()) {
-            Parties.LOGGER.info("Loading cancelled, party persistence disabled or syncing from other parties mod...");
+            Parties.LOGGER.info("[Parties] Loading cancelled, party persistence disabled or syncing from other parties mod...");
             return;
         }
 
@@ -68,9 +68,9 @@ public class PartySaveData extends SavedData
 
     @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
-        Parties.LOGGER.info("Saving parties to disk...");
+        Parties.LOGGER.info("[Parties] Saving parties to disk...");
         if (ServerConfigData.isPersistDisabled()) {
-            Parties.LOGGER.info("Saving cancelled, party persistence disabled...");
+            Parties.LOGGER.info("[Parties] Saving cancelled, party persistence disabled...");
             return tag;
         }
         ListTag list = new ListTag();

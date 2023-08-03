@@ -6,7 +6,7 @@
   "gui.sedparties.name.p_name":"Name Element",
   "gui.sedparties.name.p_dim":"Dimension Element",
   "gui.sedparties.name.p_armor":"Armor Element",
-  "gui.sedparties.name.p_chicken":"Hunger Element",
+  "gui.sedparties.name.p_hunger":"Hunger Element",
   "gui.sedparties.name.p_lvlbar":"Level Bar Element",
   "gui.sedparties.name.p_offline":"Offline Element",
   "gui.sedparties.name.p_dead":"Dead Element",
@@ -166,8 +166,8 @@
   "config.sedparties.tooltip.disableb": "Disabled",
 
 
-  "messages.sedparties.config.loadfail": "Load not successful because preset is of a different version.",
-  "messages.sedparties.config.loadfailv": "Try loading a file instead or copy a preset of the same version.",
+  "messages.sedparties.config.loadfail": "Load not successful because preset is invalid or of a different version.",
+  "messages.sedparties.config.loadfailv": "Try loading a file instead or copy a preset of a version >= 1.0.0",
   "messages.sedparties.config.reloadsuccess": "Configurations reloaded successfully.",
 
   "messages.sedparties.preset.pasteload": "Preset loaded from clipboard successfully",

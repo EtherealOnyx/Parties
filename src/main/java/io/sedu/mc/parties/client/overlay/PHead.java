@@ -298,11 +298,6 @@ public class PHead extends RenderSelfItem implements TooltipItem {
     }
 
     @Override
-    public String getType() {
-        return "Icon";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+4, b.y, 0);
     }
@@ -318,6 +313,11 @@ public class PHead extends RenderSelfItem implements TooltipItem {
         e.addEntry("scale", 2, 2);
         e.addEntry("bleed", true, 1);
         return e;
+    }
+
+    @Override
+    public int getId() {
+        return 3;
     }
 
     @Override

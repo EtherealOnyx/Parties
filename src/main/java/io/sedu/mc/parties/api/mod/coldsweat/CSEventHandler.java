@@ -30,7 +30,7 @@ public class CSEventHandler {
                         ServerPlayerData.playerList.get(player = e.player.getUUID()).setBodyTemp(CSCompatManager.getHandler().getBodyTemp(e.player), temp -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendBodyTempUpdate(id, player, temp)));
                     } catch (Throwable t) {
                         CSCompatManager.changeHandler();
-                        Parties.LOGGER.error("Failed to support Cold Sweat!", t);
+                        Parties.LOGGER.error("[Parties] Failed to support Cold Sweat!", t);
                         onEntityTick(e);
                     }
 
@@ -46,7 +46,7 @@ public class CSEventHandler {
                         ServerPlayerData.playerList.get(player = e.player.getUUID()).setWorldTemp(CSCompatManager.getHandler().getWorldTemp(e.player), temp -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendWorldTempUpdate(id, player, temp)));
                     } catch (Throwable t) {
                         CSCompatManager.changeHandler();
-                        Parties.LOGGER.error("Failed to support Cold Sweat!", t);
+                        Parties.LOGGER.error("[Parties] Failed to support Cold Sweat!", t);
                         onEntityTick(e);
                     }
                 }

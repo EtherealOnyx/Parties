@@ -17,7 +17,7 @@ public class OHandler implements IOHandler {
     public static boolean ready = false;
 
     static {
-        Parties.LOGGER.info("Initializing Compatibility with Origins (Forge).");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with Origins (Forge).");
     }
 
     public List<Origin> getOriginList() {

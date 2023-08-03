@@ -4,7 +4,6 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
-import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
 import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.api.mod.thirstmod.TMCompatManager;
@@ -18,7 +17,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.OverlayRegistry;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.codec.binary.Base64;
@@ -47,7 +45,7 @@ public class Config {
             Files.createDirectories(PRESET_PATH);
             Files.createDirectories(FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).resolve("dims"));
         } catch (IOException e) {
-            Parties.LOGGER.error("Error trying to create config paths!", e);
+            Parties.LOGGER.error("[Parties] Error trying to create config paths!", e);
         }
 
     }
@@ -62,7 +60,7 @@ public class Config {
             writer.write(gson.toJson(json));
             writer.flush();
         } catch (IOException e) {
-            Parties.LOGGER.error("Error trying to create preset for " + name + "!", e);
+            Parties.LOGGER.error("[Parties] Error trying to create preset for " + name + "!", e);
             return false;
         }
         return true;
@@ -80,7 +78,7 @@ public class Config {
             writer.write(gson.toJson(json));
             writer.flush();
         } catch (IOException e) {
-            Parties.LOGGER.error("Error trying to save default preset!", e);
+            Parties.LOGGER.error("[Parties] Error trying to save default preset!", e);
         }
     }
 
@@ -111,8 +109,8 @@ public class Config {
             updateValues(GeneralOptions.INSTANCE, element, updater);
             RenderItem.items.forEach((name, item) -> updateValues(item, jsonObject.get(name), updater));
         } catch (IOException e) {
-            Parties.LOGGER.warn("Error trying to load a preset! Refreshing list", e);
-            Parties.LOGGER.warn("Refreshing preset list...", e);
+            Parties.LOGGER.warn("[Parties] Error trying to load a preset! Refreshing list", e);
+            Parties.LOGGER.warn("[Parties] Refreshing preset list...", e);
             return false;
         }
         return true;
@@ -124,12 +122,12 @@ public class Config {
                 if (jsonObject.get(entryName) != null && updater.get(entryName) != null)
                     updater.get(entryName).onUpdate(item, getPrimitiveValue(jsonObject.get(entryName)));
                 else {
-                    Parties.LOGGER.warn("Entry '" + entryName + "' is not defined. Perhaps json file is from a different version?");
+                    Parties.LOGGER.warn("[Parties] Entry '" + entryName + "' is not defined. Perhaps json file is from a different version?");
                 }
             });
             return;
         }
-        Parties.LOGGER.warn("Failed to parse an element properly. Perhaps json file is from a different version?");
+        Parties.LOGGER.warn("[Parties] Failed to parse an element properly. Perhaps json file is from a different version?");
     }
 
     private static Object getPrimitiveValue(JsonElement jsonElement) {
@@ -165,7 +163,7 @@ public class Config {
                 }
             }
         } catch (IOException e) {
-            Parties.LOGGER.error("Error trying to load default presets!", e);
+            Parties.LOGGER.error("[Parties] Error trying to load default presets!", e);
         }
     }
 
@@ -180,43 +178,128 @@ public class Config {
     public static boolean pastePreset(Minecraft minecraft, HashMap<String, RenderItem.Update> updater) {
         assert minecraft.player != null;
         try {
-            String bits = minecraft.keyboardHandler.getClipboard();
-            if (Integer.parseInt(bits.substring(0, bits.indexOf('|'))) != Parties.ENCODE_VERSION) {
-                minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.config.loadfail").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), minecraft.player.getUUID());
-                minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.config.loadfailv").append("(v. " + Parties.ENCODE_VERSION + ")").withStyle(ChatFormatting.GRAY), minecraft.player.getUUID());
+            if (!applyPresetString(minecraft.keyboardHandler.getClipboard().toCharArray(), updater)) {
+                parseError();
                 return false;
             }
-            bits = bits.substring(bits.indexOf('|') + 1);
-            int parse = Integer.parseInt(bits.substring(0, bits.indexOf('|')));
-            bits = new BigInteger(1, Base64.decodeBase64(bits.substring(bits.indexOf('|') + 1))).toString(2);
-            if (parse > 0) {
-                bits = bits.substring(parse);
-            } else {
-                bits = String.format("%" + (bits.length() + Math.abs(parse)) + "s", bits).replace(' ', '0');
-            }
-            parseBinaryString(bits.toCharArray(), updater);
         } catch (Exception e) {
+            minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.config.loadfail").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), minecraft.player.getUUID());
+            minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.config.loadfailv").withStyle(ChatFormatting.GRAY), minecraft.player.getUUID());
+            Parties.LOGGER.error("[Parties] Failed to load preset.", e);
             return false;
         }
         return true;
     }
 
+    public static void parseError() {
+        Parties.LOGGER.warn("[Parties] Failed to load preset.");
+    }
 
-    private static void parseBinaryString(char[] bits, HashMap<String, RenderItem.Update> updater) {
-        int index = 0;
-        index = GeneralOptions.INSTANCE.getDefaults().readBits(index, bits, (name, value) -> updater.get(name).onUpdate(GeneralOptions.INSTANCE, value));
-        for (RenderItem item : RenderItem.items.values()) {
-            index += item.getDefaults().readBits(index, bits, (name, value) -> updater.get(name).onUpdate(item, value));
+
+    private static boolean applyPresetString(char[] bits, HashMap<String, RenderItem.Update> updater)  {
+        StringBuilder bitBuilder = new StringBuilder();
+        boolean newEntry = true;
+        boolean hasZeroes = false;
+        boolean validPreset = false;
+        int eleId = -1;
+        int eleVer = 0;
+        String elementBits = "";
+        ArrayList<RenderItem> itemList = new ArrayList<>(RenderItem.items.values());
+
+        for (char bit : bits) {
+            if (bit == ':') { //bitBuilder contains ID.
+                newEntry = false; //We are grabbing an entry.
+                eleId = Integer.parseInt(bitBuilder.toString());
+                bitBuilder.setLength(0); //Clear builder.
+                continue;
+            }
+            if (bit == '-') {
+                if (newEntry) {//newEntry = true, - defines a subversion of an entry.
+                    eleVer = Integer.parseInt(bitBuilder.toString());
+                } else { //newEntry = false, - defines additional zeros needed.
+                    hasZeroes = true;
+                    //base64 part completed.
+                    elementBits = new BigInteger(1, Base64.decodeBase64(bitBuilder.toString())).toString(2);
+                }
+                bitBuilder.setLength(0); //Clear builder.
+                continue;
+            }
+            if (bit == '|') {
+                if (hasZeroes) { //bitBuilder contains integer of zeroes we need to add to elementBits.
+                    elementBits = String.format("%" + (elementBits.length() + Integer.parseInt(bitBuilder.toString())) + "s", elementBits).replace(' ', '0');
+                } else { //bitBuilder contains elementBits.
+                    elementBits = new BigInteger(1, Base64.decodeBase64(bitBuilder.toString())).toString(2);
+                }
+                //Entry is fully defined.
+                if (eleId == 0) {
+                    GeneralOptions.INSTANCE.getDefaults().readBits(elementBits.toCharArray(), (name, value) -> updater.get(name).onUpdate(GeneralOptions.INSTANCE, value));
+                } else {
+                    //TODO: Replace eleVer functionality when multi versions of elements are added.
+                    if (eleVer == 0) {
+                        String finalElementBits = elementBits;
+                        RenderItem.getItemById(eleId, item -> {
+                            itemList.remove(item);
+                            item.getDefaults().readBits(finalElementBits.toCharArray(), (name, value) -> updater.get(name).onUpdate(item, value));
+                        });
+                    } else {
+                        //Future proofing
+                        Parties.LOGGER.error("[Parties] Attempted to load an element from a future version. Reverting to default.");
+                        RenderItem.getItemById(eleId, item -> {
+                            itemList.remove(item);
+                            RenderItem.setElementDefaults(item, updater);
+                        });
+                    }
+                }
+
+                bitBuilder.setLength(0); //Clear builder.
+                //Reset for next element
+                eleId = -1;
+                eleVer = 0;
+                hasZeroes = false;
+                newEntry = true;
+                validPreset = true;
+                continue;
+            }
+            bitBuilder.append(bit);
         }
+        if (validPreset) {
+            //Disable items not in preset.
+            itemList.forEach(item -> item.setEnabled(false));
+            RenderItem.isDirty = true;
+        }
+        return validPreset;
+
+
     }
 
     public static String getPresetString(HashMap<String, RenderItem.Getter> getter) {
+        //New
+        //Only save enabled items.
+        //TODO: Allow people to save non-enabled items as well that are marked for saving.
         StringBuilder bits = new StringBuilder();
-        bits.append(GeneralOptions.INSTANCE.getCurrentValues(getter).getBits());
-        RenderItem.items.values().forEach((item) -> bits.append(item.getCurrentValues(getter).getBits()));
-        BigInteger temp = new BigInteger(bits.toString(), 2);
-        int sizeDiff = temp.toString(2).length() - bits.length();
-        return Parties.ENCODE_VERSION + "|" + sizeDiff + "|" + Base64.encodeBase64String(temp.toByteArray());
+        //Add main entry.
+        String bitForm = GeneralOptions.INSTANCE.getCurrentValues(getter).getBits();
+        BigInteger intForm = bitsToInt(bitForm);
+        bits.append("0:").append(intTo64(intForm)).append("-").append(bitForm.length() - intForm.toString(2).length()).append("|");
+
+        RenderItem.forEachToSave((item) -> {
+            String bitF = item.getCurrentValues(getter).getBits();
+            BigInteger intF = bitsToInt(bitF);
+            bits.append(item.getId()).append(":").append(intTo64(intF));
+            int length = bitF.length() - intF.toString(2).length();
+            if (length != 0)
+                bits.append("-").append(length);
+            bits.append("|");
+        });
+        return bits.toString();
+    }
+
+    public static BigInteger bitsToInt(String bits) {
+        return new BigInteger(bits, 2);
+    }
+
+    public static String intTo64(BigInteger integer) {
+        return Base64.encodeBase64String(integer.toByteArray());
     }
 
     public static void saveDefaultDims(List<DimConfig.DimEntryConfig> entries) {
@@ -225,7 +308,7 @@ public class Config {
             writer.write(gson.toJson(entries));
             writer.flush();
         } catch (IOException e) {
-            Parties.LOGGER.error("Error trying to save default dimension entries !", e);
+            Parties.LOGGER.error("[Parties] Error trying to save default dimension entries !", e);
         }
     }
 
@@ -246,7 +329,7 @@ public class Config {
                 }
             }
         } catch (IOException e) {
-            Parties.LOGGER.error("Error trying to load dimension entries!", e);
+            Parties.LOGGER.error("[Parties] Error trying to load dimension entries!", e);
         }
     }
 
@@ -298,96 +381,21 @@ public class Config {
     }
 
     public static void loadDefaultPreset() {
+        //TODO: Reimplement this.
         Minecraft minecraft = Minecraft.getInstance();
         assert minecraft.player != null;
         HashMap<String, RenderItem.Update> updater = new HashMap<>();
         RenderItem.initUpdater(updater);
         try {
-
             String bits = ClientConfigData.defaultPreset.get();
-            if (bits.equals("") || Integer.parseInt(bits.substring(0, bits.indexOf('|'))) != Parties.ENCODE_VERSION) {
-                saveDefaultPresetString();
-                return;
+            if (!applyPresetString(bits.toCharArray(), updater)) {
+                parseError();
             }
-            bits = bits.substring(bits.indexOf('|') + 1);
-            int parse = Integer.parseInt(bits.substring(0, bits.indexOf('|')));
-            bits = new BigInteger(1, Base64.decodeBase64(bits.substring(bits.indexOf('|') + 1))).toString(2);
-            if (parse > 0) {
-                bits = bits.substring(parse);
-            } else {
-                bits = String.format("%" + (bits.length() + Math.abs(parse)) + "s", bits).replace(' ', '0');
-            }
-            parseBinaryString(bits.toCharArray(), updater);
         } catch (Exception e) {
-            saveDefaultPresetString();
+            minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.config.loadfail").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), minecraft.player.getUUID());
+            minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.config.loadfailv").withStyle(ChatFormatting.GRAY), minecraft.player.getUUID());
+            Parties.LOGGER.error("[Parties] Failed to load preset.", e);
         }
-    }
-
-    public static boolean loadDefaultPreset(String bits) {
-        Minecraft minecraft = Minecraft.getInstance();
-        assert minecraft.player != null;
-        HashMap<String, RenderItem.Update> updater = new HashMap<>();
-        RenderItem.initUpdater(updater);
-        try {
-            if (bits.equals("") || Integer.parseInt(bits.substring(0, bits.indexOf('|'))) != Parties.ENCODE_VERSION) {
-                saveDefaultPresetString();
-                return false;
-            }
-            bits = bits.substring(bits.indexOf('|') + 1);
-            int parse = Integer.parseInt(bits.substring(0, bits.indexOf('|')));
-            bits = new BigInteger(1, Base64.decodeBase64(bits.substring(bits.indexOf('|') + 1))).toString(2);
-            if (parse > 0) {
-                bits = bits.substring(parse);
-            } else {
-                bits = String.format("%" + (bits.length() + Math.abs(parse)) + "s", bits).replace(' ', '0');
-            }
-            parseBinaryString(bits.toCharArray(), updater);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public static void saveDefaultPresetString() {
-        //IMPORTANT TO RESAVE THIS PRESET EVERY PRESET VERSION UPDATE.
-        Parties.LOGGER.info("Filling the default preset in the client configuration and using it.");
-        String defaultLoad = "4|-7|AIAIBUAgAAAf0AgAgL7vn/wAuAJCgRAQlcAQCAcanl//+pqf///wLgKQo8WBAQggGjU8v////+BcBSFHiwICEf+pqf///wLgKQKPFgQEYITgBFu+f+BWAUwwnQCe/ZmYAyApgg7AJ275/8AAADBBQAT4AAAEAcAcKECIAcAcJ8CLBAuATt3z/4AAAGCAIBYBRwH/FwAAAKCEeAmAuAVDAAAAE/+dB3kKZTa8APyYAcEC4B0HgArCAAAAAF4v/itn+2f+Li/7Y2KEC4CQPAAzCAAAA+nMr/bLD/Z5DWHTtsUIFwEgeABmEAAABxLnMr/bLD/EmubDElqUIFwEgeABmEAAABa+r/bWVOWkZs6fPZ1y";
-        if (ModList.get().isLoaded("ars_nouveau")) {
-            if (SSCompatManager.active()) { // Ars & SS
-                if (FCompatManager.active() || EFCompatManager.active()) { //Ars & SS & Stam
-                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2aEC4CQFAAzCAAAA8nMr/bLD/Z5DWHTts0IPwEgKABmEAAABxLnMr/bLD/EmubDElq0IKwEgKABmEAAABaor/bWVOWkZs6fPZ1y";
-                } else {//Ars & SS
-                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2aEC4CQHgAzCAAAA8nMr/bLD/Z5DWHTts0INQEgPABmEAAABxLnMr/bLD/EmubDElqUIFwEgeABmEAAABaor/bWVOWkZs6fPZ1y";
-                }
-            } else {//Ars
-                if (FCompatManager.active() || EFCompatManager.active()) { //Ars & Stam
-                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2aEC4CQHgAzCAAAA8nMr/bLD/Z5DWHTtsUINQEgPABmEAAABxLnMr/bLD/EmubDElq0INQEgPABmEAAABaor/bWVOWkZs6fPZ1y";
-                } else { //Ars
-                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2aEC4CQPAAzCAAAA8nMr/bLD/Z5DWHTtsUIFwEgeABmEAAABxLnMr/bLD/EmubDElqUIFwEgeABmEAAABaor/bWVOWkZs6fPZ1y";
-                }
-            }
-        } else {
-            if (SSCompatManager.active()) { //SS
-                if (FCompatManager.active() || EFCompatManager.active()) {//SS & Stam
-                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2KEC4CQHgAzCAAAA8nMr/bLD/Z5DWHTts0IFwEgPABmEAAABxLnMr/bLD/EmubDElq0INQEgPABmEAAABaor/bWVOWkZs6fPZ1y";
-                } else { //SS
-                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2KEC4CQHgAzCAAAA8nMr/bLD/Z5DWHTts0IFwEgeABmEAAABxLnMr/bLD/EmubDElqUINQEYPABmEAAABaor/bWVOWkZs6fPZ1y";
-                }
-            } else {
-                if (FCompatManager.active() || EFCompatManager.active()) { //Stam
-                    defaultLoad = "4|-7|AIAIBUgggAAgUAgAgL7vn/wAuAHCgRAQlcAQCAcanl//+pqf///wLgKwo8WBAQggGjU8v////+BcBWFHiwICEf+pqf///wLgKwKPFgQEYITgBFu+f+BWAUwwnQB+/ZmYAyApgg7AIW75/8AAADBBQAQ4AAAEAUAUKMCYAYAYKMCTBAuAQt3z/4AAAGCAIBYBRwH/FwAAAKCEeAgAuAVDAAAAE/+dB3kKZTa8APyYAcEC4BoHgArCAAAAAF4v/itn+2f+Li/7Y2KEC4CQPAAzCAAAA8nMr/bLD/Z5DWHTtsUIFwEgeABmEAAABxLnMr/bLD/EmubDElq0IFwEgeABmEAAABaor/bWVOWkZs6fPZ1y";
-                }
-            }
-        }
-        if (!loadDefaultPreset(defaultLoad))
-            RenderItem.setDefaultValues();
-        saveCurrentPresetAsDefault();
-    }
-
-    private static void saveCurrentPresetAsDefault() {
-        HashMap<String, RenderItem.Getter> getter = new HashMap<>();
-        RenderItem.initGetter(getter);
-        saveCurrentPresetAsDefault(getter);
     }
 
     public static void saveCurrentPresetAsDefault(HashMap<String, RenderItem.Getter> getter) {
@@ -408,7 +416,7 @@ public class Config {
             writer.write(gson.toJson(dims));
             writer.flush();
         } catch (IOException e) {
-            Parties.LOGGER.error("Error trying to save missing dimension entries !", e);
+            Parties.LOGGER.error("[Parties] Error trying to save missing dimension entries !", e);
         }
     }
 }

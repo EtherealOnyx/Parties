@@ -45,11 +45,6 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
     }
 
     @Override
-    public String getType() {
-        return "Misc";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         DimConfig.entry("minecraft:overworld", (icon, color) -> renderGuiItemMenu(icon, b.x+7, b.y+3));
     }
@@ -261,6 +256,11 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         e.addEntry("ypos", 32, 12);
         e.addEntry("zpos", 1, 4);
         return e;
+    }
+
+    @Override
+    public int getId() {
+        return 6;
     }
 
     public ItemBound getRenderItemBound() {

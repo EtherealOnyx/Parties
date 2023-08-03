@@ -176,6 +176,11 @@ public class PManaI extends BarBase {
     }
 
     @Override
+    public int getId() {
+        return 20;
+    }
+
+    @Override
     public boolean isEnabled() {
         return elementEnabled && ModList.get().isLoaded("irons_spellbooks");
     }

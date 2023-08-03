@@ -454,7 +454,7 @@ public class ClientPlayerData {
                         new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(
                                 new TranslatableComponent("messages.sedparties.api.coldsweatunload").withStyle(ChatFormatting.RED))
                         , Minecraft.getInstance().player.getUUID());
-            Parties.LOGGER.error("Failed to support Cold Sweat!", t);
+            Parties.LOGGER.error("[Parties] Failed to support Cold Sweat!", t);
             }
         }
     }
@@ -486,7 +486,7 @@ public class ClientPlayerData {
                             new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(
                             new TranslatableComponent("messages.sedparties.api.coldsweatunload").withStyle(ChatFormatting.RED))
                             , Minecraft.getInstance().player.getUUID());
-                Parties.LOGGER.error("Failed to support Cold Sweat!", t);
+                Parties.LOGGER.error("[Parties] Failed to support Cold Sweat!", t);
             }
 
         }

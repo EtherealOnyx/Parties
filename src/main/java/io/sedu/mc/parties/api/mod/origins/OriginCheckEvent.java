@@ -22,7 +22,7 @@ public class OriginCheckEvent {
             if (handler.isPresent()) {
                 handler.getOriginList().forEach(origin -> {
                     if (origin.getRegistryName() == null) {
-                        Parties.LOGGER.error("An origin doesn't have a valid registry name! Skipping...");
+                        Parties.LOGGER.error("[Parties] An origin doesn't have a valid registry name! Skipping...");
                     } else {
                         new OriginHolder(origin.getRegistryName().toString(), origin.getName().getString(), origin.getDescription().getString(), origin.getIcon(), origin.getImpact());
                     }

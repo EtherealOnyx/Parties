@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
 public class TANHandler implements ITANHandler {
 
     static {
-        Parties.LOGGER.info("Initializing Compatibility with Tough as Nails.");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with Tough as Nails.");
     }
 
     private int getTempLevel(TemperatureLevel temp) {

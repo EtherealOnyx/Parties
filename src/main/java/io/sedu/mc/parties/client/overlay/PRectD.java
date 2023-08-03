@@ -25,11 +25,6 @@ public class PRectD extends RenderItem {
     }
 
     @Override
-    public String getType() {
-        return "BG";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         RenderUtils.sizeRect(poseStack.last().pose(), b.x+8, b.y+4, 0, 8, 8, 0x66002024, 0x66002024);
     }
@@ -82,5 +77,10 @@ public class PRectD extends RenderItem {
         e.addEntry("width", 165, 12);
         e.addEntry("height", 36, 12);
         return e;
+    }
+
+    @Override
+    public int getId() {
+        return 1;
     }
 }

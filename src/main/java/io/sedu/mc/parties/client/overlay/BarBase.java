@@ -55,11 +55,6 @@ public abstract class BarBase extends RenderIconTextItem implements TooltipItem 
     }
 
     @Override
-    public String getType() {
-        return "Bar";
-    }
-
-    @Override
     protected abstract void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b);
 
     @Override

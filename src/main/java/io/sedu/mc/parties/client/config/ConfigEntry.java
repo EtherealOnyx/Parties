@@ -42,13 +42,13 @@ public class ConfigEntry {
     }
 
 
-    public int readBits(int index, char[] bits, BiConsumer<String, Object> action) {
+    public void readBits(char[] bits, BiConsumer<String, Object> action) {
+        int index = 0;
         for (EntryObject entry : entries) {
             entry.updateValue(bits, index);
             action.accept(entry.name, entry.value);
             index += entry.bitSize;
         }
-        return totalBits;
     }
 
 

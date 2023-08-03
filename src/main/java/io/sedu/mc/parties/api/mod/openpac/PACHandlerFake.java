@@ -11,7 +11,7 @@ public class PACHandlerFake implements IPACHandler {
     @Override
     public void initParties(MinecraftServer server) {
         //initialize default...
-        Parties.LOGGER.error("Error initializing parties with Open-PAC Support!");
+        Parties.LOGGER.error("[Parties] Error initializing parties with Open-PAC Support!");
         PartySaveData.get();
     }
 

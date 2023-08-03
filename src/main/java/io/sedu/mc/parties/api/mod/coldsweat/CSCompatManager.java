@@ -40,7 +40,7 @@ public class CSCompatManager {
     }
 
     public static void changeHandler() {
-        Parties.LOGGER.error("Cold Sweat API wasn't found. Disabling support...");
+        Parties.LOGGER.error("[Parties] Cold Sweat API wasn't found. Disabling support...");
         disableSupport();
     }
 }

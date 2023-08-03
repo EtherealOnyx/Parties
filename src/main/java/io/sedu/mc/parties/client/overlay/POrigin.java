@@ -51,11 +51,6 @@ public class POrigin extends RenderIconTextItem implements TooltipItem {
     }
 
     @Override
-    public String getType() {
-        return "";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         poseStack.pushPose();
         Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+4, b.y-1, 0);
@@ -77,6 +72,11 @@ public class POrigin extends RenderIconTextItem implements TooltipItem {
         e.addEntry("xtpos", 0, 12);
         e.addEntry("ytpos", 0, 12);
         return e;
+    }
+
+    @Override
+    public int getId() {
+        return 23;
     }
 
     @Override

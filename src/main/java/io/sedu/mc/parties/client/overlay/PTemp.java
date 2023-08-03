@@ -37,11 +37,6 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
     }
 
     @Override
-    public String getType() {
-        return "Icon";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         setup(partyPath);
         RenderSystem.enableDepthTest();
@@ -168,6 +163,11 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
         e.addEntry("xtpos", 0, 12);
         e.addEntry("ytpos", 0, 12);
         return e;
+    }
+
+    @Override
+    public int getId() {
+        return 22;
     }
 
     @Override

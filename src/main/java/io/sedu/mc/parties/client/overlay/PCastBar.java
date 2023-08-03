@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.fml.ModList;
 
 import java.util.ArrayList;
 
@@ -30,11 +31,6 @@ public class PCastBar extends RenderIconTextItem {
     @Override
     int getColor() {
         return 0xdd943c;
-    }
-
-    @Override
-    public String getType() {
-        return "";
     }
 
     protected int maxW() {
@@ -70,6 +66,11 @@ public class PCastBar extends RenderIconTextItem {
         e.addEntry("ytpos", 0, 12);
         e.addEntry("thalfsize", true, 1);
         return e;
+    }
+
+    @Override
+    public int getId() {
+        return 21;
     }
 
     @Override
@@ -175,5 +176,10 @@ public class PCastBar extends RenderIconTextItem {
         //Left Pos: x + offset + (width - offset*2)*leftPos | Right Pos: x + offset + (
         RenderUtils.rectNoA(p.last().pose(), zPos, Math.max(x(i), x(i) + (width-2))+1, y(i)+1, Math.min(x(i)+width-1, x(i)+1 + (width-2)*rightPosition), y(i)+height-1, startColor, endColor);
         //Render.rectNoA(p.last().pose(), zLevel, l(i)+width*leftPosition-1, t(i)+1, l(i)-1+width*rightPosition, b(i)-1, startColor, endColor);
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return elementEnabled && ModList.get().isLoaded("irons_spellbooks");
     }
 }

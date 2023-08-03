@@ -45,11 +45,6 @@ public class PDead extends RenderIconTextItem {
     }
 
     @Override
-    public String getType() {
-        return "Icon";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         setup(GUI_ICONS_LOCATION);
         blit(poseStack, b.x+8, b.y+4, 16 + (gui.getGuiTicks() >> 4 & 1)*9, 0, 9, 9);
@@ -71,6 +66,11 @@ public class PDead extends RenderIconTextItem {
         e.addEntry("xtpos", 25, 12);
         e.addEntry("ytpos", 20, 12);
         return e;
+    }
+
+    @Override
+    public int getId() {
+        return 9;
     }
 
     @Override

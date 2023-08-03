@@ -36,11 +36,6 @@ public class PName extends RenderItem {
     }
 
     @Override
-    public String getType() {
-        return "Text";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         poseStack.pushPose();
         Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(sign, b.x+4, b.y-1, 0);
@@ -96,6 +91,11 @@ public class PName extends RenderItem {
         e.addEntry("zpos", 0, 4);
         e.addEntry("scale", 2, 2);
         return e;
+    }
+
+    @Override
+    public int getId() {
+        return 4;
     }
 
     @Override

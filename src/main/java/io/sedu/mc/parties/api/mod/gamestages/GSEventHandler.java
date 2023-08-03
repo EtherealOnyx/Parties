@@ -50,7 +50,7 @@ public class GSEventHandler {
         HashSet<String> newStages = new HashSet<>();
         PartyData p = PartyAPI.getPartyFromId(party);
         if (p == null) {
-            Parties.LOGGER.error("Error initializing game stage pool for party. This might break your game!");
+            Parties.LOGGER.error("[Parties] Error initializing game stage pool for party. This might break your game!");
         } else {
             p.getMembers().forEach(member -> {
                 if (playerChoices.getOrDefault(member, ServerSyncType.NONE) == ServerSyncType.ALL) {

@@ -13,7 +13,7 @@ public class ANHandler implements IANHandler {
 
     private static final Capability<IManaCap> MANA = CapabilityManager.get(new CapabilityToken<>(){});
     static {
-        Parties.LOGGER.info("Initializing Compatibility with Ars Nouveau.");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with Ars Nouveau.");
     }
 
     public boolean exists() {

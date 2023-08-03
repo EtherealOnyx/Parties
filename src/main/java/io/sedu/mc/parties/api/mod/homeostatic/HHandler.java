@@ -28,7 +28,7 @@ public class HHandler implements IHHandler {
 
 
     static {
-        Parties.LOGGER.info("Initializing Compatibility with Homeostatic.");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with Homeostatic.");
     }
 
     @Override

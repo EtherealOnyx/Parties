@@ -85,11 +85,6 @@ public abstract class PEffects extends RenderSelfItem {
     }
 
     @Override
-    public String getType() {
-        return "Bar";
-    }
-
-    @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isOnline) {
             renderSelf(id, gui, poseStack, partialTicks);

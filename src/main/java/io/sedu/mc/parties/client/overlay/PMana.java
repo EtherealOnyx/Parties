@@ -176,6 +176,11 @@ public class PMana extends BarBase {
     }
 
     @Override
+    public int getId() {
+        return 18;
+    }
+
+    @Override
     public boolean isEnabled() {
         return elementEnabled && ModList.get().isLoaded("ars_nouveau");
     }

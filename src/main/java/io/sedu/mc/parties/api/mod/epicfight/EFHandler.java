@@ -19,9 +19,9 @@ public class EFHandler implements IEFHandler {
     }
 
     static {
-        Parties.LOGGER.info("Initializing Compatibility with Epic Fight Mod.");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with Epic Fight Mod.");
         if (STAM == null) {
-            Parties.LOGGER.error("Failed to load Epic Fight Mod compatibility...");
+            Parties.LOGGER.error("[Parties] Failed to load Epic Fight Mod compatibility...");
         }
     }
 

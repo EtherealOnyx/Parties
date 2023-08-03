@@ -30,11 +30,6 @@ public class PLevelBar extends RenderIconTextItem implements TooltipItem {
     }
 
     @Override
-    public String getType() {
-        return "Bar";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         assert Minecraft.getInstance().player != null;
         float bar = Minecraft.getInstance().player.experienceProgress;
@@ -201,6 +196,11 @@ public class PLevelBar extends RenderIconTextItem implements TooltipItem {
         e.addEntry("xtpos", 0, 12);
         e.addEntry("ytpos", 0,12);
         return e;
+    }
+
+    @Override
+    public int getId() {
+        return 13;
     }
 
 

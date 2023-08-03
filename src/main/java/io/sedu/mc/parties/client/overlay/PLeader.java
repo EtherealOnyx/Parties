@@ -36,11 +36,6 @@ public class PLeader extends RenderItem implements TooltipItem{
     }
 
     @Override
-    public String getType() {
-        return "Icon";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         setup(partyPath);
         RenderSystem.enableDepthTest();
@@ -64,6 +59,11 @@ public class PLeader extends RenderItem implements TooltipItem{
         e.addEntry("zpos", 2, 4);
         e.addEntry("scale", 2, 2);
         return e;
+    }
+
+    @Override
+    public int getId() {
+        return 5;
     }
 
     @Override

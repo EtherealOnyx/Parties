@@ -111,7 +111,7 @@ public class PartyData {
 
     public void removeMember(UUID removedMember, boolean wasKicked) {
         if (!party.remove(removedMember))
-            Parties.LOGGER.error("Error removing a party member from party!");
+            Parties.LOGGER.error("[Parties] Error removing a party member from party!");
             //Some error occured!
 
         //Player is being removed.

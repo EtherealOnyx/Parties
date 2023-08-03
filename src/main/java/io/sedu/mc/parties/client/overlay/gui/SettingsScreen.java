@@ -115,7 +115,7 @@ public class SettingsScreen extends Screen {
 
     private void resetAll() {
         if (isConfirmed) {
-            Config.saveDefaultPresetString();
+            //TODO: Config.saveDefaultPresetString();
             isConfirmed = false;
             revertCooldown = 0;
             ((SmallButton)miscButtons.get(6)).setColor(1f, 1f, .5f);
@@ -151,6 +151,7 @@ public class SettingsScreen extends Screen {
         RenderItem.items.values().forEach(i -> i.setEnabled(b));
         RenderItem.clickArea.setEnabled(true);
         RenderItem.items.computeIfPresent(tabsOrder.get(selEle), (s, renderItem) -> renderItem.setEnabled(true));
+        RenderItem.isDirty = true; //Update displays.
     }
 
     protected final HashMap<String, RenderItem.Update> updater = new HashMap<>();
@@ -432,11 +433,11 @@ public class SettingsScreen extends Screen {
         if (isPresetOnly) {
             presetButton = new TabButton(-1, 0, 0, 32, 32, b -> {},
                                          RenderUtils.transTip(this, new TranslatableComponent("gui.sedparties.name.preset")),
-                                         new PresetOptions("Load").render((ForgeIngameGui) minecraft.gui), "Load");
+                                         new PresetOptions("Load").render((ForgeIngameGui) minecraft.gui));
         } else {
             presetButton = new TabButton(-1, 0, 0, 32, 32, b -> this.selectButton(((TabButton)b).index),
                                          RenderUtils.transTip(this, new TranslatableComponent("gui.sedparties.name.preset")),
-                                         new PresetOptions("Load").render((ForgeIngameGui) minecraft.gui), "Load");
+                                         new PresetOptions("Load").render((ForgeIngameGui) minecraft.gui));
         }
 
 
@@ -449,8 +450,7 @@ public class SettingsScreen extends Screen {
         tabsOrder.add("general");
         tabs.put("general", new TabButton(0, 0, 0, 24, 16, b -> this.selectButton(((TabButton)b).index),
                                           RenderUtils.transTip(this, new TranslatableComponent("gui.sedparties.name.general")),
-                                          new GeneralOptions("general").render((ForgeIngameGui) minecraft.gui),
-                                          "Main", true
+                                          new GeneralOptions("general").render((ForgeIngameGui) minecraft.gui), true
                                           ));
         while (iter.hasNext()) {
             item = iter.next();
@@ -458,8 +458,7 @@ public class SettingsScreen extends Screen {
                 tabsOrder.add(item.getKey());
                 tabs.put(item.getKey(), new TabButton(i, 0, 0, 24, 16, b -> this.selectButton(((TabButton)b).index),
                                                       RenderUtils.transTip(this, new TranslatableComponent(item.getValue().translateName())),
-                                                      item.getValue().render((ForgeIngameGui) minecraft.gui),
-                                                      item.getValue().getType(), true
+                                                      item.getValue().render((ForgeIngameGui) minecraft.gui), true
 
                 ));
                 i++;

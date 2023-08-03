@@ -31,11 +31,6 @@ public class PArmor extends RenderIconTextItem implements TooltipItem {
     }
 
     @Override
-    public String getType() {
-        return "Icon";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         setup(GUI_ICONS_LOCATION);
         blit(poseStack, b.x+8, b.y+3, 34, 9, 9, 9);
@@ -115,6 +110,11 @@ public class PArmor extends RenderIconTextItem implements TooltipItem {
         e.addEntry("xtpos", 0, 12);
         e.addEntry("ytpos", 0, 12);
         return e;
+    }
+
+    @Override
+    public int getId() {
+        return 7;
     }
 
     @Override

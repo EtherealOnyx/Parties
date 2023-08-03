@@ -166,8 +166,10 @@ public class PThirst extends OverflowBarBase {
         return e;
     }
 
-
-
+    @Override
+    public int getId() {
+        return 16;
+    }
 
 
     @Override

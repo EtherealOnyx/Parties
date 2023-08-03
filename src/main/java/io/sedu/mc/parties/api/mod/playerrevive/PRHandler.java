@@ -14,9 +14,9 @@ public class PRHandler implements IPRHandler {
     private static final Capability<IBleeding> BLEEDING = CapabilityManager.get(new CapabilityToken<>(){});
 
     static {
-        Parties.LOGGER.info("Initializing Compatibility with PlayerRevive.");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with PlayerRevive.");
         if (BLEEDING == null) {
-            Parties.LOGGER.warn("Failed to load PlayerRevive compatibility...");
+            Parties.LOGGER.warn("[Parties] Failed to load PlayerRevive compatibility...");
         }
     }
 

@@ -148,6 +148,25 @@ public abstract class RenderItem {
         selfFrameY = Math.min(ClientConfigData.yPos.get(), w.getScreenHeight() - frameEleH);
     }
 
+    public static void forEachToSave(Consumer<RenderItem> action) {
+        items.values().forEach(item -> {
+            //TODO: Allow saving marked items instead of just enabled.
+            //Calling isEnabled() since this method also checks for mod presence.
+            if (item.isEnabled()) {
+                action.accept(item);
+            }
+        });
+    }
+
+    public static void getItemById(int id, Consumer<RenderItem> action) {
+        for (RenderItem item : items.values()) {
+            if (item.getId() == id) {
+                action.accept(item);
+                return;
+            }
+        }
+    }
+
     public boolean isEnabled() {
         return elementEnabled;
     }
@@ -214,13 +233,10 @@ public abstract class RenderItem {
         return null;
     }
 
-    //TODO: For all frameX and frameY references, check if index == 0 ? frameX : otherFrameX, where otherFrameX is party member frame X position.
-
     public static void resetPos() {
         currentY = 0;
     }
 
-    //abstract void resetElement();
 
     int hOffset(int pOffset) {
         return pOffset == 0 ? 0 : (pOffset-1)*framePosH;
@@ -311,6 +327,7 @@ public abstract class RenderItem {
 
     public RenderItem setEnabled(boolean enabled) {
         this.elementEnabled = enabled;
+        this.elementEnabled = this.isEnabled(); //Prevent item from being enabled.
         return this;
     }
 
@@ -473,9 +490,6 @@ public abstract class RenderItem {
 
     }
 
-    public abstract String getType();
-
-
 
     protected void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int mouseX, int mouseY, int offsetX, int offsetY, String text, int outStart, int outEnd, int inStart, int inEnd, int textColor) {
         renderTooltip(poseStack, gui, mouseX, mouseY, offsetX, offsetY, new TextComponent(text), outStart, outEnd, inStart, inEnd, textColor);
@@ -596,6 +610,7 @@ public abstract class RenderItem {
 
     public SmallBound changeVisibility(boolean data) {
         elementEnabled = data;
+        elementEnabled = this.isEnabled();
         //Prevent tooltip rendering.
         isDirty = true;
         return null;
@@ -887,6 +902,8 @@ public abstract class RenderItem {
         return e;
     }
 
+    public abstract int getId();
+
     public static void getCurrentMouseFrame(int mouseX, int mouseY, TriConsumer<Integer, Integer, Integer> action) {
         int partyMouseX = mouseX;
         int partyMouseY = mouseY;
@@ -919,6 +936,14 @@ public abstract class RenderItem {
 
     private interface ItemRender {
         void render(ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof RenderItem r) {
+            return r.getId() == this.getId();
+        }
+        return false;
     }
 
 

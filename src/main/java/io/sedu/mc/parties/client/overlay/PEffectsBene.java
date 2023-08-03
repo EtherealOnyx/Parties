@@ -104,6 +104,11 @@ public class PEffectsBene extends PEffects {
     }
 
     @Override
+    public int getId() {
+        return 11;
+    }
+
+    @Override
     protected boolean getClientEffect(EffectHolder effects, Integer buffIndex, Consumer<ClientEffect> action) {
         return effects.getEffect(maxSize, effects.sortedEffectBene, buffIndex, action);
     }

@@ -64,9 +64,9 @@ public class ClientSetup {
         //Bars
         items.put("lvlbar", new PLevelBar("p_lvlbar"));
         items.put("health", new PHealth("p_health"));
-        items.put("chicken", new PHunger("p_chicken"));
+        items.put("hunger", new PHunger("p_hunger"));
         items.put("thirst", new PThirst("p_thirst"));
-        items.put("stam_ef", new PStamina("p_stam_ef"));
+        items.put("stam", new PStamina("p_stam"));
         items.put("mana", new PMana("p_mana"));
         items.put("mana_ss", new PManaSS("p_mana_ss"));
         items.put("mana_i", new PManaI("p_mana_i"));

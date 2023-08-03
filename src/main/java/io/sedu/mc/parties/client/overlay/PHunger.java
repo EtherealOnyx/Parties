@@ -179,6 +179,11 @@ public class PHunger extends OverflowBarBase {
     }
 
     @Override
+    public int getId() {
+        return 15;
+    }
+
+    @Override
     protected ConfigOptionsList getConfigOptions(SettingsScreen s, Minecraft minecraft, int x, int y, int w, int h,
                                                  boolean parse) {
         ConfigOptionsList c = new ConfigOptionsList(this::getColor, s, minecraft, x, y, w, h, parse);

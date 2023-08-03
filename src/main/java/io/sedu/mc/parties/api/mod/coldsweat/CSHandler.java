@@ -17,7 +17,7 @@ public class CSHandler implements ICSHandler {
 
     private static final Capability<ITemperatureCap> TEMP = CapabilityManager.get(new CapabilityToken<>(){});
     static {
-        Parties.LOGGER.info("Initializing Compatibility with Cold Sweat.");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with Cold Sweat.");
     }
 
     public boolean exists() {

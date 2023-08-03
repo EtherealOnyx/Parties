@@ -168,8 +168,10 @@ public class PManaSS extends OverflowBarBase {
         return e;
     }
 
-
-
+    @Override
+    public int getId() {
+        return 19;
+    }
 
 
     @Override

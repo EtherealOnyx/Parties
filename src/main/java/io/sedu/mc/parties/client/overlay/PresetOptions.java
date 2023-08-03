@@ -30,11 +30,6 @@ public class PresetOptions extends RenderItem {
     }
 
     @Override
-    public String getType() {
-        return "";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+8, b.y+4, 0);
         gui.getFont().drawShadow(poseStack, "Load", b.x+4, b.y+22, 0xFFFFFF);
@@ -43,6 +38,11 @@ public class PresetOptions extends RenderItem {
     @Override
     public ConfigEntry getDefaults() {
         return new ConfigEntry();
+    }
+
+    @Override
+    public int getId() {
+        return -1;
     }
 
     @Override

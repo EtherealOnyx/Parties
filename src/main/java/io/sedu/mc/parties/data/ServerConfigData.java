@@ -72,7 +72,7 @@ public class ServerConfigData {
             return false;
         else {
             if (isPartySyncEnabled()) {
-                Parties.LOGGER.error("Party sync is enabled, so party persistence cannot be disabled. Enabling...");
+                Parties.LOGGER.error("[Parties] Party sync is enabled, so party persistence cannot be disabled. Enabling...");
                 partyPersistence.set(true);
                 partyPersistence.save();
                 return false;
@@ -85,7 +85,7 @@ public class ServerConfigData {
         //TODO: FTB Teams Support
         if (partiesSync.get()) {
             if (!PACCompatManager.active()) {
-                Parties.LOGGER.error("Party sync was enabled but no syncable mods were found. Disabling...");
+                Parties.LOGGER.error("[Parties] Party sync was enabled but no syncable mods were found. Disabling...");
                 partiesSync.set(false);
                 partiesSync.save();
                 return false;

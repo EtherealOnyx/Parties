@@ -15,7 +15,7 @@ public class OEventHandler {
         if (eventInstance != null) {
             MinecraftForge.EVENT_BUS.register(eventInstance);
         } else {
-            Parties.LOGGER.error("Error properly loading Origins Support on the client!");
+            Parties.LOGGER.error("[Parties] Error properly loading Origins Support on the client!");
         }
     }
 

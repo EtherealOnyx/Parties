@@ -20,11 +20,6 @@ public class PRectO extends RenderSelfItem {
     }
 
     @Override
-    public String getType() {
-        return "BG";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
 
     }
@@ -51,6 +46,11 @@ public class PRectO extends RenderSelfItem {
     @Override
     public ConfigEntry getDefaults() {
         return new ConfigEntry();
+    }
+
+    @Override
+    public int getId() {
+        return -1;
     }
 
     protected int maxH() {

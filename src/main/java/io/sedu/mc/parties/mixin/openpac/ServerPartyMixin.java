@@ -41,7 +41,7 @@ public abstract class ServerPartyMixin {
             if (p != null) {
                 PACCompatManager.getHandler().memberAdded(p.getOwner().getUUID(), memberUUID, p.getId());
             } else {
-                Parties.LOGGER.error("Error adding party member through Open-PAC syncing!");
+                Parties.LOGGER.error("[Parties] Error adding party member through Open-PAC syncing!");
             }
         }
     }

@@ -30,11 +30,6 @@ public class GeneralOptions extends RenderItem {
     }
 
     @Override
-    public String getType() {
-        return "Main";
-    }
-
-    @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+4, b.y, 0);
     }
@@ -47,6 +42,11 @@ public class GeneralOptions extends RenderItem {
         e.addEntry("gen_pw", 0, 12);
         e.addEntry("gen_ph", 63, 12);
         return e;
+    }
+
+    @Override
+    public int getId() {
+        return 0;
     }
 
     @Override

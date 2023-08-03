@@ -13,7 +13,7 @@ public class HRHandler implements IHRHandler {
 
 
     static {
-        Parties.LOGGER.info("Initializing Compatibility with Hardcore Revival.");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with Hardcore Revival.");
     }
 
     @Override

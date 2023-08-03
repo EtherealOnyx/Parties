@@ -70,12 +70,12 @@ public class OriginHolder {
 
     public static void printOriginInfo() {
         oTable.forEach(((s, originHolder) -> {
-            Parties.LOGGER.info("Resource Name: " + s);
-            Parties.LOGGER.info("Name: " + originHolder.name);
-            Parties.LOGGER.info("Desc: " + originHolder.desc);
-            Parties.LOGGER.info("Item used: " + originHolder.item.getDisplayName().getString());
-            Parties.LOGGER.info("Dominant Color: 0x" + Integer.toHexString(originHolder.color));
-            Parties.LOGGER.info("--------------------------------------------------");
+            Parties.LOGGER.info("[Parties] Resource Name: " + s);
+            Parties.LOGGER.info("[Parties] Name: " + originHolder.name);
+            Parties.LOGGER.info("[Parties] Desc: " + originHolder.desc);
+            Parties.LOGGER.info("[Parties] Item used: " + originHolder.item.getDisplayName().getString());
+            Parties.LOGGER.info("[Parties] Dominant Color: 0x" + Integer.toHexString(originHolder.color));
+            Parties.LOGGER.info("[Parties] --------------------------------------------------");
         }));
     }
 

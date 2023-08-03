@@ -175,4 +175,9 @@ public class PEffectsBoth extends PEffects {
         return e;
     }
 
+    @Override
+    public int getId() {
+        return 10;
+    }
+
 }

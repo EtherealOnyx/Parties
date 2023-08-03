@@ -13,9 +13,9 @@ public class TMHandler implements ITMHandler {
     private static final Capability<IThirstCap> THIRSTY = CapabilityManager.get(new CapabilityToken<>(){});
 
     static {
-        Parties.LOGGER.info("Initializing Compatibility with Thirst was Taken (Thirst Mod).");
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with Thirst was Taken (Thirst Mod).");
         if (THIRSTY == null) {
-            Parties.LOGGER.warn("Failed to load Thirst Mod compatibility...");
+            Parties.LOGGER.warn("[Parties] Failed to load Thirst Mod compatibility...");
         }
     }
 

@@ -206,6 +206,11 @@ public class ConfigOptionsList extends AbstractWindowList<ConfigOptionsList.Entr
             this.desc = new TranslatableComponent("config.sedparties.tooltip." + name).getString();
         }
 
+        CheckboxEntry(String name, boolean isEnabled, boolean refreshes) {
+            this(name, isEnabled);
+            doesRefresh = refreshes;
+        }
+
         @Override
         void toggle(boolean enabled) {
             enable.active = enabled;

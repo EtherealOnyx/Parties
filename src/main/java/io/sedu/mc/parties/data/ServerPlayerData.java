@@ -419,7 +419,7 @@ public class ServerPlayerData {
         ServerPlayer p = getPlayer();
         if (listDirty) {
             if (p == null) {
-                Parties.LOGGER.error("Attempted to redo experience calculations when a player was not fully connected yet!");
+                Parties.LOGGER.error("[Parties] Attempted to redo experience calculations when a player was not fully connected yet!");
             } else {
                 redoList(p.getUUID());
             }
@@ -432,7 +432,7 @@ public class ServerPlayerData {
         ServerPlayer p = getPlayer();
         if (listDirty) {
             if (p == null) {
-                Parties.LOGGER.error("Attempted to redo experience calculations when a player was not fully connected yet!");
+                Parties.LOGGER.error("[Parties] Attempted to redo experience calculations when a player was not fully connected yet!");
             } else {
                 redoList(p.getUUID());
             }

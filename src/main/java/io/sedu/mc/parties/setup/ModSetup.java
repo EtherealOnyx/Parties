@@ -34,7 +34,7 @@ public class ModSetup {
     }
 
     private static void initSupport() {
-        Parties.LOGGER.info("Initializing mod support...");
+        Parties.LOGGER.info("[Parties] Initializing mod support...");
         PRCompatManager.init(); //Player Revive Support
         HRCompatManager.init(); //Hardcore Revival Support
         TANCompatManager.init();//Tough as Nails Support
@@ -50,6 +50,6 @@ public class ModSetup {
         OCompatManager.init(); //Origins Mod Support
         ISSCompatManager.init(); //Iron's Spells n' Spellbooks Support
         ICompatManager.init(); //Incapacitated Support
-        Parties.LOGGER.info("Mod support initialization complete!");
+        Parties.LOGGER.info("[Parties] Mod support initialization complete!");
     }
 }

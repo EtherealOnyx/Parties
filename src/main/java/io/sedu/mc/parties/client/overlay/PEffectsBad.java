@@ -110,6 +110,11 @@ public class PEffectsBad extends PEffects{
     }
 
     @Override
+    public int getId() {
+        return 12;
+    }
+
+    @Override
     protected boolean getClientEffect(EffectHolder effects, Integer buffIndex, Consumer<ClientEffect> action) {
         return effects.getEffect(maxSize, effects.sortedEffectBad, buffIndex, action);
     }
