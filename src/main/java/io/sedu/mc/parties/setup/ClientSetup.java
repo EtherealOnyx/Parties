@@ -38,11 +38,7 @@ public class ClientSetup {
 
     public static void init(final FMLClientSetupEvent event) {
         MinecraftForge.EVENT_BUS.addListener(ClientEvent::onClientLeave);
-        MinecraftForge.EVENT_BUS.addListener(ClientEvent::onClientJoin);
-        MinecraftForge.EVENT_BUS.addListener(ClientEvent::ticker);
-        MinecraftForge.EVENT_BUS.addListener(ClientEvent::keyPress);
-        MinecraftForge.EVENT_BUS.addListener(ClientEvent::mouseReleased);
-        MinecraftForge.EVENT_BUS.addListener(ClientEvent::nameTagRender);
+        MinecraftForge.EVENT_BUS.register(ClientEvent.class);
 
 
 

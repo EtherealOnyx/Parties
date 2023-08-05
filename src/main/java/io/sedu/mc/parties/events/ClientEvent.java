@@ -14,14 +14,19 @@ import net.minecraftforge.client.event.RenderNameplateEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ClientEvent {
+
+    @SubscribeEvent
     public static void onClientLeave(ClientPlayerNetworkEvent.LoggedOutEvent event) {
         //Reset info.
 
         ClientPlayerData.resetOnly();
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onClientJoin(ClientPlayerNetworkEvent.LoggedInEvent event) {
         //Reset info.
 
@@ -29,6 +34,7 @@ public class ClientEvent {
     }
 
     public static int tick = 0;
+    @SubscribeEvent
     public static void ticker(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             AnimBarHandler.tick();
@@ -41,16 +47,19 @@ public class ClientEvent {
         }
     }
 
+    @SubscribeEvent
     public static void keyPress(InputEvent.KeyInputEvent event) {
         if (ClientSetup.showMouse.getKey().getValue() == event.getKey() && Minecraft.getInstance().screen == null) {
             Minecraft.getInstance().setScreen(new HoverScreen(ClientSetup.showMouse.getKey().getValue()));
         }
     }
 
+    @SubscribeEvent
     public static void mouseReleased(ScreenEvent.MouseReleasedEvent event) {
         SliderButton.clickReleased = true; //hehe
     }
 
+    @SubscribeEvent
     public static void nameTagRender(RenderNameplateEvent event) {
         if (event.getEntity() instanceof Player p && ((GUIRenderer) p).isRenderingUI()) {
             event.setResult(Event.Result.DENY);

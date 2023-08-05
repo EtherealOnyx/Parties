@@ -165,6 +165,10 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+
+    flatDir {
+        dirs "libs"
+    }
     mavenLocal()
 }
 
@@ -199,9 +203,6 @@ dependencies {
     compileOnly fg.deobf("curse.maven:hardcorerevival-274036:3830873")
     compileOnly fg.deobf("curse.maven:balm-531761:4442615")
 
-    //Thirst Mod - Local file, also can't test in dev environment...
-    compileOnly files("libs/Thirst--1.18.2-1.2.3.jar")
-
     //Cold Sweat
     //compileOnly fg.deobf("curse.maven:coldsweat-506194:4459981")
     compileOnly fg.deobf("curse.maven:coldsweat-506194:4512295")
@@ -233,9 +234,6 @@ dependencies {
     //Homeostatic
     implementation fg.deobf("curse.maven:homeostatic-634466:4655143")
 
-    //Dietary Statistics - Local file, also can't test in dev environment...
-    compileOnly files("libs/DietaryStatistics-1.0.2.jar")
-
     //Origins Mod
     implementation fg.deobf("curse.maven:origins-forge-474438:3889853")
     runtimeOnly fg.deobf("curse.maven:caelus-308989:3650485")
@@ -261,6 +259,12 @@ dependencies {
     //Blue Skies
     runtimeOnly fg.deobf("curse.maven:structure-gel-api-378802:4018606")
     runtimeOnly fg.deobf("curse.maven:blue-skies-312918:3788736")
+
+    //Thirst Mod - Local file
+    compileOnly fg.deobf("local:Thirst:1.2.3")
+
+    //Dietary Statistics - Local file
+    implementation fg.deobf("local:DietaryStatistics:1.0.2")
 }
 
 mixin {

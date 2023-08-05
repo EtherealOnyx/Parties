@@ -9,6 +9,7 @@ import io.sedu.mc.parties.network.InfoPacketHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class DSEventHandler {
     }
 
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onClientJoin(ClientPlayerNetworkEvent.LoggedInEvent event) {
         if (event.getPlayer() != null)
             PlayerAPI.getClientPlayer(event.getPlayer().getUUID(), player -> DSCompatManager.getHandler().getMaxHunger(event.getPlayer(), (max) -> {

@@ -317,7 +317,7 @@ public class ServerPlayerData {
 
     public float getMaxHunger(boolean forceUpdate) {
         if (forceUpdate && !dataItems.containsKey(MAXHUNGER)) {
-            if (serverPlayer.get() != null) { // Try to get info before sending it.
+            if (serverPlayer != null && serverPlayer.get() != null) { // Try to get info before sending it.
                 DSCompatManager.getHandler().getMaxHunger(serverPlayer.get(), food -> dataItems.put(MAXHUNGER, food));
             }
         }

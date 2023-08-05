@@ -105,7 +105,6 @@ public class PartyEvent {
                 FoodData d;
                 (pD = ServerPlayerData.playerList.get(player = e.player.getUUID())).setSaturation((d = e.player.getFoodData()).getSaturationLevel(), saturation -> {
                     InfoPacketHelper.sendSaturationUpdate((ServerPlayer) e.player, saturation);
-                    Parties.LOGGER.debug("Saturation Update: " + saturation);
                 });
 
                 if ((trackers = ServerPlayerData.playerTrackers.get(e.player.getUUID())) != null) {

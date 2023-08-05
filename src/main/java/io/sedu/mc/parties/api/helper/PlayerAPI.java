@@ -56,7 +56,9 @@ public class PlayerAPI {
 
     public static void getClientPlayer(UUID player, Consumer<ClientPlayerData> action) {
         ClientPlayerData p;
-        if ((p = ClientPlayerData.playerList.get(player)) != null)
+        if ((p = ClientPlayerData.playerList.get(player)) != null) {
             action.accept(p);
+        }
+
     }
 }
