@@ -46,6 +46,8 @@ import static io.sedu.mc.parties.data.ServerConfigData.playerUpdateInterval;
 @Mod.EventBusSubscriber(modid = Parties.MODID)
 public class PartyEvent {
 
+    public static boolean ignoreXpShare = false;
+
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!event.getPlayer().level.isClientSide) {

@@ -11,6 +11,7 @@
     "openpac.ServerPartyMixin",
     "origins.ChooseOriginMixin",
     "vanilla.EntitySelectorMixin",
+    "vanilla.ExperienceCommandMixin",
     "vanilla.PlayerMixin"
   ],
   "client": [

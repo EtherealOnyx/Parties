@@ -20,12 +20,13 @@ public class ServerConfigData {
     public static ForgeConfigSpec.BooleanValue partyPersistence;
     public static ForgeConfigSpec.BooleanValue allowGlobalUpdates;
     public static ForgeConfigSpec.ConfigValue<ServerSyncType> syncGameStages;
+    public static ForgeConfigSpec.BooleanValue ignoreCommand;
 
 
 
     public static void registerServerConfig(ForgeConfigSpec.Builder SERVER_BUILDER) {
         SERVER_BUILDER.comment("Server Party Settings");
-        SERVER_BUILDER.push("party-timers");
+        SERVER_BUILDER.push("timers");
         playerUpdateInterval = SERVER_BUILDER.comment("Delay (in ticks) for player packet syncing (hunger, xp)")
                                              .defineInRange("playerUpdateInterval", 10, 10, 200);
         playerSlowUpdateInterval = SERVER_BUILDER.comment("Delay (in ticks) for player packet syncing for less frequent items (World Temp, etc)")
@@ -33,17 +34,21 @@ public class ServerConfigData {
         playerAcceptTimer = SERVER_BUILDER.comment("Delay (in seconds) for player to accept invite before it automatically expires.")
                                           .defineInRange("playerAcceptTimer", 30, 5, 60);
         SERVER_BUILDER.pop();
-        SERVER_BUILDER.push("party-mechanics");
+        SERVER_BUILDER.push("mechanics");
         partySize = SERVER_BUILDER.comment("Max size for a party")
                                   .defineInRange("partySize", 5, 2, Integer.MAX_VALUE);
         friendlyFire = SERVER_BUILDER.comment("Allow players to attack each other in parties")
                                      .define("friendlyFire", false);
-        enableShare = SERVER_BUILDER.comment("Allow players to share XP in a party.")
+        partyPersistence = SERVER_BUILDER.comment("Makes parties persist between server launches. Disabling this removes all saved parties - they will have to be remade.")
+                                         .define("partyPersistence", true);
+        SERVER_BUILDER.pop();
+        SERVER_BUILDER.push("xp-share");
+        enableShare = SERVER_BUILDER.comment("Allow players to share XP in a party. This is a universal option.")
                                     .define("enableShare", true);
         globalShare = SERVER_BUILDER.comment("Enables XP Sharing between party members regardless of distance from each other.")
                                     .define("globalShare", true);
-        partyPersistence = SERVER_BUILDER.comment("Makes parties persist between server launches. Disabling this removes all saved parties - they will have to be remade.")
-                                         .define("partyPersistence", true);
+        ignoreCommand = SERVER_BUILDER.comment("Disables XP Sharing from vanilla commands that give experience *points*.",
+                                               "(/xp add [name] [amount] points)").define("ignoreCommand", true);
 
         SERVER_BUILDER.pop();
         SERVER_BUILDER.push("mod-support");

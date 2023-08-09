@@ -4,8 +4,9 @@ import io.sedu.mc.parties.api.helper.PartyAPI;
 import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.client.overlay.gui.GUIRenderer;
 import io.sedu.mc.parties.data.PartyData;
-import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.data.ServerConfigData;
+import io.sedu.mc.parties.data.ServerPlayerData;
+import io.sedu.mc.parties.events.PartyEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,8 +22,8 @@ public abstract class PlayerMixin implements GUIRenderer {
 
     @ModifyVariable(at = @At("HEAD"), method = "giveExperiencePoints(I)V", argsOnly = true)
     private int modifiedExperiencePoints(int pXpPoints) {
-        if (pXpPoints < 0 ) return pXpPoints;
-        if (!ServerConfigData.enableShare.get()) return pXpPoints;
+        System.out.println(PartyEvent.ignoreXpShare);
+        if (pXpPoints < 0 || PartyEvent.ignoreXpShare || !ServerConfigData.enableShare.get()) return pXpPoints;
         ServerPlayerData pd;
         if ((pd = PlayerAPI.getNormalPlayer(((Player)(Object)this).getUUID())) == null) return pXpPoints;
         List<Player> members = ServerConfigData.globalShare.get() ? pd.getOnlineMembers() : pd.getNearbyMembers();
