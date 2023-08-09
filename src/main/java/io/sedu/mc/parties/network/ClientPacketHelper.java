@@ -1,7 +1,6 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
-import io.sedu.mc.parties.client.overlay.gui.HoverScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.MutableComponent;
@@ -13,8 +12,8 @@ import net.minecraft.world.entity.player.Player;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import static io.sedu.mc.parties.client.overlay.ClientPlayerData.*;
 import static io.sedu.mc.parties.api.helper.PlayerAPI.getClientPlayer;
+import static io.sedu.mc.parties.client.overlay.ClientPlayerData.*;
 
 public class ClientPacketHelper {
 
@@ -86,7 +85,6 @@ public class ClientPacketHelper {
         });
 
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_ACTIVATE, .25f, 1f);
-        HoverScreen.reInit();
     }
 
     public static void refreshClientOnDimChange() {
@@ -107,7 +105,6 @@ public class ClientPacketHelper {
         ClientPlayerData.reset();
         msg(new TranslatableComponent("messages.sedparties.phandler.dropparty").withStyle(ChatFormatting.DARK_AQUA));
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
-        HoverScreen.reInit();
     }
 
     public static void removePartyMemberDropped(UUID uuid) {
@@ -118,14 +115,12 @@ public class ClientPacketHelper {
     private static void remove(UUID id) {
         playerList.remove(id);
         playerOrderedList.remove(id);
-        HoverScreen.reInit();
     }
 
     public static void dropPartyKicked() {
         ClientPlayerData.reset();
         msg(new TranslatableComponent("messages.sedparties.phandler.kickedfromparty").withStyle(ChatFormatting.AQUA));
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
-        HoverScreen.reInit();
     }
 
     public static void removePartyMemberKicked(UUID uuid) {
@@ -137,7 +132,6 @@ public class ClientPacketHelper {
         ClientPlayerData.reset();
         msg(new TranslatableComponent("messages.sedparties.phandler.partydisband").withStyle(ChatFormatting.AQUA));
         Minecraft.getInstance().player.playSound(SoundEvents.BEACON_DEACTIVATE, .25f, 1f);
-        HoverScreen.reInit();
     }
 
     public static void sendTrackerToClient(Player entity) {
