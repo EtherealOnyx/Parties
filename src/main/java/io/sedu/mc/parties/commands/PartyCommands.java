@@ -2,8 +2,11 @@ package io.sedu.mc.parties.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import io.sedu.mc.parties.api.mod.gamestages.GSEventHandler;
+import io.sedu.mc.parties.api.mod.gamestages.SyncType;
 import io.sedu.mc.parties.data.PartyHelper;
 import io.sedu.mc.parties.data.PartySaveData;
+import io.sedu.mc.parties.data.ServerConfigData;
 import io.sedu.mc.parties.network.ClientPacketData;
 import io.sedu.mc.parties.network.PartiesPacketHandler;
 import net.minecraft.ChatFormatting;
@@ -11,6 +14,9 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.server.command.EnumArgument;
 
 import java.util.UUID;
 
@@ -26,6 +32,20 @@ public class PartyCommands {
              return Command.SINGLE_SUCCESS;
         }
         ));
+        if (ModList.get().isLoaded("gamestages")) {
+            dispatcher.register(Commands.literal("party").then(Commands.literal("sync")
+               .then(Commands.argument("type", EnumArgument.enumArgument(SyncType.class)).executes(ctx -> {
+                   ServerPlayer p = ctx.getSource().getPlayerOrException();
+                   SyncType t = ctx.getArgument("type", SyncType.class);
+                   if (GSEventHandler.changePlayerOption(p.getUUID(), t, false))
+                       p.sendMessage(new TranslatableComponent("messages.sedparties.command.syncchange", t).withStyle(ChatFormatting.DARK_AQUA), ctx.getSource().getPlayerOrException().getUUID());
+                   else
+                       p.sendMessage(new TranslatableComponent("messages.sedparties.command.syncsame", t).withStyle(ChatFormatting.DARK_AQUA), ctx.getSource().getPlayerOrException().getUUID());
+                   if (!GSEventHandler.validType(t))
+                       p.sendMessage(new TranslatableComponent("messages.sedparties.command.syncoverride", ServerConfigData.syncGameStages.get(), t).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY), ctx.getSource().getPlayerOrException().getUUID());
+                   return Command.SINGLE_SUCCESS;
+            }))));
+        }
         dispatcher.register(Commands.literal("party")
             .then(Commands.literal("invite")
                 .then(Commands.argument("player", new NotSelfArgument(false))

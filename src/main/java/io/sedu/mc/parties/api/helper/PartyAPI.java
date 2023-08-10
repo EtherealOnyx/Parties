@@ -77,4 +77,8 @@ public class PartyAPI {
     public static boolean hasParty(UUID player) {
         return getPartyFromMember(player) != null;
     }
+
+    public static UUID getPartyId(UUID uuid) {
+        return null;
+    }
 }

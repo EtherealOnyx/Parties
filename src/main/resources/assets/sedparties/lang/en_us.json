@@ -265,7 +265,10 @@
   "gui.sedparties.tooltip.scale-l": "L-Click: Increase Size",
   "gui.sedparties.tooltip.scale-r": "R-Click: Decrease Size",
   "messages.sedparties.preset.loadsuccessclipboard": "Preset from clipboard has been loaded successfully.",
-  "messages.sedparties.preset.loadfailclipboard": "Could not load a valid preset from the clipboard."
+  "messages.sedparties.preset.loadfailclipboard": "Could not load a valid preset from the clipboard.",
+  "messages.sedparties.command.syncchange": "Stage Sync has been changed to [%s].",
+  "messages.sedparties.command.syncsame": "Your stage sync is already set to [%s].",
+  "messages.sedparties.command.syncoverride": "Note: Server sync is set to [%s]. Your selected option of [%s] will be overwritten."
 
 
 }

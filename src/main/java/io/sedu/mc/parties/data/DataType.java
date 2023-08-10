@@ -40,5 +40,8 @@ public enum DataType {
     IMANAMAX,
 
     //Origins
-    ORIGIN
+    ORIGIN,
+
+    //Game Stages
+    GSYNCTYPE
 }

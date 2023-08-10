@@ -52,6 +52,12 @@ public class PartiesPacketHandler {
            .encoder(StringPacketData::encode)
            .consumer(StringPacketData::handle)
            .add();
+
+        net.messageBuilder(StageTypeSync.class, id(), NetworkDirection.PLAY_TO_SERVER)
+           .decoder(StageTypeSync::new)
+           .encoder(StageTypeSync::encode)
+           .consumer(StageTypeSync::handle)
+           .add();
     }
 
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {

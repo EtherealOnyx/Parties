@@ -98,7 +98,10 @@ public class ServerPacketHelper {
             PartiesPacketHandler.sendToPlayer(
                     new ClientPacketData(3, PartyAPI.getPartyFromMember(player.getUUID()).getLeader()), player);
             //API Helper
-            MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(player));
+            PlayerAPI.getPlayer(player.getUUID(), playerData -> {
+                MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(player, playerData.getPartyId()));
+            });
+
         }
         if(!player.isDeadOrDying())
             player.getActiveEffects().forEach(effect -> InfoPacketHelper.sendEffect(player.getUUID(), MobEffect.getId(effect.getEffect()), effect.getDuration(), effect.getAmplifier()));

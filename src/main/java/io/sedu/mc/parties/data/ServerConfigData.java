@@ -1,7 +1,7 @@
 package io.sedu.mc.parties.data;
 
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.mod.gamestages.ServerSyncType;
+import io.sedu.mc.parties.api.mod.gamestages.SyncType;
 import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -19,7 +19,7 @@ public class ServerConfigData {
     public static ForgeConfigSpec.BooleanValue partiesSync;
     public static ForgeConfigSpec.BooleanValue partyPersistence;
     public static ForgeConfigSpec.BooleanValue allowGlobalUpdates;
-    public static ForgeConfigSpec.ConfigValue<ServerSyncType> syncGameStages;
+    public static ForgeConfigSpec.ConfigValue<SyncType> syncGameStages;
     public static ForgeConfigSpec.BooleanValue ignoreCommand;
 
 
@@ -68,7 +68,7 @@ public class ServerConfigData {
                                              "ALL - Players can opt-in to allow all game stage syncing, including previous entries.",
                                              "FUTURE - Players can only opt-in to allow future game stages to be synced",
                                              "NONE - Game stage syncing is disabled completely.")
-                                    .defineEnum("syncGameStages", ServerSyncType.NONE);
+                                    .defineEnum("syncGameStages", SyncType.NONE);
         SERVER_BUILDER.pop();
     }
 

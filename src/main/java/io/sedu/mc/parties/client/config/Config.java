@@ -428,7 +428,6 @@ public class Config {
 
     public static void reloadClientConfigs() {
         //Force file recheck.
-        //FileWatcher.defaultInstance().add
         OverlayRegistry.enableOverlay(ForgeIngameGui.POTION_ICONS_ELEMENT, renderPotionEffects.get());
         OverlayRegistry.enableOverlay(ForgeIngameGui.EXPERIENCE_BAR_ELEMENT, renderXPBar.get());
         OverlayRegistry.enableOverlay(ForgeIngameGui.PLAYER_HEALTH_ELEMENT, renderPlayerHealth.get());

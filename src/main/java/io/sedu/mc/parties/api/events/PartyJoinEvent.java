@@ -21,11 +21,13 @@ public class PartyJoinEvent extends PlayerEvent {
 
     //The ID of the player that triggered this event.
     private final UUID id;
+    private final UUID partyId;
 
     //Constructor used to trigger this event. It requires the player.
-    public PartyJoinEvent(Player player) {
+    public PartyJoinEvent(Player player, UUID partyId) {
         super(player);
         trackers = ServerPlayerData.playerTrackers.get(id = player.getUUID());
+        this.partyId = partyId;
     }
 
     /*
@@ -59,5 +61,10 @@ public class PartyJoinEvent extends PlayerEvent {
                 action.accept(id, this.id);
             });
         }
+    }
+
+    //This method simply returns the party ID associated with the party creation.
+    public UUID getPartyId() {
+        return partyId;
     }
 }

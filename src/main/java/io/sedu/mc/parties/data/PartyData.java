@@ -79,7 +79,7 @@ public class PartyData {
         PlayerAPI.getPlayer(futureMember, (playerData) -> playerData.addParty(partyId));
         Parties.LOGGER.debug("Add Member internal POST-player party info");
         //API Helper
-        PlayerAPI.getServerPlayer(futureMember, (serverPlayer) -> MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(serverPlayer)));
+        PlayerAPI.getServerPlayer(futureMember, (serverPlayer) -> MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(serverPlayer, partyId)));
         Parties.LOGGER.debug("Add Member internal POST-api");
     }
 

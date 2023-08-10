@@ -1,8 +1,7 @@
 package io.sedu.mc.parties.api.mod.gamestages;
 
-public enum ClientSyncType {
+public enum SyncType {
     ALL,
     FUTURE,
     NONE,
-    PROMPT
 }

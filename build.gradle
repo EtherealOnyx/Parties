@@ -232,14 +232,14 @@ dependencies {
     compileOnly fg.deobf("curse.maven:openpac-636608:4500809")
 
     //Homeostatic
-    implementation fg.deobf("curse.maven:homeostatic-634466:4655143")
+    compileOnly fg.deobf("curse.maven:homeostatic-634466:4655143")
 
     //Origins Mod
-    implementation fg.deobf("curse.maven:origins-forge-474438:3889853")
+    compileOnly fg.deobf("curse.maven:origins-forge-474438:3889853")
     runtimeOnly fg.deobf("curse.maven:caelus-308989:3650485")
 
-    implementation fg.deobf("curse.maven:irons-spells-n-spellbooks-855414:4605093")
-    implementation fg.deobf("curse.maven:playeranimator-658587:4418152")
+    compileOnly fg.deobf("curse.maven:irons-spells-n-spellbooks-855414:4605093")
+    compileOnly fg.deobf("curse.maven:playeranimator-658587:4418152")
 
     //Curios API
     runtimeOnly fg.deobf("curse.maven:curios-309927:4590652")
@@ -248,23 +248,21 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:geckolib-388172:4181370")
 
     //AppleSkin
-    implementation fg.deobf("curse.maven:appleskin-248787:3686482")
+    compileOnly fg.deobf("curse.maven:appleskin-248787:3686482")
 
     //Game Stages
-    compileOnly fg.deobf("curse.maven:game-stages-268655:4066389")
+    implementation fg.deobf("curse.maven:game-stages-268655:4066389")
+    runtimeOnly fg.deobf("curse.maven:bookshelf-228525:4556713")
+    runtimeOnly fg.deobf("curse.maven:crafttweaker-239197:4611964")
 
     //Incapacitated
-    implementation fg.deobf("curse.maven:incapacitated-528135:4645650")
-
-    //Blue Skies
-    runtimeOnly fg.deobf("curse.maven:structure-gel-api-378802:4018606")
-    runtimeOnly fg.deobf("curse.maven:blue-skies-312918:3788736")
+    compileOnly fg.deobf("curse.maven:incapacitated-528135:4645650")
 
     //Thirst Mod - Local file
     compileOnly fg.deobf("local:Thirst:1.2.3")
 
     //Dietary Statistics - Local file
-    implementation fg.deobf("local:DietaryStatistics:1.0.2")
+    compileOnly fg.deobf("local:DietaryStatistics:1.0.2")
 }
 
 mixin {

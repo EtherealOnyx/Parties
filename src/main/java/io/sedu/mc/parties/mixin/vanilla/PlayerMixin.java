@@ -22,7 +22,6 @@ public abstract class PlayerMixin implements GUIRenderer {
 
     @ModifyVariable(at = @At("HEAD"), method = "giveExperiencePoints(I)V", argsOnly = true)
     private int modifiedExperiencePoints(int pXpPoints) {
-        System.out.println(PartyEvent.ignoreXpShare);
         if (pXpPoints < 0 || PartyEvent.ignoreXpShare || !ServerConfigData.enableShare.get()) return pXpPoints;
         ServerPlayerData pd;
         if ((pd = PlayerAPI.getNormalPlayer(((Player)(Object)this).getUUID())) == null) return pXpPoints;

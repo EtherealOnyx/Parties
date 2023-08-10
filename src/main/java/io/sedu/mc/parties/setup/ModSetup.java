@@ -6,6 +6,7 @@ import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.mod.dietarystats.DSCompatManager;
 import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
+import io.sedu.mc.parties.api.mod.gamestages.GSCompatManager;
 import io.sedu.mc.parties.api.mod.hardcorerevival.HRCompatManager;
 import io.sedu.mc.parties.api.mod.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.mod.incapacitated.ICompatManager;
@@ -50,6 +51,7 @@ public class ModSetup {
         OCompatManager.init(); //Origins Mod Support
         ISSCompatManager.init(); //Iron's Spells n' Spellbooks Support
         ICompatManager.init(); //Incapacitated Support
+        GSCompatManager.init(); //Game Stages Support
         Parties.LOGGER.info("[Parties] Mod support initialization complete!");
     }
 }

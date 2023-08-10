@@ -343,7 +343,7 @@ public class PACHandler implements IPACHandler {
                         InfoPacketHelper.forceUpdate(member, pMember, true);
                         //TODO: Make this more efficient. This sends data multiple times...
                         //API Helper
-                        PlayerAPI.getServerPlayer(pMember, (player) -> MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(player)));
+                        PlayerAPI.getServerPlayer(pMember, (player) -> MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(player, partyId)));
                     } else {
                         PartiesPacketHandler.sendToPlayer(new ClientPacketData(1, pMember), mS);
                     }

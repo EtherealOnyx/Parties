@@ -4,6 +4,7 @@ import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.helper.PartyAPI;
 import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.api.mod.dietarystats.DSCompatManager;
+import io.sedu.mc.parties.api.mod.gamestages.SyncType;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -397,6 +398,18 @@ public class ServerPlayerData {
             dataItems.put(ORIGIN, v);
             action.run();
         }
+    }
+
+    public SyncType getGSyncType() {
+        return (SyncType) dataItems.getOrDefault(GSYNCTYPE, SyncType.NONE);
+    }
+
+    public boolean setGSyncType(SyncType type) {
+        boolean changed = (getGSyncType() != type);
+
+        dataItems.put(GSYNCTYPE, type);
+        Parties.LOGGER.info("Stage/Quest Sync updated for {}: {}", this.getName(), getGSyncType());
+        return changed;
     }
 
 
