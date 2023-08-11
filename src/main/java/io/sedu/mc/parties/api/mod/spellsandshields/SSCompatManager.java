@@ -1,11 +1,12 @@
 package io.sedu.mc.parties.api.mod.spellsandshields;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class SSCompatManager {
     public static boolean enableOverlay = true;
-    private static ISSHandler handler = new SSHandlerFake();
+    private static ISSHandler handler = FakeHandler.INST;
     private static boolean active = false;
 
 

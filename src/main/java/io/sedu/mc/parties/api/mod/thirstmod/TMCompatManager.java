@@ -1,10 +1,11 @@
 package io.sedu.mc.parties.api.mod.thirstmod;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class TMCompatManager {
-    private static ITMHandler handler = new TMHandlerFake();
+    private static ITMHandler handler = FakeHandler.INST;
     private static boolean active = false;
     public static boolean enableOverlay = true;
 

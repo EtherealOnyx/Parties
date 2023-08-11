@@ -1,10 +1,11 @@
 package io.sedu.mc.parties.api.mod.toughasnails;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class TANCompatManager {
-    private static ITANHandler handler = new TANHandlerFake();
+    private static ITANHandler handler = FakeHandler.INST;
     private static boolean active = false;
 
 

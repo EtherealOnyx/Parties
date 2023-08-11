@@ -1,10 +1,11 @@
 package io.sedu.mc.parties.api.mod.hardcorerevival;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class HRCompatManager {
-    private static IHRHandler handler = new HRHandlerFake();
+    private static IHRHandler handler = FakeHandler.INST;
     public static IHRHandler getHandler() {
         return handler;
     }

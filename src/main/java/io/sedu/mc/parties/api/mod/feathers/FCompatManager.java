@@ -1,11 +1,12 @@
 package io.sedu.mc.parties.api.mod.feathers;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class FCompatManager {
     public static boolean enableOverlay = true;
-    private static IFHandler handler = new FHandlerFake();
+    private static IFHandler handler = FakeHandler.INST;
     private static boolean active = false;
 
 

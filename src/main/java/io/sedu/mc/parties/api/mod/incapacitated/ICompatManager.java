@@ -1,11 +1,12 @@
 package io.sedu.mc.parties.api.mod.incapacitated;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class ICompatManager {
 
-    private static IIHandler handler = new IHandlerFake();
+    private static IIHandler handler = FakeHandler.INST;
 
     public static IIHandler getHandler() {
         return handler;

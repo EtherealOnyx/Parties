@@ -204,7 +204,7 @@ public class SettingsScreen extends Screen {
 
     @Override
     public void onClose() {
-        ColorAPI.colorCycle = false;
+        ColorAPI.setColorCycle(false);
         notEditing = true;
         PHead.icon = null;
         PName.sign = null;
@@ -341,7 +341,7 @@ public class SettingsScreen extends Screen {
 
     protected void init() {
         initMiscButtons();
-        ColorAPI.colorCycle = true;
+        ColorAPI.setColorCycle(true);
         RenderItem.initUpdater(updater);
         RenderItem.initGetter(getter);
         notEditing = isPresetOnly;

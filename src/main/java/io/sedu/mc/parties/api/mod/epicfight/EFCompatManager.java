@@ -1,10 +1,11 @@
 package io.sedu.mc.parties.api.mod.epicfight;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class EFCompatManager {
-    private static IEFHandler handler = new EFHandlerFake();
+    private static IEFHandler handler = FakeHandler.INST;
     private static boolean active = false;
 
 

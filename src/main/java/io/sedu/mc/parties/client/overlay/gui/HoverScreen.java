@@ -97,7 +97,7 @@ public class HoverScreen extends Screen {
         rightLim = (frameEleW + framePosW*(partyDisplay-1));
         outOfBounds = partyFrameX > width / partyScale - rightLim || partyFrameY > height/ partyScale - botLim || partyFrameX < 0 || partyFrameY < 0;
 
-        ColorAPI.colorCycle = true;
+        ColorAPI.setColorCycle(true);
         int y = (int) Math.max(0, clickArea.t(0)* playerScale - 10);
         int x = (int) (clickArea.l(0)* playerScale);
         int oY = (int) Math.max(0, clickArea.t(1)* partyScale - 10);
@@ -755,7 +755,7 @@ public class HoverScreen extends Screen {
 
     @Override
     public void onClose() {
-        ColorAPI.colorCycle = false;
+        ColorAPI.setColorCycle(false);
         notEditing = false;
         if (isMoving) {
             revertPos(true);

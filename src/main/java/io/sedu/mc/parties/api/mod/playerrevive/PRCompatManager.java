@@ -1,10 +1,11 @@
 package io.sedu.mc.parties.api.mod.playerrevive;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class PRCompatManager {
-    private static IPRHandler handler = new PRHandlerFake();
+    private static IPRHandler handler = FakeHandler.INST;
 
 
     public static IPRHandler getHandler() {

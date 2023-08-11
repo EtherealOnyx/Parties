@@ -1,9 +1,10 @@
 package io.sedu.mc.parties.api.mod.openpac;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.fml.ModList;
 
 public class PACCompatManager {
-    private static IPACHandler handler = new PACHandlerFake();
+    private static IPACHandler handler = FakeHandler.INST;
     public static IPACHandler getHandler() {
         return handler;
     }

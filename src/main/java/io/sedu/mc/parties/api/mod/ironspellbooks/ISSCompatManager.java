@@ -1,10 +1,11 @@
 package io.sedu.mc.parties.api.mod.ironspellbooks;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class ISSCompatManager {
-    private static IISSHandler handler = new ISSHandlerFake();
+    private static IISSHandler handler = FakeHandler.INST;
 
 
     public static IISSHandler getHandler() {

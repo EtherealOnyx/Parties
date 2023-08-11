@@ -1,10 +1,11 @@
 package io.sedu.mc.parties.api.mod.origins;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class OCompatManager {
-    private static IOHandler handler = new OHandlerFake();
+    private static IOHandler handler = FakeHandler.INST;
     protected static OriginCheckEvent eventInstance;
 
     public static IOHandler getHandler() {

@@ -2,11 +2,12 @@ package io.sedu.mc.parties.api.mod.coldsweat;
 
 import dev.momostudios.coldsweat.config.ColdSweatConfig;
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class CSCompatManager {
-    private static ICSHandler handler = new CSHandlerFake();
+    private static ICSHandler handler = FakeHandler.INST;
     private static boolean active = false;
 
 
@@ -34,7 +35,7 @@ public class CSCompatManager {
     }
 
     public static void disableSupport() {
-        handler = new CSHandlerFake();
+        handler = FakeHandler.INST;
         MinecraftForge.EVENT_BUS.unregister(CSEventHandler.class);
         active = false;
     }

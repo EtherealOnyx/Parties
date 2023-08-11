@@ -14,36 +14,72 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class ColorAPI {
 
-    public static boolean colorCycle = true;
+
+
+    private static boolean colorCycle = true;
     private static int color;
     private static float hue;
 
+
+    /**
+     * Grabs the Red value of an integer and converts it to a float.
+     * @param color The color that is grabbed from.
+     * @return A float that holds the red value of the provided integer.
+     */
     public static float getR(int color) {
         return (float)(color >> 16 & 255) / 255.0F;
     }
 
+    /**
+     * Grabs the Green value of an integer and converts it to a float.
+     * @param color The color that is grabbed from.
+     * @return A float that holds the green value of the provided integer.
+     */
     public static float getG(int color) {
         return (float)(color >> 8 & 255) / 255.0F;
     }
 
+    /**
+     * Grabs the Blue value of an integer and converts it to a float.
+     * @param color The color that is grabbed from.
+     * @return A float that holds the blue value of the provided integer.
+     */
     public static float getB(int color) {
         return (float)(color & 255) / 255.0F;
     }
 
+    /**
+     * Grabs the Red value of an integer and converts it to a range of 0-255.
+     * @param color The color that is grabbed from.
+     * @return An integer that holds the red value of the provided integer (from 0-255).
+     */
     public static int getRI(int color) {
         return (color >> 16 & 255);
     }
 
+    /**
+     * Grabs the Green value of an integer and converts it to a range of 0-255.
+     * @param color The color that is grabbed from.
+     * @return An integer that holds the green value of the provided integer (from 0-255).
+     */
     public static int getGI(int color) {
         return (color >> 8 & 255);
     }
 
+    /**
+     * Grabs the Blue value of an integer and converts it to a range of 0-255.
+     * @param color The color that is grabbed from.
+     * @return An integer that holds the blue value of the provided integer (from 0-255).
+     */
     public static int getBI(int color) {
         return (color & 255);
     }
 
+    /**
+     * Gets an integer that cycles colors automatically when ColorAPI.colorCycle is true.
+     * @return The color in integer form.
+     */
     public static int getRainbowColor() {
-        //S = .4F, L = .8F
         return color;
     }
 
@@ -99,6 +135,11 @@ public class ColorAPI {
         return r << 16 | g << 8 | b;
     }
 
+    /**
+     * Grabs the dominant color of the provided item.
+     * @param item The item stack to search.
+     * @return An integer holding the dominant color of the provided item. Returns 0 if the item is invalid.
+     */
     public static int getDomColor(ItemStack item) {
         Item i = item.getItem();
         TextureAtlasSprite texture;
@@ -119,11 +160,23 @@ public class ColorAPI {
         return domColor == null ? 0 : RGBUtil.packRGB(domColor);
     }
 
+
+    /**
+     * Cycles through a hue at a rate of 0.001f creating a rainbow effect. This automatically cycles on its own if ColorAPI.colorCycle is true.
+     */
     public static void tick() {
         if (!colorCycle) return;
         hue += 0.001f;
         if (hue > 1f)
             hue -= 1f;
         color = HSBtoRGB(hue, 0.5f, 0.75f);
+    }
+
+    /**
+     * A setter method for colorCycle. If enabled, automatically ticks through a hue at a slow rate, creating a rainbow effect.
+     * @param colorCycle A boolean that enables or disables colorCycle.
+     */
+    public static void setColorCycle(boolean colorCycle) {
+        ColorAPI.colorCycle = colorCycle;
     }
 }

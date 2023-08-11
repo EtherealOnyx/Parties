@@ -1,11 +1,12 @@
 package io.sedu.mc.parties.api.mod.dietarystats;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class DSCompatManager {
     
-    private static IDSHandler handler = new DSHandlerFake();
+    private static IDSHandler handler = FakeHandler.INST;
     private static boolean active = false;
 
 

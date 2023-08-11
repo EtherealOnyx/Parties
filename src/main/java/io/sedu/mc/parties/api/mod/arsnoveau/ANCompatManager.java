@@ -1,10 +1,11 @@
 package io.sedu.mc.parties.api.mod.arsnoveau;
 
+import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class ANCompatManager {
-    private static IANHandler handler = new ANHandlerFake();
+    private static IANHandler handler = FakeHandler.INST;
 
 
     public static IANHandler getHandler() {
