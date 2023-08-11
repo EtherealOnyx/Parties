@@ -238,6 +238,7 @@ dependencies {
     compileOnly fg.deobf("curse.maven:origins-forge-474438:3889853")
     runtimeOnly fg.deobf("curse.maven:caelus-308989:3650485")
 
+    //Iron's Spells n' Spellbooks
     compileOnly fg.deobf("curse.maven:irons-spells-n-spellbooks-855414:4605093")
     compileOnly fg.deobf("curse.maven:playeranimator-658587:4418152")
 

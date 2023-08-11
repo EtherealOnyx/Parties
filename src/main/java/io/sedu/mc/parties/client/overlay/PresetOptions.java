@@ -11,6 +11,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.HashMap;
+
 public class PresetOptions extends RenderItem {
 
     public static ItemStack icon = null;
@@ -33,6 +35,11 @@ public class PresetOptions extends RenderItem {
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+8, b.y+4, 0);
         gui.getFont().drawShadow(poseStack, "Load", b.x+4, b.y+22, 0xFFFFFF);
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+
     }
 
     @Override

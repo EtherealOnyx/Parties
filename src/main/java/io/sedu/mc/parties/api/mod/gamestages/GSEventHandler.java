@@ -50,6 +50,8 @@ public class GSEventHandler {
         PlayerAPI.getPlayer(playerId, player -> updatePartyStages(playerId, partyId, player.getGSyncType()));
     }
     private static void updatePartyStages(UUID playerId, UUID partyId, SyncType type) {
+        //Prevent party stage sync if server setting isn't set to ALL.
+        if (ServerConfigData.syncGameStages.get() != SyncType.ALL) return;
         recalculatePartyStages(partyId);
         if (type == ALL) {
             final IStageData data = GameStageSaveHandler.getPlayerData(playerId);

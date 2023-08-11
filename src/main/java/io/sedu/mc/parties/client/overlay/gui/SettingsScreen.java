@@ -2,6 +2,7 @@ package io.sedu.mc.parties.client.overlay.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.*;
@@ -115,7 +116,7 @@ public class SettingsScreen extends Screen {
 
     private void resetAll() {
         if (isConfirmed) {
-            //TODO: Config.saveDefaultPresetString();
+            Config.createDefaultPreset();
             isConfirmed = false;
             revertCooldown = 0;
             ((SmallButton)miscButtons.get(6)).setColor(1f, 1f, .5f);
@@ -124,8 +125,8 @@ public class SettingsScreen extends Screen {
         } else {
             miscButtons.get(6).active = false;
             triggeredPrompt = true;
-            buttonCooldown = 100;
-            revertCooldown = 100;
+            buttonCooldown = 60;
+            revertCooldown = 120;
             SmallButton b = (SmallButton) miscButtons.get(6);
             b.setMessage(new TextComponent("↺").withStyle(ChatFormatting.OBFUSCATED));
             b.setColor(1f, 0.5f, 0.5f);
@@ -262,7 +263,7 @@ public class SettingsScreen extends Screen {
         font.drawShadow(poseStack, "Desc:", descBox.x - 29, descBox.y, 0xFFFFFF);
         renderShadows(poseStack);
 
-        renderBg(-5, screenX, screenY, screenX + screenW, screenY + eleBoxH, screenW, eleBoxH, 200, MENU_LOC);
+        renderBg(0, screenX, screenY, screenX + screenW, screenY + eleBoxH, screenW, eleBoxH, 200, MENU_LOC);
         super.render(poseStack, pMouseX, pMouseY, pPartialTick);
 
     }
@@ -661,6 +662,7 @@ public class SettingsScreen extends Screen {
 
     public void finalizeUpdate(String name, Object data, boolean markDirty) {
         triggerUpdate(name, data);
+        Parties.LOGGER.info("Update for {} value {}.", name, data);
 
         if (markDirty)
             markDirty();

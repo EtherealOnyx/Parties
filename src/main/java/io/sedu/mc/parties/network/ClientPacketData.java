@@ -4,7 +4,6 @@ import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.config.DimConfig;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
-import io.sedu.mc.parties.setup.ClientSetup;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
@@ -102,7 +101,6 @@ public class ClientPacketData {
             //#7 Reload config
             case 7 -> {
                 DimConfig.reload();
-                ClientSetup.saveDefaultPresets();
                 Config.reloadClientConfigs();
                 Config.loadDefaultPreset();
             }

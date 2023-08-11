@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -36,6 +37,11 @@ public class PEffectsBene extends PEffects {
         RenderSystem.setShaderTexture(0, sprite.atlas().location());
         Gui.blit(poseStack, b.x, b.y, 0, 18, 18, sprite);
         poseStack.popPose();
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        //No changes
     }
 
     public PEffectsBene(String name) {

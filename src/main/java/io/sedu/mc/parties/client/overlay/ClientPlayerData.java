@@ -448,7 +448,7 @@ public class ClientPlayerData {
                 });
             } catch (Throwable t) {
             CSCompatManager.changeHandler();
-            Config.loadDefaultPreset(); //Forces refresh.
+            Config.createDefaultPreset(); //Forces refresh.
             if (Minecraft.getInstance().player != null)
                 Minecraft.getInstance().player.sendMessage(
                         new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(
@@ -480,7 +480,7 @@ public class ClientPlayerData {
                 });
             } catch (Throwable t) {
                 CSCompatManager.changeHandler();
-                Config.loadDefaultPreset(); //Forces refresh.
+                Config.createDefaultPreset(); //Forces refresh.
                 if (Minecraft.getInstance().player != null)
                     Minecraft.getInstance().player.sendMessage(
                             new TranslatableComponent("messages.sedparties.api.partiesprefix").withStyle(ChatFormatting.DARK_AQUA).append(

@@ -13,6 +13,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static io.sedu.mc.parties.client.overlay.anim.AnimBarHandler.DF;
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
@@ -33,6 +34,14 @@ public class PHealth extends OverflowBarBase {
         RenderSystem.enableDepthTest();
         blit(poseStack,b.x+3, b.y+4, 16, 0, 9, 9);
         blit(poseStack,b.x+3, b.y+4, 52, 0, 9, 9);
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        if (RenderItem.barModsPresent() > 0) {
+            //Move text up to make space for bar array.
+            updater.get("ypos").onUpdate(this, 26);
+        }
     }
 
     @Override

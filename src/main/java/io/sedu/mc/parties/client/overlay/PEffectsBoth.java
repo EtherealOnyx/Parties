@@ -51,6 +51,11 @@ public class PEffectsBoth extends PEffects {
     }
 
     @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        //No changes
+    }
+
+    @Override
     void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.effects.sizeAll() > 0) {
             start(poseStack, 0, id.effects.sizeAll());

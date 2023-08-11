@@ -6,6 +6,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.HashMap;
+
 public class PRectO extends RenderSelfItem {
 
 
@@ -21,6 +23,11 @@ public class PRectO extends RenderSelfItem {
 
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
+
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
 
     }
 

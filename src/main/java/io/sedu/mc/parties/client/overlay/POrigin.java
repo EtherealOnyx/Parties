@@ -19,6 +19,7 @@ import net.minecraft.world.item.Items;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class POrigin extends RenderIconTextItem implements TooltipItem {
@@ -55,6 +56,13 @@ public class POrigin extends RenderIconTextItem implements TooltipItem {
         poseStack.pushPose();
         Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+4, b.y-1, 0);
         poseStack.popPose();
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        if (OCompatManager.active()) {
+            updater.get("display").onUpdate(this, true);
+        }
     }
 
     @Override

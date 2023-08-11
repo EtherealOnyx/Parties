@@ -14,6 +14,7 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.fml.ModList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static io.sedu.mc.parties.client.overlay.anim.AnimBarHandler.DF;
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
@@ -32,6 +33,14 @@ public class PThirst extends OverflowBarBase {
         setup(partyPath);
         RenderSystem.enableDepthTest();
         blit(poseStack, b.x+3, b.y+4, 0, 9, 9, 9);
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        if (RenderItem.barModsPresent() > 0) {
+            //Move text up to make space for bar array.
+            updater.get("ypos").onUpdate(this, 17);
+        }
     }
 
     @Override

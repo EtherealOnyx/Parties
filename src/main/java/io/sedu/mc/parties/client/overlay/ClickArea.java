@@ -10,6 +10,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.HashMap;
+
 public class ClickArea extends RenderItem {
 
     public ClickArea(String n) {
@@ -27,6 +29,11 @@ public class ClickArea extends RenderItem {
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+8, b.y+4, 0, 8, 8, 0xFFFFFF, 0xFFFFFF);
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+
     }
 
     protected int maxH() {

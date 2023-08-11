@@ -22,6 +22,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.HashMap;
+
 import static io.sedu.mc.parties.util.RenderUtils.renderEntityInInventory;
 import static io.sedu.mc.parties.util.RenderUtils.renderFlame;
 
@@ -300,6 +302,11 @@ public class PHead extends RenderSelfItem implements TooltipItem {
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(icon, b.x+4, b.y, 0);
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        //No changes
     }
 
     @Override

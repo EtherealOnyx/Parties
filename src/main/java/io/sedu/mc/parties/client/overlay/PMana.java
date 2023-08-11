@@ -2,6 +2,7 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.anim.ManaAnim;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
@@ -14,6 +15,7 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.fml.ModList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static io.sedu.mc.parties.client.overlay.anim.AnimBarHandler.DF;
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
@@ -31,6 +33,21 @@ public class PMana extends BarBase {
         setup(partyPath);
         RenderSystem.enableDepthTest();
         blit(poseStack,b.x+3, b.y+4, 9, 0, 9, 9);
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        if (ANCompatManager.getHandler().exists()) {
+            int max = RenderItem.barModsPresent();
+            if (max > 0) {
+                int spacing = 240 / max;
+                int index = RenderItem.getBarIndex(this);
+                //Move text up to make space for bar array.
+                updater.get("xpos").onUpdate(this, 46+(spacing/2*index));
+                updater.get("width").onUpdate(this, spacing);
+            }
+            updater.get("display").onUpdate(this, true);
+        }
     }
 
     @Override
@@ -155,12 +172,12 @@ public class PMana extends BarBase {
         e.addEntry("display", false, 1);
         e.addEntry("barmode", true, 1);
         e.addEntry("scale", 1, 2);
-        e.addEntry("zpos", 0, 4);
+        e.addEntry("zpos", 1, 4);
         e.addEntry("idisplay", true, 1);
         e.addEntry("xpos", 46, 12);
-        e.addEntry("ypos", 36, 12);
+        e.addEntry("ypos", 35, 12);
         e.addEntry("width", 240, 12);
-        e.addEntry("height", 12, 12);
+        e.addEntry("height", 10, 12);
         e.addEntry("tdisplay", true, 1);
         e.addEntry("tshadow", true, 1);
         e.addEntry("ttype", 0, 4);

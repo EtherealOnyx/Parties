@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
@@ -40,6 +41,11 @@ public class POffline extends RenderIconTextItem {
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         setup(GUI_ICONS_LOCATION);
         blit(poseStack, b.x+7, b.y+4, 0, 216, 10, 8);
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        //No changes
     }
 
     @Override
@@ -97,7 +103,7 @@ public class POffline extends RenderIconTextItem {
         e.addEntry("scale", 2, 2);
         e.addEntry("zpos", 0, 4);
         e.addEntry("idisplay", true, 1);
-        e.addEntry("xpos", 156, 12);
+        e.addEntry("xpos", 159, 12);
         e.addEntry("ypos", 8, 12);
         e.addEntry("tdisplay", true, 1);
         e.addEntry("tshadow", false, 1);

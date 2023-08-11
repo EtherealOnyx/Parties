@@ -13,6 +13,7 @@ import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PLevelBar extends RenderIconTextItem implements TooltipItem {
 
@@ -62,6 +63,11 @@ public class PLevelBar extends RenderIconTextItem implements TooltipItem {
         gui.getFont().draw(poseStack, level, (float)x, (float)y, 8453920);
         poseStack.translate(0,0,-zPos);
 
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        //No changes
     }
 
     @Override

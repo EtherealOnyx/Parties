@@ -263,8 +263,12 @@ public class Config {
             bitBuilder.append(bit);
         }
         if (validPreset) {
-            //Disable items not in preset.
-            itemList.forEach(item -> item.setEnabled(false));
+            //Make items default that aren't in preset and disable them.
+
+            itemList.forEach(item -> {
+                RenderItem.setElementDefaults(item, updater);
+                item.setEnabled(false);
+            });
             RenderItem.isDirty = true;
         }
         return validPreset;
@@ -444,22 +448,39 @@ public class Config {
         RenderItem.updateFramePos();
     }
 
+    public static void createDefaultPreset() {
+        HashMap<String, RenderItem.Update> updater = new HashMap<>();
+        RenderItem.initUpdater(updater);
+        generateDefaultPreset(updater);
+    }
+
     public static void loadDefaultPreset() {
-        //TODO: Reimplement this.
-        Minecraft minecraft = Minecraft.getInstance();
-        assert minecraft.player != null;
         HashMap<String, RenderItem.Update> updater = new HashMap<>();
         RenderItem.initUpdater(updater);
         try {
             String bits = ClientConfigData.defaultPreset.get();
             if (!applyPresetString(bits.toCharArray(), updater)) {
                 parseError();
+                generateDefaultPreset(updater);
             }
         } catch (Exception e) {
-            minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.config.loadfail").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC), minecraft.player.getUUID());
-            minecraft.player.sendMessage(new TranslatableComponent("messages.sedparties.config.loadfailv").withStyle(ChatFormatting.GRAY), minecraft.player.getUUID());
             Parties.LOGGER.error("[Parties] Failed to load preset.", e);
+            generateDefaultPreset(updater);
         }
+    }
+
+    private static void generateDefaultPreset(HashMap<String, RenderItem.Update> updater) {
+        //General Defaults
+        RenderItem.getGeneralDefaults().forEachEntry((s, v) -> updater.get(s.getName()).onUpdate(null, v));
+        //Rest of item defaults.
+        RenderItem.items.values().forEach(item -> RenderItem.setElementDefaults(item, updater));
+
+        //Modify for loaded mods.
+
+        //Save
+        //HashMap<String, RenderItem.Getter> getter = new HashMap<>();
+        //RenderItem.initGetter(getter);
+        //saveCurrentPresetAsDefault(getter);
     }
 
     public static void saveCurrentPresetAsDefault(HashMap<String, RenderItem.Getter> getter) {

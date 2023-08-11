@@ -5,6 +5,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
+import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
+import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
+import io.sedu.mc.parties.api.mod.ironspellbooks.ISSCompatManager;
+import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.anim.DimAnim;
 import io.sedu.mc.parties.client.overlay.effects.EffectHolder;
@@ -165,6 +170,27 @@ public abstract class RenderItem {
                 return;
             }
         }
+    }
+
+    protected static int barModsPresent() {
+        int i = 0;
+        if (EFCompatManager.active() || FCompatManager.active()) i++;
+        if (ANCompatManager.getHandler().exists()) i++;
+        if (SSCompatManager.active()) i++;
+        if (ISSCompatManager.active()) i++;
+        return i;
+    }
+
+    protected static int getBarIndex(RenderItem item) {
+        int i = -1;
+        if (EFCompatManager.active() || FCompatManager.active()) i++;
+        if (item instanceof PStamina) return i; //Value of 0.
+        if (ANCompatManager.getHandler().exists()) i++;
+        if (item instanceof PMana) return i; //Value of 0 or 1.
+        if (SSCompatManager.active()) i++;
+        if (item instanceof PManaSS) return i; //Value of 0, 1, 2.
+        if (ISSCompatManager.active()) i++;
+        return i; //Value of 0, 1, 2, 3.
     }
 
     public boolean isEnabled() {
@@ -606,6 +632,8 @@ public abstract class RenderItem {
 
     abstract void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b);
 
+    abstract void updateDefaultPositionForMods(HashMap<String, Update> updater);
+
 
 
     public SmallBound changeVisibility(boolean data) {
@@ -879,6 +907,7 @@ public abstract class RenderItem {
 
     public static void setElementDefaults(RenderItem item, HashMap<String, Update> updater) {
         item.getDefaults().forEachEntry((s, v) -> updater.get(s.getName()).onUpdate(item, v));
+        item.updateDefaultPositionForMods(updater);
     }
 
     public abstract ConfigEntry getDefaults();

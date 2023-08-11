@@ -2,9 +2,8 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-
-import io.sedu.mc.parties.api.mod.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
+import io.sedu.mc.parties.api.mod.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.mod.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
@@ -15,6 +14,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PTemp extends RenderIconTextItem implements TooltipItem {
 
@@ -41,6 +41,17 @@ public class PTemp extends RenderIconTextItem implements TooltipItem {
         setup(partyPath);
         RenderSystem.enableDepthTest();
         blit(poseStack, b.x+8, b.y+3, 44, 19, 9, 9);
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        if (RenderItem.barModsPresent() > 0) {
+            //Move text up to make space for bar array.
+            updater.get("ypos").onUpdate(this, 17);
+        }
+        if (HCompatManager.getHandler().exists() || TANCompatManager.getHandler().tempExists() || CSCompatManager.getHandler().exists()) {
+            updater.get("display").onUpdate(this, true);
+        }
     }
 
     @Override

@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static net.minecraft.client.gui.GuiComponent.GUI_ICONS_LOCATION;
 
@@ -51,14 +52,19 @@ public class PDead extends RenderIconTextItem {
     }
 
     @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+
+    }
+
+    @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
         e.addEntry("display", true, 1);
         e.addEntry("scale", 2, 2);
         e.addEntry("zpos", 1, 4);
         e.addEntry("idisplay", true, 1);
-        e.addEntry("xpos", 157, 12);
-        e.addEntry("ypos", 9, 12);
+        e.addEntry("xpos", 160, 12);
+        e.addEntry("ypos", 8, 12);
         e.addEntry("tdisplay", true, 1);
         e.addEntry("tshadow", true, 1);
         e.addEntry("tcolor", 0xBF6666, 24);

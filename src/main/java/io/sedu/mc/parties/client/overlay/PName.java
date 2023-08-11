@@ -9,6 +9,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.HashMap;
+
 public class PName extends RenderItem {
     public static ItemStack sign = null;
 
@@ -41,6 +43,14 @@ public class PName extends RenderItem {
         Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(sign, b.x+4, b.y-1, 0);
         poseStack.popPose();
 
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        if (RenderItem.barModsPresent() > 0) {
+            //Move text up to make space for bar array.
+            updater.get("ypos").onUpdate(this, 8);
+        }
     }
 
     @Override

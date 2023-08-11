@@ -2,6 +2,7 @@ package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.api.mod.ironspellbooks.ISSCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.anim.CastAnim;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
@@ -17,6 +18,7 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.fml.ModList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PCastBar extends RenderIconTextItem {
 
@@ -46,6 +48,13 @@ public class PCastBar extends RenderIconTextItem {
         RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+3, b.y+5, 0, 18, 7, 0xffcc5b, 0xDDA528);
         RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+4, b.y+6, 0, 12, 5, 0xFFDB8A, 0xFFDB8A);
         RenderUtils.sizeRectNoA(poseStack.last().pose(), b.x+16, b.y+6, 0, 4, 5, 0x3F2B00, 0x3F2B00);
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        if (ISSCompatManager.active()) {
+            updater.get("display").onUpdate(this, true);
+        }
     }
 
     @Override

@@ -42,11 +42,10 @@ public abstract class PEffects extends RenderSelfItem {
     private int eleHeight;
 
     private static final List<PEffects> effectItems = new ArrayList<>();
-    private TranslatableComponent instantText = new TranslatableComponent("ui.sedparties.tooltip.effectinstant");
+    private final TranslatableComponent instantText = new TranslatableComponent("ui.sedparties.tooltip.effectinstant");
 
     @Override
     public SmallBound changeVisibility(boolean data) {
-        this.elementEnabled = data;
         //Prevent tooltip rendering.
         int index = effectItems.indexOf(this);
         if (data) {
@@ -55,7 +54,7 @@ public abstract class PEffects extends RenderSelfItem {
             if (index == -1) return null;
             effectItems.remove(index);
         }
-        return null;
+        return super.changeVisibility(data);
     }
 
     public PEffects(String name) {
@@ -364,6 +363,8 @@ public abstract class PEffects extends RenderSelfItem {
             }
         };
     }
+
+
 
 
 }

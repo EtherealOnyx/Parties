@@ -10,6 +10,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.HashMap;
+
 public class PRectD extends RenderItem {
 
 
@@ -27,6 +29,11 @@ public class PRectD extends RenderItem {
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         RenderUtils.sizeRect(poseStack.last().pose(), b.x+8, b.y+4, 0, 8, 8, 0x66002024, 0x66002024);
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+
     }
 
     @Override

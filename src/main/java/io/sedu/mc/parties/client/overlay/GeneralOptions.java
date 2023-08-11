@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.client.overlay;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.api.mod.ironspellbooks.ISSCompatManager;
 import io.sedu.mc.parties.client.config.ConfigEntry;
 import io.sedu.mc.parties.client.overlay.gui.ConfigOptionsList;
 import io.sedu.mc.parties.client.overlay.gui.SettingsScreen;
@@ -8,6 +9,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+
+import java.util.HashMap;
 
 public class GeneralOptions extends RenderItem {
 
@@ -35,9 +38,17 @@ public class GeneralOptions extends RenderItem {
     }
 
     @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        //Change width for Iron's Spells n Spellbooks.
+        if (ISSCompatManager.active()) {
+            updater.get("gen_w").onUpdate(this, 256);
+        }
+    }
+
+    @Override
     public ConfigEntry getDefaults() {
         ConfigEntry e = new ConfigEntry();
-        e.addEntry("gen_w", 256, 12);
+        e.addEntry("gen_w", 178, 12);
         e.addEntry("gen_h", 64, 12);
         e.addEntry("gen_pw", 0, 12);
         e.addEntry("gen_ph", 63, 12);

@@ -19,6 +19,8 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
+import java.util.HashMap;
+
 import static io.sedu.mc.parties.util.AnimUtils.animPos;
 
 public class PDimIcon extends RenderSelfItem implements TooltipItem {
@@ -47,6 +49,11 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
     @Override
     void renderElement(PoseStack poseStack, ForgeIngameGui gui, Button b) {
         DimConfig.entry("minecraft:overworld", (icon, color) -> renderGuiItemMenu(icon, b.x+7, b.y+3));
+    }
+
+    @Override
+    void updateDefaultPositionForMods(HashMap<String, Update> updater) {
+        //No mod changes this position.
     }
 
     @Override
