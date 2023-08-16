@@ -589,12 +589,11 @@ public class HoverScreen extends Screen {
 
     public void render(PoseStack poseStack, int mX, int mY, float partialTick) {
 
-        //TODO: Unbind options from the party list.
         super.render(poseStack, mX, mY, partialTick);
 
         checkFrameRender(poseStack);
 
-        if (isDragging()) { //TODO: add boundary checks to know what element was being dragged. Maybe store active element on click and check if element != null or -1?
+        if (isDragging()) {
             if (draggedItem == -1) {
                 calculateItem(mX, mY);
             }

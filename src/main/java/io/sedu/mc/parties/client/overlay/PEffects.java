@@ -63,13 +63,15 @@ public abstract class PEffects extends RenderSelfItem {
 
     public static void checkEffectTooltip(int posX, int posY, BiConsumer<PEffects, Integer> action) {
         effectItems.forEach(item -> {
-            int newX = (posX - item.x)/(item.width/2);
-            if (newX < item.maxPerRow) {
-                int eleIndex = (posY - item.y);
-                if (eleIndex < 0) return;
-                eleIndex = (eleIndex/(item.height/2))*item.maxPerRow + newX;
-                if (eleIndex < item.maxSize && eleIndex > -1) {
-                    action.accept(item, eleIndex);
+            if (posX > item.x) {
+                int newX = (posX - item.x)/(item.width/2);
+                if (newX < item.maxPerRow) {
+                    int eleIndex = (posY - item.y);
+                    if (eleIndex < 0) return;
+                    eleIndex = (eleIndex/(item.height/2))*item.maxPerRow + newX;
+                    if (eleIndex < item.maxSize && eleIndex > -1) {
+                        action.accept(item, eleIndex);
+                    }
                 }
             }
         });
@@ -86,8 +88,13 @@ public abstract class PEffects extends RenderSelfItem {
     @Override
     void renderMember(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.isOnline) {
-            renderSelf(id, gui, poseStack, partialTicks);
+            renderEffect(i, id, gui, poseStack, partialTicks);
         }
+    }
+
+    @Override
+    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+        renderEffect(0, id, gui, poseStack, partialTicks);
     }
 
     void renderOverflow(ForgeIngameGui gui, PoseStack poseStack, int i, int iX, int iY, float partialTicks) {
@@ -112,7 +119,7 @@ public abstract class PEffects extends RenderSelfItem {
         if (effect.isInstant() && (gui.getGuiTicks() >> 3 & 1) == 0) {
             //TODO: Remove width hardcoding for all values here. Maybe.
             rectInscribedFlash(poseStack.last().pose(), borderSize, sX(i, iX), sY(i, iY), 26, 26, 0xFFFFFF, effect.getEffect()
-                                                                                                           .getColor());
+                                                                                                                  .getColor());
         } else {
             rectInscribed(poseStack.last().pose(), borderSize, sX(i, iX), sY(i, iY), 26, 26, effect.getEffect().getColor(), effect.bene());
         }
@@ -125,7 +132,7 @@ public abstract class PEffects extends RenderSelfItem {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float) (.75f + Math.sin((gui.getGuiTicks() + partialTicks) / 2f) / 4f));
         else
             resetColor();
-        Gui.blit(poseStack, sX(i, iX) + 4, sY(i, iY) + 4,0, 18, 18, sprite);
+        Gui.blit(poseStack, sX(i, iX) + 4, sY(i, iY) + 4, 0, 18, 18, sprite);
 
         //Text
         int x, y;
@@ -158,6 +165,9 @@ public abstract class PEffects extends RenderSelfItem {
         }
 
     }
+
+
+    abstract void renderEffect(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks);
 
     protected boolean getClientEffect(EffectHolder effects, Integer buffIndex, Consumer<ClientEffect> action) {
         return effects.getEffect(maxSize, effects.sortedEffectAll, buffIndex, action);
@@ -208,19 +218,31 @@ public abstract class PEffects extends RenderSelfItem {
     }
 
     private int sX(int pI, int bI) {
-        return (int) (((framePosW<<1)*pI+((x+(pI == 0 ? selfFrameX : partyFrameX))<<1))/scale +width*bI) + xOff/2;
+        if (pI == 0) //selfFrame
+            return (int) (((x + selfFrameX) << 1)/(scale) +width*bI) + xOff/2;
+        else
+            return (int) (((framePosW<<1)*(pI-1)+((x+partyFrameX)<<1))/(scale) +width*bI) + xOff/2;
     }
 
     private float rX(int pI, int bI) {
-        return (framePosW*pI+x+(pI == 0 ? selfFrameX : partyFrameX) + (width/2f*scale)*bI);
+        if (pI == 0)
+            return (x+selfFrameX + (width/2f*scale)*bI);
+        else
+            return framePosW*(pI-1)+x+ partyFrameX + width / 2f * scale * bI;
     }
 
     private int sY(int pI, int bI) {
-        return (int) (((framePosH<<1)*pI+((y+(pI == 0 ? selfFrameY : partyFrameY))<<1))/scale +height*bI) + yOff/2;
+        if (pI == 0)
+            return (int) (((y + selfFrameY) << 1)/scale +height*bI) + yOff/2;
+        else
+            return (int) (((framePosH<<1)*(pI-1)+((y+(partyFrameY))<<1))/scale +height*bI) + yOff/2;
     }
 
     private float rY(int pI, int bI) {
-        return framePosH*pI+(y+(pI == 0 ? selfFrameY : partyFrameY))+(height/2f*scale)*bI;
+        if (pI == 0)
+            return y+selfFrameY+(height/2f*scale)*bI;
+        else
+            return framePosH*(pI-1)+(y+partyFrameY)+(height/2f*scale)*bI;
     }
 
 

@@ -56,9 +56,9 @@ public class PEffectsBoth extends PEffects {
     }
 
     @Override
-    void renderSelf(ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
+    void renderEffect(int i, ClientPlayerData id, ForgeIngameGui gui, PoseStack poseStack, float partialTicks) {
         if (id.effects.sizeAll() > 0) {
-            start(poseStack, 0, id.effects.sizeAll());
+            start(poseStack, i, id.effects.sizeAll());
             AtomicInteger iX = new AtomicInteger();
             AtomicInteger iY = new AtomicInteger();
             if (id.effects.largerAll(maxSize)) {
@@ -68,7 +68,7 @@ public class PEffectsBoth extends PEffects {
                         iX.set(0);
                         iY.getAndIncrement();
                     }
-                    renderEffect(effect, gui, poseStack, 0, iX.get(), iY.get(), partialTicks);
+                    renderEffect(effect, gui, poseStack, i, iX.get(), iY.get(), partialTicks);
                     iX.getAndIncrement();
                     resetColor();
                 });
@@ -78,7 +78,7 @@ public class PEffectsBoth extends PEffects {
                     iX.set(0);
                     iY.getAndIncrement();
                 }
-                renderOverflow(gui, poseStack, 0, iX.get(), iY.get(), partialTicks);
+                renderOverflow(gui, poseStack, i, iX.get(), iY.get(), partialTicks);
                 poseStack.popPose();
             } else {
                 id.effects.forEachAll((effect) -> {
@@ -87,7 +87,7 @@ public class PEffectsBoth extends PEffects {
                         iX.set(0);
                         iY.getAndIncrement();
                     }
-                    renderEffect(effect, gui, poseStack, 0, iX.get(), iY.get(), partialTicks);
+                    renderEffect(effect, gui, poseStack, i, iX.get(), iY.get(), partialTicks);
                     iX.getAndIncrement();
                     resetColor();
                 });
