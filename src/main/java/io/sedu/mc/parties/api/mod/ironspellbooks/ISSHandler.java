@@ -5,6 +5,7 @@ import io.redspace.ironsspellbooks.player.ClientMagicData;
 import io.redspace.ironsspellbooks.spells.CastType;
 import io.redspace.ironsspellbooks.spells.SchoolType;
 import io.redspace.ironsspellbooks.spells.SpellType;
+import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.client.overlay.anim.CastAnim;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -16,6 +17,10 @@ import java.util.function.Consumer;
 import static io.redspace.ironsspellbooks.registries.AttributeRegistry.MAX_MANA;
 
 public class ISSHandler implements IISSHandler {
+
+    static {
+        Parties.LOGGER.info("[Parties] Initializing Compatibility with Iron's Spells n' Spellbooks.");
+    }
 
 
     @Override

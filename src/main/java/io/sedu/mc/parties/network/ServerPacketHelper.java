@@ -56,7 +56,7 @@ public class ServerPacketHelper {
     }
 
     public static void sendRemoveMember(UUID removedMember, ArrayList<UUID> party, boolean wasKicked) {
-        int i = (wasKicked) ? 5 : 4;
+        int i = wasKicked ? 5 : 4;
         party.forEach(id -> {
             PartiesPacketHandler.sendToPlayer(new ClientPacketData(i, removedMember), PlayerAPI.getNormalServerPlayer(id));
         });

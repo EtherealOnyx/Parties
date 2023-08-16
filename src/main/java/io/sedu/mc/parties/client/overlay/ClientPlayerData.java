@@ -41,7 +41,6 @@ import static io.sedu.mc.parties.client.overlay.DataType.*;
 public class ClientPlayerData {
     public static HashMap<UUID, ClientPlayerData> playerList = new HashMap<>();
     public static ArrayList<UUID> playerOrderedList = new ArrayList<>();
-    public static boolean showSelf = true;
     private static UUID leader;
 
     //Client Information
@@ -90,6 +89,12 @@ public class ClientPlayerData {
         }
     }
 
+    public static void completeReset() {
+        playerOrderedList.clear();
+        playerList.clear();
+        leader = null;
+    }
+
     private void initData() {
         data.put(DIM, new DimAnim(100, this));
         data.put(HEALTH, new HealthAnim(20, true));
@@ -133,12 +138,11 @@ public class ClientPlayerData {
 
     public static void reset() {
         resetOnly();
-        addSelf();
     }
 
     public static void addSelf() {
         Player p;
-        if (showSelf & (p = Minecraft.getInstance().player) != null)
+        if ((p = Minecraft.getInstance().player) != null)
         {
             ClientPlayerData.addClientMember(p.getUUID());
             if (RenderItem.items.get("dim").isEnabled()) playerList.get(p.getUUID()).setClientPlayer(p).getDim().activate(String.valueOf(p.level.dimension().location()), true);
@@ -173,9 +177,27 @@ public class ClientPlayerData {
     }
 
     public static void resetOnly() {
-        playerList.clear();
+
+        UUID selfId = playerOrderedList.size() > 0 ? playerOrderedList.get(0) : null;
+        ClientPlayerData self = selfId == null ? null : playerList.get(selfId);
+
+        //Clear
         playerOrderedList.clear();
+        playerList.clear();
         leader = null;
+
+        if (self != null) {
+            playerOrderedList.add(selfId);
+            playerList.put(selfId, self);
+            Player p;
+            if ((p = self.clientPlayer) != null) {
+                if (RenderItem.items.get("dim").isEnabled()) playerList.get(p.getUUID()).setClientPlayer(p).getDim().activate(String.valueOf(p.level.dimension().location()), true);
+            }
+        } else {
+            addSelfParty();
+            //TODO: This will 'reset' any events. Things may be unsynced (like max hunger).
+        }
+
     }
 
     public static void updateSelfDim(String data) {
@@ -345,6 +367,7 @@ public class ClientPlayerData {
     }
 
     public void setFood(int data) {
+        Parties.LOGGER.debug("Setting food for {}: {}", getName(), data);
         getHunger(hunger -> hunger.checkHealth(data));
     }
 
@@ -689,6 +712,7 @@ public class ClientPlayerData {
     }
 
     public void setMaxHunger(float data) {
+        Parties.LOGGER.debug("Setting max food for {}: {}", getName(), data);
         getHunger(hunger -> hunger.checkMax(data));
     }
 

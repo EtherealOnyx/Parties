@@ -94,7 +94,7 @@ public class PManaI extends BarBase {
     public void renderTooltip(PoseStack poseStack, ForgeIngameGui gui, int index, int mouseX, int mouseY) {
         ClientPlayerData.getOrderedPlayer(index, p -> {
             if (p.isOnline && !p.isSpectator) {
-                p.getManaI(h -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(h.cur) + "/" + DF.format(h.max), 0x9D7CFC, 0x310F4D, 0xFFE187));
+                p.getManaI(h -> renderTooltip(poseStack, gui, mouseX, mouseY, 10, 0, tipName.getString() + DF.format(h.cur) + "/" + DF.format(h.max), 0x00b7ec, 0x018ab1, 0x54fcfc));
             }
         });
     }

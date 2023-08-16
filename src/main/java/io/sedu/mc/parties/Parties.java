@@ -20,7 +20,6 @@ public class Parties
 {
     public static final Logger LOGGER = LogManager.getLogger();
     public static final String MODID = "sedparties";
-    public static final int ENCODE_VERSION = 4;
 
     public Parties() {
 

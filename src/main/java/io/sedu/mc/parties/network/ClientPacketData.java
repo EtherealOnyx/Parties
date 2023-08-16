@@ -115,6 +115,11 @@ public class ClientPacketData {
                 closeScreens(true);
                 if (Config.pastePreset(mc, updater)) {
                     msg(new TranslatableComponent("messages.sedparties.preset.loadsuccessclipboard").withStyle(ChatFormatting.GREEN));
+                    //Save preset to default.
+                    HashMap<String, RenderItem.Getter> getter = new HashMap<>();
+                    RenderItem.initGetter(getter);
+                    Config.saveCurrentPresetAsDefault(getter);
+
                 } else {
                     msg(new TranslatableComponent("messages.sedparties.preset.loadfailclipboard").withStyle(ChatFormatting.RED));
                 }

@@ -4,18 +4,14 @@ import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.api.helper.PartyAPI;
 import io.sedu.mc.parties.api.helper.PlayerAPI;
-import io.sedu.mc.parties.data.ClientConfigData;
 import io.sedu.mc.parties.data.PartyData;
 import io.sedu.mc.parties.data.ServerConfigData;
 import io.sedu.mc.parties.data.ServerPlayerData;
-import io.sedu.mc.parties.network.PartiesPacketHandler;
-import io.sedu.mc.parties.network.StageTypeSync;
 import net.darkhax.gamestages.GameStageHelper;
 import net.darkhax.gamestages.data.GameStageSaveHandler;
 import net.darkhax.gamestages.data.IStageData;
 import net.darkhax.gamestages.event.GameStageEvent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -92,11 +88,7 @@ public class GSEventHandler {
         };
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onClientJoin(ClientPlayerNetworkEvent.LoggedInEvent event) {
-        if (event.getPlayer() != null)
-            PartiesPacketHandler.sendToServer(new StageTypeSync(ClientConfigData.defaultSync.get()));
-    }
+
 
 
 

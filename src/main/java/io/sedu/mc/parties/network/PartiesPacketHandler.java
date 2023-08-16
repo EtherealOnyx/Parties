@@ -61,11 +61,16 @@ public class PartiesPacketHandler {
     }
 
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
-        if (player != null) //Don't send packet to offline player.
+        if (player != null)  {
+            //Don't send packet to offline player.
+            //Parties.LOGGER.debug("Sending packet to player {} containing {}", player.getScoreboardName(), message.getClass().getName());
             INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
+        }
+
     }
 
     public static <MSG> void sendToServer(MSG message) {
+        //Parties.LOGGER.debug("Sending packet to server containing {}", message.getClass().getName());
         INSTANCE.sendToServer(message);
     }
 

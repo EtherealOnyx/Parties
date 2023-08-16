@@ -36,21 +36,37 @@ public class ModSetup {
 
     private static void initSupport() {
         Parties.LOGGER.info("[Parties] Initializing mod support...");
+        Parties.LOGGER.debug("[Parties] Checking for PlayerRevive...");
         PRCompatManager.init(); //Player Revive Support
+        Parties.LOGGER.debug("[Parties] Checking for HardcoreRevival...");
         HRCompatManager.init(); //Hardcore Revival Support
+        Parties.LOGGER.debug("[Parties] Checking for Tough As Nails...");
         TANCompatManager.init();//Tough as Nails Support
+        Parties.LOGGER.debug("[Parties] Checking for Thirst was Taken...");
         TMCompatManager.init(); //Thirst was Taken Support
+        Parties.LOGGER.debug("[Parties] Checking for Cold Sweat...");
         CSCompatManager.init(); //Cold Sweat Support
+        Parties.LOGGER.debug("[Parties] Checking for Ars Nouveau...");
         ANCompatManager.init(); //Ars Nouveau Support
+        Parties.LOGGER.debug("[Parties] Checking for Epic Fight Mod...");
         EFCompatManager.init(); //Epic Fight Support
+        Parties.LOGGER.debug("[Parties] Checking for Feathers...");
         FCompatManager.init(); //Feathers Support
-        SSCompatManager.init(); //Spells and Shield Support
+        Parties.LOGGER.debug("[Parties] Checking for Spells and Shields...");
+        SSCompatManager.init(); //Spells and Shields Support
+        Parties.LOGGER.debug("[Parties] Checking for Open Parties and Claims...");
         PACCompatManager.init(); //Open-PAC Support
+        Parties.LOGGER.debug("[Parties] Checking for Homeostatic...");
         HCompatManager.init(); //Homeostatic Support
+        Parties.LOGGER.debug("[Parties] Checking for Dietary Statistics...");
         DSCompatManager.init(); //Dietary Stats Support
+        Parties.LOGGER.debug("[Parties] Checking for Origins...");
         OCompatManager.init(); //Origins Mod Support
+        Parties.LOGGER.debug("[Parties] Checking for Iron's Spells n' Spellbooks...");
         ISSCompatManager.init(); //Iron's Spells n' Spellbooks Support
+        Parties.LOGGER.debug("[Parties] Checking for Incapacitated...");
         ICompatManager.init(); //Incapacitated Support
+        Parties.LOGGER.debug("[Parties] Checking for Game Stages...");
         GSCompatManager.init(); //Game Stages Support
         Parties.LOGGER.info("[Parties] Mod support initialization complete!");
     }

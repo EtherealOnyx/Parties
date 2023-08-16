@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.api.events;
 
+import io.sedu.mc.parties.Parties;
 import net.minecraftforge.eventbus.api.Event;
 
 import java.util.UUID;
@@ -13,6 +14,7 @@ public class PartyLeaveEvent extends Event {
 
     //Constructor used to trigger this event. It requires the ID of the player that left and the ID of the party involved.
     public PartyLeaveEvent(UUID playerId, UUID partyId) {
+        Parties.LOGGER.debug("Player {} is being removed from party {}.", playerId, partyId);
         this.playerId = playerId;
         this.partyId = partyId;
     }

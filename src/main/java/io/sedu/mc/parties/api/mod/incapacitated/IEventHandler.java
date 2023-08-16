@@ -23,6 +23,7 @@ public class IEventHandler {
     //TODO: Party Join event
     @SubscribeEvent
     public static void onPartyJoin(PartyJoinEvent event) {
+        System.out.println("Hello from server");
         event.forTrackersAndSelf((sendTo, propOf, propPlayer) -> {
             ICompatManager.getHandler().getCompleteIncapInfo(propPlayer, (count, duration) -> {
                 InfoPacketHelper.sendDowned(sendTo, propOf, true, duration);

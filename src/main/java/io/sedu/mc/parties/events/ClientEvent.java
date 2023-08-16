@@ -23,7 +23,7 @@ public class ClientEvent {
     public static void onClientLeave(ClientPlayerNetworkEvent.LoggedOutEvent event) {
         //Reset info.
 
-        ClientPlayerData.resetOnly();
+        ClientPlayerData.completeReset();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
