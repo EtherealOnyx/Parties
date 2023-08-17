@@ -148,9 +148,13 @@ public abstract class RenderItem {
 
     public static void updateFramePos() {
         Window w = Minecraft.getInstance().getWindow();
-        //TODO: include other frame.
         selfFrameX = Math.min(ClientConfigData.xPos.get(), w.getScreenWidth() - frameEleW);
         selfFrameY = Math.min(ClientConfigData.yPos.get(), w.getScreenHeight() - frameEleH);
+        partyFrameX = Math.min(ClientConfigData.xPosParty.get(), w.getScreenWidth() - frameEleW);
+        partyFrameY = Math.min(ClientConfigData.yPosParty.get(), w.getScreenHeight() - frameEleH);
+        playerScale = (float) Mth.clamp(ClientConfigData.scale.get(), 0.5, 2.0);
+        partyScale = (float) Mth.clamp(ClientConfigData.partyScale.get(), 0.5, 2.0);
+        Parties.LOGGER.debug("Values set: {} | {} | {} | {} | {} | {} |", selfFrameX, selfFrameY, partyFrameX, partyFrameY, playerScale, partyScale);
     }
 
     public static void forEachToSave(Consumer<RenderItem> action) {

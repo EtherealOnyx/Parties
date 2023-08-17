@@ -25,6 +25,8 @@ public class ClientConfigData {
     public static ForgeConfigSpec.IntValue yPos;
     public static ForgeConfigSpec.IntValue xPosParty;
     public static ForgeConfigSpec.IntValue yPosParty;
+    public static ForgeConfigSpec.DoubleValue scale;
+    public static ForgeConfigSpec.DoubleValue partyScale;
     public static ForgeConfigSpec.ConfigValue<SyncType> defaultSync;
     public static void registerClientConfig(ForgeConfigSpec.Builder CLIENT_BUILDER) {
         CLIENT_BUILDER.comment("--------------------------------------------------------",
@@ -66,16 +68,20 @@ public class ClientConfigData {
                                         .define("renderSelfFrame", true);
         xPos = CLIENT_BUILDER.comment("X Position of the player frame.",
                                       "Note: The player frame is bounded by the screen size.")
-                             .defineInRange("xPos", 16, 0, Integer.MAX_VALUE);
+                             .defineInRange("xPos", 8, 0, Integer.MAX_VALUE);
         yPos = CLIENT_BUILDER.comment("Y Position of the player frame.",
                                       "Note: The player frame is bounded by the screen size.")
-                             .defineInRange("yPos", 16, 0, Integer.MAX_VALUE);
+                             .defineInRange("yPos", 8, 0, Integer.MAX_VALUE);
         xPosParty = CLIENT_BUILDER.comment("X Position of the party frame.",
                                       "Note: The party frame is bounded by the screen size.")
-                             .defineInRange("xPos", 16, 0, Integer.MAX_VALUE);
+                             .defineInRange("xPosParty", 8, 0, Integer.MAX_VALUE);
         yPosParty = CLIENT_BUILDER.comment("Y Position of the party frame.",
                                       "Note: The party frame is bounded by the screen size.")
-                             .defineInRange("yPos", 16, 0, Integer.MAX_VALUE);
+                             .defineInRange("yPosParty", 224, 0, Integer.MAX_VALUE);
+        scale = CLIENT_BUILDER.comment("The scale of the self frame.")
+                             .defineInRange("scale", 1.0, 0.5, 2.0);
+        partyScale = CLIENT_BUILDER.comment("The scale of the party frame.")
+                             .defineInRange("partyScale", .5, 0.5, 2.0);
 
 
         forceModelRotation = CLIENT_BUILDER.comment("Makes all the models drawn on the party frame face forward if true.",

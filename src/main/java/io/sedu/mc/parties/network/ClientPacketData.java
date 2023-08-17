@@ -133,9 +133,13 @@ public class ClientPacketData {
 
     private static void closeScreens(boolean closeAll) {
         if (closeAll) {
+            //Save information on hover screen/settings screen first
+            if (Minecraft.getInstance().screen != null)
+                Minecraft.getInstance().screen.onClose();
             Minecraft.getInstance().setScreen(null);
         } else {
-            if (Minecraft.getInstance().screen instanceof SettingsScreen) {
+            if (Minecraft.getInstance().screen instanceof SettingsScreen sS) {
+                sS.onClose();
                 Minecraft.getInstance().setScreen(null);
             }
         }

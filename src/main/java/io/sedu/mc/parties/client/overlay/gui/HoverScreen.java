@@ -1,6 +1,7 @@
 package io.sedu.mc.parties.client.overlay.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.helper.ColorAPI;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PEffects;
@@ -20,6 +21,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -745,8 +747,7 @@ public class HoverScreen extends Screen {
             return true;
         }
         if (pKeyCode != key) {
-            //TODO: Fix when you press escape.
-
+            this.onClose();
             Minecraft.getInstance().setScreen(null);
         }
         return true;
@@ -763,12 +764,22 @@ public class HoverScreen extends Screen {
         }
         draggedItem = -1;
         isArranging = false;
-        ClientConfigData.xPos.set(selfFrameX);
-        ClientConfigData.yPos.set(selfFrameY);
-        ClientConfigData.xPosParty.set(partyFrameX);
-        ClientConfigData.yPosParty.set(partyFrameY);
+        Parties.LOGGER.debug("Saving frame position and scale...");
+        saveValue(ClientConfigData.xPos, selfFrameX);
+        saveValue(ClientConfigData.yPos, selfFrameY);
+        saveValue(ClientConfigData.xPosParty, partyFrameX);
+        saveValue(ClientConfigData.yPosParty, partyFrameY);
+        saveValue(ClientConfigData.scale, (double) playerScale);
+        saveValue(ClientConfigData.partyScale, (double) partyScale);
         showInfo = false;
         super.onClose();
+    }
+
+    private <T> void saveValue(ForgeConfigSpec.ConfigValue<T> configValue , T value) {
+        if (!configValue.get().equals(value)) {
+            configValue.set(value);
+            configValue.save();
+        }
     }
 
     @Override
