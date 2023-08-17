@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.api.events;
 
+import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.util.TriConsumer;
 import net.minecraft.world.entity.player.Player;
@@ -11,8 +12,12 @@ import java.util.function.BiConsumer;
 
 import static io.sedu.mc.parties.api.helper.PlayerAPI.getServerPlayer;
 
-//This event is triggered when the player rejoins the party (by being online again)
-// or when they join the party for the first time.
+
+/**
+ * This event is triggered when the player joins the party for the first time,
+ * or when they are online again. This is also triggered by the party leader
+ * when the player invites another party member and the member accepts (triggered once for each member).
+ */
 public class PartyJoinEvent extends PlayerEvent {
 
     //A collection of players (by their UUID) that are tracking this player.
@@ -26,6 +31,7 @@ public class PartyJoinEvent extends PlayerEvent {
     //Constructor used to trigger this event. It requires the player.
     public PartyJoinEvent(Player player, UUID partyId) {
         super(player);
+        Parties.LOGGER.debug("New join event for {}", player.getScoreboardName());
         trackers = ServerPlayerData.playerTrackers.get(id = player.getUUID());
         this.partyId = partyId;
     }

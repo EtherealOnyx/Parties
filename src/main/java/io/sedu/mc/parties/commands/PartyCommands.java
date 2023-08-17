@@ -13,6 +13,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.fml.ModList;
@@ -38,13 +39,23 @@ public class PartyCommands {
                    ServerPlayer p = ctx.getSource().getPlayerOrException();
                    SyncType t = ctx.getArgument("type", SyncType.class);
                    if (GSEventHandler.changePlayerOption(p.getUUID(), t, false))
-                       p.sendMessage(new TranslatableComponent("messages.sedparties.command.syncchange", t).withStyle(ChatFormatting.DARK_AQUA), ctx.getSource().getPlayerOrException().getUUID());
+                       p.sendMessage(new TranslatableComponent("messages.sedparties.command.syncchange", t).withStyle(ChatFormatting.DARK_AQUA), ChatType.GAME_INFO, ctx.getSource().getPlayerOrException().getUUID());
                    else
-                       p.sendMessage(new TranslatableComponent("messages.sedparties.command.syncsame", t).withStyle(ChatFormatting.DARK_AQUA), ctx.getSource().getPlayerOrException().getUUID());
+                       p.sendMessage(new TranslatableComponent("messages.sedparties.command.syncsame", t).withStyle(ChatFormatting.DARK_AQUA), ChatType.GAME_INFO, ctx.getSource().getPlayerOrException().getUUID());
                    if (!GSEventHandler.validType(t))
-                       p.sendMessage(new TranslatableComponent("messages.sedparties.command.syncoverride", ServerConfigData.syncGameStages.get(), t).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY), ctx.getSource().getPlayerOrException().getUUID());
+                       p.sendMessage(new TranslatableComponent("messages.sedparties.command.syncoverride", ServerConfigData.syncGameStages.get(), t).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY), ChatType.GAME_INFO, ctx.getSource().getPlayerOrException().getUUID());
                    return Command.SINGLE_SUCCESS;
             }))));
+            dispatcher.register(Commands.literal("party").then(Commands.literal("serversync").requires(cs->cs.hasPermission(4))
+                                                                       .then(Commands.argument("type", EnumArgument.enumArgument(SyncType.class)).executes(ctx -> {
+                                                                           ServerPlayer p = ctx.getSource().getPlayerOrException();
+                                                                           SyncType t = ctx.getArgument("type", SyncType.class);
+                                                                           if (GSEventHandler.changeServerOption(t))
+                                                                               p.sendMessage(new TranslatableComponent("messages.sedparties.command.serversyncchange", t).withStyle(ChatFormatting.DARK_AQUA), ctx.getSource().getPlayerOrException().getUUID());
+                                                                           else
+                                                                               p.sendMessage(new TranslatableComponent("messages.sedparties.command.serversyncsame", t).withStyle(ChatFormatting.DARK_AQUA), ctx.getSource().getPlayerOrException().getUUID());
+                                                                          return Command.SINGLE_SUCCESS;
+                                                                       }))));
         }
         dispatcher.register(Commands.literal("party")
             .then(Commands.literal("invite")

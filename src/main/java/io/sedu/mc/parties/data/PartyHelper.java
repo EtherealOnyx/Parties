@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.data;
 
+import io.sedu.mc.parties.api.events.PartyJoinEvent;
 import io.sedu.mc.parties.api.helper.PartyAPI;
 import io.sedu.mc.parties.api.helper.PlayerAPI;
 import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
@@ -9,6 +10,7 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -26,8 +28,12 @@ public class PartyHelper {
         }
 
         //This checks if initiator is in a party. Creates one if not.
-        if (!Objects.requireNonNull(PlayerAPI.getNormalPlayer(initiator)).hasParty()) {
+        ServerPlayerData pD;
+        if ((pD = PlayerAPI.getNormalPlayer(initiator)) != null && !pD.hasParty()) {
             new PartyData(initiator);
+            //Party join event if player is online
+            if (pD.getPlayer() != null)
+                MinecraftForge.EVENT_BUS.post(new PartyJoinEvent(pD.getPlayer(), pD.getPartyId()));
         }
         return addPlayerToParty(futureMember, Objects.requireNonNull(PartyAPI.getPartyFromMember(initiator)));
     }

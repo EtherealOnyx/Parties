@@ -2,6 +2,8 @@ package io.sedu.mc.parties.api.helper;
 
 import io.sedu.mc.parties.data.PartyData;
 import io.sedu.mc.parties.data.ServerPlayerData;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.player.Player;
 
 import javax.annotation.Nullable;
@@ -23,6 +25,26 @@ public class PartyAPI {
         PartyData p;
         if ((pl = ServerPlayerData.playerList.get(playerId)) != null && (party = pl.getPartyId()) != null && (p = getPartyFromId(party)) != null)
             return p;
+        return null;
+    }
+
+    /**
+     * Tries to get the PartyData that the provided entity belongs to.
+     * @param entity The LivingEntity object of the member to check for.
+     * @return The PartyData instance that the player or owned entity belongs to.
+     */
+    public static PartyData getPartyFromMember(LivingEntity entity) {
+
+        if (entity instanceof Player p) {
+            return getPartyFromMember(p.getUUID());
+        }
+        //Entity is not a player.
+        if (entity instanceof OwnableEntity ownedEntity) {
+            //Check if owner entity is a player.
+            if (ownedEntity.getOwner() instanceof Player p) {
+                return getPartyFromMember(p.getUUID());
+            }
+        }
         return null;
     }
 
@@ -77,6 +99,35 @@ public class PartyAPI {
             return false;
         return p1.equals(p2);
     }
+
+    /**
+     * Checks if the provided entities are part of the same party. This includes players and owned entities.
+     * @param member1 The LivingEntity object holding the first member.
+     * @param member2 The LivingEntity object holding the second object.
+     * @return - A boolean that is true when the members are in the same party and false otherwise.
+     */
+    public static boolean inSameParty(LivingEntity member1, LivingEntity member2) {
+        //Note that member1 and member2 is considered to be in the same party if one entity owns the other.
+        //Check if member1 is a player and member2 is an ownable entity owned by member1.
+        if (member1 instanceof Player p1 && member2 instanceof OwnableEntity own1 && p1.getUUID().equals(own1.getOwnerUUID())) {
+            return true;
+        }
+
+        //Check if member2 is a player and member1 is an ownable entity owned by member2.
+        if (member2 instanceof Player p1 && member1 instanceof OwnableEntity own1 && p1.getUUID().equals(own1.getOwnerUUID())) {
+            return true;
+        }
+
+        PartyData p1, p2;
+        if ((p1 = getPartyFromMember(member1)) == null || (p2 = getPartyFromMember(member2)) == null) {
+            return false;
+        }
+
+
+        return p1.equals(p2);
+    }
+
+
 
 
     /**

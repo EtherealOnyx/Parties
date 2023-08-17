@@ -20,10 +20,9 @@ import static io.sedu.mc.parties.data.ServerConfigData.playerUpdateInterval;
 //TODO: Figure out how to properly sync timers.
 
 public class IEventHandler {
-    //TODO: Party Join event
+
     @SubscribeEvent
     public static void onPartyJoin(PartyJoinEvent event) {
-        System.out.println("Hello from server");
         event.forTrackersAndSelf((sendTo, propOf, propPlayer) -> {
             ICompatManager.getHandler().getCompleteIncapInfo(propPlayer, (count, duration) -> {
                 InfoPacketHelper.sendDowned(sendTo, propOf, true, duration);
@@ -39,7 +38,6 @@ public class IEventHandler {
         }));
     }
 
-    //TODO: Rescue/Abort Rescue events
     @SubscribeEvent
     public static void onEntityTick(TickEvent.PlayerTickEvent e) {
         if (e.side == LogicalSide.SERVER && e.phase == TickEvent.Phase.END) {

@@ -1,12 +1,14 @@
 package io.sedu.mc.parties.network;
 
 import io.sedu.mc.parties.Parties;
+import io.sedu.mc.parties.api.mod.gamestages.SyncType;
 import io.sedu.mc.parties.client.config.Config;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.*;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
@@ -220,5 +222,9 @@ public class RenderPacketHelper {
         } else {
             Parties.LOGGER.warn("Failed to properly parse incoming preset link from {}, skipping...", name);
         }
+    }
+
+    public static void sendSync(ServerPlayer p, SyncType t) {
+
     }
 }

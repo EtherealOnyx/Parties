@@ -761,9 +761,4 @@ public class ClientPlayerData {
         getCastInfo(CastAnim::markDone);
     }
 
-    public void startCast(Integer spellId, Integer castTime) {
-
-    }
 }
-
-//TODO: Check max health updates for server tracked player.

@@ -22,9 +22,9 @@
   "gui.sedparties.name.p_mana_i":"Mana Element (Iron's S&S)",
   "gui.sedparties.name.p_mana_ss":"Mana Element (Spells and Shields)",
   "gui.sedparties.name.p_mana":"Mana Element (Ars Nouveau)",
-  "gui.sedparties.name.p_stam_ef":"Stamina Element (Epic Fight Mod/Feathers)",
+  "gui.sedparties.name.p_stam":"Stamina Element (EFM/Feathers)",
   "gui.sedparties.name.p_castbar":"Cast Bar Element (Iron's S&S)",
-  "gui.sedparties.name.p_origin":"Origin Element",
+  "gui.sedparties.name.p_origin":"Origin Element (Origins)",
 
   "config.sedparties.title.display":"Display Settings",
   "config.sedparties.title.presetd":"Default Presets",
@@ -268,8 +268,17 @@
   "messages.sedparties.preset.loadfailclipboard": "Could not load a valid preset from the clipboard.",
   "messages.sedparties.command.syncchange": "Stage Sync has been changed to [%s].",
   "messages.sedparties.command.syncsame": "Your stage sync is already set to [%s].",
-  "messages.sedparties.command.syncoverride": "Note: Server sync is set to [%s]. Your selected option of [%s] will be overwritten."
-
-
+  "messages.sedparties.command.syncoverride": "Note: Server sync is set to [%s]. Your selected option of [%s] will be overwritten.",
+  "messages.sedparties.command.serversyncchange": "Server sync mode has been changed to [%s].",
+  "messages.sedparties.command.serversyncsame": "The server's sync setting is already set to [%s].",
+  "messages.sedparties.phandler.gamestagesync": "Click an option to sync game stages: ",
+  "messages.sedparties.phandler.sync-none": "[NONE]",
+  "messages.sedparties.phandler.sync-none2": "Disable Stage Sync",
+  "messages.sedparties.phandler.sync-future": "[FUTURE]",
+  "messages.sedparties.phandler.sync-future2": "Sync Future Stages",
+  "messages.sedparties.phandler.sync-future3": "Future stage sync is disabled.",
+  "messages.sedparties.phandler.sync-all": "[ALL]",
+  "messages.sedparties.phandler.sync-all2": "Sync Current & Future Stages",
+  "messages.sedparties.phandler.sync-all3": "Syncing all stages is disabled."
 }
 

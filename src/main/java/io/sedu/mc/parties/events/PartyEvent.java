@@ -8,8 +8,8 @@ import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.commands.PartyCommands;
 import io.sedu.mc.parties.data.PartySaveData;
-import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.data.ServerConfigData;
+import io.sedu.mc.parties.data.ServerPlayerData;
 import io.sedu.mc.parties.network.ClientPacketHelper;
 import io.sedu.mc.parties.network.InfoPacketHelper;
 import io.sedu.mc.parties.network.ServerPacketHelper;
@@ -18,6 +18,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.item.ArmorItem;
@@ -176,11 +177,11 @@ public class PartyEvent {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onEntityAttacked(LivingAttackEvent event) {
         if (!event.getEntity().level.isClientSide()
-                && event.getEntity() instanceof Player p
+                && event.getEntity() instanceof LivingEntity member1
                 && event.getSource() != null
-                && event.getSource().getEntity() instanceof Player source
+                && event.getSource().getEntity() instanceof LivingEntity member2
                 && !ServerConfigData.friendlyFire.get()
-                && PartyAPI.inSameParty(source.getUUID(), p.getUUID())) {
+                && PartyAPI.inSameParty(member1, member2)) {
             event.setCanceled(true);
         }
 
