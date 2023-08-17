@@ -33,45 +33,7 @@ credits="" #optional
 # A text field displayed in the mod UI
 authors="EtherealOnyx" #optional
 # The description text for the mod (multi line!) (#mandatory)
-description='''
-⚑ This mod adds a party system to minecraft!
-
-Track your party members' health, xp, or even dimension!
-Choose from several presets or create your own...
-almost everything is configurable!
-Special support for other mods will be added over time!
-
-⭐ Configurable Elements:
-✔ Player Head/Model
-✔ Player Name
-✔ Leader Indicator
-✔ Dimension Indicator/Animation:
-    ⏵ (Mod Support: RFTools Dimensions)
-    ⏵ Default Preset Support:
-        ⏵ Vanilla Minecraft
-        ⏵ RFTools Dimensions
-        ⏵ Twilight Forest
-        ⏵ (Customizable Support)
-✔ Potion Effects:
-    ⏵ Buffs Only Bar
-    ⏵ Debuffs Only Bar
-    ⏵ Combined Buff/Debuff Bar
-✔ Armor Indicator
-✔ Thirst Indicator (Mod Support: Thirst Was Taken/Tough as Nails)
-✔ Temperature Indicator (Mod Support: Cold Sweat/Tough as Nails)
-✔ Experience Bar
-✔ Hunger Bar/Animation
-✔ Health Bar/Animation
-✔ Mana Bar/Animation (Mod Support: Ars Noveau)
-✔ Mana Bar/Animation (Mod Support: Spells & Shields)
-✔ Stamina Bar/Animation (Mod Support: Epic Fight, Feathers)
-✔ Offline Indicator
-✔ Dead Indicator
-✔ Transparent Box Background
-⏳Clickable Box Area
-
-⭐ NOTE: Items marked with ⏳ are not implemented yet and/or are still a work in progress.
-'''
+description="An rpg-like party system for Minecraft. Currently contains 24 customizable elements with direct support for 16+ mods! Also provides extra features like xp sharing, stage syncing, and more."
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.sedparties]] #optional
     # the modid of the dependency
