@@ -3,7 +3,7 @@ package io.sedu.mc.parties.api.mod.coldsweat;
 import dev.momostudios.coldsweat.api.util.Temperature;
 import dev.momostudios.coldsweat.common.capability.ITemperatureCap;
 import dev.momostudios.coldsweat.config.ClientSettingsConfig;
-import dev.momostudios.coldsweat.util.config.ConfigSettings;
+import dev.momostudios.coldsweat.config.ConfigSettings;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.util.TriConsumer;
 import net.minecraft.world.entity.player.Player;
@@ -51,7 +51,7 @@ public class CSHandler implements ICSHandler {
 
     @Override
     public void convertTemp(float temp, BiConsumer<Integer, Integer> action) {
-        action.accept((int) (ClientSettingsConfig.getInstance().celsius() ? temp * 23.333333333 : temp * 42 + 32), getRenderType(temp));
+        action.accept((int) (ClientSettingsConfig.getInstance().isCelsius() ? temp * 23.333333333 : temp * 42 + 32), getRenderType(temp));
     }
 
     @Override

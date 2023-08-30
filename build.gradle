@@ -20,7 +20,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.18.2-1.0.1'
+version = '1.18.2-1.0.2'
 group = 'io.sedu.mc.sedparties' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'sedparties'
 
@@ -205,7 +205,7 @@ dependencies {
 
     //Cold Sweat
     //compileOnly fg.deobf("curse.maven:coldsweat-506194:4459981")
-    compileOnly fg.deobf("curse.maven:coldsweat-506194:4512295")
+    implementation fg.deobf("curse.maven:cold-sweat-506194:4708791")
 
     //Tough as Nails
     compileOnly fg.deobf("curse.maven:toughasnails-246391:3804267") //impl
@@ -262,8 +262,8 @@ dependencies {
     //Incapacitated
     implementation fg.deobf("curse.maven:incapacitated-528135:4645650")
 
-    //Thirst Mod - Local file
-    compileOnly fg.deobf("local:Thirst:1.2.3")
+    //Thirst was Taken (Actually version 1.3.2)
+    implementation fg.deobf("local:Thirst:1.2.3")
 
     //Dietary Statistics - Local file
     implementation fg.deobf("local:DietaryStatistics:1.0.2")

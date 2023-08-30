@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.api.mod.thirstmod;
 
-import dev.ghen.thirst.foundation.common.capability.IThirstCap;
+import dev.ghen.thirst.foundation.common.capability.IThirst;
 import dev.ghen.thirst.foundation.gui.ThirstBarRenderer;
 import io.sedu.mc.parties.Parties;
 import net.minecraft.world.entity.player.Player;
@@ -10,7 +10,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 
 public class TMHandler implements ITMHandler {
-    private static final Capability<IThirstCap> THIRSTY = CapabilityManager.get(new CapabilityToken<>(){});
+    private static final Capability<IThirst> THIRSTY = CapabilityManager.get(new CapabilityToken<>(){});
 
     static {
         Parties.LOGGER.info("[Parties] Initializing Compatibility with Thirst was Taken (Thirst Mod).");
@@ -25,7 +25,7 @@ public class TMHandler implements ITMHandler {
 
     @Override
     public int getThirst(Player player) {
-        IThirstCap thirst = player.getCapability(THIRSTY).orElse(null);
+        IThirst thirst = player.getCapability(THIRSTY).orElse(null);
         //noinspection ConstantConditions
         if (thirst != null) {
             return thirst.getThirst();
@@ -41,7 +41,7 @@ public class TMHandler implements ITMHandler {
 
     @Override
     public int getQuench(Player player) {
-        IThirstCap thirst = player.getCapability(THIRSTY).orElse(null);
+        IThirst thirst = player.getCapability(THIRSTY).orElse(null);
         //noinspection ConstantConditions
         if (thirst != null) {
             return thirst.getQuenched();
