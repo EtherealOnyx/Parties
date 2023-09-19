@@ -16,26 +16,26 @@ public class ClientConfigData {
     public static ForgeConfigSpec.BooleanValue renderSSMana;
     public static ForgeConfigSpec.BooleanValue renderFeathers;
     //public static ForgeConfigSpec.BooleanValue renderStamina;
-    public static ForgeConfigSpec.ConfigValue<String> defaultPreset;
+    //public static ForgeConfigSpec.ConfigValue<String> defaultPreset;
     public static ForgeConfigSpec.BooleanValue forceModelRotation;
     public static ForgeConfigSpec.IntValue rotationOffset;
     public static ForgeConfigSpec.BooleanValue renderSelfFrame;
 
-    public static ForgeConfigSpec.IntValue xPos;
-    public static ForgeConfigSpec.IntValue yPos;
-    public static ForgeConfigSpec.IntValue xPosParty;
-    public static ForgeConfigSpec.IntValue yPosParty;
-    public static ForgeConfigSpec.DoubleValue scale;
-    public static ForgeConfigSpec.DoubleValue partyScale;
+    //public static ForgeConfigSpec.IntValue xPos;
+    //public static ForgeConfigSpec.IntValue yPos;
+    //public static ForgeConfigSpec.IntValue xPosParty;
+    //public static ForgeConfigSpec.IntValue yPosParty;
+    //public static ForgeConfigSpec.DoubleValue scale;
+    //public static ForgeConfigSpec.DoubleValue partyScale;
     public static ForgeConfigSpec.ConfigValue<SyncType> defaultSync;
     public static void registerClientConfig(ForgeConfigSpec.Builder CLIENT_BUILDER) {
         CLIENT_BUILDER.comment("--------------------------------------------------------",
                                "Client Party Settings",
                                "Type /party reload in-game to reload this configuration.",
                                "--------------------------------------------------------");
-        CLIENT_BUILDER.push("presets");
-        defaultPreset = CLIENT_BUILDER.comment("The default preset to load on the client. It's automatically set to load your last preset used.")
-                                      .define("defaultPreset", "");
+        //CLIENT_BUILDER.push("presets");
+        //defaultPreset = CLIENT_BUILDER.comment("The default preset to load on the client. It's automatically set to load your last preset used.")
+                                      //.define("defaultPreset", "");
         CLIENT_BUILDER.pop();
         CLIENT_BUILDER.push("hide-overlays");
         renderPotionEffects = CLIENT_BUILDER.comment("Enable the Vanilla Potion Effect HUD")
@@ -66,22 +66,22 @@ public class ClientConfigData {
                                                  "If true, this will include you in the party list. This will also render your information when outside the party.",
                                                  "If false, your information will NOT be rendered both in a party and outside a party.")
                                         .define("renderSelfFrame", true);
-        xPos = CLIENT_BUILDER.comment("X Position of the player frame.",
-                                      "Note: The player frame is bounded by the screen size.")
-                             .defineInRange("xPos", 8, 0, Integer.MAX_VALUE);
-        yPos = CLIENT_BUILDER.comment("Y Position of the player frame.",
-                                      "Note: The player frame is bounded by the screen size.")
-                             .defineInRange("yPos", 8, 0, Integer.MAX_VALUE);
-        xPosParty = CLIENT_BUILDER.comment("X Position of the party frame.",
-                                      "Note: The party frame is bounded by the screen size.")
-                             .defineInRange("xPosParty", 8, 0, Integer.MAX_VALUE);
-        yPosParty = CLIENT_BUILDER.comment("Y Position of the party frame.",
-                                      "Note: The party frame is bounded by the screen size.")
-                             .defineInRange("yPosParty", 224, 0, Integer.MAX_VALUE);
-        scale = CLIENT_BUILDER.comment("The scale of the self frame.")
-                             .defineInRange("scale", 1.0, 0.5, 2.0);
-        partyScale = CLIENT_BUILDER.comment("The scale of the party frame.")
-                             .defineInRange("partyScale", .5, 0.5, 2.0);
+        //xPos = CLIENT_BUILDER.comment("X Position of the player frame.",
+                                      //"Note: The player frame is bounded by the screen size.")
+                             //.defineInRange("xPos", 8, 0, Integer.MAX_VALUE);
+        //yPos = CLIENT_BUILDER.comment("Y Position of the player frame.",
+                                      //"Note: The player frame is bounded by the screen size.")
+                             //.defineInRange("yPos", 8, 0, Integer.MAX_VALUE);
+        //xPosParty = CLIENT_BUILDER.comment("X Position of the party frame.",
+                                      //"Note: The party frame is bounded by the screen size.")
+                             //.defineInRange("xPosParty", 8, 0, Integer.MAX_VALUE);
+        //yPosParty = CLIENT_BUILDER.comment("Y Position of the party frame.",
+                                      //"Note: The party frame is bounded by the screen size.")
+                             //.defineInRange("yPosParty", 224, 0, Integer.MAX_VALUE);
+        //scale = CLIENT_BUILDER.comment("The scale of the self frame.")
+                             //.defineInRange("scale", 1.0, 0.5, 2.0);
+        //partyScale = CLIENT_BUILDER.comment("The scale of the party frame.")
+                             //.defineInRange("partyScale", .5, 0.5, 2.0);
 
 
         forceModelRotation = CLIENT_BUILDER.comment("Makes all the models drawn on the party frame face forward if true.",

@@ -11,7 +11,6 @@ import io.sedu.mc.parties.api.mod.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.overlay.GeneralOptions;
 import io.sedu.mc.parties.client.overlay.PHead;
 import io.sedu.mc.parties.client.overlay.RenderItem;
-import io.sedu.mc.parties.data.ClientConfigData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -39,6 +38,7 @@ import static io.sedu.mc.parties.data.ClientConfigData.*;
 public class Config {
     public static final Path DEFAULT_PRESET_PATH = FMLPaths.GAMEDIR.get().resolve(FMLConfig.defaultConfigPath()).resolve(Parties.MODID).resolve("presets");
     public static final Path PRESET_PATH = FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).resolve("presets");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public static void init() {
         try {
             Files.createDirectories(DEFAULT_PRESET_PATH);
@@ -52,12 +52,11 @@ public class Config {
 
     public static boolean saveCompletePreset(String name, String desc, HashMap<String, RenderItem.Getter> itemGetter) {
         JsonObject json = new JsonObject();
-        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         json.addProperty("description", desc);
-        json.add("general", GeneralOptions.INSTANCE.getCurrentValues(itemGetter).getJsonEntries(gson));
-        RenderItem.items.forEach((itemName, item) -> json.add(itemName, item.getCurrentValues(itemGetter).getJsonEntries(gson)));
+        json.add("general", GeneralOptions.INSTANCE.getCurrentValues(itemGetter).getJsonEntries(GSON));
+        RenderItem.items.forEach((itemName, item) -> json.add(itemName, item.getCurrentValues(itemGetter).getJsonEntries(GSON)));
         try (FileWriter writer = new FileWriter(new File(PRESET_PATH.toFile(), name + ".json"))){
-            writer.write(gson.toJson(json));
+            writer.write(GSON.toJson(json));
             writer.flush();
         } catch (IOException e) {
             Parties.LOGGER.error("[Parties] Error trying to create preset for " + name + "!", e);
@@ -404,10 +403,9 @@ public class Config {
 
     public static void forEachMissing(Consumer<List<DimConfig.DimEntryConfig>> action) {
         try (Reader reader = new FileReader(FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).resolve("dims").resolve("missing.json").toFile())) {
-            Gson gson = new Gson();
             //General values
             Type dimListType = new TypeToken<ArrayList<DimConfig.DimEntryConfig>>(){}.getType();
-            List<DimConfig.DimEntryConfig> l = gson.fromJson(reader, dimListType);
+            List<DimConfig.DimEntryConfig> l = GSON.fromJson(reader, dimListType);
             if (l != null) action.accept(l);
         } catch (IOException e) {
             Parties.LOGGER.debug("missing.json was not found. Generating...");
@@ -415,8 +413,7 @@ public class Config {
     }
 
     public static void saveDefaultPresetFromString(HashMap<String, RenderItem.Update> updater, String fileName, String description, String load) {
-        Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(load, JsonObject.class);
+        JsonObject jsonObject = GSON.fromJson(load, JsonObject.class);
         //General values
         JsonElement element = jsonObject.get("general");
         updateValues(GeneralOptions.INSTANCE, element, updater);
@@ -457,34 +454,38 @@ public class Config {
     public static void loadDefaultPreset() {
         HashMap<String, RenderItem.Update> updater = new HashMap<>();
         RenderItem.initUpdater(updater);
-        try {
-            String bits = ClientConfigData.defaultPreset.get();
-            if (!applyPresetString(bits.toCharArray(), updater)) {
-                parseError();
-                generateDefaultPreset(updater);
+        try (Reader reader = new FileReader(FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).resolve("client").resolve("active-preset.json").toFile())) {
+            Type presetType = new TypeToken<ArrayList<PresetEntry>>(){}.getType();
+            if (PresetEntry.loadPreset(GSON.fromJson(reader, presetType))) {
+                char[] bits = PresetEntry.getMainPresetString();
+                if (!applyPresetString(bits, updater)) {
+                    parseError();
+                    generateDefaultPreset(updater);
+                }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             Parties.LOGGER.error("[Parties] Failed to load preset.", e);
             generateDefaultPreset(updater);
         }
+
     }
 
     private static void generateDefaultPreset(HashMap<String, RenderItem.Update> updater) {
         //General Defaults
         RenderItem.getGeneralDefaults().forEachEntry((s, v) -> updater.get(s.getName()).onUpdate(null, v));
+
         //Rest of item defaults.
         RenderItem.items.values().forEach(item -> RenderItem.setElementDefaults(item, updater));
 
-        //Modify for loaded mods.
 
-        //Save
-        //HashMap<String, RenderItem.Getter> getter = new HashMap<>();
-        //RenderItem.initGetter(getter);
-        //saveCurrentPresetAsDefault(getter);
+        HashMap<String, RenderItem.Getter> getter = new HashMap<>();
+        RenderItem.initGetter(getter);
+        saveCurrentPresetAsDefault(getter);
     }
 
     public static void saveCurrentPresetAsDefault(HashMap<String, RenderItem.Getter> getter) {
-        ClientConfigData.defaultPreset.set(getPresetString(getter));
+        //TODO: Implement party preset.
+        PresetEntry.updatePresetString(getPresetString(getter));
         Parties.LOGGER.debug("Updated default preset for this instance.");
     }
 
