@@ -1,9 +1,9 @@
 package io.sedu.mc.parties.api.mod.coldsweat;
 
-import dev.momostudios.coldsweat.api.util.Temperature;
-import dev.momostudios.coldsweat.common.capability.ITemperatureCap;
-import dev.momostudios.coldsweat.config.ClientSettingsConfig;
-import dev.momostudios.coldsweat.config.ConfigSettings;
+import com.momosoftworks.coldsweat.api.util.Temperature;
+import com.momosoftworks.coldsweat.common.capability.ITemperatureCap;
+import com.momosoftworks.coldsweat.config.ClientSettingsConfig;
+import com.momosoftworks.coldsweat.config.ConfigSettings;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.util.TriConsumer;
 import net.minecraft.world.entity.player.Player;

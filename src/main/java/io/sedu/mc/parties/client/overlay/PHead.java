@@ -44,7 +44,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
         height = 32;
         renderSelf = (i, id, gui, poseStack, partialTicks) -> {
             if (renderType != 0 && id.clientPlayer != null && !id.getDim().active)  {
-                float newScale = scale * playerScale;
+                float newScale = (float) (scale * playerScale);
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 renderEntityInInventory((int) ((x(i)+16)*newScale), (int) (y(i)*newScale), newScale, (int) (15*newScale), id.clientPlayer, partialTicks);
 
@@ -62,7 +62,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
         };
         renderMember = (i, id, gui, poseStack, partialTicks) -> {
             if (renderType == 2 && id.shouldRenderModel)  {
-                float newScale = scale * partyScale;
+                float newScale = (float) (scale * partyScale);
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 RenderItem.setColor(0,0,0,0);
                 renderEntityInInventory((int) ((x(i)+16)*newScale), (int) (y(i)*newScale), newScale, (int) (15*newScale), id.clientPlayer, 1F);
@@ -221,7 +221,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             }
             if (renderType != 0 && id.clientPlayer != null && !id.getDim().active)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
-                float newScale = scale * playerScale;
+                float newScale = (float) (scale * playerScale);
                 renderEntityInInventory((int) ((x(i)+16)*newScale), (int) ((y(i))*newScale), newScale, (int) (15*newScale), id.clientPlayer, partialTicks);
                 return;
             }
@@ -282,7 +282,7 @@ public class PHead extends RenderSelfItem implements TooltipItem {
             if (renderType == 2 && id.shouldRenderModel)  {
                 RenderUtils.sizeRect(poseStack.last().pose(), x(i), y(i), zPos, width, height, 0x33FFFFFF);
                 RenderItem.setColor(0,0,0,0);
-                float newScale = scale * partyScale;
+                float newScale = (float) (scale * partyScale);
                 renderEntityInInventory((int) ((x(i)+16)*newScale), (int) (y(i)*newScale), newScale, (int) (15*newScale), id.clientPlayer, 1F);
                 RenderItem.resetColor();
                 return;

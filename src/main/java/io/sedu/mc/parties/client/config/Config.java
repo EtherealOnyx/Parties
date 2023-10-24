@@ -442,7 +442,7 @@ public class Config {
         FCompatManager.getHandler().setFeathersRender(renderFeathers.get());
         PHead.updateModelRenderer();
         RenderItem.updateSelfRender();
-        RenderItem.updateFramePos();
+        loadDefaultPreset();
     }
 
     public static void createDefaultPreset() {
@@ -454,20 +454,35 @@ public class Config {
     public static void loadDefaultPreset() {
         HashMap<String, RenderItem.Update> updater = new HashMap<>();
         RenderItem.initUpdater(updater);
-        try (Reader reader = new FileReader(FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).resolve("client").resolve("active-preset.json").toFile())) {
+        try (Reader reader = new FileReader(FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).resolve("active-preset.json").toFile())) {
             Type presetType = new TypeToken<ArrayList<PresetEntry>>(){}.getType();
             if (PresetEntry.loadPreset(GSON.fromJson(reader, presetType))) {
+                //Preset valid
                 char[] bits = PresetEntry.getMainPresetString();
                 if (!applyPresetString(bits, updater)) {
                     parseError();
                     generateDefaultPreset(updater);
+                    //Save preset since the default broke.
+                    savePersistentPreset();
                 }
+                PresetEntry.refreshPos();
             }
         } catch (IOException e) {
             Parties.LOGGER.error("[Parties] Failed to load preset.", e);
             generateDefaultPreset(updater);
+            //Save preset since the default broke.
+            savePersistentPreset();
         }
+    }
 
+    public static void savePersistentPreset() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        try (FileWriter writer = new FileWriter(new File(FMLPaths.CONFIGDIR.get().resolve(Parties.MODID).toFile(), "active-preset.json"))){
+            writer.write(gson.toJson(PresetEntry.getEntries()));
+            writer.flush();
+        } catch (IOException e) {
+            Parties.LOGGER.error("[Parties] Error trying to save persistent preset!", e);
+        }
     }
 
     private static void generateDefaultPreset(HashMap<String, RenderItem.Update> updater) {
@@ -480,10 +495,10 @@ public class Config {
 
         HashMap<String, RenderItem.Getter> getter = new HashMap<>();
         RenderItem.initGetter(getter);
-        saveCurrentPresetAsDefault(getter);
+        cachePreset(getter);
     }
 
-    public static void saveCurrentPresetAsDefault(HashMap<String, RenderItem.Getter> getter) {
+    public static void cachePreset(HashMap<String, RenderItem.Getter> getter) {
         //TODO: Implement party preset.
         PresetEntry.updatePresetString(getPresetString(getter));
         Parties.LOGGER.debug("Updated default preset for this instance.");

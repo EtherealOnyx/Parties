@@ -1,6 +1,6 @@
 package io.sedu.mc.parties.api.mod.coldsweat;
 
-import dev.momostudios.coldsweat.config.ColdSweatConfig;
+import com.momosoftworks.coldsweat.config.ColdSweatConfig;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.mod.FakeHandler;
 import net.minecraftforge.common.MinecraftForge;

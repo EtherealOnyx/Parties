@@ -36,7 +36,7 @@ public class ClientConfigData {
         //CLIENT_BUILDER.push("presets");
         //defaultPreset = CLIENT_BUILDER.comment("The default preset to load on the client. It's automatically set to load your last preset used.")
                                       //.define("defaultPreset", "");
-        CLIENT_BUILDER.pop();
+        //CLIENT_BUILDER.pop();
         CLIENT_BUILDER.push("hide-overlays");
         renderPotionEffects = CLIENT_BUILDER.comment("Enable the Vanilla Potion Effect HUD")
                                      .define("renderPotionEffects", false);

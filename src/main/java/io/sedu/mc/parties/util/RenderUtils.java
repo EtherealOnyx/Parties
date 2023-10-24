@@ -438,7 +438,7 @@ public class RenderUtils {
         if (renderSelfFrame) {
             poseStack.pushPose();
             //For Self
-            poseStack.scale(playerScale, playerScale, 1f);
+            poseStack.scale((float) playerScale, (float) playerScale, 1f);
             clickArea.rect(0, poseStack, -2, -2, ColorAPI.getRainbowColor() | 150 << 24);
             poseStack.popPose();
         }
@@ -447,7 +447,7 @@ public class RenderUtils {
 
     public static void renderSelfFrame(PoseStack poseStack) {
         poseStack.pushPose();
-        poseStack.scale(playerScale, playerScale, 1f);
+        poseStack.scale((float) playerScale, (float) playerScale, 1f);
         RenderUtils.sizeRect(poseStack.last().pose(), selfFrameX, selfFrameY, -2, frameEleW,
                              frameEleH,
                              ColorAPI.getRainbowColor() | 25 << 24);
@@ -458,7 +458,7 @@ public class RenderUtils {
 
     public static void renderPartyFrame(PoseStack poseStack, boolean outOfBounds) {
         poseStack.pushPose();
-        poseStack.scale(partyScale, partyScale, 1f);
+        poseStack.scale((float) partyScale, (float) partyScale, 1f);
         int index = HoverScreen.getPartyDisplay()-1;
 
         RenderUtils.sizeRect(poseStack.last().pose(), partyFrameX, partyFrameY, -2, frameEleW + framePosW*index,
@@ -474,7 +474,7 @@ public class RenderUtils {
 
     public static void renderSelfFrameOutline(PoseStack poseStack) {
         poseStack.pushPose();
-        poseStack.scale(playerScale, playerScale, 1f);
+        poseStack.scale((float) playerScale, (float) playerScale, 1f);
         RenderUtils.borderRectNoA(poseStack.last().pose(), -1, 1, selfFrameX, selfFrameY,
                                frameEleW,
                                frameEleH, 0xFFFFFF);
@@ -483,7 +483,7 @@ public class RenderUtils {
 
     public static void renderPartyFrameOutline(PoseStack poseStack, boolean outOfBounds) {
         poseStack.pushPose();
-        poseStack.scale(partyScale, partyScale, 1f);
+        poseStack.scale((float) partyScale, (float) partyScale, 1f);
         int index = HoverScreen.getPartyDisplay()-1;
         RenderUtils.borderRectNoA(poseStack.last().pose(), -1, 1, partyFrameX, partyFrameY, frameEleW + framePosW*index,
                                   frameEleH + framePosH*index, outOfBounds ?  0xCC2222 : 0xFFFFFF);

@@ -112,7 +112,7 @@ public abstract class RenderItem {
             itemRender = (gui, poseStack, partialTicks) -> {
                 ClientPlayerData.forSelf((id) -> {
                     poseStack.pushPose();
-                    poseStack.scale(playerScale, playerScale, 1f);
+                    poseStack.scale((float) playerScale, (float) playerScale, 1f);
                     for (RenderSelfItem item : selfItems) {
                         item.itemStart(poseStack);
                         item.renderSelf(id, gui, poseStack, partialTicks);
@@ -127,7 +127,7 @@ public abstract class RenderItem {
                 });
                 //TODO: Check if this is fine to have outside.
                 poseStack.pushPose();
-                poseStack.scale(partyScale, partyScale, 1f);
+                poseStack.scale((float) partyScale, (float) partyScale, 1f);
                 ClientPlayerData.forOthersOrdered((i, id) -> {
                     //Render other players.
                     for (RenderSelfItem item : selfItems) {
@@ -146,14 +146,14 @@ public abstract class RenderItem {
         }
     }
 
-    public static void updateFramePos() {
+    public static void updateFramePos(int x, int y, int x2, int y2, double scale, double scale2) {
         Window w = Minecraft.getInstance().getWindow();
-        selfFrameX = Math.min(ClientConfigData.xPos.get(), w.getScreenWidth() - frameEleW);
-        selfFrameY = Math.min(ClientConfigData.yPos.get(), w.getScreenHeight() - frameEleH);
-        partyFrameX = Math.min(ClientConfigData.xPosParty.get(), w.getScreenWidth() - frameEleW);
-        partyFrameY = Math.min(ClientConfigData.yPosParty.get(), w.getScreenHeight() - frameEleH);
-        playerScale = (float) Mth.clamp(ClientConfigData.scale.get(), 0.5, 2.0);
-        partyScale = (float) Mth.clamp(ClientConfigData.partyScale.get(), 0.5, 2.0);
+        selfFrameX = Math.min(x, w.getScreenWidth() - frameEleW);
+        selfFrameY = Math.min(y, w.getScreenHeight() - frameEleH);
+        partyFrameX = Math.min(x2, w.getScreenWidth() - frameEleW);
+        partyFrameY = Math.min(y2, w.getScreenHeight() - frameEleH);
+        playerScale = (float) Mth.clamp(scale, 0.5, 2.0);
+        partyScale = (float) Mth.clamp(scale2, 0.5, 2.0);
         Parties.LOGGER.debug("Values set: {} | {} | {} | {} | {} | {} |", selfFrameX, selfFrameY, partyFrameX, partyFrameY, playerScale, partyScale);
     }
 
@@ -338,8 +338,8 @@ public abstract class RenderItem {
     }
 
     //TODO: Make a client config for this option.
-    public static float playerScale = 1f;
-    public static float partyScale = .5f;
+    public static double playerScale = 1;
+    public static double partyScale = .5;
     public static void register() {
         IIngameOverlay overlay = (gui, poseStack, partialTicks, width, height) -> {
             if (ClientPlayerData.playerOrderedList.size() == 0) return;

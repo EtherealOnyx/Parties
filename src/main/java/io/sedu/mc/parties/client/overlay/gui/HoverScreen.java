@@ -3,10 +3,10 @@ package io.sedu.mc.parties.client.overlay.gui;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.sedu.mc.parties.Parties;
 import io.sedu.mc.parties.api.helper.ColorAPI;
+import io.sedu.mc.parties.client.config.PresetEntry;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.PEffects;
 import io.sedu.mc.parties.client.overlay.RenderItem;
-import io.sedu.mc.parties.data.ClientConfigData;
 import io.sedu.mc.parties.mixinaccessors.TrimmedMessagesAccessor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.GuiMessage;
@@ -21,7 +21,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.common.ForgeConfigSpec;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -169,7 +168,7 @@ public class HoverScreen extends Screen {
     }
 
     private void toggleScale(boolean selfFrame, boolean increasing) {
-        float scale = selfFrame ? playerScale : partyScale;
+        double scale = selfFrame ? playerScale : partyScale;
         if (!selfFrame && increasing) {
             enableBoundaries = false;
             partyMoveFrame.get(7).setMessage(new TextComponent("▫"));
@@ -225,10 +224,10 @@ public class HoverScreen extends Screen {
     }
 
     private String getCurrentScale(boolean selfFrame) {
-        float scale = selfFrame ? playerScale : partyScale;
-        if (scale <= .25f) return "¼";
-        else if (scale <= .5f) return "½";
-        else if (scale <= 1f) return "1";
+        double scale = selfFrame ? playerScale : partyScale;
+        if (scale <= .25) return "¼";
+        else if (scale <= .5) return "½";
+        else if (scale <= 1) return "1";
         else return "2";
     }
 
@@ -765,21 +764,9 @@ public class HoverScreen extends Screen {
         draggedItem = -1;
         isArranging = false;
         Parties.LOGGER.debug("Saving frame position and scale...");
-        saveValue(ClientConfigData.xPos, selfFrameX);
-        saveValue(ClientConfigData.yPos, selfFrameY);
-        saveValue(ClientConfigData.xPosParty, partyFrameX);
-        saveValue(ClientConfigData.yPosParty, partyFrameY);
-        saveValue(ClientConfigData.scale, (double) playerScale);
-        saveValue(ClientConfigData.partyScale, (double) partyScale);
+        PresetEntry.save();
         showInfo = false;
         super.onClose();
-    }
-
-    private <T> void saveValue(ForgeConfigSpec.ConfigValue<T> configValue , T value) {
-        if (!configValue.get().equals(value)) {
-            configValue.set(value);
-            configValue.save();
-        }
     }
 
     @Override

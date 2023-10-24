@@ -118,7 +118,7 @@ public class ClientPacketData {
                     //Save preset to default.
                     HashMap<String, RenderItem.Getter> getter = new HashMap<>();
                     RenderItem.initGetter(getter);
-                    Config.saveCurrentPresetAsDefault(getter);
+                    Config.cachePreset(getter);
 
                 } else {
                     msg(new TranslatableComponent("messages.sedparties.preset.loadfailclipboard").withStyle(ChatFormatting.RED));

@@ -80,7 +80,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
 
 
     private void world(int pI, ClientPlayerData id) {
-        DimConfig.entry(id.getDim().dimension, (icon, color) -> RenderUtils.renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale, zPos, pI == 0 ? playerScale : partyScale));
+        DimConfig.entry(id.getDim().dimension, (icon, color) -> RenderUtils.renderGuiItem(icon, x(pI), y(pI), .75f*head.scale, 5*head.scale, zPos, (float) (pI == 0 ? playerScale : partyScale)));
     }
 
     protected void renderGuiItemMenu(ItemStack iStack, int pX, int pY) {
@@ -168,7 +168,7 @@ public class PDimIcon extends RenderSelfItem implements TooltipItem {
         }
         translateY += offY;
 
-        renderGuiItem(DimConfig.item(dim.dimension), x(pI), y(pI), translateX, translateY, scale, scalePos, pI == 0 ? playerScale : partyScale);
+        renderGuiItem(DimConfig.item(dim.dimension), x(pI), y(pI), translateX, translateY, scale, scalePos, (float) (pI == 0 ? playerScale : partyScale));
 
         if (renderText)
             //TODO: Extract sounds to their own implementation

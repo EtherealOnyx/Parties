@@ -117,7 +117,7 @@ public class POrigin extends RenderIconTextItem implements TooltipItem {
                 if (iconEnabled) {
                     RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, -1, width, height, (color & 0xfefefe) >> 1, color);
                     RenderUtils.offRectNoA(poseStack.last().pose(), x(i), y(i), zPos, 0, width, height, 0x222222, (color & 0xfefefe) >> 1);
-                    RenderUtils.renderGuiItem(item, xNormal(i), yNormal(i), scale, 8*scale, zPos+2, partyScale);
+                    RenderUtils.renderGuiItem(item, xNormal(i), yNormal(i), scale, 8*scale, zPos+2, (float) partyScale);
                 }
 
                 if (textEnabled)
@@ -136,7 +136,7 @@ public class POrigin extends RenderIconTextItem implements TooltipItem {
             if (iconEnabled) {
                 RenderUtils.offRectNoA(poseStack.last().pose(), x(0), y(0), zPos, -1, width, height, (color & 0xfefefe) >> 1, color);
                 RenderUtils.offRectNoA(poseStack.last().pose(), x(0), y(0), zPos, 0, width, height, 0x222222, (color & 0xfefefe) >> 1);
-                RenderUtils.renderGuiItem(item, xNormal(0), yNormal(0), scale, 8*scale, zPos+2, playerScale);
+                RenderUtils.renderGuiItem(item, xNormal(0), yNormal(0), scale, 8*scale, zPos+2, (float) playerScale);
             }
 
             if (textEnabled)
