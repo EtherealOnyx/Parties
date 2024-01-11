@@ -26,7 +26,7 @@ public class TANEventHandler {
                 if ((trackers = ServerPlayerData.playerTrackers.get(e.player.getUUID())) != null) {
                     UUID player;
                     //Thirst
-                    ServerPlayerData.playerList.get(player = e.player.getUUID()).setThirst(TANCompatManager.getHandler().getPlayerThirst(e.player), thirst -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendThirstUpdate(id, player, thirst)));
+                    ServerPlayerData.playerList.get(player = e.player.getUUID()).setThirst(TANCompatManager.getHandler().getThirst(e.player), thirst -> trackers.forEach((id, serverTracked) -> InfoPacketHelper.sendThirstUpdate(id, player, thirst)));
                 }
             }
             if (e.player.tickCount % playerSlowUpdateInterval.get() == 9) {

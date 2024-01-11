@@ -14,6 +14,7 @@ import io.sedu.mc.parties.api.mod.openpac.IPACHandler;
 import io.sedu.mc.parties.api.mod.origins.IOHandler;
 import io.sedu.mc.parties.api.mod.playerrevive.IPRHandler;
 import io.sedu.mc.parties.api.mod.spellsandshields.ISSHandler;
+import io.sedu.mc.parties.api.mod.tfc.ITFCHandler;
 import io.sedu.mc.parties.api.mod.thirstmod.ITMHandler;
 import io.sedu.mc.parties.api.mod.toughasnails.ITANHandler;
 import io.sedu.mc.parties.util.TriConsumer;
@@ -25,7 +26,7 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class FakeHandler implements IANHandler, ICSHandler, IDSHandler, IEFHandler, IFHandler, IHRHandler, IHHandler, IIHandler, IISSHandler, IPACHandler, IOHandler, IPRHandler, ISSHandler, ITMHandler, ITANHandler {
+public class FakeHandler implements IANHandler, ICSHandler, IDSHandler, IEFHandler, IFHandler, IHRHandler, IHHandler, IIHandler, IISSHandler, IPACHandler, IOHandler, IPRHandler, ISSHandler, ITMHandler, ITANHandler, ITFCHandler {
     public static final FakeHandler INST = new FakeHandler();
 
     @Override
@@ -289,7 +290,7 @@ public class FakeHandler implements IANHandler, ICSHandler, IDSHandler, IEFHandl
     }
 
     @Override
-    public int getPlayerThirst(Player player) {
+    public float getThirstTFC(Player player) {
         return 0;
     }
 

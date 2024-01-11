@@ -10,7 +10,7 @@ public interface ITANHandler {
 
     int getPlayerTemp(Player player);
 
-    int getPlayerThirst(Player player);
+    int getThirst(Player player);
 
     boolean tempExists();
 

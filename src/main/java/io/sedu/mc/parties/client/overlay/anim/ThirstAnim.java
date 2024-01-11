@@ -1,5 +1,6 @@
 package io.sedu.mc.parties.client.overlay.anim;
 
+import io.sedu.mc.parties.api.mod.tfc.TFCCompatManager;
 import io.sedu.mc.parties.client.overlay.ClientPlayerData;
 import io.sedu.mc.parties.client.overlay.RenderItem;
 
@@ -17,6 +18,8 @@ public class ThirstAnim extends AnimBarHandler {
 
     public ThirstAnim(int length, boolean enabled) {
         super(length);
+        if (TFCCompatManager.active())
+            this.oldMax = max = 100f;
         updateText();
     }
 

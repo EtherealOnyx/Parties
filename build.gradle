@@ -192,8 +192,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
-    implementation fg.deobf("mezz.jei:jei-${jei_version}")
+    implementation fg.deobf("curse.maven:jei-238222:4593548")
 
     //PlayerRevive Mod
     compileOnly fg.deobf("curse.maven:playerrevive-266890:3759779") //impl
@@ -205,14 +204,14 @@ dependencies {
 
     //Cold Sweat
     //compileOnly fg.deobf("curse.maven:coldsweat-506194:4459981")
-    implementation fg.deobf("curse.maven:cold-sweat-506194:4770585")
+    compileOnly fg.deobf("curse.maven:cold-sweat-506194:4770585")
 
     //Tough as Nails
     compileOnly fg.deobf("curse.maven:toughasnails-246391:3804267") //impl
 
     //Ars Nouveau Support
     compileOnly fg.deobf("curse.maven:arsnoveau-401955:4052851") //impl
-    //runtimeOnly fg.deobf("curse.maven:patchouli-306770:3846086")
+    runtimeOnly fg.deobf("curse.maven:patchouli-306770:3846086")
     //runtimeOnly fg.deobf("curse.maven:curios-309927:4418032")
 
     //Customizable Player Models
@@ -255,18 +254,21 @@ dependencies {
     compileOnly fg.deobf("curse.maven:appleskin-248787:3686482")
 
     //Game Stages
-    implementation fg.deobf("curse.maven:game-stages-268655:4066389")
-    runtimeOnly fg.deobf("curse.maven:bookshelf-228525:4556713")
-    runtimeOnly fg.deobf("curse.maven:crafttweaker-239197:4611964")
+    compileOnly fg.deobf("curse.maven:game-stages-268655:4066389")
+    compileOnly fg.deobf("curse.maven:bookshelf-228525:4556713")
+    compileOnly fg.deobf("curse.maven:crafttweaker-239197:4611964")
 
     //Incapacitated
-    implementation fg.deobf("curse.maven:incapacitated-528135:4645650")
+    compileOnly fg.deobf("curse.maven:incapacitated-528135:4645650")
 
     //Thirst was Taken (Actually version 1.3.2)
-    implementation fg.deobf("local:Thirst:1.2.3")
+    compileOnly fg.deobf("local:Thirst:1.2.3")
 
     //Dietary Statistics - Local file
-    implementation fg.deobf("local:DietaryStatistics:1.0.2")
+    compileOnly fg.deobf("local:DietaryStatistics:1.0.2")
+
+    //Terra Firma Craft
+    implementation fg.deobf("curse.maven:terrafirmacraft-302973:4843196")
 }
 
 mixin {

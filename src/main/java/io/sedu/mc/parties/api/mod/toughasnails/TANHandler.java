@@ -50,7 +50,7 @@ public class TANHandler implements ITANHandler {
     }
 
     @Override
-    public int getPlayerThirst(Player player) {
+    public int getThirst(Player player) {
         return ThirstHelper.getThirst(player).getThirst();
     }
 

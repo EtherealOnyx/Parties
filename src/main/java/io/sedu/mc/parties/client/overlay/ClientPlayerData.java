@@ -4,14 +4,15 @@ package io.sedu.mc.parties.client.overlay;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import io.sedu.mc.parties.Parties;
-import io.sedu.mc.parties.api.mod.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.mod.arsnoveau.ANCompatManager;
 import io.sedu.mc.parties.api.mod.coldsweat.CSCompatManager;
 import io.sedu.mc.parties.api.mod.epicfight.EFCompatManager;
 import io.sedu.mc.parties.api.mod.feathers.FCompatManager;
+import io.sedu.mc.parties.api.mod.homeostatic.HCompatManager;
 import io.sedu.mc.parties.api.mod.ironspellbooks.ISSCompatManager;
 import io.sedu.mc.parties.api.mod.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
+import io.sedu.mc.parties.api.mod.tfc.TFCCompatManager;
 import io.sedu.mc.parties.api.mod.thirstmod.TMCompatManager;
 import io.sedu.mc.parties.api.mod.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.client.config.Config;
@@ -105,7 +106,7 @@ public class ClientPlayerData {
             data.put(EF_STAM, new StaminAnim(20, true));
         if (SSCompatManager.active())
             data.put(SSMANA, new ManaSSAnim(20, true));
-        if (TMCompatManager.active() || TANCompatManager.active() || HCompatManager.active())
+        if (TMCompatManager.active() || TANCompatManager.active() || HCompatManager.active() || TFCCompatManager.active())
             data.put(THIRST, new ThirstAnim(20, true));
 
         if (ISSCompatManager.active()) {
@@ -553,7 +554,13 @@ public class ClientPlayerData {
 
     public void updateThirstTAN() {
         if (clientPlayer != null) {
-            getThirst(thirst -> thirst.checkHealth(TANCompatManager.getHandler().getPlayerThirst(clientPlayer)));
+            getThirst(thirst -> thirst.checkHealth(TANCompatManager.getHandler().getThirst(clientPlayer)));
+        }
+    }
+
+    public void updateThirstTFC() {
+        if (clientPlayer != null) {
+            getThirst(thirst -> thirst.checkHealth(TFCCompatManager.getHandler().getThirstTFC(clientPlayer)));
         }
     }
 
@@ -760,5 +767,6 @@ public class ClientPlayerData {
     public void finishSpell() {
         getCastInfo(CastAnim::markDone);
     }
+
 
 }

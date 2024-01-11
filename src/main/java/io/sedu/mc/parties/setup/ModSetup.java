@@ -15,6 +15,7 @@ import io.sedu.mc.parties.api.mod.openpac.PACCompatManager;
 import io.sedu.mc.parties.api.mod.origins.OCompatManager;
 import io.sedu.mc.parties.api.mod.playerrevive.PRCompatManager;
 import io.sedu.mc.parties.api.mod.spellsandshields.SSCompatManager;
+import io.sedu.mc.parties.api.mod.tfc.TFCCompatManager;
 import io.sedu.mc.parties.api.mod.thirstmod.TMCompatManager;
 import io.sedu.mc.parties.api.mod.toughasnails.TANCompatManager;
 import io.sedu.mc.parties.commands.NotSelfArgument;
@@ -68,6 +69,8 @@ public class ModSetup {
         ICompatManager.init(); //Incapacitated Support
         Parties.LOGGER.debug("[Parties] Checking for Game Stages...");
         GSCompatManager.init(); //Game Stages Support
+        Parties.LOGGER.debug("[Parties] Checking for TerraFirmaCraft...");
+        TFCCompatManager.init(); //Game Stages Support
         Parties.LOGGER.info("[Parties] Mod support initialization complete!");
     }
 }
